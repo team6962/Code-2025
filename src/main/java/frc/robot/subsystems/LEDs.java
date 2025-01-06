@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.github.tommyettinger.colorful.oklab.ColorTools;
+// import com.github.tommyettinger.colorful.oklab.ColorTools;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -149,8 +149,8 @@ public class LEDs extends SubsystemBase {
 
   private static void setRainbow(int start, int stop) {
     for (int pixel = start; pixel < stop; pixel++) {
-      int[] rgb = HCLtoRGB(new double[] {(pixel / 100.0 + time * 1.0) % 1.0, 0.3, 0.6});
-      setColor(pixel, rgb);
+      // int[] rgb = HCLtoRGB(new double[] {(pixel / 100.0 + time * 1.0) % 1.0, 0.3, 0.6});
+      // setColor(pixel, rgb);
     }
   }
 
@@ -281,8 +281,8 @@ public class LEDs extends SubsystemBase {
     setColor(0, length, new int[] {0, 0, 0});
   }
 
-  private static int[] HCLtoRGB(double[] HCL) {
-    float OKLAB = ColorTools.oklabByHCL((float) HCL[0], (float) HCL[1], (float) HCL[2], (float) 1.0);
-    return new int[] {ColorTools.redInt(OKLAB), ColorTools.greenInt(OKLAB), ColorTools.blueInt(OKLAB)};
-  }
+  // private static int[] HCLtoRGB(double[] HCL) {
+  //   float OKLAB = ColorTools.oklabByHCL((float) HCL[0], (float) HCL[1], (float) HCL[2], (float) 1.0);
+  //   return new int[] {ColorTools.redInt(OKLAB), ColorTools.greenInt(OKLAB), ColorTools.blueInt(OKLAB)};
+  // }
 }

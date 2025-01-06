@@ -13,11 +13,14 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +29,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -46,10 +50,10 @@ import frc.robot.util.software.Logging.Logger;
 import frc.robot.util.software.Logging.StatusChecks;
 
 public class SwerveModule extends SubsystemBase {
-  private CANSparkMax driveMotor, steerMotor;
+  private SparkMax driveMotor, steerMotor;
   private RelativeEncoder driveEncoder, steerEncoder;
   private CANcoder absoluteSteerEncoder;
-  private SparkPIDController drivePID, steerPID;
+  private SparkClosedLoopController drivePID, steerPID;
   private SwerveModuleState targetState = new SwerveModuleState();
   private String name;
   private int corner;
@@ -70,13 +74,13 @@ public class SwerveModule extends SubsystemBase {
     this.corner = corner;
     this.name = name;
 
-    driveMotor           = new CANSparkMax(config.CAN_DRIVE(), MotorType.kBrushless);
-    steerMotor           = new CANSparkMax(config.CAN_STEER(), MotorType.kBrushless);
+    driveMotor           = new SparkMax(config.CAN_DRIVE(), MotorType.kBrushless);
+    steerMotor           = new SparkMax(config.CAN_STEER(), MotorType.kBrushless);
     absoluteSteerEncoder = new CANcoder(config.CAN_ENCODER());
     steerEncoder         = steerMotor.getEncoder();
     driveEncoder         = driveMotor.getEncoder();
-    drivePID             = driveMotor.getPIDController();
-    steerPID             = steerMotor.getPIDController();
+    drivePID             = driveMotor.getClosedLoopController();
+    steerPID             = steerMotor.getClosedLoopController();
 
     double encoderOffset = config.ENCODER_OFFSET();
     switch (corner) {
@@ -99,23 +103,26 @@ public class SwerveModule extends SubsystemBase {
     encoderOffset = (encoderOffset > 1.0) ? encoderOffset - 2.0 : (encoderOffset < -1.0) ? encoderOffset + 2.0 : encoderOffset;
 
     MagnetSensorConfigs magConfig = new MagnetSensorConfigs();
-    magConfig.withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf);
+    // magConfig.withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf);
     magConfig.withMagnetOffset(encoderOffset);
     BaseStatusSignal.setUpdateFrequencyForAll(50, absoluteSteerEncoder.getAbsolutePosition(), absoluteSteerEncoder.getFaultField(), absoluteSteerEncoder.getVersion());
     absoluteSteerEncoder.optimizeBusUtilization();
 
-    SparkMaxUtil.configureAndLog(this, driveMotor, false, CANSparkMax.IdleMode.kBrake, PHYSICS.SLIPLESS_CURRENT_LIMIT, PHYSICS.SLIPLESS_CURRENT_LIMIT);
-    SparkMaxUtil.configureAndLog(this, steerMotor, true, CANSparkMax.IdleMode.kCoast);
-    SparkMaxUtil.configureEncoder(driveMotor, SWERVE_DRIVE.DRIVE_ENCODER_CONVERSION_FACTOR);
-    SparkMaxUtil.configureEncoder(steerMotor, SWERVE_DRIVE.STEER_ENCODER_CONVERSION_FACTOR);
-    SparkMaxUtil.configurePID(this, driveMotor, DRIVE_MOTOR_PROFILE.kP, DRIVE_MOTOR_PROFILE.kI, DRIVE_MOTOR_PROFILE.kD, 0.0, false);
-    SparkMaxUtil.configurePID(this, steerMotor, STEER_MOTOR_PROFILE.kP, STEER_MOTOR_PROFILE.kI, STEER_MOTOR_PROFILE.kD, 0.0, true);
+    SparkMaxConfig driveMotorConfig = new SparkMaxConfig();
+    SparkMaxConfig steerMotorConfig = new SparkMaxConfig();
+
+    SparkMaxUtil.configureAndLog(this, driveMotor, driveMotorConfig, false, IdleMode.kBrake, PHYSICS.SLIPLESS_CURRENT_LIMIT, PHYSICS.SLIPLESS_CURRENT_LIMIT);
+    SparkMaxUtil.configureAndLog(this, steerMotor, steerMotorConfig, true, IdleMode.kCoast);
+    SparkMaxUtil.configureEncoder(driveMotorConfig, SWERVE_DRIVE.DRIVE_ENCODER_CONVERSION_FACTOR);
+    SparkMaxUtil.configureEncoder(steerMotorConfig, SWERVE_DRIVE.STEER_ENCODER_CONVERSION_FACTOR);
+    SparkMaxUtil.configurePID(this, driveMotorConfig, DRIVE_MOTOR_PROFILE.kP, DRIVE_MOTOR_PROFILE.kI, DRIVE_MOTOR_PROFILE.kD, 0.0, false);
+    SparkMaxUtil.configurePID(this, steerMotorConfig, STEER_MOTOR_PROFILE.kP, STEER_MOTOR_PROFILE.kI, STEER_MOTOR_PROFILE.kD, 0.0, true);
     
     // driveMotor.setClosedLoopRampRate(SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY / SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION);
     // driveMotor.setOpenLoopRampRate(SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY / SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION);
     
-    SparkMaxUtil.save(driveMotor);
-    SparkMaxUtil.save(steerMotor);
+    SparkMaxUtil.save(driveMotor, driveMotorConfig);
+    SparkMaxUtil.save(steerMotor, steerMotorConfig);
     
     SparkMaxUtil.configureCANStatusFrames(driveMotor, true, true);
     SparkMaxUtil.configureCANStatusFrames(steerMotor, false, true);
@@ -133,7 +140,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void periodic() {
     relativeSteerDirection = Rotation2d.fromRadians(steerEncoder.getPosition());
-    absoluteSteerDirection = Rotation2d.fromRotations(absoluteSteerEncoder.getAbsolutePosition().getValue());
+    absoluteSteerDirection = (Rotation2d)(absoluteSteerEncoder.getAbsolutePosition().getValue());
     driveVelocity = driveEncoder.getVelocity();
     drivePosition = driveEncoder.getPosition();
 
@@ -156,14 +163,14 @@ public class SwerveModule extends SubsystemBase {
     
     drivePID.setReference(
       speedMetersPerSecond,
-      CANSparkMax.ControlType.kVelocity,
-      0,
+      ControlType.kVelocity,
+      ClosedLoopSlot.kSlot0,
       driveFF.calculate(speedMetersPerSecond)
     );
 
     steerPID.setReference(
       radians,
-      CANSparkMax.ControlType.kPosition
+      ControlType.kPosition
     );
 
     if (state.speedMetersPerSecond == 0 && Math.abs(getRelativeSteerDirection().minus(getAbsoluteSteerDirection()).getDegrees()) > 0.5) {

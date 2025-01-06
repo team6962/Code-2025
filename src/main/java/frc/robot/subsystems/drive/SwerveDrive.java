@@ -9,14 +9,16 @@ import java.util.function.Supplier;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
-import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -28,7 +30,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -52,7 +53,6 @@ import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.Field;
-import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.vision.AprilTags;
@@ -99,7 +99,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private SWERVE_DRIVE.MODULE_CONFIG[] equippedModules;
 
-  private SwerveDriveWheelPositions previousWheelPositions;
+  private SwerveModulePosition[] previousWheelPositions;
   private Translation2d linearAcceleration;
 
   public SwerveDrive() {
@@ -131,7 +131,7 @@ public class SwerveDrive extends SubsystemBase {
       VecBuilder.fill(1.0, 1.0, Units.degreesToRadians(30))
     );
 
-    previousWheelPositions = new SwerveDriveWheelPositions(getModulePositions());
+    previousWheelPositions = getModulePositions();
 
     alignmentController.enableContinuousInput(-Math.PI, Math.PI);
     alignmentController.setTolerance(SWERVE_DRIVE.ABSOLUTE_ROTATION_GAINS.TOLERANCE.getRadians());
@@ -139,7 +139,7 @@ public class SwerveDrive extends SubsystemBase {
     
     // If possible, connect to the gyroscope
     try {
-      gyro = new AHRS(SPI.Port.kMXP);
+      gyro = new AHRS(NavXComType.kMXP_SPI);
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), false);
     }
@@ -171,22 +171,39 @@ public class SwerveDrive extends SubsystemBase {
     Logger.autoLog(this, "gyroIsConnected", () -> gyro.isConnected());
     Logger.autoLog(this, "gyroRawDegrees", () -> gyro.getRotation2d().getDegrees());
     StatusChecks.addCheck(this, "isGyroConnected", gyro::isConnected);
+    
 
-    AutoBuilder.configureHolonomic(
-      this::getPose, // Robot pose supplier
-      this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-      this::getMeasuredChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-      new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-        new PIDConstants(SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kP, SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kI, SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kD), // Translation PID constants
-        new PIDConstants(SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kP, SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kI, SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kD), // Rotation PID constants
-        SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY, // Max module speed, in m/s
-        SWERVE_DRIVE.PHYSICS.DRIVE_RADIUS, // Drive base radius in meters. Distance from robot center to furthest module.
-        new ReplanningConfig(true, true) // Default path replanning config. See the API for the options here
-      ),
-      this::shouldFlipPaths,
-      this // Reference to this subsystem to set requirements
+    RobotConfig config;
+
+    AutoBuilder.configure(
+          this::getPose, // Robot pose supplier
+          this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+          this::getMeasuredChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+          (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                  new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                  new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+          ),
+          config, // The robot configuration
+          this::shouldFlipPaths,
+          this // Reference to this subsystem to set requirements
     );
+
+    // AutoBuilder.configureHolonomic(
+    //   this::getPose, // Robot pose supplier
+    //   this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+    //   this::getMeasuredChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //   this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    //   new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+    //     new PIDConstants(SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kP, SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kI, SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kD), // Translation PID constants
+    //     new PIDConstants(SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kP, SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kI, SWERVE_DRIVE.AUTONOMOUS.   ROTATION_GAINS.kD), // Rotation PID constants
+    //     SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY, // Max module speed, in m/s
+    //     SWERVE_DRIVE.PHYSICS.DRIVE_RADIUS, // Drive base radius in meters. Distance from robot center to furthest module.
+    //     new ReplanningConfig(true, true) // Default path replanning config. See the API for the options here
+    //   ),
+    //   this::shouldFlipPaths,
+    //   this // Reference to this subsystem to set requirements
+    // );
     // Logging callback for target robot pose
     PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
         // Do whatever you want with the pose here
@@ -300,7 +317,7 @@ public class SwerveDrive extends SubsystemBase {
   public void updateOdometry() {
     Pose2d poseBefore = getPose();
 
-    SwerveDriveWheelPositions wheelPositions = new SwerveDriveWheelPositions(getModulePositions());
+    SwerveModulePosition[] wheelPositions = getModulePositions();
     Twist2d twist = kinematics.toTwist2d(previousWheelPositions, wheelPositions);
     Pose2d newPose = getPose().exp(twist);
 
@@ -327,7 +344,7 @@ public class SwerveDrive extends SubsystemBase {
       resetPose(gyroHeading.plus(gyroOffset), poseBefore, previousWheelPositions);
     }
     
-    previousWheelPositions = wheelPositions.copy();
+    previousWheelPositions = wheelPositions.clone();
   }
 
   @Override
@@ -376,7 +393,7 @@ public class SwerveDrive extends SubsystemBase {
   private void driveAttainableSpeeds(ChassisSpeeds fieldRelativeSpeeds) {
     isDriven = true;
 
-    if (!(RobotState.isAutonomous() && !Autonomous.avoidPillars)) {
+    if (!(RobotState.isAutonomous())) { //&& !Autonomous.avoidPillars
       Translation2d velocity = XBoxSwerve.avoidObstacles(new Translation2d(
         fieldRelativeSpeeds.vxMetersPerSecond,
         fieldRelativeSpeeds.vyMetersPerSecond
@@ -577,7 +594,7 @@ public class SwerveDrive extends SubsystemBase {
    * Resets the odometer position to a given position
    * @param pose Position to reset the odometer to
    */
-  public void resetPose(Rotation2d heading, Pose2d pose, SwerveDriveWheelPositions wheelPositions) {
+  public void resetPose(Rotation2d heading, Pose2d pose, SwerveModulePosition[] wheelPositions) {
     poseEstimator.resetPosition(heading, wheelPositions, pose);
     alignmentController.setSetpoint(getHeading().getRadians());
   }

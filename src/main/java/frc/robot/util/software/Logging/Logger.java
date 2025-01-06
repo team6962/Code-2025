@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.studica.frc.AHRS;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.can.CANStatus;
@@ -85,7 +85,7 @@ public final class Logger {
   }
 
   public static void log(String key, Object obj) {
-    if (obj instanceof CANSparkMax) log(key, (CANSparkMax) obj);
+    if (obj instanceof SparkMax) log(key, (SparkMax) obj);
     else if (obj instanceof RelativeEncoder) log(key, (RelativeEncoder) obj);
     else if (obj instanceof AHRS) log(key, (AHRS) obj);
     else if (obj instanceof Pose2d) log(key, (Pose2d) obj);

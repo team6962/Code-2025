@@ -1,6 +1,6 @@
 package frc.robot.util.hardware;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,13 +14,13 @@ public class NoteDetector extends SubsystemBase {
   MedianFilter filter = new MedianFilter(filterSize);
   double delay = NEO.SAFE_RAMP_RATE * 1.0;
   double delayCounter = 0.0;
-  CANSparkMax motor;
+  SparkMax motor;
   double gearing = 0.0;
   double filteredTorque;
   double freeTorque;
   boolean isNeo550 = false;
 
-  public NoteDetector(CANSparkMax motor, double gearing, double freeTorque, boolean isNeo550) {
+  public NoteDetector(SparkMax motor, double gearing, double freeTorque, boolean isNeo550) {
     this.motor = motor;
     this.gearing = gearing;
     this.freeTorque = freeTorque;

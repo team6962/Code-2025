@@ -1,8 +1,11 @@
 package frc.robot.util.hardware.MotionControl;
 
-import com.revrobotics.CANSparkMax;
+
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -28,10 +31,9 @@ public class PivotController {
   // State setpointState;
   private double kS = 0.0;
   // Onboard spark max PID controller. Runs at 1kHz
-  // private SparkPIDController pid;
-  private SparkPIDController pid;
+  private SparkClosedLoopController pid;
   // CAN Spark Max motor controller;
-  private CANSparkMax motor;
+  private SparkMax motor;
   // Built-in relative NEO encoder
   private RelativeEncoder encoder;
   // Rev absolute through-bore encoder
@@ -54,13 +56,12 @@ public class PivotController {
   private PIDController simPID;
 
 
-  public PivotController(SubsystemBase subsystem, CANSparkMax motor, int absoluteEncoderDIO, double absolutePositionOffset, double kP, double kS, double gearing, Rotation2d minAngle, Rotation2d maxAngle, Rotation2d tolerance, boolean reversed) {
+  public PivotController(SubsystemBase subsystem, SparkMax motor, int absoluteEncoderDIO, double absolutePositionOffset, double kP, double kS, double gearing, Rotation2d minAngle, Rotation2d maxAngle, Rotation2d tolerance, boolean reversed) {
     // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
     // profile = new TrapezoidProfile(
     //   new Constraints(maxVelocity, maxAcceleration)
     // );
     this.kS = kS;
-    pid = motor.getPIDController();
     encoder = motor.getEncoder();
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO);
 
@@ -72,14 +73,14 @@ public class PivotController {
     this.reversed = reversed;
     this.subsystem = subsystem;
     encoderOffset = absolutePositionOffset;
-
+    absoluteEncoder.get
     SparkMaxUtil.configureEncoder(motor, 2.0 * Math.PI / gearing);
     SparkMaxUtil.configurePID(subsystem, motor, kP, 0.0, 0.0, 0.0, false);
     
     Logger.autoLog(subsystem, "targetPosition",                   () -> getTargetAngle().getRadians());
     Logger.autoLog(subsystem, "position",                         () -> getPosition().getRadians());
     Logger.autoLog(subsystem, "relativePosition",                 () -> encoder.getPosition());
-    Logger.autoLog(subsystem, "rawAbsolutePosition",              () -> absoluteEncoder.getAbsolutePosition() * 360);
+    Logger.autoLog(subsystem, "rawAbsolutePosition",              () -> absoluteEncoder.get* 360);
     Logger.autoLog(subsystem, "doneMoving",                       () -> doneMoving());
 
     StatusChecks.addCheck(subsystem, "absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
@@ -132,8 +133,8 @@ public class PivotController {
     // Set onboard PID controller to follow
     pid.setReference(
       achievableAngle.getRadians(),
-      CANSparkMax.ControlType.kPosition,
-      0,
+      ControlType.kPosition,
+      ClosedLoopSlot.kSlot0,
       kS * Math.signum(achievableAngle.getRadians() - getPosition().getRadians())
     );
 
@@ -193,7 +194,7 @@ public class PivotController {
     // ((0.26934 + x) * -1)
 
     // Map absolute encoder position from 0 - 1 rotations to -pi - pi radians, where 0 is straight out
-    double absoluteAngle = (absoluteEncoder.getAbsolutePosition() + encoderOffset) * factor;
+    double absoluteAngle = (absoluteEncoder.get + encoderOffset) * factor;
     while (absoluteAngle < 0) absoluteAngle++;
     absoluteAngle %= 1.0;
     

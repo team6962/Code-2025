@@ -13,20 +13,15 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.WheelRadiusCalibration;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
-import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.subsystems.hang.Hang;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.vision.AprilTags;
 import frc.robot.util.software.Dashboard.AutonChooser;
 import frc.robot.util.software.Logging.Logger;
@@ -44,12 +39,6 @@ public class RobotContainer {
 
   // The robot's subsystems and commands
   private final SwerveDrive swerveDrive;
-  
-  private final Shooter shooter;
-  private final Transfer transfer;
-  private final Amp amp;
-  private final Hang hang;
-  private final Intake intake;
   private final RobotStateController stateController;
   private final LEDs ledStrip;
   // private final CollisionDetector collisionDetector;
@@ -80,26 +69,14 @@ public class RobotContainer {
     StatusChecks.addCheck(new SubsystemBase() {}, "5V Enabled", () -> RobotController.getEnabled5V());
     StatusChecks.addCheck(new SubsystemBase() {}, "6V Enabled", () -> RobotController.getEnabled6V());
     StatusChecks.addCheck(new SubsystemBase() {}, "Sys Time Valid", () -> RobotController.isSystemTimeValid());
-    StatusChecks.addCheck(new SubsystemBase() {}, "Amp Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_AMP);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Dashboard Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_DASHBOARD);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Drive Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_DRIVE);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Hang Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_HANG);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Intake Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_INTAKE);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Shooter Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_SHOOTER);
-    StatusChecks.addCheck(new SubsystemBase() {}, "Transfer Enabled", () -> Constants.ENABLED_SYSTEMS.ENABLE_TRANSFER);
 
     swerveDrive = new SwerveDrive();
-    shooter = new Shooter(swerveDrive);
-    transfer = new Transfer();
-    amp = new Amp();
-    intake = new Intake();
-    stateController = new RobotStateController(amp, swerveDrive, shooter, transfer, intake);
-    hang = new Hang();
+    stateController = new RobotStateController(swerveDrive);
     ledStrip = new LEDs(stateController);
     // collisionDetector = new CollisionDetector();
     
     // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, transfer, transfer.getInWheels(), transfer.getOutWheels(), shooter, shooter.getWheels(), shooter.getPivot(), amp, amp.getPivot(), amp.getWheels(), hang);
+    Controls.configureBindings(stateController, swerveDrive);
 
     SwerveDrive.printChoreoConfig();
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
@@ -108,7 +85,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, AutonChooser.getNotes());
+    // return new Autonomous(stateController, swerveDrive, AutonChooser.getNotes());
+    return Commands.run(() -> {});
   }
 
   public static double getVoltage() {
