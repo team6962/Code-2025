@@ -140,7 +140,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void periodic() {
     relativeSteerDirection = Rotation2d.fromRadians(steerEncoder.getPosition());
-    absoluteSteerDirection = (Rotation2d)(absoluteSteerEncoder.getAbsolutePosition().getValue());
+    absoluteSteerDirection = new Rotation2d(absoluteSteerEncoder.getAbsolutePosition().getValue());
     driveVelocity = driveEncoder.getVelocity();
     drivePosition = driveEncoder.getPosition();
 

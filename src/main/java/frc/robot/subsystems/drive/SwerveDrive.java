@@ -176,36 +176,36 @@ public class SwerveDrive extends SubsystemBase {
     StatusChecks.addCheck(this, "isGyroConnected", gyro::isConnected);
     
 
-    ModuleConfig moduleConfig = new ModuleConfig(
-      SWERVE_DRIVE.WHEEL_RADIUS,
-      SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
-      SWERVE_DRIVE.FRICTION_COEFFICIENT,
-      null,
-      SWERVE_DRIVE.DRIVE_MOTOR_GEARING,
-      SWERVE_DRIVE.MAX_CURRENT_DRAW,
-      4);
+    // ModuleConfig moduleConfig = new ModuleConfig(
+    //   SWERVE_DRIVE.WHEEL_RADIUS,
+    //   SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
+    //   SWERVE_DRIVE.FRICTION_COEFFICIENT,
+    //   ,
+    //   SWERVE_DRIVE.DRIVE_MOTOR_GEARING,
+    //   SWERVE_DRIVE.MAX_CURRENT_DRAW,
+    //   4);
 
-    RobotConfig robotConfig = new RobotConfig(
-      SWERVE_DRIVE.ROBOT_MASS,
-      SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA,
-      moduleConfig,
-      new Translation2d[] {
-      }
-    );
+    // RobotConfig robotConfig = new RobotConfig(
+    //   SWERVE_DRIVE.ROBOT_MASS,
+    //   SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA,
+    //   moduleConfig,
+    //   new Translation2d[] {
+    //   }
+    // );
 
-    AutoBuilder.configure(
-          this::getPose, // Robot pose supplier
-          this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-          this::getMeasuredChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-          (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                  new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                  new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-          ),
-          robotConfig, // The robot configuration
-          this::shouldFlipPaths,
-          this // Reference to this subsystem to set requirements
-    );
+    // AutoBuilder.configure(
+    //       this::getPose, // Robot pose supplier
+    //       this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+    //       this::getMeasuredChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //       (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+    //       new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+    //               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+    //               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+    //       ),
+    //       robotConfig, // The robot configuration
+    //       this::shouldFlipPaths,
+    //       this // Reference to this subsystem to set requirements
+    // );
 
     // AutoBuilder.configureHolonomic(
     //   this::getPose, // Robot pose supplier
