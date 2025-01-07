@@ -7,22 +7,24 @@ package frc.robot.subsystems.drive;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import choreo.Choreo;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,7 +36,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
@@ -57,7 +61,6 @@ import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.vision.AprilTags;
 import frc.robot.subsystems.vision.Notes;
-import frc.robot.util.software.CustomSwerveDrivePoseEstimator;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.Logging.Logger;
 import frc.robot.util.software.Logging.StatusChecks;
@@ -71,7 +74,7 @@ public class SwerveDrive extends SubsystemBase {
   private static AHRS gyro;
 
   private SwerveDriveKinematics kinematics = getKinematics();
-  private CustomSwerveDrivePoseEstimator poseEstimator;
+  private SwerveDrivePoseEstimator poseEstimator;
   private static Field2d field = new Field2d();
   private Rotation2d gyroHeading = Rotation2d.fromDegrees(0.0);
   private Rotation2d gyroOffset = SWERVE_DRIVE.STARTING_POSE.get().getRotation();
@@ -122,7 +125,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     // Set up pose estimator and rotation controller
-    poseEstimator = new CustomSwerveDrivePoseEstimator(
+    poseEstimator = new SwerveDrivePoseEstimator(
       kinematics,
       SWERVE_DRIVE.STARTING_POSE.get().getRotation(),
       getModulePositions(),
@@ -173,7 +176,22 @@ public class SwerveDrive extends SubsystemBase {
     StatusChecks.addCheck(this, "isGyroConnected", gyro::isConnected);
     
 
-    RobotConfig config;
+    ModuleConfig moduleConfig = new ModuleConfig(
+      SWERVE_DRIVE.WHEEL_RADIUS,
+      SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
+      SWERVE_DRIVE.FRICTION_COEFFICIENT,
+      null,
+      SWERVE_DRIVE.DRIVE_MOTOR_GEARING,
+      SWERVE_DRIVE.MAX_CURRENT_DRAW,
+      4);
+
+    RobotConfig robotConfig = new RobotConfig(
+      SWERVE_DRIVE.ROBOT_MASS,
+      SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA,
+      moduleConfig,
+      new Translation2d[] {
+      }
+    );
 
     AutoBuilder.configure(
           this::getPose, // Robot pose supplier
@@ -184,7 +202,7 @@ public class SwerveDrive extends SubsystemBase {
                   new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                   new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
           ),
-          config, // The robot configuration
+          robotConfig, // The robot configuration
           this::shouldFlipPaths,
           this // Reference to this subsystem to set requirements
     );
@@ -755,7 +773,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public Pose2d getPose(double timestampSeconds) {
-    Pose2d estimatedPose = poseEstimator.getEstimatedPosition(timestampSeconds);
+    Pose2d estimatedPose = poseEstimator.sampleAt(timestampSeconds).get();
     return estimatedPose;
   }
 
@@ -858,129 +876,27 @@ public class SwerveDrive extends SubsystemBase {
     );
   }
 
-  /**
-   * Follow a choreo trajectory
-   * @param pathName Name of the path to follow
-   * @param first Whether or not this is the first command in autonomous mode
-   * @return A command to run
-   */
-  public Command followChoreoTrajectory(String pathName, boolean first) {
-
-    ChoreoTrajectory trajectory = Choreo.getTrajectory(pathName);
-
-    field.getObject("traj").setPoses(
-      trajectory.getInitialPose(), trajectory.getFinalPose()
-    );
-    field.getObject("trajPoses").setPoses(
-      trajectory.getPoses()
-    );
-
-    Command swerveCommand = Choreo.choreoSwerveCommand(
-        // Choreo trajectory to follow
-        trajectory,
-
-        // A supplier that returns the current field-relative pose of the robot based on the wheel
-        // and vision odometry
-        this::getPose,
-
-        // PIDControllers for correcting errors in field-relative translation (input: X or Y error in
-        // meters, output: m/s).
-        new PIDController(
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kP,
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kI, 
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kD
-        ),
-        new PIDController(
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kP,
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kI, 
-          SWERVE_DRIVE.AUTONOMOUS.TRANSLATION_GAINS.kD
-        ),
-
-        // PIDController to correct for rotation error (input: heading error in radians, output: rad/s)
-        new PIDController(
-          SWERVE_DRIVE.AUTONOMOUS.ROTATION_GAINS.kP,
-          SWERVE_DRIVE.AUTONOMOUS.ROTATION_GAINS.kI,
-          SWERVE_DRIVE.AUTONOMOUS.ROTATION_GAINS.kD
-        ),
-
-        // A consumer which drives the robot in robot-relative coordinates
-        this::driveRobotRelative,
-        
-        // A supplier which returns whether or not to mirror the path based on alliance (this assumes
-        // the path is created for the blue alliance)
-        () -> false,
-
-        // The subsystem(s) to require, typically your drive subsystem only
-        this
-    );
-    
-    if (first) {
-      return Commands.sequence(
-        Commands.runOnce(() -> System.out.println("===== STARTING AUTO =====")),
-        Commands.runOnce(() -> this.resetPose(trajectory.getInitialPose())),
-        swerveCommand
-      );
-    } else {
-      return Commands.sequence(
-        Commands.runOnce(() -> System.out.println("===== STARTING AUTO =====")),
-        swerveCommand
-      );
-    }
-  }
-
-  /**
-   * Go to a position on the field
-   * @param goalPosition Field-relative position on the field to go to
-   * @param orientation Field-relative orientation to rotate to
-   * @return A command to run
-   */
-  // public Command goTo(Pose2d pose) {
-  //   return pathfindThenFollowPath(
-  //     new Pose2d(new Translation2d(-1.0, 0).rotateBy(pose.getTranslation().minus(getPose().getTranslation()).getAngle()).plus(pose.getTranslation()), pose.getRotation()),
-  //     pose
-  //   );
-
-  //   // Command pathfindingCommand = goToSimple(pose);
-
-  //   // if (pose.getTranslation().getDistance(getPose().getTranslation()) > 1.0) {
-  //   //   // Since AutoBuilder is configured, we can use it to build pathfinding commands
-  //   //   pathfindingCommand = AutoBuilder.path(
-  //   //     pose,
-  //   //     SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS,
-  //   //     0.0, // Goal end velocity in meters/sec
-  //   //     0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  //   //   ).andThen(goToSimple(pose));
-  //   // }
-
-  //   // if (RobotState.isAutonomous()) {
-  //   //   return pathfindingCommand;
-  //   // } else {
-  //   //   return pathfindingCommand.andThen(Commands.runOnce(() -> setTargetHeading(pose.getRotation())));
-  //   // }
-  // }
-
   public Command pathfindThenFollowPath(Pose2d firstPoint, Pose2d secondPoint) {
     Rotation2d angle = secondPoint.getTranslation().minus(firstPoint.getTranslation()).getAngle();
 
-    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+    List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(
       new Pose2d(firstPoint.getTranslation(), angle),
       new Pose2d(secondPoint.getTranslation(), angle)
     );
 
     PathPlannerPath path = new PathPlannerPath(
       bezierPoints,
-      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS,
+      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS, 
+      null, 
       new GoalEndState(
         0.0,
-        secondPoint.getRotation(),
-        true
+        secondPoint.getRotation()
       )
     );
     
     return AutoBuilder.pathfindThenFollowPath(
       path,
-      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS,
-      0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS
     );
   }
 
@@ -993,18 +909,18 @@ public class SwerveDrive extends SubsystemBase {
   public Command goToSimple(Pose2d pose) {
     Rotation2d angle = pose.getTranslation().minus(getPose().getTranslation()).getAngle();
 
-    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
       new Pose2d(getPose().getTranslation(), angle),
       new Pose2d(pose.getTranslation(), angle)
     );
 
     PathPlannerPath path = new PathPlannerPath(
-      bezierPoints,
-      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS,
+      waypoints,
+      SWERVE_DRIVE.AUTONOMOUS.DEFAULT_PATH_CONSTRAINTS, 
+      null, 
       new GoalEndState(
         0.0,
-        pose.getRotation(),
-        true
+        pose.getRotation()
       )
     );
 

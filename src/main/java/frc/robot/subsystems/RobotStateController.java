@@ -46,9 +46,12 @@ public class RobotStateController extends SubsystemBase {
    * @param state
    * @return
    */
-
   public Command setState(State state) {
     return new Command() {};
+  }
+
+  public Translation2d getFieldVelocity() {
+    return swerveDrive.getFieldVelocity();
   }
   
   @Override

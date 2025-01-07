@@ -6,6 +6,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -64,6 +65,7 @@ public class PivotController {
     this.kS = kS;
     encoder = motor.getEncoder();
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO);
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
 
     this.motor = motor;
     this.minAngle = minAngle;
@@ -73,18 +75,17 @@ public class PivotController {
     this.reversed = reversed;
     this.subsystem = subsystem;
     encoderOffset = absolutePositionOffset;
-    absoluteEncoder.get
-    SparkMaxUtil.configureEncoder(motor, 2.0 * Math.PI / gearing);
-    SparkMaxUtil.configurePID(subsystem, motor, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
+    SparkMaxUtil.configurePID(subsystem, motorConfig, kP, 0.0, 0.0, 0.0, false);
     
     Logger.autoLog(subsystem, "targetPosition",                   () -> getTargetAngle().getRadians());
     Logger.autoLog(subsystem, "position",                         () -> getPosition().getRadians());
     Logger.autoLog(subsystem, "relativePosition",                 () -> encoder.getPosition());
-    Logger.autoLog(subsystem, "rawAbsolutePosition",              () -> absoluteEncoder.get* 360);
+    Logger.autoLog(subsystem, "rawAbsolutePosition",              () -> absoluteEncoder.get() * 360);
     Logger.autoLog(subsystem, "doneMoving",                       () -> doneMoving());
 
     StatusChecks.addCheck(subsystem, "absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
-    StatusChecks.addCheck(subsystem, "absoluteEncoderUpdated",   () -> absoluteEncoder.getAbsolutePosition() != 0.0);
+    StatusChecks.addCheck(subsystem, "absoluteEncoderUpdated",   () -> absoluteEncoder.get() != 0.0);
 
     sim = new SingleJointedArmSim(
       DCMotor.getNEO(1),
@@ -194,7 +195,7 @@ public class PivotController {
     // ((0.26934 + x) * -1)
 
     // Map absolute encoder position from 0 - 1 rotations to -pi - pi radians, where 0 is straight out
-    double absoluteAngle = (absoluteEncoder.get + encoderOffset) * factor;
+    double absoluteAngle = (absoluteEncoder.get() + encoderOffset) * factor;
     while (absoluteAngle < 0) absoluteAngle++;
     absoluteAngle %= 1.0;
     
