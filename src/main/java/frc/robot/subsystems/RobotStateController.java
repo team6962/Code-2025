@@ -21,10 +21,6 @@ import frc.robot.util.software.Logging.StatusChecks;
 
 public class RobotStateController extends SubsystemBase {
   private SwerveDrive swerveDrive;
-  private DigitalInput beamBreakSensor;
-  private Debouncer beamBreakDebouncer = new Debouncer(0.1);
-  private Debouncer shotDebouncer = new Debouncer(0.25);
-  private boolean shootOverride = false;
   // private static ShuffleboardTab tab = Shuffleboard.getTab("Auto");
   // private static SimpleWidget hasNote = tab.add("has Note", true).withWidget(BuiltInWidgets.kToggleButton).withSize(1, 1).withPosition(0, 0);
 
@@ -34,8 +30,7 @@ public class RobotStateController extends SubsystemBase {
   }
 
   public RobotStateController(SwerveDrive swerveDrive) {
-
-    StatusChecks.addCheck(new SubsystemBase() {}, "Beam Break Sensor", () -> beamBreakSensor.get());
+    this.swerveDrive = swerveDrive;
 
     Logger.autoLog(this, "Loop Time", () -> Robot.getLoopTime());
     Logger.autoLog(this, "Compute Time", () -> Robot.getComputeTime());
