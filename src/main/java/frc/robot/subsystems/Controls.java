@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
+import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.utils.FactoryCommand;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -10,9 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
-import frc.robot.commands.drive.GoToPose;
 import frc.robot.commands.drive.XBoxSwerve;
-import frc.robot.subsystems.drive.SwerveDrive;
 
 public class Controls {
   public static final CommandXboxController operator = new CommandXboxController(DEVICES.OPERATOR_XBOX_CONTROLLER);
@@ -44,7 +45,9 @@ public class Controls {
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));    
 
     if (RobotBase.isSimulation()) {
-      driver.button(1).whileTrue(new GoToPose(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP"), swerveDrive));
+      driver.button(1).whileTrue(new FactoryCommand(() ->
+        swerveDrive.pathfindTo(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get())
+      ));
       
       // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
     }

@@ -22,6 +22,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -99,6 +101,14 @@ public class SwerveDrive extends SwerveCore {
 
     public SubsystemBase[] useMotion() {
         return new SubsystemBase[] { translationSubsystem, rotationSubsysem };
+    }
+
+    public LinearVelocity getLinearDriveVelocity(double powerFraction) {
+        return getConstants().maxDriveSpeed().times(powerFraction);
+    }
+
+    public AngularVelocity getAngularDriveVelocity(double powerFraction) {
+        return getConstants().maxRotationSpeed().times(powerFraction);
     }
 
     public Command driveModules(Supplier<SwerveModuleState[]> states) {

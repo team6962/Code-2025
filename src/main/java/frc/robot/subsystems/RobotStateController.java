@@ -1,12 +1,13 @@
 package frc.robot.subsystems;
 
+import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.drive.SwerveDrive;
 
 // This class is a subsystem that controls the state of the robot. It is used to coordinate the actions of the intake, shooter, transfer, and amp subsystems.
 
@@ -37,7 +38,7 @@ public class RobotStateController extends SubsystemBase {
   }
 
   public Translation2d getFieldVelocity() {
-    return swerveDrive.getFieldVelocity();
+    return KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds());
   }
   
   @Override

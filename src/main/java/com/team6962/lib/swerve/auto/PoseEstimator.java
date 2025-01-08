@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import com.team6962.lib.utils.KinematicsUtils;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -13,6 +15,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,8 +56,20 @@ public class PoseEstimator extends SubsystemBase {
         positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
     }
 
+    public SwerveGyroscope getGyroscope() {
+        return gyroscope;
+    }
+
     public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
         poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
+    }
+
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        Time timestamp,
+        Matrix<N3, N1> visionMeasurementStdDevs
+    ) {
+        poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
     }
 
     public void resetPosition(Pose2d expectedPose) {
@@ -73,6 +89,10 @@ public class PoseEstimator extends SubsystemBase {
         Twist2d deltaTwist = new Twist2d(chassisVelocity.dx * deltaSeconds, chassisVelocity.dy * deltaSeconds, chassisVelocity.dtheta * deltaSeconds);
 
         return currentPose.exp(deltaTwist);
+    }
+
+    public Pose2d getEstimatedPose(Time timestamp) {
+        return poseEstimator.sampleAt(timestamp.in(Seconds)).orElseGet(this::getEstimatedPose);
     }
 
     public ChassisSpeeds getEstimatedSpeeds() {

@@ -121,7 +121,7 @@ public class SwerveConfig {
         }
 
         public Distance driveRadius() {
-            return wheelBase.plus(trackWidth).divide(2);
+            return Meters.of(Math.hypot(wheelBase.in(Meters), trackWidth.in(Meters)) / 2);
         }
     }
 

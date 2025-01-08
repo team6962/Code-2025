@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.auto.PoseEstimator;
+import com.team6962.lib.swerve.auto.SwerveGyroscope;
 import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -63,9 +65,17 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         return poseEstimator;
     }
 
+    public SwerveGyroscope getGyroscope() {
+        return poseEstimator.getGyroscope();
+    }
+
     @Override
     public Pose2d getEstimatedPose() {
         return poseEstimator.getEstimatedPose();
+    }
+
+    public Pose2d getEstimatedPose(Time timestamp) {
+        return poseEstimator.getEstimatedPose(timestamp);
     }
 
     public Pose2d[] getModulePoses() {

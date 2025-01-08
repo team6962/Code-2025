@@ -89,6 +89,14 @@ public final class KinematicsUtils {
         return new SwerveDriveKinematics(modulePositionsFromChassis(chassis));
     }
 
+    public static Translation2d getTranslation(ChassisSpeeds speeds) {
+        return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    }
+
+    public static Rotation2d getRotation(ChassisSpeeds speeds) {
+        return Rotation2d.fromRadians(speeds.omegaRadiansPerSecond);
+    }
+
     public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed, AngularVelocity maxRotation) {
         LinearVelocity topSpeed = MetersPerSecond.of(0);
         AngularVelocity topRotation = RotationsPerSecond.of(0);
