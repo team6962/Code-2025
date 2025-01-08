@@ -45,6 +45,7 @@ import frc.robot.Constants.Constants.SWERVE_DRIVE.PHYSICS;
 import frc.robot.Constants.Constants.SWERVE_DRIVE.STEER_MOTOR_PROFILE;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
 import frc.robot.util.hardware.SparkMaxUtil;
+import frc.robot.util.hardware.TalonFXUtil;
 import frc.robot.util.software.MathUtils.SwerveMath;
 import frc.robot.util.software.Logging.Logger;
 import frc.robot.util.software.Logging.StatusChecks;
@@ -111,18 +112,18 @@ public class SwerveModule extends SubsystemBase {
     SparkMaxConfig driveMotorConfig = new SparkMaxConfig();
     SparkMaxConfig steerMotorConfig = new SparkMaxConfig();
 
-    SparkMaxUtil.configureAndLog(this, driveMotor, driveMotorConfig, false, IdleMode.kBrake, PHYSICS.SLIPLESS_CURRENT_LIMIT, PHYSICS.SLIPLESS_CURRENT_LIMIT);
-    SparkMaxUtil.configureAndLog(this, steerMotor, steerMotorConfig, true, IdleMode.kCoast);
+    SparkMaxUtil.configure(driveMotorConfig, false, IdleMode.kBrake, PHYSICS.SLIPLESS_CURRENT_LIMIT, PHYSICS.SLIPLESS_CURRENT_LIMIT);
+    SparkMaxUtil.configure(steerMotorConfig, true, IdleMode.kCoast);
     SparkMaxUtil.configureEncoder(driveMotorConfig, SWERVE_DRIVE.DRIVE_ENCODER_CONVERSION_FACTOR);
     SparkMaxUtil.configureEncoder(steerMotorConfig, SWERVE_DRIVE.STEER_ENCODER_CONVERSION_FACTOR);
-    SparkMaxUtil.configurePID(this, driveMotorConfig, DRIVE_MOTOR_PROFILE.kP, DRIVE_MOTOR_PROFILE.kI, DRIVE_MOTOR_PROFILE.kD, 0.0, false);
-    SparkMaxUtil.configurePID(this, steerMotorConfig, STEER_MOTOR_PROFILE.kP, STEER_MOTOR_PROFILE.kI, STEER_MOTOR_PROFILE.kD, 0.0, true);
+    SparkMaxUtil.configurePID(driveMotorConfig, DRIVE_MOTOR_PROFILE.kP, DRIVE_MOTOR_PROFILE.kI, DRIVE_MOTOR_PROFILE.kD, 0.0, false);
+    SparkMaxUtil.configurePID(steerMotorConfig, STEER_MOTOR_PROFILE.kP, STEER_MOTOR_PROFILE.kI, STEER_MOTOR_PROFILE.kD, 0.0, true);
     
     // driveMotor.setClosedLoopRampRate(SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY / SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION);
     // driveMotor.setOpenLoopRampRate(SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY / SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION);
     
-    SparkMaxUtil.save(driveMotor, driveMotorConfig);
-    SparkMaxUtil.save(steerMotor, steerMotorConfig);
+    SparkMaxUtil.saveAndLog(this, driveMotor, driveMotorConfig);
+    SparkMaxUtil.saveAndLog(this, steerMotor, steerMotorConfig);
     
     SparkMaxUtil.configureCANStatusFrames(driveMotor, true, true);
     SparkMaxUtil.configureCANStatusFrames(steerMotor, false, true);
@@ -336,6 +337,6 @@ public class SwerveModule extends SubsystemBase {
 
   private void undoCalibrationPrep() {
     isCalibrating = false;
-    SparkMaxUtil.configureCANStatusFrames(steerMotor, false, false);
+    TalonFXUtil.configureCANStatusFrames(steerMotor, false, false);
   }
 }

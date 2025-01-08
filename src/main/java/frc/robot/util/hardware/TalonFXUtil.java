@@ -1,7 +1,11 @@
 package frc.robot.util.hardware;
 import java.util.function.Supplier;
 
-
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -11,33 +15,26 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.NEO;
 import frc.robot.util.software.Logging.StatusChecks;
 
-public final class SparkMaxUtil {
-  public static void configure(SparkMaxConfig config, boolean inverted, IdleMode idleMode) {
-    configure(config, inverted, idleMode, NEO.SAFE_FREE_CURRENT, NEO.SAFE_STALL_CURRENT);
+public final class TalonFXUtil {
+  public static void configure(TalonFXConfiguration config, InvertedValue inverted, NeutralModeValue neutralMode) {
+    configure(config, inverted, neutralMode, NEO.SAFE_FREE_CURRENT, NEO.SAFE_STALL_CURRENT);
   }
 
-  public static void configure(SparkMaxConfig config, boolean inverted, IdleMode idleMode, int freeCurrentLimit, int stallCurrentLimit) {
-    config.idleMode(idleMode);
-    config.voltageCompensation(12.0);
-    config.smartCurrentLimit(stallCurrentLimit, freeCurrentLimit);
-    config.openLoopRampRate(NEO.SAFE_RAMP_RATE);
-    config.inverted(inverted);
-  }
+  public static void configure(TalonFXConfiguration config, InvertedValue inverted, NeutralModeValue neutralMode, int supplyCurrentLimit, int statorCurrentLimit) {
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
 
-  private static void configure(Supplier<REVLibError> config, SparkMax motor) {
-    for (int i = 0; i < 5; i++) {
-      if (config.get() == REVLibError.kOk) {
-        return;
-      }
-    }
-    DriverStation.reportError("Failure configuring spark max " + motor.getDeviceId() + "\n" + "Error: " + config.get().toString(), false);
-  }
+    config.MotorOutput.NeutralMode = neutralMode;
+    config.MotorOutput.Inverted = inverted;
 
-  public static void configureAndLog550(SparkMax motor, SparkMaxConfig config, boolean inverted, IdleMode idleMode) {
-    configure(config, inverted, idleMode, 10, 40);
+    // config.voltageCompensation(12.0);
+    // config.openLoopRampRate(NEO.SAFE_RAMP_RATE);
   }
 
   public static void configureCANStatusFrames(SparkMax motor, boolean velocityTemperatureVoltageCurrent, boolean position) {
@@ -56,31 +53,14 @@ public final class SparkMaxUtil {
     // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
   }
 
-  public static void configurePID(SparkMaxConfig config, double kP, double kI, double kD, double kV, boolean wrap) {
-    config.closedLoop.pidf(kP, kI, kD, kV / 12.0);
-
-
-    if (wrap) {
-      config.closedLoop.positionWrappingEnabled(true);
-      config.closedLoop.positionWrappingInputRange(-Math.PI, Math.PI);
-    }
-
-    // new TunableNumber(subsystem, "PID " + motor.getDeviceId(), pid::setP, 0.0);
-  }
-
   public static void configureEncoder(SparkMaxConfig config, double encoderConversionFactor) {
     config.encoder.positionConversionFactor(encoderConversionFactor);
     config.encoder.velocityConversionFactor(encoderConversionFactor);
   }
 
-  public static void configureFollower(SparkMaxConfig config, SparkMax leader, boolean inverted) {
-    config.follow(leader, inverted);
-  }
-
-  public static void saveAndLog(Subsystem subsystem, SparkMax motor, SparkMaxConfig config) {
-    configure(() -> motor.setCANTimeout(0), motor);
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    String logPath = "motor" + motor.getDeviceId() + "/";
+  public static void saveAndLog(Subsystem subsystem, TalonFX motor, TalonFXConfiguration config) {
+    motor.getConfigurator().apply(config);
+    String logPath = "motor" + motor.getDeviceID() + "/";
 
     // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
     // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
@@ -92,8 +72,8 @@ public final class SparkMaxUtil {
     // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
     // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
     
-    StatusChecks.addCheck(subsystem, logPath + "hasFaults", () -> motor.getFaults() == null);
-    StatusChecks.addCheck(subsystem, logPath + "isConnected", () -> motor.getFirmwareVersion() != 0);
+    StatusChecks.addCheck(subsystem, logPath + "hasFaults", () -> motor.getFaultField().getValue() == 0);
+    StatusChecks.addCheck(subsystem, logPath + "isConnected", () -> motor.isConnected());
     // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <= NEO.SAFE_TEMPERATURE);
     // configure(() -> motor.burnFlash(), motor);
   }

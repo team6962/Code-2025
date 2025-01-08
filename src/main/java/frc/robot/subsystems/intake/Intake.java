@@ -28,13 +28,13 @@ public class Intake extends SubsystemBase {
     public Intake() {
         pivotMotor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
         pivotMotorConfig = new SparkMaxConfig();
-        SparkMaxUtil.configureAndLog(this, pivotMotor, pivotMotorConfig, false, IdleMode.kBrake);
-        SparkMaxUtil.save(pivotMotor, pivotMotorConfig);
+        SparkMaxUtil.configure(pivotMotorConfig, false, IdleMode.kBrake);
+        SparkMaxUtil.saveAndLog(this, pivotMotor, pivotMotorConfig);
 
         wheelsMotor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
         wheelsMotorConfig = new SparkMaxConfig();
-        SparkMaxUtil.configureAndLog(this, wheelsMotor, wheelsMotorConfig, false, IdleMode.kBrake);
-        SparkMaxUtil.save(wheelsMotor, wheelsMotorConfig);
+        SparkMaxUtil.configure(wheelsMotorConfig, false, IdleMode.kBrake);
+        SparkMaxUtil.saveAndLog(this, wheelsMotor, wheelsMotorConfig);
     }
 
     public enum State {

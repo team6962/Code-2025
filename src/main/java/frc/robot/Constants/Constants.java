@@ -299,6 +299,24 @@ public final class Constants {
       return STATS.stallTorqueNewtonMeters / STATS.stallCurrentAmps * currentLimit;
     }
   }
+
+  public static final class KRAKEN {
+    public static final DCMotor STATS = new DCMotor(
+      12.0, 
+      7.09, 
+      366.0, 
+      2.0,
+      Units.rotationsPerMinuteToRadiansPerSecond(6000), 
+      1
+    );
+    public static final int SAFE_STALL_CURRENT = 120;
+    public static final int SAFE_FREE_CURRENT = 70;
+    public static final double SAFE_RAMP_RATE = 0.1;
+
+    public static double maxTorqueCurrentLimited(int currentLimit) {
+      return STATS.stallTorqueNewtonMeters / STATS.stallCurrentAmps * currentLimit;
+    }
+  }
   public static final class SHOOTER_FEED {
     public static final double GEARING = 1.0;
     public static final double FREE_TORQUE = 1.0; // TODO

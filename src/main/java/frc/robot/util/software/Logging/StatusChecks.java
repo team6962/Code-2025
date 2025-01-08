@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StatusChecks {
@@ -31,7 +32,7 @@ public class StatusChecks {
     }
   }
 
-  public static void addCheck(SubsystemBase subsystem, String name, BooleanSupplier supplier) {
+  public static void addCheck(Subsystem subsystem, String name, BooleanSupplier supplier) {
     addCheck(subsystem.getClass().getSimpleName() + "/" + name, supplier);
     
   }

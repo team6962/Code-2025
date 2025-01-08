@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.util.hardware.SparkMaxUtil;
+import frc.robot.util.hardware.TalonFXUtil;
 import frc.robot.util.software.Logging.Logger;
 import frc.robot.util.software.Logging.StatusChecks;
 
@@ -75,8 +75,8 @@ public class PivotController {
     this.reversed = reversed;
     this.subsystem = subsystem;
     encoderOffset = absolutePositionOffset;
-    SparkMaxUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
-    SparkMaxUtil.configurePID(subsystem, motorConfig, kP, 0.0, 0.0, 0.0, false);
+    TalonFXUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
+    TalonFXUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     
     Logger.autoLog(subsystem, "targetPosition",                   () -> getTargetAngle().getRadians());
     Logger.autoLog(subsystem, "position",                         () -> getPosition().getRadians());
