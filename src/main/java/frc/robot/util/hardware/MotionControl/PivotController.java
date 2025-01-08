@@ -1,12 +1,17 @@
 package frc.robot.util.hardware.MotionControl;
 
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -19,8 +24,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.hardware.SparkMaxUtil;
-import frc.robot.util.software.Logging.Logger;
-import frc.robot.util.software.Logging.StatusChecks;
 
 /*
  * Uses oboard 1kHz PID, Feedforward, and Trapazoidal Profiles to
@@ -45,8 +48,6 @@ public class PivotController {
   private double encoderOffset = 0.0;
 
   private boolean reversed;
-
-  private SubsystemBase subsystem;
 
   private Debouncer debouncer = new Debouncer(0.1);
 
@@ -73,19 +74,19 @@ public class PivotController {
     this.tolerance = tolerance;
 
     this.reversed = reversed;
-    this.subsystem = subsystem;
     encoderOffset = absolutePositionOffset;
     SparkMaxUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
     SparkMaxUtil.configurePID(subsystem, motorConfig, kP, 0.0, 0.0, 0.0, false);
     
-    Logger.autoLog(subsystem, "targetPosition",                   () -> getTargetAngle().getRadians());
-    Logger.autoLog(subsystem, "position",                         () -> getPosition().getRadians());
-    Logger.autoLog(subsystem, "relativePosition",                 () -> encoder.getPosition());
-    Logger.autoLog(subsystem, "rawAbsolutePosition",              () -> absoluteEncoder.get() * 360);
-    Logger.autoLog(subsystem, "doneMoving",                       () -> doneMoving());
+    Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().getRadians());
+    Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().getRadians());
+    Logger.logNumber(subsystem.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()).in(Radians));
+    Logger.logNumber(subsystem.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()).in(Radians));
+    Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
 
-    StatusChecks.addCheck(subsystem, "absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
-    StatusChecks.addCheck(subsystem, "absoluteEncoderUpdated",   () -> absoluteEncoder.get() != 0.0);
+    StatusChecks.Category statusChecks = StatusChecks.under(subsystem);
+    statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
+    statusChecks.add("absoluteEncoderUpdated",   () -> absoluteEncoder.get() != 0.0);
 
     sim = new SingleJointedArmSim(
       DCMotor.getNEO(1),

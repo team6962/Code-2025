@@ -21,6 +21,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,8 +48,6 @@ import frc.robot.Constants.Constants.SWERVE_DRIVE.STEER_MOTOR_PROFILE;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
 import frc.robot.util.hardware.SparkMaxUtil;
 import frc.robot.util.software.MathUtils.SwerveMath;
-import frc.robot.util.software.Logging.Logger;
-import frc.robot.util.software.Logging.StatusChecks;
 
 public class SwerveModule extends SubsystemBase {
   private SparkMax driveMotor, steerMotor;
@@ -130,11 +130,11 @@ public class SwerveModule extends SubsystemBase {
     seedSteerEncoder();
 
     String logPath = "module" + name + "/";
-    Logger.autoLog(this, logPath + "relativeSteerDirection",           () -> relativeSteerDirection.getDegrees());
-    Logger.autoLog(this, logPath + "absoluteSteerDirection",        () -> absoluteSteerDirection.getDegrees());
+    Logger.logNumber(logPath + "relativeSteerDirection", () -> relativeSteerDirection.getDegrees());
+    Logger.logNumber(logPath + "absoluteSteerDirection", () -> absoluteSteerDirection.getDegrees());
 
-    StatusChecks.addCheck(this, name + "canCoderHasFaults", () -> absoluteSteerEncoder.getFaultField().getValue() == 0);
-    StatusChecks.addCheck(this, name + "canCoderIsConnected", () -> absoluteSteerEncoder.getVersion().getValue() != 0);
+    StatusChecks.under(this).add(name + "canCoderHasFaults", () -> absoluteSteerEncoder.getFaultField().getValue() == 0);
+    StatusChecks.under(this).add(name + "canCoderIsConnected", () -> absoluteSteerEncoder.getVersion().getValue() != 0);
   }
 
 

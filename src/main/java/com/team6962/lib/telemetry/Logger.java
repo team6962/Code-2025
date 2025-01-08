@@ -179,6 +179,16 @@ public class Logger {
         log(path + "/angleRadians", position.angle.getRadians());
     }
 
+    public static void logSwerveModulePositions(String path, Supplier<SwerveModulePosition[]> supplier) {
+        updates.add(() -> log(path, supplier.get()));
+    }
+
+public static void log(String path, SwerveModulePosition[] positions) {
+        for (int i = 0; i < positions.length; i++) {
+            log(path + "/" + i, positions[i]);
+        }
+    }
+
     public static void logNavX(String path, Supplier<AHRS> supplier) {
         updates.add(() -> log(path, supplier.get()));
     }

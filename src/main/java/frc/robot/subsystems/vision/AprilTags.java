@@ -25,7 +25,10 @@ import io.limelightvision.LimelightHelpers.PoseEstimate;
 
 public class AprilTags extends SubsystemBase {
   public static void injectVisionData(Map<String, Pose3d> cameraPoses, SwerveDrive swerveDrive) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates = cameraPoses.keySet().stream().map(LimelightHelpers::getBotPoseEstimate_wpiBlue).collect(Collectors.toList());
+    List<LimelightHelpers.PoseEstimate> poseEstimates = cameraPoses.keySet().stream()
+      .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
+      .filter((estimate) -> estimate != null)
+      .collect(Collectors.toList());
     
     HashMap<String, Object> bestPoseEstimate = new HashMap<>();
     bestPoseEstimate.put("pose", new Pose2d());

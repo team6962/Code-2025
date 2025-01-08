@@ -8,19 +8,15 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
+import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.telemetry.StatusChecks;
 
-import choreo.Choreo;
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -36,13 +32,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -62,8 +55,6 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.vision.AprilTags;
 import frc.robot.subsystems.vision.Notes;
 import frc.robot.util.software.MathUtils;
-import frc.robot.util.software.Logging.Logger;
-import frc.robot.util.software.Logging.StatusChecks;
 
 /**
  * This class represents the subsystem for the swerve drive. It contains four
@@ -156,24 +147,24 @@ public class SwerveDrive extends SubsystemBase {
     
     SmartDashboard.putData("Field", field);
     
-    Logger.autoLog(this, "pose", () -> this.getPose());
-    Logger.autoLog(this, "measuredHeading", () -> this.getHeading().getDegrees());
-    Logger.autoLog(this, "targetHeading", () -> Units.radiansToDegrees(alignmentController.getSetpoint()));
-    Logger.autoLog(this, "targetStates", () -> getTargetModuleStates());
-    Logger.autoLog(this, "measuredStates", () -> getMeasuredModuleStates());
-    Logger.autoLog(this, "modulePositions", () -> getModulePositions());
-    Logger.autoLog(this, "gyroAcceleration", () -> Math.hypot(gyro.getWorldLinearAccelX(), gyro.getWorldLinearAccelY()));
-    Logger.autoLog(this, "gyroVelocity", () -> Math.hypot(gyro.getVelocityX(), gyro.getVelocityY()));
-    Logger.autoLog(this, "commandedLinearAcceleration", () -> linearAcceleration.getNorm());
-    Logger.autoLog(this, "commandedLinearVelocity", () -> Math.hypot(getDrivenChassisSpeeds().vxMetersPerSecond, getDrivenChassisSpeeds().vyMetersPerSecond));
-    Logger.autoLog(this, "commandedAngularAcceleration", () -> angularAcceleration);
-    Logger.autoLog(this, "commandedAngularVelocity", () -> getDrivenChassisSpeeds().omegaRadiansPerSecond);
-    Logger.autoLog(this, "measuredAngularVelocity", () -> getMeasuredChassisSpeeds().omegaRadiansPerSecond);
-    Logger.autoLog(this, "measuredLinearVelocity", () -> Math.hypot(getMeasuredChassisSpeeds().vxMetersPerSecond, getMeasuredChassisSpeeds().vyMetersPerSecond));
-    Logger.autoLog(this, "gyroIsCalibrating", () -> gyro.isCalibrating());
-    Logger.autoLog(this, "gyroIsConnected", () -> gyro.isConnected());
-    Logger.autoLog(this, "gyroRawDegrees", () -> gyro.getRotation2d().getDegrees());
-    StatusChecks.addCheck(this, "isGyroConnected", gyro::isConnected);
+    Logger.logPose(getName() + "/pose", () -> this.getPose());
+    Logger.logNumber(getName() + "/measuredHeading", () -> this.getHeading().getDegrees());
+    Logger.logNumber(getName() + "/targetHeading", () -> Units.radiansToDegrees(alignmentController.getSetpoint()));
+    Logger.logSwerveModuleStates(getName() + "/targetStates", () -> getTargetModuleStates());
+    Logger.logSwerveModuleStates(getName() + "/measuredStates", () -> getMeasuredModuleStates());
+    Logger.logSwerveModulePositions(getName() + "/modulePositions", () -> getModulePositions());
+    Logger.logNumber(getName() + "/gyroAcceleration", () -> Math.hypot(gyro.getWorldLinearAccelX(), gyro.getWorldLinearAccelY()));
+    Logger.logNumber(getName() + "/gyroVelocity", () -> Math.hypot(gyro.getVelocityX(), gyro.getVelocityY()));
+    Logger.logNumber(getName() + "/commandedLinearAcceleration", () -> linearAcceleration.getNorm());
+    Logger.logNumber(getName() + "/commandedLinearVelocity", () -> Math.hypot(getDrivenChassisSpeeds().vxMetersPerSecond, getDrivenChassisSpeeds().vyMetersPerSecond));
+    Logger.logNumber(getName() + "/commandedAngularAcceleration", () -> angularAcceleration);
+    Logger.logNumber(getName() + "/commandedAngularVelocity", () -> getDrivenChassisSpeeds().omegaRadiansPerSecond);
+    Logger.logNumber(getName() + "/measuredAngularVelocity", () -> getMeasuredChassisSpeeds().omegaRadiansPerSecond);
+    Logger.logNumber(getName() + "/measuredLinearVelocity", () -> Math.hypot(getMeasuredChassisSpeeds().vxMetersPerSecond, getMeasuredChassisSpeeds().vyMetersPerSecond));
+    Logger.logBoolean(getName() + "/gyroIsCalibrating", () -> gyro.isCalibrating());
+    Logger.logBoolean(getName() + "/gyroIsConnected", () -> gyro.isConnected());
+    Logger.logNumber(getName() + "/gyroRawDegrees", () -> gyro.getRotation2d().getDegrees());
+    StatusChecks.under(this).add("isGyroConnected", gyro::isConnected);
     
 
     // ModuleConfig moduleConfig = new ModuleConfig(
