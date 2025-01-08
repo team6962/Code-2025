@@ -46,12 +46,11 @@ public class AprilTags extends SubsystemBase {
     List<Pose2d> poses = new ArrayList<>();
 
     for (PoseEstimate poseEstimate : poseEstimates) {
-      Pose2d pose2d = poseEstimate.pose.toPose2d();
-      if (IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.primaryTagID)) continue;
+      Pose2d pose2d = poseEstimate.pose;
+      if (IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.rawFiducials[0].id)) continue;
       if (poseEstimate.tagCount == 0) continue;
       if (pose2d.getTranslation().getNorm() == 0.0) continue;
       if (pose2d.getRotation().getRadians() == 0.0) continue;
-      if (Math.abs(poseEstimate.pose.getZ()) > 1) continue;
       if (Double.isNaN(poseEstimate.avgTagDist)) continue;
       // if (poseEstimate.avgTagDist > 6) continue;
       
