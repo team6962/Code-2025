@@ -183,4 +183,6 @@ public interface Coordinates {
             return pose;
         }
     }
+
+    // TODO: Finish implementing pose coordinate conversions for FieldSystems
 }
