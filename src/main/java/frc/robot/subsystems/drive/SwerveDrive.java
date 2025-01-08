@@ -66,7 +66,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private SwerveDriveKinematics kinematics = getKinematics();
   private SwerveDrivePoseEstimator poseEstimator;
-  private static Field2d field = new Field2d();
+  private static Field2d field = Logger.getField();
   private Rotation2d gyroHeading = Rotation2d.fromDegrees(0.0);
   private Rotation2d gyroOffset = SWERVE_DRIVE.STARTING_POSE.get().getRotation();
   private Debouncer doneRotating = new Debouncer(0.5);
