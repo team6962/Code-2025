@@ -67,9 +67,17 @@ public final class Preferences {
 
   public static final class INTAKE {
     public static final double IN_POWER = 0.5;
+    public static final double OUT_POWER = 0.5; // Placeholder value
+
     public static final double TO_SHOOTER_POWER = 0.3;
     public static final double SLOW_OUT_POWER = 0.4;
   }
+
+  public static final class MANIPULATOR {
+    public static final double MANIPUALTOR_OUT_SPEED = 2;
+    public static final double MANIPUALTOR_IN_SPEED = 2;
+  }
+
 
   public static final class HANG {
     public static final double LEFT_MOTOR_EXTEND_POWER = 1.0; 
@@ -86,5 +94,6 @@ public final class Preferences {
     public static final double TRANSFER = 9.0;
     public static final double HANG = 9.0;
     public static final double AMP = 10.0;
+    public static final double MANIPULATOR = 8; // placeholder value
   }
 }
