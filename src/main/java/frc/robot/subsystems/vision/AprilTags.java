@@ -53,16 +53,7 @@ public class AprilTags extends SubsystemBase {
     
     BestEstimate bestPoseEstimate = new BestEstimate();
 
-    //if (swerveDrive.getRotationalVelocity() > 2.0) return;
-
-    int tagCount = 0;
-    for (PoseEstimate poseEstimate : poseEstimates) {
-      tagCount += poseEstimate.tagCount;
-    }
-    
-    // if (tagCount <= 1) return;
-
-    List<Pose2d> poses = new ArrayList<>();
+    List<Pose2d> loggedVisionPoses = new ArrayList<>();
 
     for (PoseEstimate poseEstimate : poseEstimates) {
       Pose2d pose2d = poseEstimate.pose;
@@ -71,9 +62,7 @@ public class AprilTags extends SubsystemBase {
       if (pose2d.getTranslation().getNorm() == 0.0) continue;
       if (pose2d.getRotation().getRadians() == 0.0) continue;
       if (Double.isNaN(poseEstimate.avgTagDist)) continue;
-      // if (poseEstimate.avgTagDist > 6) continue;
-      
-      // if (poseEstimate.avgTagDist > 5) continue;
+
       if (pose2d.getX() < 0.0 || pose2d.getY() < 0.0 || pose2d.getX() > Field.LENGTH || pose2d.getY() > Field.WIDTH) continue;
       boolean canChangeHeading = false;
       if (poseEstimate.tagCount >= 2 || RobotState.isDisabled()) {
@@ -88,17 +77,13 @@ public class AprilTags extends SubsystemBase {
         rotationError = 9999999;
         pose2d = new Pose2d(
           pose2d.getTranslation(),
-          swerveDrive.getEstimatedPose(/* TODO: Remember previous pose estimates / poseEstimate.timestampSeconds */).getRotation()
+          swerveDrive.getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds)).getRotation()
         );
       }
 
       double translationError = Math.pow(Math.abs(poseEstimate.avgTagDist), 2.0) / Math.pow(poseEstimate.tagCount, 2) / 10;
 
-      // if (RobotState.isAutonomous() && poseEstimate.tagCount <= 1) {
-      //   continue;
-      // }
-
-      poses.add(pose2d);
+      loggedVisionPoses.add(pose2d);
       translationError += 0.5;
       
       if (translationError < bestPoseEstimate.translationError.in(Meters) || rotationError < Units.degreesToRadians(360.0)) {
@@ -107,14 +92,10 @@ public class AprilTags extends SubsystemBase {
     }
 
     if ((int) bestPoseEstimate.tagCount > 0) {
-      // Logger.log("canChangeHeading", canChangeHeading);
-      // Logger.log("rotationAccuracy", rotationError);
-      // Logger.log("poseRotation", pose2d.getRotation().getDegrees());
-
       swerveDrive.getPoseEstimator().addVisionMeasurement(bestPoseEstimate.pose, bestPoseEstimate.timestamp, VecBuilder.fill(bestPoseEstimate.translationError.in(Meters), bestPoseEstimate.translationError.in(Meters), bestPoseEstimate.rotationError.in(Radians)));
     }
 
-    Logger.getField().getObject("visionPosese").setPoses(poses);
+    Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);
     
   }
 
