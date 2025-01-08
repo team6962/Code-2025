@@ -6,10 +6,6 @@ package frc.robot.commands.drive;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.team6962.lib.swerve.SwerveDrive;
 
@@ -22,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
-import frc.robot.Constants.Field;
 import frc.robot.Constants.Preferences;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.util.software.MathUtils;

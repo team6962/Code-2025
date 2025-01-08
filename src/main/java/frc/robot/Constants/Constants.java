@@ -6,17 +6,14 @@ package frc.robot.Constants;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.SwerveConfig;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 
 

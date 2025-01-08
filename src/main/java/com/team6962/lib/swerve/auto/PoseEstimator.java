@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
