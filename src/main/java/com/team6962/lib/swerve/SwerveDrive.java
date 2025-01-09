@@ -334,7 +334,7 @@ public class SwerveDrive extends SwerveCore {
                 translationSubsystem.getCurrentCommand().cancel();
             }
 
-            if (rotationSubsysem.getCurrentCommand()) {
+            if (rotationSubsysem.getCurrentCommand() != null) {
                 rotationSubsysem.getCurrentCommand().cancel();
             }
         }, useMotion());
