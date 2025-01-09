@@ -12,12 +12,12 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.NEO;
-import frc.robot.util.software.Logging.StatusChecks;
 
 public final class TalonFXUtil {
   public static void configure(TalonFXConfiguration config, InvertedValue inverted, NeutralModeValue neutralMode) {
@@ -60,8 +60,7 @@ public final class TalonFXUtil {
 
   public static void saveAndLog(Subsystem subsystem, TalonFX motor, TalonFXConfiguration config) {
     motor.getConfigurator().apply(config);
-    String logPath = "motor" + motor.getDeviceID() + "/";
-
+    
     // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
     // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
     // Logger.autoLog(subsystem, logPath + "setOutput",        () -> motor.get());
@@ -72,8 +71,7 @@ public final class TalonFXUtil {
     // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
     // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
     
-    StatusChecks.addCheck(subsystem, logPath + "hasFaults", () -> motor.getFaultField().getValue() == 0);
-    StatusChecks.addCheck(subsystem, logPath + "isConnected", () -> motor.isConnected());
+    StatusChecks.under(subsystem).add("TalonFX", motor);
     // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <= NEO.SAFE_TEMPERATURE);
     // configure(() -> motor.burnFlash(), motor);
   }
