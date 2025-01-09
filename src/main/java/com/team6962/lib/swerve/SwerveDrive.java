@@ -31,6 +31,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * The main class for the swerve drive system. This class extends {@link SwerveCore}
+ * to provide the {@link Command}-based API for controlling the drivetrain.
+ */
 public class SwerveDrive extends SwerveCore {
     /**
      * Subsystem for translation commands to require.
@@ -79,8 +83,8 @@ public class SwerveDrive extends SwerveCore {
      * system.
      * @return The estimated speeds as a ChassisSpeeds object
      */
-    public ChassisSpeeds getEstimatedSpeeds(Coordinates.LocalSystem system) {
-        return convertSpeeds(getPoseEstimator().getEstimatedSpeeds(), Coordinates.LocalSystem.ROBOT, system);
+    public ChassisSpeeds getEstimatedSpeeds(Coordinates.MovementSystem system) {
+        return convertSpeeds(getPoseEstimator().getEstimatedSpeeds(), Coordinates.MovementSystem.ROBOT, system);
     }
 
     /**
@@ -88,7 +92,7 @@ public class SwerveDrive extends SwerveCore {
      * @return The estimated speeds as a ChassisSpeeds object
      */
     public ChassisSpeeds getEstimatedSpeeds() {
-        return getEstimatedSpeeds(Coordinates.LocalSystem.ALLIANCE);
+        return getEstimatedSpeeds(Coordinates.MovementSystem.ALLIANCE);
     }
 
     public SubsystemBase useTranslation() {
@@ -119,52 +123,52 @@ public class SwerveDrive extends SwerveCore {
         return driveModules(() -> states);
     }
 
-    public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.LocalSystem system) {
+    public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
         return Commands.run(() ->
-            setMovement(convertSpeeds(speeds.get(), system, Coordinates.LocalSystem.ROBOT)),
+            setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
             useMotion()
         );
     }
 
     public Command driveSpeeds(Supplier<ChassisSpeeds> speeds) {
-        return driveSpeeds(speeds, Coordinates.LocalSystem.ROBOT);
+        return driveSpeeds(speeds, Coordinates.MovementSystem.ROBOT);
     }
 
     public Command drive(ChassisSpeeds speeds) {
         return driveSpeeds(() -> speeds);
     }
 
-    public Command driveTranslation(Supplier<Translation2d> translation, Coordinates.LocalSystem system) {
+    public Command driveTranslation(Supplier<Translation2d> translation, Coordinates.MovementSystem system) {
         return Commands.run(() -> {
-            setMovement(convertVelocity(translation.get(), system, Coordinates.LocalSystem.ROBOT));},
+            setMovement(convertVelocity(translation.get(), system, Coordinates.MovementSystem.ROBOT));},
             useTranslation()
         );
     }
 
     public Command driveTranslation(Supplier<Translation2d> translation) {
-        return driveTranslation(translation, Coordinates.LocalSystem.ROBOT);
+        return driveTranslation(translation, Coordinates.MovementSystem.ROBOT);
     }
 
     public Command drive(Translation2d translation) {
         return driveTranslation(() -> translation);
     }
 
-    public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.LocalSystem system) {
+    public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
         return Commands.run(() ->
-            setMovement(convertAngle(rotation.get(), system, Coordinates.LocalSystem.ROBOT)),
+            setMovement(convertAngle(rotation.get(), system, Coordinates.MovementSystem.ROBOT)),
             useRotation()
         );
     }
 
     public Command driveRotation(Supplier<Rotation2d> rotation) {
-        return driveRotation(rotation, Coordinates.LocalSystem.ROBOT);
+        return driveRotation(rotation, Coordinates.MovementSystem.ROBOT);
     }
 
     public Command drive(Rotation2d rotation) {
         return driveRotation(() -> rotation);
     }
 
-    public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.LocalSystem system) {
+    public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
         Command command = new Command() {
             private PIDController pid;
 
@@ -181,7 +185,7 @@ public class SwerveDrive extends SwerveCore {
                 Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
                 double output = pid.calculate(error.getRadians());
 
-                setMovement(convertAngle(new Rotation2d(output), system, Coordinates.LocalSystem.ROBOT));
+                setMovement(convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
             }
 
             @Override
@@ -196,7 +200,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveHeading(Supplier<Rotation2d> heading) {
-        return driveHeading(heading, Coordinates.LocalSystem.ROBOT);
+        return driveHeading(heading, Coordinates.MovementSystem.ROBOT);
     }
 
     public Command driveHeading(Rotation2d heading) {
@@ -298,7 +302,7 @@ public class SwerveDrive extends SwerveCore {
                 path,
                 constraints,
                 this::getEstimatedPose,
-                () -> this.getEstimatedSpeeds(Coordinates.LocalSystem.ROBOT),
+                () -> this.getEstimatedSpeeds(Coordinates.MovementSystem.ROBOT),
                 (speeds, feedforwards) -> { // TODO: Figure out if we should use feedforwards
                     speeds = allianceToRobotSpeeds(speeds);
 
@@ -322,5 +326,17 @@ public class SwerveDrive extends SwerveCore {
             Math.hypot(getEstimatedSpeeds().vxMetersPerSecond, getEstimatedSpeeds().vyMetersPerSecond),
             Rotation2d.fromRadians(getEstimatedSpeeds().omegaRadiansPerSecond)
         );
+    }
+
+    public Command cancelDrive() {
+        return Commands.run(() -> {
+            if (translationSubsystem.getCurrentCommand() != null) {
+                translationSubsystem.getCurrentCommand().cancel();
+            }
+
+            if (rotationSubsysem.getCurrentCommand()) {
+                rotationSubsysem.getCurrentCommand().cancel();
+            }
+        }, useMotion());
     }
 }

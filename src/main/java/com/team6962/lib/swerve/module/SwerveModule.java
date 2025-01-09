@@ -40,6 +40,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+/**
+ * A swerve module, consisting of a drive motor, a steer motor, and a steer encoder.
+ */
 public class SwerveModule extends SubsystemBase {
     /**
      * The drive motor for this module.
@@ -150,18 +153,34 @@ public class SwerveModule extends SubsystemBase {
         return steerEncoder;
     }
 
+    /**
+     * Gets the swerve drive configuration for this module.
+     * @return The {@link SwerveConfig} instance
+     */
     public SwerveConfig getDrivetrainConstants() {
         return constants;
     }
 
+    /**
+     * Gets the swerve module configuration for this module.
+     * @return The {@link SwerveConfig.Module} instance
+     */
     public SwerveConfig.Module getModuleConstants() {
         return constants.module(corner);
     }
 
+    /**
+     * Gets the corner of the robot that this module is located in.
+     * @return The {@link Corner} enum value
+     */
     public Corner getModuleCorner() {
         return corner;
     }
 
+    /**
+     * Drives the module to a given state.
+     * @param targetState The desired state to drive to
+     */
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
@@ -171,34 +190,66 @@ public class SwerveModule extends SubsystemBase {
         CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
     }
 
+    /**
+     * Gets the current position of the drive and steer motors.
+     * @return The current {@link SwerveModulePosition}
+     */
     public Distance getDrivePosition() {
         return constants.wheel().diameter().times(CTREUtils.unwrap(driveMotor.getPosition()).in(Radians));
     }
 
+    /**
+     * Gets the current speed of the drive motor.
+     * @return The current {@link LinearVelocity}
+     */
     public LinearVelocity getDriveSpeed() {
         return MetersPerSecond.of(constants.wheel().radius().in(Meters) * CTREUtils.unwrap(driveMotor.getVelocity()).in(RadiansPerSecond));
     }
 
+    /**
+     * Gets the current angle of the steer motor.
+     * @return The current {@link Angle}
+     */
     public Angle getSteerAngle() {
         return CTREUtils.unwrap(steerEncoder.getPosition());
     }
 
+    /**
+     * Gets the current velocity of the steer motor.
+     * @return The current {@link AngularVelocity}
+     */
     public AngularVelocity getSteerVelocity() {
         return CTREUtils.unwrap(steerEncoder.getVelocity());
     }
 
+    /**
+     * Gets the current state of the module.
+     * @return The measured {@link SwerveModuleState}
+     */
     public SwerveModuleState getState() {
         return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
     }
 
+    /**
+     * Gets the current position of the module.
+     * @return The measured {@link SwerveModulePosition}
+     */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerAngle()));
     }
 
+    /**
+     * Gets the current current consumed by the module.
+     * @return The measured {@link Current}
+     */
     public Current getConsumedCurrent() {
         return CTREUtils.unwrap(driveMotor.getSupplyCurrent()).plus(CTREUtils.unwrap(steerMotor.getSupplyCurrent()));
     }
 
+    /**
+     * Gets the pose of the module relative to the robot's center.
+     * @return The relative {@link Pose2d}
+     */
     public Pose2d getRelativePose() {
         return new Pose2d(
             calculateRelativeTranslation(corner.index, constants.chassis()),
@@ -206,11 +257,23 @@ public class SwerveModule extends SubsystemBase {
         );
     }
 
+    /**
+     * Creates a command to calibrate the steer motor.
+     * @param averageBusVoltage The expected average bus voltage to during calibration
+     * @param maxCurrent The maximum current to use during calibration
+     * @return The calibration {@link Command}
+     */
     public Command calibrateSteerMotor(Voltage averageBusVoltage, Current maxCurrent) {
         return calibrateMotor("steer", getSteerMotor(), averageBusVoltage, maxCurrent, log ->
             log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
     }
 
+    /**
+     * Creates a command to calibrate the drive motor.
+     * @param averageBusVoltage The expected average bus voltage to during calibration
+     * @param maxCurrent The maximum current to use during calibration
+     * @return The calibration {@link Command}
+     */
     public Command calibrateDriveMotor(Voltage averageBusVoltage, Current maxCurrent) {
         return calibrateMotor("drive", getDriveMotor(), averageBusVoltage, maxCurrent, log ->
             log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
@@ -248,6 +311,11 @@ public class SwerveModule extends SubsystemBase {
         );
     }
 
+    /**
+     * Gets the name of a module given its index (e.g. 0 -> "Front Left").
+     * @param moduleIndex The index of the module
+     * @return The name of the module, formatted with spaces and capitalization
+     */
     public static String getModuleName(int moduleIndex) {
         return switch (moduleIndex) {
             case 0 -> "Front Left";
@@ -258,6 +326,11 @@ public class SwerveModule extends SubsystemBase {
         };
     }
 
+    /**
+     * Gets the name of a module given its index (e.g. 0 -> "front-left").
+     * @param moduleIndex The index of the module
+     * @return The name of the module, formatted with hyphens and lowercase
+     */
     public static String getModuleSysIdName(int moduleIndex) {
         return switch (moduleIndex) {
             case 0 -> "front-left";
@@ -268,6 +341,9 @@ public class SwerveModule extends SubsystemBase {
         };
     }
     
+    /**
+     * Represents a corner of the robot that a module can be on.
+     */
     public static enum Corner {
         FRONT_LEFT(0),
         FRONT_RIGHT(1),
@@ -280,6 +356,11 @@ public class SwerveModule extends SubsystemBase {
             this.index = index;
         }
 
+        /**
+         * Converts an index to a {@link Corner} object.
+         * @param index
+         * @return
+         */
         public static Corner fromIndex(int index) {
             return switch (index) {
                 case 0 -> FRONT_LEFT;
@@ -291,6 +372,12 @@ public class SwerveModule extends SubsystemBase {
         }
     }
 
+    /**
+     * Calculates the relative translation of a module given its corner index.
+     * @param cornerIndex The index of the corner
+     * @param chassis The chassis configuration
+     * @return The relative translation of the module
+     */
     public static Translation2d calculateRelativeTranslation(int cornerIndex, SwerveConfig.Chassis chassis) {
         return new Translation2d(
             (cornerIndex >= 2 ? -1 : 1) * chassis.wheelBase().in(Meters) / 2,

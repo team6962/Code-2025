@@ -19,8 +19,15 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * The "core" of the swerve drive system. This class is responsible for managing
+ * the swerve modules, the pose estimator, and the current movement the drivetrain
+ * is performing. {@code SwerveCore} is extended by {@link SwerveDrive} to provide
+ * the {@link Command}-based API for controlling the drivetrain.
+ */
 public class SwerveCore extends SubsystemBase implements Coordinates {
     private PoseEstimator poseEstimator;
     private SwerveModule[] modules;

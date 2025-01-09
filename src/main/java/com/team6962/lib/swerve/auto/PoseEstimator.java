@@ -20,6 +20,15 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * {@code PoseEstimator} is a class that estimates the pose of a swerve drive
+ * robot using a combination of odometry, gyroscope, and vision measurements.
+ * A PoseEstimator contains a {@link SwerveDrivePoseEstimator} that is updated
+ * with the latest measurements. It also contains a {@link SwerveGyroscope} that
+ * can be used to get and reset the robot's heading.
+ * <p>
+ * Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
+ */
 public class PoseEstimator extends SubsystemBase {
     private SwerveDriveKinematics kinematics;
     private SwerveGyroscope gyroscope;

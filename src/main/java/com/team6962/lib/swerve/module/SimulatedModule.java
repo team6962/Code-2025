@@ -15,6 +15,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
+/**
+ * A simulated swerve module, using the same code as the real one, plus some
+ * simulation code.
+ */
 public class SimulatedModule extends SwerveModule {
     private FlywheelSim driveFlywheel;
 

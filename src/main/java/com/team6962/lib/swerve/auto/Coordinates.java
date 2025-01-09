@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * An interface that provides methods for converting between different coordinate
- * systems. It should be implemented by the SwerveDrive class to allow for easy
- * conversion between robot, absolute, and alliance coordinates.
+ * systems.
  */
 public interface Coordinates {
     /**
@@ -36,51 +35,92 @@ public interface Coordinates {
      */
     public static final Translation2d FIELD_CENTER = new Translation2d(FIELD_LENGTH.div(2), FIELD_WIDTH.div(2));
 
-    public static enum LocalSystem {
+    /**
+     * An enum that represents the different coordinate systems that can be used
+     * for movements.
+     */
+    public static enum MovementSystem {
         ROBOT, ABSOLUTE, ALLIANCE
     }
 
-    public static enum FieldSystem {
+    /**
+     * An enum that represents the different coordinate systems that can be used
+     * for poses.
+     */
+    public static enum PoseSystem {
         ABSOLUTE, ALLIANCE
     }
 
+    /**
+     * Gets the estimated pose of the robot.
+     */
     public Pose2d getEstimatedPose();
 
+    /**
+     * Gets whether alliance-relative coordinates should be inverted.
+     * <p>
+     * This method will return an empty {@link Optional} if the alliance has not
+     * yet been received from the Driver Station.
+     */
     public static Optional<Boolean> isAllianceInverted() {
         return DriverStation.getAlliance().map(a -> a == DriverStation.Alliance.Red);
     }
 
+    /**
+     * Returns whether the alliance has been received from the Driver Station.
+     */
     public static boolean knowsAlliance() {
         return DriverStation.getAlliance().isPresent();
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from robot coordinates to absolute coordinates.
+     */
     public default ChassisSpeeds robotToAbsoluteSpeeds(ChassisSpeeds speeds) {
         return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation().unaryMinus());
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from absolute coordinates to robot coordinates.
+     */
     public default ChassisSpeeds absoluteToRobotSpeeds(ChassisSpeeds speeds) {
         return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation());
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from alliance coordinates to absolute coordinates.
+     */
     public default ChassisSpeeds allianceToAbsoluteSpeeds(ChassisSpeeds speeds) {
         return isAllianceInverted().orElse(false) ?
             KinematicsUtils.rotateSpeeds(speeds, Rotation2d.fromRotations(0.5)) :
             speeds;
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from absolute coordinates to alliance coordinates.
+     */
     public default ChassisSpeeds absoluteToAllianceSpeeds(ChassisSpeeds speeds) {
         return allianceToAbsoluteSpeeds(speeds);
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from robot coordinates to alliance coordinates.
+     */
     public default ChassisSpeeds robotToAllianceSpeeds(ChassisSpeeds speeds) {
         return absoluteToAllianceSpeeds(robotToAbsoluteSpeeds(speeds));
     }
 
+    /**
+     * Converts {@link ChassisSpeeds} from alliance coordinates to robot coordinates.
+     */
     public default ChassisSpeeds allianceToRobotSpeeds(ChassisSpeeds speeds) {
         return absoluteToRobotSpeeds(allianceToAbsoluteSpeeds(speeds));
     }
 
-    public default ChassisSpeeds convertSpeeds(ChassisSpeeds speeds, LocalSystem from, LocalSystem to) {
+    /**
+     * Converts {@link ChassisSpeeds} from one coordinate system to another.
+     */
+    public default ChassisSpeeds convertSpeeds(ChassisSpeeds speeds, MovementSystem from, MovementSystem to) {
         ChassisSpeeds absolute = switch (from) {
             case ROBOT -> robotToAbsoluteSpeeds(speeds);
             case ABSOLUTE -> speeds;
@@ -94,33 +134,54 @@ public interface Coordinates {
         };
     }
 
+    /**
+     * Converts a {@link Translation2d} from robot coordinates to absolute coordinates.
+     */
     public default Translation2d robotToAbsoluteVelocity(Translation2d velocity) {
         return velocity.rotateBy(getEstimatedPose().getRotation().unaryMinus());
     }
 
+    /**
+     * Converts a {@link Translation2d} from absolute coordinates to robot coordinates.
+     */
     public default Translation2d absoluteToRobotVelocity(Translation2d velocity) {
         return velocity.rotateBy(getEstimatedPose().getRotation());
     }
 
+    /**
+     * Converts a {@link Translation2d} from alliance coordinates to absolute coordinates.
+     */
     public default Translation2d allianceToAbsoluteVelocity(Translation2d velocity) {
         return isAllianceInverted().orElse(false) ?
             velocity.rotateBy(Rotation2d.fromRotations(0.5)) :
             velocity;
     }
 
+    /**
+     * Converts a {@link Translation2d} from absolute coordinates to alliance coordinates.
+     */
     public default Translation2d absoluteToAllianceVelocity(Translation2d velocity) {
         return allianceToAbsoluteVelocity(velocity);
     }
 
+    /**
+     * Converts a {@link Translation2d} from robot coordinates to alliance coordinates.
+     */
     public default Translation2d robotToAllianceVelocity(Translation2d velocity) {
         return absoluteToAllianceVelocity(robotToAbsoluteVelocity(velocity));
     }
 
+    /**
+     * Converts a {@link Translation2d} from alliance coordinates to robot coordinates.
+     */
     public default Translation2d allianceToRobotVelocity(Translation2d velocity) {
         return absoluteToRobotVelocity(allianceToAbsoluteVelocity(velocity));
     }
 
-    public default Translation2d convertVelocity(Translation2d velocity, LocalSystem from, LocalSystem to) {
+    /**
+     * Converts a {@link Translation2d} from one coordinate system to another.
+     */
+    public default Translation2d convertVelocity(Translation2d velocity, MovementSystem from, MovementSystem to) {
         Translation2d absolute = switch (from) {
             case ROBOT -> robotToAbsoluteVelocity(velocity);
             case ABSOLUTE -> velocity;
@@ -134,33 +195,54 @@ public interface Coordinates {
         };
     }
 
+    /**
+     * Converts a {@link Rotation2d} from robot coordinates to absolute coordinates.
+     */
     public default Rotation2d robotToAbsoluteAngle(Rotation2d angle) {
         return angle.rotateBy(getEstimatedPose().getRotation().unaryMinus());
     }
 
+    /**
+     * Converts a {@link Rotation2d} from absolute coordinates to robot coordinates.
+     */
     public default Rotation2d absoluteToRobotAngle(Rotation2d angle) {
         return angle.rotateBy(getEstimatedPose().getRotation());
     }
 
+    /**
+     * Converts a {@link Rotation2d} from alliance coordinates to absolute coordinates.
+     */
     public default Rotation2d allianceToAbsoluteAngle(Rotation2d angle) {
         return isAllianceInverted().orElse(false) ?
             angle.rotateBy(Rotation2d.fromRotations(0.5)) :
             angle;
     }
 
+    /**
+     * Converts a {@link Rotation2d} from absolute coordinates to alliance coordinates.
+     */
     public default Rotation2d absoluteToAllianceAngle(Rotation2d angle) {
         return allianceToAbsoluteAngle(angle);
     }
 
+    /**
+     * Converts a {@link Rotation2d} from robot coordinates to alliance coordinates.
+     */
     public default Rotation2d robotToAllianceAngle(Rotation2d angle) {
         return absoluteToAllianceAngle(robotToAbsoluteAngle(angle));
     }
 
+    /**
+     * Converts a {@link Rotation2d} from alliance coordinates to robot coordinates.
+     */
     public default Rotation2d allianceToRobotAngle(Rotation2d angle) {
         return absoluteToRobotAngle(allianceToAbsoluteAngle(angle));
     }
 
-    public default Rotation2d convertAngle(Rotation2d angle, LocalSystem from, LocalSystem to) {
+    /**
+     * Converts a {@link Rotation2d} from one coordinate system to another.
+     */
+    public default Rotation2d convertAngle(Rotation2d angle, MovementSystem from, MovementSystem to) {
         Rotation2d absolute = switch (from) {
             case ROBOT -> robotToAbsoluteAngle(angle);
             case ABSOLUTE -> angle;
@@ -174,6 +256,9 @@ public interface Coordinates {
         };
     }
 
+    /**
+     * Converts a {@link Pose2d} from alliance coordinates to absolute coordinates.
+     */
     public default Pose2d allianceToAbsolutePose(Pose2d pose) {
         if (isAllianceInverted().orElse(false)) {
             return pose.transformBy(new Transform2d(FIELD_CENTER.times(-1), Rotation2d.fromDegrees(0)))
@@ -184,5 +269,25 @@ public interface Coordinates {
         }
     }
 
-    // TODO: Finish implementing pose coordinate conversions for FieldSystems
+    /**
+     * Converts a {@link Pose2d} from absolute coordinates to alliance coordinates.
+     */
+    public default Pose2d absoluteToAlliancePose(Pose2d pose) {
+        return allianceToAbsolutePose(pose);
+    }
+
+    /**
+     * Converts a {@link Pose2d} from one coordinate system to another.
+     */
+    public default Pose2d convertPose(Pose2d pose, PoseSystem from, PoseSystem to) {
+        Pose2d absolute = switch (from) {
+            case ABSOLUTE -> pose;
+            case ALLIANCE -> allianceToAbsolutePose(pose);
+        };
+
+        return switch (to) {
+            case ABSOLUTE -> absolute;
+            case ALLIANCE -> absoluteToAlliancePose(absolute);
+        };
+    }
 }
