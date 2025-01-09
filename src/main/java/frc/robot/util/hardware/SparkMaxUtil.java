@@ -1,18 +1,17 @@
 package frc.robot.util.hardware;
 import java.util.function.Supplier;
 
-
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.Constants.NEO;
-import frc.robot.util.software.Logging.StatusChecks;
 
 public final class SparkMaxUtil {
   public static void configure(SparkMaxConfig config, boolean inverted, IdleMode idleMode) {
@@ -25,6 +24,20 @@ public final class SparkMaxUtil {
     config.smartCurrentLimit(stallCurrentLimit, freeCurrentLimit);
     config.openLoopRampRate(NEO.SAFE_RAMP_RATE);
     config.inverted(inverted);
+
+    // String logPath = "motor" + motor.getDeviceId() + "/";
+
+    // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
+    // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
+    // Logger.autoLog(subsystem, logPath + "setOutput",        () -> motor.get());
+    // Logger.autoLog(subsystem, logPath + "appliedOutput",    () -> motor.getAppliedOutput());
+    // Logger.autoLog(subsystem, logPath + "appliedVoltage",   () -> motor.getBusVoltage() * motor.getAppliedOutput());
+    // Logger.autoLog(subsystem, logPath + "powerWatts",       () -> motor.getBusVoltage() * motor.getAppliedOutput() * motor.getOutputCurrent());
+    // Logger.autoLog(subsystem, logPath + "motorTemperature", () -> motor.getMotorTemperature());
+    // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
+    // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
+
+    // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <= NEO.SAFE_TEMPERATURE);
   }
 
   private static void configure(Supplier<REVLibError> config, SparkMax motor) {
@@ -80,7 +93,6 @@ public final class SparkMaxUtil {
   public static void saveAndLog(Subsystem subsystem, SparkMax motor, SparkMaxConfig config) {
     configure(() -> motor.setCANTimeout(0), motor);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    String logPath = "motor" + motor.getDeviceId() + "/";
 
     // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
     // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
@@ -92,8 +104,7 @@ public final class SparkMaxUtil {
     // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
     // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
     
-    StatusChecks.addCheck(subsystem, logPath + "hasFaults", () -> motor.getFaults() == null);
-    StatusChecks.addCheck(subsystem, logPath + "isConnected", () -> motor.getFirmwareVersion() != 0);
+    StatusChecks.under(subsystem).add("Spark MAX", motor);
     // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <= NEO.SAFE_TEMPERATURE);
     // configure(() -> motor.burnFlash(), motor);
   }

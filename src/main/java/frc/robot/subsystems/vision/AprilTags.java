@@ -1,68 +1,75 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Field;
 import frc.robot.subsystems.LEDs;
-import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.util.software.LimelightHelpers;
-import frc.robot.util.software.LimelightHelpers.PoseEstimate;
+import io.limelightvision.LimelightHelpers;
+import io.limelightvision.LimelightHelpers.PoseEstimate;
 
 
 public class AprilTags extends SubsystemBase {
-  public static void injectVisionData(Map<String, Pose3d> cameraPoses, SwerveDrive swerveDrive) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates = cameraPoses.keySet().stream().map(LimelightHelpers::getBotPoseEstimate_wpiBlue).collect(Collectors.toList());
-    
-    HashMap<String, Object> bestPoseEstimate = new HashMap<>();
-    bestPoseEstimate.put("pose", new Pose2d());
-    bestPoseEstimate.put("timestamp", Timer.getFPGATimestamp());
-    bestPoseEstimate.put("translationError", Double.MAX_VALUE);
-    bestPoseEstimate.put("rotationError", Double.MAX_VALUE);
-    bestPoseEstimate.put("tagCount", 0);
-
-    //if (swerveDrive.getRotationalVelocity() > 2.0) return;
-
-    int tagCount = 0;
-    for (PoseEstimate poseEstimate : poseEstimates) {
-      tagCount += poseEstimate.tagCount;
+  private static record BestEstimate(Pose2d pose, Time timestamp, Distance translationError, Angle rotationError, int tagCount) {
+    public BestEstimate() {
+      this(
+        new Pose2d(),
+        Seconds.of(Timer.getFPGATimestamp()),
+        Meters.of(Double.POSITIVE_INFINITY),
+        Rotations.of(Double.POSITIVE_INFINITY),
+        0
+      );
     }
+  }
+  
+  public static void injectVisionData(Map<String, Pose3d> cameraPoses, SwerveDrive swerveDrive) {
+    List<LimelightHelpers.PoseEstimate> poseEstimates = cameraPoses.keySet().stream()
+      .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
+      .filter((estimate) -> estimate != null)
+      .collect(Collectors.toList());
     
-    // if (tagCount <= 1) return;
+    BestEstimate bestPoseEstimate = new BestEstimate();
 
-    List<Pose2d> poses = new ArrayList<>();
+    List<Pose2d> loggedVisionPoses = new ArrayList<>();
 
     for (PoseEstimate poseEstimate : poseEstimates) {
-      Pose2d pose2d = poseEstimate.pose.toPose2d();
-      if (IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.primaryTagID)) continue;
+      Pose2d pose2d = poseEstimate.pose;
+      if (IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.rawFiducials[0].id)) continue;
       if (poseEstimate.tagCount == 0) continue;
       if (pose2d.getTranslation().getNorm() == 0.0) continue;
       if (pose2d.getRotation().getRadians() == 0.0) continue;
-      if (Math.abs(poseEstimate.pose.getZ()) > 1) continue;
       if (Double.isNaN(poseEstimate.avgTagDist)) continue;
-      // if (poseEstimate.avgTagDist > 6) continue;
-      
-      // if (poseEstimate.avgTagDist > 5) continue;
+
       if (pose2d.getX() < 0.0 || pose2d.getY() < 0.0 || pose2d.getX() > Field.LENGTH || pose2d.getY() > Field.WIDTH) continue;
       boolean canChangeHeading = false;
-      if (swerveDrive.canZeroHeading() && (poseEstimate.tagCount >= 2 || RobotState.isDisabled())) {
+      if (poseEstimate.tagCount >= 2 || RobotState.isDisabled()) {
         canChangeHeading = true;
       }
 
-      canChangeHeading = canChangeHeading && swerveDrive.getPose().getTranslation().getDistance(pose2d.getTranslation()) < 1.0;
+      canChangeHeading = canChangeHeading && swerveDrive.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation()) < 1.0;
       if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
       
       double rotationError = Units.degreesToRadians(15);
@@ -70,37 +77,25 @@ public class AprilTags extends SubsystemBase {
         rotationError = 9999999;
         pose2d = new Pose2d(
           pose2d.getTranslation(),
-          swerveDrive.getPose(poseEstimate.timestampSeconds).getRotation()
+          swerveDrive.getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds)).getRotation()
         );
       }
 
       double translationError = Math.pow(Math.abs(poseEstimate.avgTagDist), 2.0) / Math.pow(poseEstimate.tagCount, 2) / 10;
 
-      // if (RobotState.isAutonomous() && poseEstimate.tagCount <= 1) {
-      //   continue;
-      // }
-
-      poses.add(pose2d);
+      loggedVisionPoses.add(pose2d);
       translationError += 0.5;
       
-      if (translationError < (double) bestPoseEstimate.get("translationError") || rotationError < Units.degreesToRadians(360.0)) {
-        bestPoseEstimate.put("pose", pose2d);
-        bestPoseEstimate.put("timestamp", poseEstimate.timestampSeconds);
-        bestPoseEstimate.put("translationError", translationError);
-        bestPoseEstimate.put("rotationError", rotationError);
-        bestPoseEstimate.put("tagCount", poseEstimate.tagCount);
+      if (translationError < bestPoseEstimate.translationError.in(Meters) || rotationError < Units.degreesToRadians(360.0)) {
+        bestPoseEstimate = new BestEstimate(pose2d, Seconds.of(poseEstimate.timestampSeconds), Meters.of(translationError), Rotations.of(rotationError), poseEstimate.tagCount);
       }
     }
 
-    if ((int) bestPoseEstimate.get("tagCount") > 0) {
-      // Logger.log("canChangeHeading", canChangeHeading);
-      // Logger.log("rotationAccuracy", rotationError);
-      // Logger.log("poseRotation", pose2d.getRotation().getDegrees());
-
-      swerveDrive.addVisionMeasurement((Pose2d) bestPoseEstimate.get("pose"), (double) bestPoseEstimate.get("timestamp"), VecBuilder.fill((double) bestPoseEstimate.get("translationError"), (double) bestPoseEstimate.get("translationError"), (double) bestPoseEstimate.get("rotationError")));
+    if ((int) bestPoseEstimate.tagCount > 0) {
+      swerveDrive.getPoseEstimator().addVisionMeasurement(bestPoseEstimate.pose, bestPoseEstimate.timestamp, VecBuilder.fill(bestPoseEstimate.translationError.in(Meters), bestPoseEstimate.translationError.in(Meters), bestPoseEstimate.rotationError.in(Radians)));
     }
 
-    SwerveDrive.getField().getObject("visionPosese").setPoses(poses);
+    Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);
     
   }
 

@@ -6,16 +6,14 @@ package frc.robot.Constants;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.path.PathConstraints;
+import com.team6962.lib.swerve.SwerveConfig;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 
 
@@ -83,176 +81,7 @@ public final class Constants {
     public static final double NOTE_CAMERA_HEIGHT_PIXELS = 960;
   }
 
-  // SWERVE DRIVE
-  public static final class SWERVE_DRIVE {
-
-    ///////////////////////// CONFIG /////////////////////////
-    public static final boolean  IS_PROTOTYPE_CHASSIS               = !new DigitalInput(0).get();
-
-    public static final double   INSPECTION_WEIGHT                  = IS_PROTOTYPE_CHASSIS ? Units.lbsToKilograms(42) : Units.lbsToKilograms(113.5);
-    public static final double   BATTERY_WEIGHT                     = Units.lbsToKilograms(12.89);
-    public static final double   BUMPER_WEIGHT                      = IS_PROTOTYPE_CHASSIS ? 0.0 : Units.lbsToKilograms(11.0);
-    public static final double   ROBOT_MASS                         = INSPECTION_WEIGHT + BATTERY_WEIGHT + BUMPER_WEIGHT; // kg
-    public static final double   FRICTION_COEFFICIENT               = 1.0;
-    public static final int      MODULE_COUNT                       = 4;
-    public static final double   CHASSIS_WIDTH                      = Units.inchesToMeters(28);
-    public static final double   CHASSIS_LENGTH                     = Units.inchesToMeters(28);
-    public static final double   BUMPER_THICKNESS                   = Units.inchesToMeters(3.25);
-    public static final double   WHEEL_TO_EDGE_DISTANCE             = Units.inchesToMeters(2.625);
-    public static final double   WHEEL_RADIUS                       = Units.inchesToMeters(2.0);
-    public static final double   WHEEL_WIDTH                        = Units.inchesToMeters(2.0);
-    public static final double   DRIVE_MOTOR_GEARING                = 6.75;
-    public static final double   STEER_MOTOR_GEARING                = 150.0 / 7.0;
-    public static final double   GEARBOX_EFFICIENCY                 = 0.975;
-    public static final double   BATTERY_RESISTANCE                 = 0.02; // ohms
-    public static final double   BATTERY_VOLTAGE                    = 12.6; // volts
-    public static final double   BROWNOUT_VOLTAGE                   = 6.8; // volts
-
-    // public static final double   VELOCITY_DEADBAND                  = 0.05; // Velocity we stop moving at
-    
-    // ODOMETER
-    public static final Supplier<Pose2d>   STARTING_POSE            = Field.pose2d(0.0, 0.0, 0.0);
-
-    // TESTING
-    public static final double   MOTOR_POWER_HARD_CAP               = 1.0; // Only use for testing, otherwise set to 1.0
-    
-    // REDUCE DRIVE VELOCITY WHEN FAR FROM ANGLE
-    public static final boolean  DO_ANGLE_ERROR_SPEED_REDUCTION     = false;
-    
-
-    ///////////////////////// CALCUALTED /////////////////////////
-
-    // PHYSICAL
-    public static final double   TRACKWIDTH                         = CHASSIS_WIDTH - WHEEL_TO_EDGE_DISTANCE * 2.0; // left-to-right distance between the drivetrain wheels
-    public static final double   WHEELBASE                          = CHASSIS_LENGTH - WHEEL_TO_EDGE_DISTANCE * 2.0; // front-to-back distance between the drivetrain wheels
-    public static final double   BUMPER_WIDTH                       = SWERVE_DRIVE.CHASSIS_WIDTH + SWERVE_DRIVE.BUMPER_THICKNESS * 2.0;
-    public static final double   BUMPER_LENGTH                      = SWERVE_DRIVE.CHASSIS_LENGTH + SWERVE_DRIVE.BUMPER_THICKNESS * 2.0;
-    public static final double   BUMPER_DIAGONAL                    = Math.hypot(SWERVE_DRIVE.BUMPER_WIDTH, SWERVE_DRIVE.BUMPER_LENGTH + Units.inchesToMeters(3.5 * 2.0));
-    public static final double   MAX_CURRENT_DRAW                   = (BATTERY_VOLTAGE - BROWNOUT_VOLTAGE) / BATTERY_RESISTANCE;
-
-    
-    // GEAR AND WHEEL RATIOS
-    public static final double   DRIVE_ENCODER_CONVERSION_FACTOR    = (WHEEL_RADIUS * 2.0 * Math.PI) / DRIVE_MOTOR_GEARING;
-    public static final double   STEER_ENCODER_CONVERSION_FACTOR    = (Math.PI * 2.0) / STEER_MOTOR_GEARING;
-    
-    public static class PHYSICS {
-      public static final double ROTATIONAL_INERTIA                 = 1.25 * ((1.0 / 12.0) * ROBOT_MASS * (Math.pow(BUMPER_WIDTH, 2.0) + Math.pow(BUMPER_LENGTH, 2.0)));
-      public static final double SLIPLESS_ACCELERATION              = 9.80 * FRICTION_COEFFICIENT;
-      public static final int    SLIPLESS_CURRENT_LIMIT             = (int) ((SLIPLESS_ACCELERATION * NEO.STATS.stallCurrentAmps * ROBOT_MASS * WHEEL_RADIUS) / (4.0 * DRIVE_MOTOR_GEARING * NEO.STATS.stallTorqueNewtonMeters));
-      
-      public static final double MAX_MOTOR_SPEED                    = Units.radiansPerSecondToRotationsPerMinute(NEO.STATS.freeSpeedRadPerSec) * GEARBOX_EFFICIENCY;
-      public static final double MAX_MOTOR_TORQUE                   = NEO.maxTorqueCurrentLimited(SLIPLESS_CURRENT_LIMIT);
-      
-      public static final double MAX_WHEEL_VELOCITY                 = (MAX_MOTOR_SPEED * (Math.PI * 2.0)) / 60.0 / DRIVE_MOTOR_GEARING;
-      
-      public static final double MAX_LINEAR_VELOCITY                = MAX_WHEEL_VELOCITY * WHEEL_RADIUS;
-      public static final double MAX_LINEAR_FORCE                   = (4.0 * MAX_MOTOR_TORQUE * DRIVE_MOTOR_GEARING) / WHEEL_RADIUS;
-      public static final double MAX_LINEAR_ACCELERATION            = MAX_LINEAR_FORCE / ROBOT_MASS;
-      
-      public static final double DRIVE_RADIUS                       = Math.hypot(WHEELBASE / 2.0, TRACKWIDTH / 2.0);
-      public static final double MAX_ANGULAR_TORQUE                 = MAX_LINEAR_FORCE * DRIVE_RADIUS;
-      public static final double MAX_ANGULAR_ACCELERATION           = MAX_ANGULAR_TORQUE / ROTATIONAL_INERTIA; // TODO FIGURE OUT WHY WRONG
-      public static final double MAX_ANGULAR_VELOCITY               = (MAX_WHEEL_VELOCITY * WHEEL_RADIUS) / DRIVE_RADIUS;
-    }
-
-    // Used only for when we have errors in the path (aka only when wheels slip or we're bumped off course)
-    public static final class AUTONOMOUS {
-      public static final class TRANSLATION_GAINS {
-        public static final double kP = 2.5;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-      }
-      public static final class ROTATION_GAINS {
-        public static final double kP = 2.5;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-      }
-
-      public static final double ACCELERATION_REDUCTION = ((SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION * SWERVE_DRIVE.ROBOT_MASS + ((SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA * SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION) / SWERVE_DRIVE.PHYSICS.DRIVE_RADIUS)) / (9.80 * SWERVE_DRIVE.ROBOT_MASS * SWERVE_DRIVE.FRICTION_COEFFICIENT));
-
-      public static final PathConstraints DEFAULT_PATH_CONSTRAINTS =
-        new PathConstraints(
-          SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
-          SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION / ACCELERATION_REDUCTION,
-          SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_VELOCITY,
-          SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION / ACCELERATION_REDUCTION
-        );
-    }
-
-    public static final class DRIVE_MOTOR_PROFILE {
-      // FROM WPILIB SYSTEM IDENTIFICATION, FREE SPINNING
-      public static final double kP                 = 0.00500; // Proportion Gain
-      public static final double kI                 = 0.00000; // Integral Gain
-      public static final double kD                 = 0.00000; // Derivative Gain
-      public static final double kS                 = 0.18000; // volts 0.081073
-      public static final double kV                 = 12.0 / PHYSICS.MAX_LINEAR_VELOCITY; // volts per m/s
-      public static final double kA                 = 0.10000; // volts per m/s^2, free spinning
-    }
-
-    public static final class STEER_MOTOR_PROFILE {
-      // FROM WPILIB SYSTEM IDENTIFICATION
-      public static final double kP                 = 0.90000; // Proportion Gain
-      public static final double kI                 = 0.00000; // Integral Gain
-      public static final double kD                 = 0.10000; // Derivative Gain
-      public static final double kS                 = 0.00000; // volts
-      public static final double kV                 = 12.0 / (NEO.STATS.freeSpeedRadPerSec / STEER_MOTOR_GEARING); // volts per rad/s
-      public static final double kA                 = 0.00010; // volts per rad/s^2
-    }
-
-    // TELEOPERATED
-    public static final class ABSOLUTE_ROTATION_GAINS {
-      public static final double kP = 4.0;
-      public static final double kI = 0.0;
-      public static final double kD = 0.5;
-      public static final Rotation2d TOLERANCE = Rotation2d.fromDegrees(0.5);
-    }
-    
-    // MODULES
-    // In order of: front left, front right, back left, back right, where the battery is in the back
-
-    // public static final String[] MODULE_NAMES          = { "FL", "FR", "BL", "BR" };
-    // public static final double[] STEER_ENCODER_OFFSETS_PROTO = { -213.047, 24.785, -34.805, -11.602 };
-    // public static final double[] STEER_ENCODER_OFFSETS_COMP  = { 69.70908 + 180.0, 88.0214 + 180.0, 57.48648 + 180.0, 191.33784 + 180.0 };
-
-    // public static final double[] STEER_ENCODER_OFFSETS_PROTO = { -213.047, 24.785, -34.805, -11.602 };
-    // public static final double[] STEER_ENCODER_OFFSETS_COMP  = { 69.70908, 88.0214, 57.48648, 191.33784 };
-    
-    public record MODULE_CONFIG (int ID, int CAN_DRIVE, int CAN_STEER, int CAN_ENCODER, double ENCODER_OFFSET) {}
-
-    public static final MODULE_CONFIG[] MODULES = new MODULE_CONFIG[] {
-      new MODULE_CONFIG(0, 31, 32, 33, -0.061523),
-      new MODULE_CONFIG(1, 34, 35, 36, 0.246582),
-      new MODULE_CONFIG(2, 37, 38, 39, -0.348633),
-      new MODULE_CONFIG(3, 40, 41, 42, -0.224854),
-      new MODULE_CONFIG(4, 43, 44, 45, -0.340576),
-      new MODULE_CONFIG(5, 46, 47, 48, -0.432373),
-      new MODULE_CONFIG(6, 49, 50, 51, -0.102783),
-      new MODULE_CONFIG(7, 52, 53, 54, -0.279785),
-      new MODULE_CONFIG(8, 55, 56, 57, -0.002197),
-      new MODULE_CONFIG(9, 58, 59, 60, -0.217041),
-    };
-
-    public static final String[] MODULE_NAMES = {
-      "front-left",
-      "front-right",
-      "back-left",
-      "back-right"
-    };
-
-    public static final MODULE_CONFIG[] EQUIPPED_MODULES_PROTOTYPE = {
-      MODULES[4], // front-left
-      MODULES[5], // front-right
-      MODULES[6], // back-left
-      MODULES[7]  // back-right
-    };
-
-    public static final MODULE_CONFIG[] EQUIPPED_MODULES_COMPETITION = {
-      MODULES[0], // front-left
-      MODULES[1], // front-right
-      MODULES[8], // back-left
-      MODULES[3]  // back-right
-    };
-  }
+  public static final SwerveConfig SWERVE_CONFIGURATION = null; // TODO: Add configuration
 
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back

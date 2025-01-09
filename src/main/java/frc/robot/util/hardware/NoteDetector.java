@@ -1,13 +1,13 @@
 package frc.robot.util.hardware;
 
 import com.revrobotics.spark.SparkMax;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.Constants.Constants.NEO;
 import frc.robot.Constants.Constants.NEO550;
-import frc.robot.util.software.Logging.Logger;
 
 public class NoteDetector extends SubsystemBase {
   int filterSize = 3;
@@ -25,9 +25,9 @@ public class NoteDetector extends SubsystemBase {
     this.gearing = gearing;
     this.freeTorque = freeTorque;
     this.isNeo550 = isNeo550;
-    Logger.autoLog("NoteDetectors/" + motor.getDeviceId() + "/isNoteStatusTrue", () -> isNoteStatus(true));
-    Logger.autoLog("NoteDetectors/" + motor.getDeviceId() + "/isNoteStatusFalse", () -> isNoteStatus(false));
-    Logger.autoLog("NoteDetectors/" + motor.getDeviceId() + "/appliedTorque", () -> filteredTorque);
+    Logger.logBoolean("NoteDetectors/" + motor.getDeviceId() + "/isNoteStatusTrue", () -> isNoteStatus(true));
+    Logger.logBoolean("NoteDetectors/" + motor.getDeviceId() + "/isNoteStatusFalse", () -> isNoteStatus(false));
+    Logger.logNumber("NoteDetectors/" + motor.getDeviceId() + "/appliedTorque", () -> filteredTorque);
   }
 
   @Override
