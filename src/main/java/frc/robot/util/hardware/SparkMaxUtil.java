@@ -76,7 +76,7 @@ public final class SparkMaxUtil {
   public static void configureFollower(SparkMaxConfig config, SparkMax leader, boolean inverted) {
     config.follow(leader, inverted);
   }
-
+  
   public static void saveAndLog(Subsystem subsystem, SparkMax motor, SparkMaxConfig config) {
     configure(() -> motor.setCANTimeout(0), motor);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

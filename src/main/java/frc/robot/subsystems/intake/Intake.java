@@ -66,10 +66,7 @@ public class Intake extends SubsystemBase {
         if (RobotState.isDisabled()) {
             pivotState = State.OFF;
         }
-    }
 
-    @Override
-    public void simulationPeriodic() {
         switch (pivotState) {
             case IN:
                 pivotMotor.set(-Preferences.INTAKE.IN_POWER);
@@ -93,5 +90,10 @@ public class Intake extends SubsystemBase {
                 wheelsMotor.set(0);
                 break;
         }
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        
     }
 }

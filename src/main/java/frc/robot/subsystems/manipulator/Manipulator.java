@@ -14,9 +14,9 @@ import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 public class Manipulator extends SubsystemBase{
     private SparkMax ManipulatorMotor;
 
-    public static enum State{
-        INTAKE,
-        OUTPUT,
+    public static enum State {
+        IN,
+        OUT,
         OFF
     }
     public State state;
@@ -44,10 +44,10 @@ public class Manipulator extends SubsystemBase{
             case OFF:
                 motorPower = 0.0;
                 break;
-            case INTAKE:
+            case IN:
                 motorPower = Preferences.MANIPULATOR.MANIPUALTOR_IN_SPEED;
                 break;
-            case OUTPUT:
+            case OUT:
                 motorPower = Preferences.MANIPULATOR.MANIPUALTOR_OUT_SPEED;
                 break;
         }
