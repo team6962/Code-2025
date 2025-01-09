@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Preferences;
@@ -20,11 +21,15 @@ public class Elevator extends SubsystemBase {
         OFF
     }
 
-    private TalonFX motor = new TalonFX(CAN.INTAKE);
+    private TalonFX motor;
     private State state = State.OFF;
+    private DutyCycleEncoder encoder;
 
 
   public Elevator() {
+    motor = new TalonFX(CAN.INTAKE);
+    encoder = new DutyCycleEncoder(CAN.ELEVATOR_ENCODER);
+    // encoder.setDistancePerRotation(1.0); // Set distance per rotation to 1.0
     // Configure the TalonFX using Phoenix 6 configuration
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

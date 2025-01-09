@@ -264,10 +264,7 @@ public final class Constants {
     public static final int TRANSFER_OUT = 24;
     public static final int TRANSFER_IN = 22;
     public static final int INTAKE = 29; 
-    public static final int AMP_PIVOT = 17;
-    public static final int AMP_WHEELS = 25;
-    // left/right is from the robot's view of from intake
-    public static final int HANG_RIGHT = 28;
+    public static final int ELEVATOR_ENCODER = 0; // UPDATE
 
   }
 
@@ -316,6 +313,11 @@ public final class Constants {
     public static double maxTorqueCurrentLimited(int currentLimit) {
       return STATS.stallTorqueNewtonMeters / STATS.stallCurrentAmps * currentLimit;
     }
+  }
+
+  public static final class ELEVATOR {
+    public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
+    
   }
   public static final class SHOOTER_FEED {
     public static final double GEARING = 1.0;
@@ -368,42 +370,11 @@ public final class Constants {
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }
-
-  public static final class AMP_WHEELS {
-    public static final double GEARING = 16.0 * 78.0 / 24.0;
-    public static final double FREE_TORQUE = 2.5; // TODO
-    public static final double RADIUS = Units.inchesToMeters(1.625 / 2.0);
-  }
-  public static final class AMP_PIVOT {
-    public static final double GEARING = (78.0 / 10.0) * (78.0 / 16.0) * (26.0 / 12.0);
-    public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
-    public static final double ABSOLUTE_POSITION_OFFSET = -0.814;
-
-    public static final class PROFILE {
-      public static final double kP = 1.5;
-      public static final double kS = 0.0;
-      public static final double MAX_ACCELERATION = 40.0; // rad/s^2
-    }
-  }
-
-  public static final class TRANSFER {
-    public static final double GEARING_IN = (42.0 / 12.0) * (24.0 / 18.0);
-    public static final double GEARING_OUT = 58.0 / 12.0;
-    public static final double RADIUS = Units.inchesToMeters(1.125);
-    public static final double MAX_LINEAR_SPEED_IN = NEO.STATS.freeSpeedRadPerSec / GEARING_IN * RADIUS;
-  }
-
+  
   public static final class INTAKE {
     public static final double GEARING = (38.0 / 16.0) * (15.0 / 18.0);
     public static final double RADIUS = Units.inchesToMeters(0.5);
     public static final double MAX_LINEAR_SPEED = NEO.STATS.freeSpeedRadPerSec / GEARING * RADIUS;
-  }
-
-  public static final class HANG {
-    public static final double SPOOL_RADIUS = Units.inchesToMeters((0.75 + 0.0511811024) / 2.0);
-    public static final double GEARING = 16.0;
-    public static final double EXTEND_HEIGHT = Units.inchesToMeters(39 - 20.5 + 11.0);
-    public static final double RETRACT_HEIGHT = Units.inchesToMeters(1.0);
   }
 
   // LED
