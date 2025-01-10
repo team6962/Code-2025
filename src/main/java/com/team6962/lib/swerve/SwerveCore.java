@@ -5,8 +5,10 @@ import java.util.Arrays;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.SwerveGyroscope;
-import com.team6962.lib.swerve.module.SimulatedModule;
+import com.team6962.lib.swerve.module.SimulatedTalonModule;
 import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.swerve.module.SwerveModule.Corner;
+import com.team6962.lib.swerve.module.TalonModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 
@@ -42,8 +44,8 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         modules = new SwerveModule[4];
 
         for (int i = 0; i < 4; i++) {
-            SwerveModule module = RobotBase.isReal() ? new SwerveModule() : new SimulatedModule();
-            module.configureModule(constants, SwerveModule.Corner.fromIndex(i));
+            TalonModule module = RobotBase.isReal() ? new TalonModule() : new SimulatedTalonModule();
+            module.configureModule(constants, Corner.fromIndex(i));
 
             modules[i] = module;
         }
