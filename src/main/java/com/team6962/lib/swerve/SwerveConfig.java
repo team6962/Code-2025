@@ -209,7 +209,7 @@ public class SwerveConfig {
         }
 
         public Distance radius() {
-            return diameter.divide(2);
+            return diameter.div(2);
         }
     }
 
@@ -323,11 +323,11 @@ public class SwerveConfig {
     }
     
     public Angle steerMotorRotorToMechanism(Angle movement) {
-        return movement.divide(gearing.steer);
+        return movement.div(gearing.steer);
     }
 
     public AngularVelocity steerMotorRotorToMechanism(AngularVelocity movement) {
-        return movement.divide(gearing.steer);
+        return movement.div(gearing.steer);
     }
 
     public Angle steerMotorMechanismToRotor(Angle movement) {
