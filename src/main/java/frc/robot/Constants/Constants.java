@@ -95,7 +95,7 @@ public final class Constants {
     public static final int INTAKE = 29; 
     public static final int HANG = 0; // UPDATE 
     public static final int ELEVATOR_ENCODER = 0; // UPDATE
-
+    
   }
 
   public static final class DIO {
@@ -103,6 +103,8 @@ public final class Constants {
     public static final int SHOOTER_PIVOT = 2;
     public static final int BEAM_BREAK = 3;
     public static final int HANG_ENCODER = 0; //UPDATE
+    public static final int ELEVATOR_ENCODER = 4;
+    
   }
 
   public static final class NEO {
@@ -148,7 +150,8 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
-    
+    public static final double ELEVATOR_MAX_HEIGHT = 40; // Placeholder, in inches
+    public static final double ELEVATOR_MIN_HEIGHT = 2; // Placeholder, in inches
   }
   public static final class SHOOTER_FEED {
     public static final double GEARING = 1.0;
