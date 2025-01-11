@@ -11,7 +11,7 @@ import frc.robot.Constants.Preferences;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 // Manipulator is for the coral
-public class Manipulator extends SubsystemBase{
+public class Manipulator extends SubsystemBase {
     private SparkMax ManipulatorMotor;
 
     public static enum State {

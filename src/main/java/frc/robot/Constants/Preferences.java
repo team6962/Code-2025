@@ -65,6 +65,11 @@ public final class Preferences {
     public static final double TO_AMP_POWER = 0.4;
   }
 
+  public static final class HANG { // Adjust these as needed
+    public static final double CLIMB_POWER = 0.5;
+    public static final double REVERSE_POWER = 0.5;
+  }
+
   public static final class INTAKE {
     public static final double IN_POWER = 0.5;
     public static final double OUT_POWER = 0.5; // Placeholder value
@@ -77,6 +82,7 @@ public final class Preferences {
     public static final double MANIPUALTOR_OUT_SPEED = 1.0;
     public static final double MANIPUALTOR_IN_SPEED = 1.0;
   }
+  
   public static final class ELEVATOR {
     public static final double POWER = 0.5;
     public static final double SLOW_POWER = 0.2;  
