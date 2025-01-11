@@ -20,7 +20,7 @@ public class Hang extends SubsystemBase {
 
 
     public Hang() {
-        motor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
+        motor = new SparkMax(CAN.HANG, MotorType.kBrushless);
         motorConfig = new SparkMaxConfig();
         SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
         SparkMaxUtil.saveAndLog(this, motor, motorConfig);

@@ -93,6 +93,7 @@ public final class Constants {
     public static final int TRANSFER_OUT = 24;
     public static final int TRANSFER_IN = 22;
     public static final int INTAKE = 29; 
+    public static final int HANG = 0; // UPDATE 
     public static final int ELEVATOR_ENCODER = 0; // UPDATE
 
   }
