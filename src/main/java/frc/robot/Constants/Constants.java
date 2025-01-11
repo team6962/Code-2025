@@ -102,6 +102,7 @@ public final class Constants {
     public static final int AMP_PIVOT = 1;
     public static final int SHOOTER_PIVOT = 2;
     public static final int BEAM_BREAK = 3;
+    public static final int HANG_ENCODER = 0; //UPDATE
   }
 
   public static final class NEO {
@@ -207,6 +208,10 @@ public final class Constants {
     public static final double MAX_LINEAR_SPEED = NEO.STATS.freeSpeedRadPerSec / GEARING * RADIUS;
   }
 
+  public static final class HANG {
+    public static final Double EXTEND_HEIGHT = 0.0; //CHANGE
+    public static final Double RETRACT_HEIGHT = 0.0; //CHANGE
+  }
   // LED
   public static final class LED {
     public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
