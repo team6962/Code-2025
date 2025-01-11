@@ -23,7 +23,6 @@ public class Hang extends SubsystemBase {
     private SparkMaxConfig motorConfig;
     private DutyCycleEncoder hangEncoder;
 
-
     public Hang() {
         motor = new SparkMax(CAN.HANG, MotorType.kBrushless);
         motorConfig = new SparkMaxConfig();
@@ -38,7 +37,7 @@ public class Hang extends SubsystemBase {
         REVERSE
     }
 
-    public Command setPivotState(State state) {
+    public Command setState(State state) {
         return runEnd(
             () -> this.state = state,
             () -> this.state = State.OFF

@@ -48,7 +48,7 @@ public class Manipulator extends SubsystemBase {
                 motorPower = Preferences.MANIPULATOR.MANIPUALTOR_IN_SPEED;
                 break;
             case OUT:
-                motorPower = Preferences.MANIPULATOR.MANIPUALTOR_OUT_SPEED;
+                motorPower = -Preferences.MANIPULATOR.MANIPUALTOR_OUT_SPEED; // Positive and negative might need to be switched for IN and OUT
                 break;
         }
         

@@ -23,8 +23,6 @@ public class Intake extends SubsystemBase {
     private SparkMaxConfig pivotMotorConfig;
     private SparkMaxConfig wheelsMotorConfig;
 
-
-
     public Intake() {
         pivotMotor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
         pivotMotorConfig = new SparkMaxConfig();
