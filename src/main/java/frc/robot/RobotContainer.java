@@ -11,6 +11,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.test.SwerveModuleTest;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -39,12 +40,14 @@ public class RobotContainer {
 
 
   // The robot's subsystems and commands
-  private final SwerveDrive swerveDrive;
-  private final RobotStateController stateController;
-  private final LEDs ledStrip;
+  // private final SwerveDrive swerveDrive;
+  // private final RobotStateController stateController;
+  // private final LEDs ledStrip;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
+
+  private final SwerveModuleTest swerveModuleTest;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -73,9 +76,9 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
-    stateController = new RobotStateController(swerveDrive);
-    ledStrip = new LEDs(stateController);
+    // swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
+    // stateController = new RobotStateController(swerveDrive);
+    // ledStrip = new LEDs(stateController);
     // collisionDetector = new CollisionDetector();
     
     // Configure the trigger bindings
@@ -84,6 +87,8 @@ public class RobotContainer {
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
     Pathfinding.ensureInitialized();
+
+    swerveModuleTest = new SwerveModuleTest();
   }
 
   public Command getAutonomousCommand() {

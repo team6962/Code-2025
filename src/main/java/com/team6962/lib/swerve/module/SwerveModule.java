@@ -114,10 +114,8 @@ public class SwerveModule extends SubsystemBase {
         // swerve drive configuration to the steer motor
         CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
 
-        // Configure the steer motor to be inverted, and brake automatically
-        // when not driven
+        // Configure the steer motor to brake automatically when not driven
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
-            //.withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)));
         
         // Configure the fusing of the absolute steer encoder's reported position
@@ -125,8 +123,7 @@ public class SwerveModule extends SubsystemBase {
         // gear ratio to the value given in the swerve drive configuration
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
             .withFusedCANcoder(steerEncoder)
-            .withRotorToSensorRatio(config.gearing().steer())
-            .withSensorToMechanismRatio(1)));
+            .withRotorToSensorRatio(config.gearing().steer())));
     }
 
     /**
@@ -187,7 +184,7 @@ public class SwerveModule extends SubsystemBase {
         targetState.optimize(getState().angle);
 
         CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(targetState.speedMetersPerSecond)));
-        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
+        CTREUtils.check(steerMotor.setControl(new PositionVoltage(-targetState.angle.getRotations())));
     }
 
     /**

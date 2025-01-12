@@ -6,7 +6,6 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Pounds;
 
 import java.util.Map;
@@ -20,8 +19,6 @@ import com.team6962.lib.swerve.SwerveConfig.DriveGains;
 import com.team6962.lib.swerve.SwerveConfig.Gearing;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
-import com.team6962.lib.swerve.module.SwerveModule;
-import com.team6962.lib.swerve.module.SwerveModule.Corner;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,11 +26,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.Constants.Preferences.SWERVE_DRIVE;
 
 
 /**
@@ -119,15 +112,16 @@ public final class Constants {
     );
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
-      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(100, 101, 102, Degrees.of(0)),
+      new SwerveConfig.Module(103, 104, 105, Degrees.of(0)),
+      new SwerveConfig.Module(106, 107, 108, Degrees.of(0)),
+      new SwerveConfig.Module(109, 110, 111, Degrees.of(0)),
+      new SwerveConfig.Module(112, 113, 114, Degrees.of(0)),
+      new SwerveConfig.Module(115, 116, 117, Degrees.of(0)),
+      new SwerveConfig.Module(118, 119, 120, Degrees.of(0)),
+      new SwerveConfig.Module(121, 122, 123, Degrees.of(0)),
+      new SwerveConfig.Module(124, 125, 126, Degrees.of(0)),
+      new SwerveConfig.Module(127, 128, 129, Degrees.of(0))
     };
 
     public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {

@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /**
@@ -23,11 +24,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 public class SimulatedModule extends SwerveModule {
     private FlywheelSim driveFlywheel;
 
-    /**
-     * Flywheel simulation representing the steer motor, working in mechanism
-     * rotations.
-     */
-    private FlywheelSim steerFlywheel;
+    private DCMotorSim steerMotorSim;
 
     private Angle drivePosition = Rotations.of(0);
 
@@ -41,7 +38,7 @@ public class SimulatedModule extends SwerveModule {
         super.configureModule(constants, corner);
 
         driveFlywheel = constants.createDriveMotorSimulation();
-        steerFlywheel = constants.createSteerMotorSimulation();
+        steerMotorSim = constants.createSteerMotorSimulation();
     }
 
     @Override
@@ -65,10 +62,10 @@ public class SimulatedModule extends SwerveModule {
 
         System.out.println(steerSim.getMotorVoltage());
 
-        steerFlywheel.setInputVoltage(MathUtil.clamp(-12.0, steerSim.getMotorVoltage(), 12.0));
-        steerFlywheel.update(0.02);
+        steerMotorSim.setInputVoltage(MathUtil.clamp(-12.0, steerSim.getMotorVoltage(), 12.0));
+        steerMotorSim.update(0.02);
 
-        AngularVelocity steerVelocity = steerFlywheel.getAngularVelocity();
+        AngularVelocity steerVelocity = steerMotorSim.getAngularVelocity();
 
         steerAngle = steerAngle.plus(steerVelocity.times(Seconds.of(0.02)));
 
@@ -79,6 +76,7 @@ public class SimulatedModule extends SwerveModule {
         CANcoderSimState steerEncoderSim = getSteerEncoder().getSimState();
 
         steerEncoderSim.setRawPosition(steerAngle);
+        steerEncoderSim.setVelocity(steerVelocity);
         steerEncoderSim.setSupplyVoltage(busVoltage);
     }
 }

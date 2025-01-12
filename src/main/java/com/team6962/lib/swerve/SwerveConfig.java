@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.NewtonMeter;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Ohms;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -47,6 +48,7 @@ import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /**
@@ -132,6 +134,11 @@ public class SwerveConfig {
         public final double drive;
         public final double steer;
 
+        /**
+         * Creates a new Gearing
+         * @param driveRatio The drive ratio reduction
+         * @param steerRatio The steer ratio reduction
+         */
         private Gearing(double driveRatio, double steerRatio) {
             this.drive = driveRatio;
             this.steer = steerRatio;
@@ -188,20 +195,26 @@ public class SwerveConfig {
     }
 
     public static enum Wheel {
-        COLSON(Inches.of(4), 1.0),
-        BILLET_NITRILE(Inches.of(4), 1.0),
-        BILLET_PRINTED(Inches.of(4), 1.5);
+        COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
 
         public final Distance diameter;
+        public final Distance width;
         public final double staticFriction;
+        public final Mass mass;
 
-        private Wheel(Distance diameter, double staticFriction) {
+        private Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
             this.diameter = diameter;
+            this.width = width;
             this.staticFriction = staticFriction;
+            this.mass = mass;
         }
 
         public Distance diameter() {
             return diameter;
+        }
+
+        public Distance width() {
+            return width;
         }
 
         public double staticFriction() {
@@ -210,6 +223,14 @@ public class SwerveConfig {
 
         public Distance radius() {
             return diameter.div(2);
+        }
+
+        public MomentOfInertia driveMomentOfInertia() {
+            return KilogramSquareMeters.of(0.5 * mass.in(Kilograms) * radius().in(Meters) * radius().in(Meters));
+        }
+
+        public MomentOfInertia steerMomentOfInertia() {
+            return KilogramSquareMeters.of(1.0 / 12.0 * mass.in(Kilograms) * (3.0 * radius().in(Meters) * radius().in(Meters) + width().in(Meters) * width().in(Meters)));
         }
     }
 
@@ -295,14 +316,14 @@ public class SwerveConfig {
         );
     }
 
-    public FlywheelSim createSteerMotorSimulation() {
-        return new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                steerMotor.gains.kV,
-                steerMotor.gains.kA
+    public DCMotorSim createSteerMotorSimulation() {
+        return new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                steerMotor().stats(),
+                wheel().steerMomentOfInertia().in(KilogramSquareMeters),
+                gearing().steer()
             ),
-            steerMotor.stats,
-            gearing.steer
+            steerMotor().stats()
         );
     }
 
