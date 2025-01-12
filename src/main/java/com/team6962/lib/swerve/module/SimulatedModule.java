@@ -3,6 +3,7 @@ package com.team6962.lib.swerve.module;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
@@ -54,13 +55,11 @@ public class SimulatedModule extends SwerveModule {
         driveFlywheel.setInputVoltage(MathUtil.clamp(-12.0, driveSim.getMotorVoltage(), 12.0));
         driveFlywheel.update(0.02);
 
-        drivePosition = drivePosition.plus(Rotations.of(
-            RadiansPerSecond.of(driveFlywheel.getAngularVelocityRadPerSec()).in(RotationsPerSecond) * 0.02
-        ));
+        drivePosition = drivePosition.plus(driveFlywheel.getAngularVelocity().times(Seconds.of(0.02)));
 
-        driveSim.setRawRotorPosition(drivePosition.in(Rotations));
-        driveSim.setRotorVelocity(RadiansPerSecond.of(driveFlywheel.getAngularVelocityRadPerSec()).in(RotationsPerSecond));
-        driveSim.setSupplyVoltage(busVoltage.in(Volts));
+        driveSim.setRawRotorPosition(drivePosition);
+        driveSim.setRotorVelocity(driveFlywheel.getAngularVelocity());
+        driveSim.setSupplyVoltage(busVoltage);
 
         TalonFXSimState steerSim = getSteerMotor().getSimState();
 
@@ -69,19 +68,17 @@ public class SimulatedModule extends SwerveModule {
         steerFlywheel.setInputVoltage(MathUtil.clamp(-12.0, steerSim.getMotorVoltage(), 12.0));
         steerFlywheel.update(0.02);
 
-        AngularVelocity steerVelocity = RadiansPerSecond.of(steerFlywheel.getAngularVelocityRadPerSec());
+        AngularVelocity steerVelocity = steerFlywheel.getAngularVelocity();
 
-        steerAngle = steerAngle.plus(Rotations.of(
-            steerVelocity.in(RotationsPerSecond) * 0.02
-        ));
+        steerAngle = steerAngle.plus(steerVelocity.times(Seconds.of(0.02)));
 
-        steerSim.setRawRotorPosition(steerAngle.in(Rotations) * getDrivetrainConstants().gearing().steer);
-        steerSim.setRotorVelocity(steerVelocity.in(RotationsPerSecond) * getDrivetrainConstants().gearing().steer);
-        steerSim.setSupplyVoltage(busVoltage.in(Volts));
+        steerSim.setRawRotorPosition(steerAngle.times(getDrivetrainConstants().gearing().steer));
+        steerSim.setRotorVelocity(steerVelocity.times(getDrivetrainConstants().gearing().steer));
+        steerSim.setSupplyVoltage(busVoltage);
 
         CANcoderSimState steerEncoderSim = getSteerEncoder().getSimState();
 
-        steerEncoderSim.setRawPosition(steerAngle.in(Rotations));
-        steerEncoderSim.setSupplyVoltage(busVoltage.in(Volts));
+        steerEncoderSim.setRawPosition(steerAngle);
+        steerEncoderSim.setSupplyVoltage(busVoltage);
     }
 }

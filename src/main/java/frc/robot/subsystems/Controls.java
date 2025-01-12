@@ -28,7 +28,7 @@ public class Controls {
     driver.b();
     driver.x();
     driver.y(); // USED
-    driver.start();
+    // driver.start().whileTrue(new GoToPose(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP"), swerveDrive));
     driver.back();
     driver.leftBumper();
     driver.rightBumper();

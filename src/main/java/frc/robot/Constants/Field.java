@@ -42,6 +42,8 @@ public final class Field {
     point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -1.0),
     point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -2.0)
   );
+
+  public static final Translation2d reefPoleOffset(double angle) { return new Translation2d(12.94/2, Rotation2d.fromDegrees(angle)); }
   
   public static final Supplier<Translation3d> SPEAKER = point3d(0.23, WIDTH / 2.0 + Units.inchesToMeters(57) * 1.0, 2.055);
 

@@ -3,10 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Newton;
+import static edu.wpi.first.units.Units.Pounds;
+
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
+import com.team6962.lib.swerve.SwerveConfig.Chassis;
+import com.team6962.lib.swerve.SwerveConfig.DriveGains;
+import com.team6962.lib.swerve.SwerveConfig.Gearing;
+import com.team6962.lib.swerve.SwerveConfig.Motor;
+import com.team6962.lib.swerve.SwerveConfig.Wheel;
+import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.swerve.module.SwerveModule.Corner;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +29,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.Constants.Preferences.SWERVE_DRIVE;
 
 
 /**
@@ -81,7 +100,53 @@ public final class Constants {
     public static final double NOTE_CAMERA_HEIGHT_PIXELS = 960;
   }
 
-  public static final SwerveConfig SWERVE_CONFIGURATION = null; // TODO: Add configuration
+  public static final class SWERVE {
+    public static final Slot0Configs DRIVE_MOTOR_GAINS = new Slot0Configs()
+      .withKA(0.1);
+    public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
+      .withKA(0.5);
+    public static final DriveGains DRIVE_GAINS = new DriveGains(
+      new PIDConstants(1, 1, 1, 0),
+      new PIDConstants(1, 1, 1, 0)
+    );
+
+    public static final Chassis CHASSIS = new Chassis(
+      Inches.of(30),
+      Inches.of(30),
+      Inches.of(30), 
+      Inches.of(30),
+      Pounds.of(30)
+    );
+
+    public static final SwerveConfig.Module[] MODULE_CONFIGS = {
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+      new SwerveConfig.Module(0, 0, 0, Degrees.of(0)),
+    };
+
+    public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {
+      MODULE_CONFIGS[0], // front-left
+      MODULE_CONFIGS[1], // front-right
+      MODULE_CONFIGS[2], // back-left
+      MODULE_CONFIGS[3]  // back-right
+    };
+
+    public static final SwerveConfig CONFIG = new SwerveConfig(
+      CHASSIS,
+      Gearing.MK4I_L2,
+      SELECTED_MODULE_CONFIGS,
+      new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(40)),
+      new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(40)),
+      Wheel.COLSON,
+      DRIVE_GAINS
+    );
+  }
 
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back

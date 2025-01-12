@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
@@ -72,13 +73,13 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    swerveDrive = new SwerveDrive(Constants.SWERVE_CONFIGURATION);
+    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
     ledStrip = new LEDs(stateController);
     // collisionDetector = new CollisionDetector();
     
     // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive);
+    // Controls.configureBindings(stateController, swerveDrive);
 
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
