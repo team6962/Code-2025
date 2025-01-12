@@ -2,6 +2,7 @@ package com.team6962.lib.test;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -25,8 +26,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModuleTest extends SubsystemBase {
@@ -36,7 +39,9 @@ public class SwerveModuleTest extends SubsystemBase {
     private TalonFX steerMotor;
     private CANcoder encoder;
 
-    private DCMotorSim steerMotorSim;
+    private FlywheelSim steerMotorSim;
+
+    private Angle wheelAngle = Rotations.of(0);
 
     public SwerveModuleTest() {
         encoder = new CANcoder(11);
@@ -60,8 +65,8 @@ public class SwerveModuleTest extends SubsystemBase {
         CTREUtils.check(steerConfig.apply(new Slot0Configs()
             .withKP(1000.0)));
         
-        steerMotorSim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
+        steerMotorSim = new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60Foc(1),
                 wheel.steerMomentOfInertia().in(KilogramSquareMeters),
                 rotorToSensorReduction
@@ -88,12 +93,14 @@ public class SwerveModuleTest extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Time delta = Seconds.of(0.02);
+
         TalonFXSimState steerSimState = steerMotor.getSimState();
 
         steerMotorSim.setInputVoltage(steerSimState.getMotorVoltage());
-        steerMotorSim.update(0.02);
+        steerMotorSim.update(delta.in(Seconds));
 
-        Angle wheelAngle = steerMotorSim.getAngularPosition();
+        wheelAngle = wheelAngle.plus(steerMotorSim.getAngularVelocity().times(delta));
 
         CTREUtils.check(steerSimState.setRawRotorPosition(wheelAngle.times(rotorToSensorReduction)));
 

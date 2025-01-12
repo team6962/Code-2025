@@ -45,12 +45,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
  */
 public class SwerveModule extends SubsystemBase {
     /**
-     * The drive motor for this module.
+     * The drive motor for this module. Works in rotor units.
      */
     private TalonFX driveMotor;
 
     /**
-     * The steer motor for this module.
+     * The steer motor for this module. Works in mechanism units.
      */
     private TalonFX steerMotor;
 
@@ -86,10 +86,6 @@ public class SwerveModule extends SubsystemBase {
 
         // Configure the drive motor to brake automatically when not driven
         CTREUtils.check(driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
-
-        // Set the drive motor gear ratio to the value given in the swerve drive
-        // configuration
-        CTREUtils.check(driveConfig.apply(new FeedbackConfigs().withSensorToMechanismRatio(config.gearing().drive())));
 
         // Connect to the module's steer encoder
         steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -183,7 +179,10 @@ public class SwerveModule extends SubsystemBase {
 
         targetState.optimize(getState().angle);
 
-        CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(targetState.speedMetersPerSecond)));
+        CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
+            constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
+        )));
+        
         CTREUtils.check(steerMotor.setControl(new PositionVoltage(-targetState.angle.getRotations())));
     }
 
