@@ -95,12 +95,12 @@ public final class Constants {
 
   public static final class SWERVE {
     public static final Slot0Configs DRIVE_MOTOR_GAINS = new Slot0Configs()
-      .withKA(0.1);
+      .withKP(1000);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKA(0.5);
+      .withKP(1000);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
-      new PIDConstants(1, 1, 1, 0),
-      new PIDConstants(1, 1, 1, 0)
+      new PIDConstants(1, 0, 0),
+      new PIDConstants(1, 0, 0)
     );
 
     public static final Chassis CHASSIS = new Chassis(
@@ -112,16 +112,15 @@ public final class Constants {
     );
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(100, 101, 102, Degrees.of(0)),
-      new SwerveConfig.Module(103, 104, 105, Degrees.of(0)),
-      new SwerveConfig.Module(106, 107, 108, Degrees.of(0)),
-      new SwerveConfig.Module(109, 110, 111, Degrees.of(0)),
-      new SwerveConfig.Module(112, 113, 114, Degrees.of(0)),
-      new SwerveConfig.Module(115, 116, 117, Degrees.of(0)),
-      new SwerveConfig.Module(118, 119, 120, Degrees.of(0)),
-      new SwerveConfig.Module(121, 122, 123, Degrees.of(0)),
-      new SwerveConfig.Module(124, 125, 126, Degrees.of(0)),
-      new SwerveConfig.Module(127, 128, 129, Degrees.of(0))
+      new SwerveConfig.Module(10, 20, 30, Degrees.of(0)),
+      new SwerveConfig.Module(11, 21, 31, Degrees.of(0)),
+      new SwerveConfig.Module(12, 22, 32, Degrees.of(0)),
+      new SwerveConfig.Module(13, 23, 33, Degrees.of(0)),
+      new SwerveConfig.Module(14, 24, 34, Degrees.of(0)),
+      new SwerveConfig.Module(15, 25, 35, Degrees.of(0)),
+      new SwerveConfig.Module(16, 26, 36, Degrees.of(0)),
+      new SwerveConfig.Module(17, 27, 37, Degrees.of(0)),
+      new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
     public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {
