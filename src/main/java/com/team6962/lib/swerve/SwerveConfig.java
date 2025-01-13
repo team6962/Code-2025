@@ -48,7 +48,6 @@ import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /**
@@ -307,18 +306,18 @@ public class SwerveConfig {
 
     public FlywheelSim createDriveMotorSimulation() {
         return new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                driveMotor.gains.kV * wheel.radius().in(Meters),
-                driveMotor.gains.kA * wheel.radius().in(Meters)
+            LinearSystemId.createFlywheelSystem(
+                driveMotor().stats(),
+                wheel().driveMomentOfInertia().in(KilogramSquareMeters),
+                gearing().drive()
             ),
-            driveMotor.stats,
-            gearing.drive
+            driveMotor().stats()
         );
     }
 
-    public DCMotorSim createSteerMotorSimulation() {
-        return new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
+    public FlywheelSim createSteerMotorSimulation() {
+        return new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
                 steerMotor().stats(),
                 wheel().steerMomentOfInertia().in(KilogramSquareMeters),
                 gearing().steer()

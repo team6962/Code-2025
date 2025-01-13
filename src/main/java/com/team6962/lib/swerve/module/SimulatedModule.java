@@ -63,14 +63,7 @@ public class SimulatedModule extends SwerveModule {
 
             SwerveConfig config = getDrivetrainConstants();
 
-            steerMotorSim = new FlywheelSim(
-                LinearSystemId.createFlywheelSystem(
-                    config.steerMotor().stats(),
-                    config.wheel().steerMomentOfInertia().in(KilogramSquareMeters),
-                    config.gearing().steer()
-                ),
-                config.steerMotor().stats()
-            );
+            steerMotorSim = config.createSteerMotorSimulation();
         }
 
         @Override
@@ -106,14 +99,7 @@ public class SimulatedModule extends SwerveModule {
             
             SwerveConfig config = getDrivetrainConstants();
 
-            driveMotorSim = new FlywheelSim(
-                LinearSystemId.createFlywheelSystem(
-                    config.driveMotor().stats(),
-                    config.wheel().driveMomentOfInertia().in(KilogramSquareMeters),
-                    config.gearing().drive()
-                ),
-                config.driveMotor().stats()
-            );
+            driveMotorSim = config.createDriveMotorSimulation();
         }
 
         @Override
