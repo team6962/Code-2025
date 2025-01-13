@@ -34,7 +34,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
     private SwerveDriveKinematics kinematics;
     private SwerveConfig constants;
 
-    private SwerveMovement currentMovement = new SwerveMovement(kinematics);
+    private SwerveMovement currentMovement;
 
     public SwerveCore(SwerveConfig constants) {
         this.constants = constants;
@@ -50,6 +50,8 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
         kinematics = KinematicsUtils.kinematicsFromChassis(constants.chassis());
         poseEstimator = new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
+
+        currentMovement = new SwerveMovement(kinematics);
     }
 
     public SwerveConfig getConstants() {
@@ -91,7 +93,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         for (int i = 0; i < 4; i++) {
             Pose2d relativePose = modules[i].getRelativePose();
 
-            poses[i] = relativePose.transformBy(KinematicsUtils.toTransform2d(poseEstimator.getEstimatedPose()));
+            poses[i] = poseEstimator.getEstimatedPose().transformBy(KinematicsUtils.toTransform2d(relativePose));
         }
 
         return poses;

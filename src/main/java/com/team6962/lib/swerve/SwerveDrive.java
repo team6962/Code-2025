@@ -69,11 +69,6 @@ public class SwerveDrive extends SwerveCore {
         modules.setPoses(getModulePoses());
     }
 
-    @Override
-    public void latePeriodic() {
-        super.latePeriodic();
-    }
-
     public Pose2d getFuturePose(Time time) {
         return getPoseEstimator().getFuturePose(time);
     }

@@ -62,6 +62,8 @@ public class PoseEstimator extends SubsystemBase {
         chassisVelocity = kinematics.toTwist2d(KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
 
         positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
+        
+        lastPositions = modulePositions;
     }
 
     public SwerveGyroscope getGyroscope() {
@@ -81,7 +83,7 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     public void resetPosition(Pose2d expectedPose) {
-        poseEstimator.resetPosition(gyroscope.getHeading(), lastPositions, expectedPose);
+        poseEstimator.resetPosition(gyroscope.getHeading(), modulePositionsSupplier.get(), expectedPose);
     }
 
     public Pose2d getEstimatedPose() {

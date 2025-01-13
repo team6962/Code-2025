@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -22,6 +23,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.CTREUtils;
+import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -177,13 +179,13 @@ public class SwerveModule extends SubsystemBase {
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
-        targetState.optimize(getState().angle);
-
+        targetState.optimize(KinematicsUtils.toRotation2d(getSteerAngle()));
+        
         CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
         )));
-        
-        CTREUtils.check(steerMotor.setControl(new PositionVoltage(-targetState.angle.getRotations())));
+
+        CTREUtils.check(steerMotor.setControl(new PositionTorqueCurrentFOC(targetState.angle.getRotations())));
     }
 
     /**
@@ -191,7 +193,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link SwerveModulePosition}
      */
     public Distance getDrivePosition() {
-        return constants.wheel().diameter().times(CTREUtils.unwrap(driveMotor.getPosition()).in(Radians));
+        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getPosition()));
     }
 
     /**
@@ -199,7 +201,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link LinearVelocity}
      */
     public LinearVelocity getDriveSpeed() {
-        return MetersPerSecond.of(constants.wheel().radius().in(Meters) * CTREUtils.unwrap(driveMotor.getVelocity()).in(RadiansPerSecond));
+        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getVelocity()));
     }
 
     /**
@@ -207,7 +209,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link Angle}
      */
     public Angle getSteerAngle() {
-        return CTREUtils.unwrap(steerEncoder.getPosition());
+        return CTREUtils.unwrap(steerEncoder.getPosition()).times(1);
     }
 
     /**
@@ -215,7 +217,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link AngularVelocity}
      */
     public AngularVelocity getSteerVelocity() {
-        return CTREUtils.unwrap(steerEncoder.getVelocity());
+        return CTREUtils.unwrap(steerEncoder.getVelocity()).times(1);
     }
 
     /**

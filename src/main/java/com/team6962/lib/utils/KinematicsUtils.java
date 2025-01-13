@@ -1,6 +1,7 @@
 package com.team6962.lib.utils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -15,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -133,8 +135,13 @@ public final class KinematicsUtils {
     }
 
     public static SwerveModuleState[] getParkedStates() {
-        // TODO: Implement
-        throw new RuntimeException("Not implemented");
+        SwerveModuleState[] output = new SwerveModuleState[4];
+
+        for (int i = 0; i < 4; i++) {
+            output[i] = new SwerveModuleState(0, Rotation2d.fromDegrees(45 + 90 * i));
+        }
+
+        return output;
     }
 
     public static Transform2d toTransform2d(Pose2d pose) {
@@ -173,5 +180,9 @@ public final class KinematicsUtils {
         if (speeds == null) speeds = new ChassisSpeeds();
 
         return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed.getRadians());
+    }
+
+    public static Rotation2d toRotation2d(Angle angle) {
+        return Rotation2d.fromRotations(angle.in(Rotations));
     }
 }

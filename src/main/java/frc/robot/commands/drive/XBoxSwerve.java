@@ -28,11 +28,11 @@ public class XBoxSwerve extends Command {
   private SwerveDrive swerveDrive;
   private RobotStateController stateController;
 
-  public final double MAX_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(MetersPerSecond);
-  public final double NOMINAL_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER).in(MetersPerSecond);
-  public final double FINE_TUNE_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER).in(MetersPerSecond);
-  public final double NOMINAL_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER).in(RadiansPerSecond);
-  public final double MAX_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(RadiansPerSecond); // TODO: use physics from constants file
+  public double MAX_DRIVE_VELOCITY;
+  public double NOMINAL_DRIVE_VELOCITY;
+  public double FINE_TUNE_DRIVE_VELOCITY;
+  public double NOMINAL_ANGULAR_VELOCITY;
+  public double MAX_ANGULAR_VELOCITY;
   
   private Translation2d velocity = new Translation2d();
   private double angularVelocity = 0.0;
@@ -45,6 +45,12 @@ public class XBoxSwerve extends Command {
     this.stateController = stateController;
     // controller.setRumble(RumbleType.kBothRumble, 1.0);
     addRequirements(swerveDrive);
+
+    MAX_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(MetersPerSecond);
+    NOMINAL_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER).in(MetersPerSecond);
+    FINE_TUNE_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER).in(MetersPerSecond);
+    NOMINAL_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER).in(RadiansPerSecond);
+    MAX_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(RadiansPerSecond);
   }
 
   // Called when the command is initially scheduled.

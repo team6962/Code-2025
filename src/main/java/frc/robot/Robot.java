@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
     double timestampBefore = Timer.getFPGATimestamp();
     loopTime = timestampBefore - time;
     CommandScheduler.getInstance().run();
+    robotContainer.latePeriodic();
     double timestampAfter = Timer.getFPGATimestamp();
     time = timestampAfter;
     computeTime = timestampAfter - timestampBefore;

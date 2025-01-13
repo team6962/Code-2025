@@ -8,6 +8,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -71,6 +72,10 @@ public class SwerveGyroscope extends SubsystemBase {
         } else {
             Rotation2d headingChange = Rotation2d.fromRadians(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 
+            if (headingChange.getRadians() < 0.01) {
+                headingChange = Rotation2d.fromDegrees(0);
+            }
+
             absoluteHeading = absoluteHeading.plus(headingChange);
         }
     }
@@ -101,6 +106,10 @@ public class SwerveGyroscope extends SubsystemBase {
     public Rotation2d getHeading() {
         return getAbsoluteHeading().plus(offset);
     }
+    
+    // h = a + o
+    // 0 = a + o
+    // o = -a
 
     /**
      * Reset the robot's heading to zero.

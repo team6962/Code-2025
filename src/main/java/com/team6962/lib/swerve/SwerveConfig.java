@@ -327,8 +327,18 @@ public class SwerveConfig {
         );
     }
 
+    /*
+     * Drive Motor Conversions
+     * 
+     * Mechanism Position = Wheel Angle (in radians) * Wheel Radius
+     * Wheel Angle = Rotor Angle / Gear Reduction
+     * 
+     * Mechanism Position = (Rotor Angle / Gear Reduction) in radians * Wheel Radius
+     * Rotor Angle = (Mechanism Position / Wheel Radius) to radians * Gear Reduction
+     */
+
     public Distance driveMotorRotorToMechanism(Angle movement) {
-        return Meters.of(movement.in(Radians) * wheel.radius().in(Meters) / gearing.drive);
+        return Meters.of(movement.in(Radians) / gearing.drive * wheel.radius().in(Meters));
     }
 
     public LinearVelocity driveMotorRotorToMechanism(AngularVelocity movement) {
@@ -336,11 +346,11 @@ public class SwerveConfig {
     }
 
     public Angle driveMotorMechanismToRotor(Distance movement) {
-        return Radians.of(movement.in(Meters) * gearing.drive / wheel.radius().in(Meters));
+        return Radians.of(movement.div(wheel.radius()).magnitude() * gearing.drive);
     }
 
     public AngularVelocity driveMotorMechanismToRotor(LinearVelocity movement) {
-        return RadiansPerSecond.of(movement.in(MetersPerSecond) * gearing.drive / wheel.radius().in(Meters));
+        return RadiansPerSecond.of(movement.in(MetersPerSecond) / wheel.radius().in(Meters) * gearing.drive);
     }
     
     public Angle steerMotorRotorToMechanism(Angle movement) {
