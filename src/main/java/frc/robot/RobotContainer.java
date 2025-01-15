@@ -14,6 +14,7 @@ import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.test.SwerveModuleTest;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -47,8 +48,6 @@ public class RobotContainer {
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
-
-  private final SwerveModuleTest swerveModuleTest;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -90,8 +89,6 @@ public class RobotContainer {
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
     Pathfinding.ensureInitialized();
-
-    swerveModuleTest = new SwerveModuleTest();
   }
 
   public Command getAutonomousCommand() {
