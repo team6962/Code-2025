@@ -11,6 +11,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.test.DriveModuleTest;
 import com.team6962.lib.test.SteerModuleTest;
 import com.team6962.lib.test.SwerveModuleTest;
 
@@ -50,7 +51,9 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
+  // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
+
+  private DriveModuleTest driveModuleTest = new DriveModuleTest();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -93,7 +96,9 @@ public class RobotContainer {
 
     Pathfinding.ensureInitialized();
 
-    swerveModuleTest = new SwerveModuleTest();
+    // swerveModuleTest = new SwerveModuleTest();
+
+    driveModuleTest = new DriveModuleTest();
   }
 
   public Command getAutonomousCommand() {

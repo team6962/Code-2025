@@ -84,10 +84,9 @@ public class SwerveModule extends SubsystemBase {
         // swerve drive configuration to the drive motor
         CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
-        System.out.println(config.driveMotor().gains());
-
         // Configure the drive motor to brake automatically when not driven
-        CTREUtils.check(driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
+        CTREUtils.check(driveConfig.apply(new MotorOutputConfigs()
+            .withNeutralMode(NeutralModeValue.Brake)));
 
         // Connect to the module's steer encoder
         steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -186,11 +185,6 @@ public class SwerveModule extends SubsystemBase {
         targetState.optimize(KinematicsUtils.toRotation2d(getSteerAngle()));
 
         Logger.log(getName() + "/targetState", targetState);
-
-        System.out.println(
-            constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
-                .minus(CTREUtils.unwrap(driveMotor.getVelocity()))
-        );
 
         CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
