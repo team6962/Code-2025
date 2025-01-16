@@ -11,6 +11,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.test.SteerModuleTest;
 import com.team6962.lib.test.SwerveModuleTest;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -42,12 +43,14 @@ public class RobotContainer {
 
 
   // The robot's subsystems and commands
-  private final SwerveDrive swerveDrive;
-  private final RobotStateController stateController;
-  private final LEDs ledStrip;
+  // private final SwerveDrive swerveDrive;
+  // private final RobotStateController stateController;
+  // private final LEDs ledStrip;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
+
+  private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -76,25 +79,27 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
-    stateController = new RobotStateController(swerveDrive);
-    ledStrip = new LEDs(stateController);
+    // swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
+    // stateController = new RobotStateController(swerveDrive);
+    // ledStrip = new LEDs(stateController);
     // collisionDetector = new CollisionDetector();
 
-    System.out.println(swerveDrive);
+    // System.out.println(swerveDrive);
     
     // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive);
+    // Controls.configureBindings(stateController, swerveDrive);
 
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
     Pathfinding.ensureInitialized();
+
+    swerveModuleTest = new SwerveModuleTest();
   }
 
   public Command getAutonomousCommand() {
     // return new Autonomous(stateController, swerveDrive, AutonChooser.getNotes());
     // return Commands.run(() -> {});
-    return swerveDrive.park();
+    return Commands.run(() -> {});//swerveDrive.park();
   }
 
   public static double getVoltage() {
@@ -110,7 +115,7 @@ public class RobotContainer {
   }
 
   public void latePeriodic() {
-    swerveDrive.latePeriodic();
+    // swerveDrive.latePeriodic();
   }
 
   public void disabledPeriodic() {

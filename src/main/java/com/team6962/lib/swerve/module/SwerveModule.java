@@ -2,8 +2,6 @@ package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -15,13 +13,13 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team6962.lib.swerve.SwerveConfig;
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 
@@ -86,6 +84,8 @@ public class SwerveModule extends SubsystemBase {
         // swerve drive configuration to the drive motor
         CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
+        System.out.println(config.driveMotor().gains());
+
         // Configure the drive motor to brake automatically when not driven
         CTREUtils.check(driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
 
@@ -122,6 +122,10 @@ public class SwerveModule extends SubsystemBase {
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
             .withFusedCANcoder(steerEncoder)
             .withRotorToSensorRatio(config.gearing().steer())));
+
+        setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
+        
+        Logger.log(getName() + "/measuredState", getState());
     }
 
     /**
@@ -180,7 +184,14 @@ public class SwerveModule extends SubsystemBase {
         if (isCalibrating) return;
 
         targetState.optimize(KinematicsUtils.toRotation2d(getSteerAngle()));
-        
+
+        Logger.log(getName() + "/targetState", targetState);
+
+        System.out.println(
+            constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
+                .minus(CTREUtils.unwrap(driveMotor.getVelocity()))
+        );
+
         CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
         )));
