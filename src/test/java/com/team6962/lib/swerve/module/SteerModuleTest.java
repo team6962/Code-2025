@@ -1,4 +1,4 @@
-package com.team6962.lib.test;
+package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Rotations;
@@ -27,8 +27,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -56,6 +54,7 @@ public class SteerModuleTest extends SubsystemBase {
         TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
+            .withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)));
 
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
@@ -63,7 +62,7 @@ public class SteerModuleTest extends SubsystemBase {
             .withRotorToSensorRatio(rotorToSensorReduction)));
         
         CTREUtils.check(steerConfig.apply(new Slot0Configs()
-            .withKP(1000.0)));
+            .withKP(-1000.0)));
         
         steerMotorSim = new FlywheelSim(
             LinearSystemId.createFlywheelSystem(

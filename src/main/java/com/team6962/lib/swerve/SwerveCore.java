@@ -12,6 +12,7 @@ import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -91,9 +92,9 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         Pose2d[] poses = new Pose2d[4];
 
         for (int i = 0; i < 4; i++) {
-            Pose2d relativePose = modules[i].getRelativePose();
+            Transform2d relativeTransform = modules[i].getRelativeTransform();
 
-            poses[i] = poseEstimator.getEstimatedPose().transformBy(KinematicsUtils.toTransform2d(relativePose));
+            poses[i] = poseEstimator.getEstimatedPose().transformBy(relativeTransform);
         }
 
         return poses;

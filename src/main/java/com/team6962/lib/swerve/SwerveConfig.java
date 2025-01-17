@@ -49,7 +49,6 @@ import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /**
  * Represents the configuration of a swerve drive

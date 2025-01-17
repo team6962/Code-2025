@@ -11,12 +11,14 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
@@ -25,6 +27,7 @@ import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -43,7 +46,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 /**
  * A swerve module, consisting of a drive motor, a steer motor, and a steer encoder.
  */
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule extends SubsystemBase implements AutoCloseable {
     /**
      * The drive motor for this module. Works in rotor units.
      */
@@ -109,10 +112,11 @@ public class SwerveModule extends SubsystemBase {
 
         // Apply the PID/feedforward/Motion Magic configuration given in the
         // swerve drive configuration to the steer motor
-        CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
+        CTREUtils.check(steerConfig.apply(invertGains(config.steerMotor().gains())));
 
         // Configure the steer motor to brake automatically when not driven
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
+            .withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)));
         
         // Configure the fusing of the absolute steer encoder's reported position
@@ -124,7 +128,7 @@ public class SwerveModule extends SubsystemBase {
 
         setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
         
-        Logger.log(getName() + "/measuredState", getState());
+        Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
     }
 
     /**
@@ -214,7 +218,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link Angle}
      */
     public Angle getSteerAngle() {
-        return CTREUtils.unwrap(steerEncoder.getPosition()).times(1);
+        return CTREUtils.unwrap(steerEncoder.getPosition());
     }
 
     /**
@@ -222,7 +226,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link AngularVelocity}
      */
     public AngularVelocity getSteerVelocity() {
-        return CTREUtils.unwrap(steerEncoder.getVelocity()).times(1);
+        return CTREUtils.unwrap(steerEncoder.getVelocity());
     }
 
     /**
@@ -250,11 +254,11 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Gets the pose of the module relative to the robot's center.
+     * Gets the transform of the module relative to the robot's center.
      * @return The relative {@link Pose2d}
      */
-    public Pose2d getRelativePose() {
-        return new Pose2d(
+    public Transform2d getRelativeTransform() {
+        return new Transform2d(
             calculateRelativeTranslation(corner.index, constants.chassis()),
             new Rotation2d(getSteerAngle())
         );
@@ -312,6 +316,13 @@ public class SwerveModule extends SubsystemBase {
             Commands.waitSeconds(1.0),
             Commands.runOnce(() -> isCalibrating = false)
         );
+    }
+
+    @Override
+    public void close() throws Exception {
+        driveMotor.close();
+        steerMotor.close();
+        steerEncoder.close();
     }
 
     /**
@@ -386,5 +397,16 @@ public class SwerveModule extends SubsystemBase {
             (cornerIndex >= 2 ? -1 : 1) * chassis.wheelBase().in(Meters) / 2,
             (cornerIndex % 2 == 1 ? -1 : 1) * chassis.trackWidth().in(Meters) / 2
         );
+    }
+
+    public static Slot0Configs invertGains(Slot0Configs configs) {
+        return new Slot0Configs()
+            .withKP(-configs.kP)
+            .withKI(-configs.kI)
+            .withKD(-configs.kD)
+            .withKS(-configs.kS)
+            .withKV(-configs.kV)
+            .withKA(-configs.kA)
+            .withKG(-configs.kG);
     }
 }

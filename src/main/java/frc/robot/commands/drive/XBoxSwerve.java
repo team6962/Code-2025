@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -122,7 +123,11 @@ public class XBoxSwerve extends Command {
       }
     }
 
-    driveCommand = swerveDrive.drive(new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity));
+    ChassisSpeeds drivenSpeeds = new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
+
+    Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
+
+    driveCommand = swerveDrive.drive(drivenSpeeds);
     driveCommand.schedule();
 
     // if (leftStick.getNorm() > 0.05 && (controller.getLeftBumper() || controller.getRightBumper())) {

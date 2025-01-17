@@ -11,9 +11,6 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-import com.team6962.lib.test.DriveModuleTest;
-import com.team6962.lib.test.SteerModuleTest;
-import com.team6962.lib.test.SwerveModuleTest;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -44,16 +41,16 @@ public class RobotContainer {
 
 
   // The robot's subsystems and commands
-  // private final SwerveDrive swerveDrive;
-  // private final RobotStateController stateController;
-  // private final LEDs ledStrip;
+  private final SwerveDrive swerveDrive;
+  private final RobotStateController stateController;
+  private final LEDs ledStrip;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
-  private DriveModuleTest driveModuleTest = new DriveModuleTest();
+  // private SteerModuleTest steerModuleTest = new SteerModuleTest();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -82,15 +79,15 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    // swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
-    // stateController = new RobotStateController(swerveDrive);
-    // ledStrip = new LEDs(stateController);
+    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
+    stateController = new RobotStateController(swerveDrive);
+    ledStrip = new LEDs(stateController);
     // collisionDetector = new CollisionDetector();
 
-    // System.out.println(swerveDrive);
+    System.out.println(swerveDrive);
     
     // Configure the trigger bindings
-    // Controls.configureBindings(stateController, swerveDrive);
+    Controls.configureBindings(stateController, swerveDrive);
 
     AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
@@ -98,7 +95,7 @@ public class RobotContainer {
 
     // swerveModuleTest = new SwerveModuleTest();
 
-    driveModuleTest = new DriveModuleTest();
+    // steerModuleTest = new SteerModuleTest();
   }
 
   public Command getAutonomousCommand() {
@@ -120,7 +117,7 @@ public class RobotContainer {
   }
 
   public void latePeriodic() {
-    // swerveDrive.latePeriodic();
+    swerveDrive.latePeriodic();
   }
 
   public void disabledPeriodic() {

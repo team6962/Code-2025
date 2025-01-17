@@ -22,12 +22,15 @@ public class SimulatedModule extends SwerveModule {
     private Timer deltaTimer = new Timer();
     private Time delta;
 
+    private DriveSim driveSim;
+    private SteerSim steerSim;
+
     @Override
     public void configureModule(SwerveConfig constants, Corner corner) {
         super.configureModule(constants, corner);
 
-        new DriveSim();
-        new SteerSim();
+        driveSim = new DriveSim();
+        steerSim = new SteerSim();
     }
 
     @Override
@@ -40,17 +43,19 @@ public class SimulatedModule extends SwerveModule {
         deltaTimer.start();
 
         super.periodic();
+
+        driveSim.update();
+        steerSim.update();
     }
 
-    private class SteerSim extends SubsystemBase {
+    private class SteerSim {
         private DCMotorSim steerMotorSim;
 
         public SteerSim() {
             steerMotorSim = getDrivetrainConstants().createSteerMotorSimulation();
         }
 
-        @Override
-        public void periodic() {
+        public void update() {
             TalonFXSimState steerSimState = getSteerMotor().getSimState();
 
             steerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
@@ -68,15 +73,14 @@ public class SimulatedModule extends SwerveModule {
         }
     }
 
-    private class DriveSim extends SubsystemBase {
+    private class DriveSim {
         private DCMotorSim driveMotorSim;
 
         public DriveSim() {
             driveMotorSim = getDrivetrainConstants().createDriveMotorSimulation();
         }
 
-        @Override
-        public void periodic() {
+        public void update() {
             TalonFXSimState driveSimState = getDriveMotor().getSimState();
 
             Logger.log(getName() + "/driveSimInputVoltage", driveSimState.getMotorVoltage());
@@ -87,6 +91,10 @@ public class SimulatedModule extends SwerveModule {
             driveMotorSim.update(delta.in(Seconds));
 
             double gearing = getDrivetrainConstants().gearing().drive();
+
+            Logger.log(getName() + "/driveSimRotorPosition", driveMotorSim.getAngularPosition().times(gearing));
+            Logger.log(getName() + "/driveSimRotorVelocity", driveMotorSim.getAngularVelocity().times(gearing));
+            Logger.log(getName() + "/driveSimRotorAcceleration", driveMotorSim.getAngularAcceleration().times(gearing));
 
             CTREUtils.check(driveSimState.setRawRotorPosition(driveMotorSim.getAngularPosition().times(gearing)));
             CTREUtils.check(driveSimState.setRotorVelocity(driveMotorSim.getAngularVelocity().times(gearing)));
