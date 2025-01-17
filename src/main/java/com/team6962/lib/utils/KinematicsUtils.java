@@ -148,14 +148,19 @@ public final class KinematicsUtils {
         return new Transform2d(pose.getTranslation(), pose.getRotation());
     }
 
+    public static ChassisSpeeds allianceInvertSpeeds(ChassisSpeeds speeds) {
+        return new ChassisSpeeds(
+            -speeds.vxMetersPerSecond,
+            -speeds.vyMetersPerSecond,
+            -speeds.omegaRadiansPerSecond
+        );
+    }
+
     public static ChassisSpeeds rotateSpeeds(ChassisSpeeds speeds, Rotation2d angle) {
-        double sin = Math.sin(angle.getRadians());
-        double cos = Math.cos(angle.getRadians());
+        Translation2d translation = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
+            .rotateBy(angle);
 
-        double x = speeds.vxMetersPerSecond * cos - speeds.vyMetersPerSecond * sin;
-        double y = speeds.vxMetersPerSecond * sin + speeds.vyMetersPerSecond * cos;
-
-        return new ChassisSpeeds(x, y, speeds.omegaRadiansPerSecond);
+        return new ChassisSpeeds(translation.getX(), translation.getY(), speeds.omegaRadiansPerSecond);
     }
 
     public static ChassisSpeeds createChassisSpeeds(Translation2d translation, Rotation2d rotation) {

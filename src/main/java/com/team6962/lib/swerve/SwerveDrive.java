@@ -119,6 +119,8 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
+        Logger.log("Swerve Drive/driveSpeeds", speeds.get());
+
         return Commands.run(() ->
             setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
             useMotion()

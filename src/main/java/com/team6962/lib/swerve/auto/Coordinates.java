@@ -77,14 +77,14 @@ public interface Coordinates {
      * Converts {@link ChassisSpeeds} from robot coordinates to absolute coordinates.
      */
     public default ChassisSpeeds robotToAbsoluteSpeeds(ChassisSpeeds speeds) {
-        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation().unaryMinus());
+        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation());
     }
 
     /**
      * Converts {@link ChassisSpeeds} from absolute coordinates to robot coordinates.
      */
     public default ChassisSpeeds absoluteToRobotSpeeds(ChassisSpeeds speeds) {
-        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation());
+        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation().unaryMinus());
     }
 
     /**
@@ -92,7 +92,7 @@ public interface Coordinates {
      */
     public default ChassisSpeeds allianceToAbsoluteSpeeds(ChassisSpeeds speeds) {
         return isAllianceInverted().orElse(false) ?
-            KinematicsUtils.rotateSpeeds(speeds, Rotation2d.fromRotations(0.5)) :
+            KinematicsUtils.allianceInvertSpeeds(speeds) :
             speeds;
     }
 
