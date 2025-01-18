@@ -76,6 +76,10 @@ public final class Constants {
     public static final String TAB_NAME = "SwerveDrive";
   }
 
+  public static final class ALGAE {
+    public static final Double ALGAE_DIAMETER = 16.25; //inches
+  }
+
   // LIMELIGHT
   // Exposure: 750
   // Sensor Gain: 10
@@ -88,16 +92,16 @@ public final class Constants {
       "limelight-btag", new Pose3d(Units.inchesToMeters(2.670592), Units.inchesToMeters(-3.0), Units.inchesToMeters(25.283), new Rotation3d(0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0)))
     );
 
-    public static final String NOTE_CAMERA_NAME = "limelight-fnote";
+    public static final String ALGAE_CAMERA_NAME = "limelight-balgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
-    public static final Rotation2d NOTE_CAMERA_PITCH = Rotation2d.fromDegrees(-24);
+    public static final Rotation2d ALGAE_CAMERA_PITCH = Rotation2d.fromDegrees(-24); //CHANGE (DEGREES)
     // x is forward, y is left, z is up
-    public static final Translation3d NOTE_CAMERA_POSITION = new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
+    public static final Translation3d ALGAE_CAMERA_POSITION = new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
 
     public static final Rotation2d FOV_HEIGHT = Rotation2d.fromDegrees(48.9); // Degrees
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
-    public static final double NOTE_CAMERA_HEIGHT_PIXELS = 960;
+    public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
   }
 
   public static final class SWERVE {
