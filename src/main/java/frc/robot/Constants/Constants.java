@@ -77,7 +77,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final Double ALGAE_DIAMETER = 16.25; //inches
+    public static final double ALGAE_DIAMETER = 16.25; //inches
   }
 
   // LIMELIGHT
@@ -95,6 +95,8 @@ public final class Constants {
     public static final String ALGAE_CAMERA_NAME = "limelight-balgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
+    public static final double SPHERE_TOLERANCE = 0.5;
+
     public static final Rotation2d ALGAE_CAMERA_PITCH = Rotation2d.fromDegrees(-24); //CHANGE (DEGREES)
     // x is forward, y is left, z is up
     public static final Translation3d ALGAE_CAMERA_POSITION = new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
@@ -102,6 +104,8 @@ public final class Constants {
     public static final Rotation2d FOV_HEIGHT = Rotation2d.fromDegrees(48.9); // Degrees
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
     public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
+
+    public static final double MAX_DETECTION_RANGE = 19.30;
   }
 
   public static final class SWERVE {
