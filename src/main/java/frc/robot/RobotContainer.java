@@ -11,8 +11,12 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.test.KinematicsTest;
+import com.team6962.lib.test.SwerveModuleTest;
+import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,22 +42,36 @@ import frc.robot.util.software.Dashboard.AutonChooser;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private static RobotContainer instance;
 
+  /**
+   * Get the RobotContainer instance (for testing or competition only!)
+   * @return
+   */
+  public static RobotContainer getInstance() {
+    return instance;
+  }
 
   // The robot's subsystems and commands
-  private final SwerveDrive swerveDrive;
-  private final RobotStateController stateController;
-  private final LEDs ledStrip;
+  public final SwerveDrive swerveDrive;
+  public final RobotStateController stateController;
+  public final LEDs ledStrip;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
+  private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   // private SteerModuleTest steerModuleTest = new SteerModuleTest();
 
+  private KinematicsTest kinematicsTest;
+
+  // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    instance = this;
+
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog(), true);
     // Logger.autoLog("PDH", PDH);
@@ -82,20 +100,27 @@ public class RobotContainer {
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
     ledStrip = new LEDs(stateController);
-    // collisionDetector = new CollisionDetector();
+    // // collisionDetector = new CollisionDetector();
 
-    System.out.println(swerveDrive);
+    // System.out.println(swerveDrive);
     
-    // Configure the trigger bindings
+    // // Configure the trigger bindings
     Controls.configureBindings(stateController, swerveDrive);
 
-    AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
+    // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
     Pathfinding.ensureInitialized();
 
-    // swerveModuleTest = new SwerveModuleTest();
+    swerveModuleTest = new SwerveModuleTest();
 
     // steerModuleTest = new SteerModuleTest();
+
+    // kinematicsTest = new KinematicsTest(Constants.SWERVE.CONFIG);
+
+    // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
+
+    // Logger.log("conversionTest/speeds", testSpeeds);
+    // Logger.log("conversionTest/states", KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
   }
 
   public Command getAutonomousCommand() {

@@ -1,5 +1,6 @@
 package com.team6962.lib.swerve;
 
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.RobotContainer;
 
 /**
  * Represents a movement that a swerve drive can take over a single control loop

@@ -95,7 +95,7 @@ public final class Constants {
 
   public static final class SWERVE {
     public static final Slot0Configs DRIVE_MOTOR_GAINS = new Slot0Configs()
-      .withKP(10);
+      .withKP(0.1);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
       .withKP(1000);
     public static final DriveGains DRIVE_GAINS = new DriveGains(

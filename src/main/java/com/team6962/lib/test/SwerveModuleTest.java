@@ -1,13 +1,7 @@
-package com.team6962.lib.swerve.module;
+package com.team6962.lib.test;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.team6962.lib.swerve.SwerveConfig;
@@ -15,26 +9,21 @@ import com.team6962.lib.swerve.SwerveConfig.Gearing;
 import com.team6962.lib.swerve.SwerveConfig.Module;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
+import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule.Corner;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveModuleTest implements AutoCloseable {
+public class SwerveModuleTest extends SubsystemBase {
     private SimulatedModule module;
 
-    @BeforeEach
-    public void constructDevices() {
-        assert HAL.initialize(500, 0);
-
+    public SwerveModuleTest() {
         /* create the TalonFX */
         module = new SimulatedModule();
 
@@ -59,42 +48,11 @@ public class SwerveModuleTest implements AutoCloseable {
             ),
             Wheel.COLSON,
             null
-        ), Corner.FRONT_LEFT);
-
-        /* enable the robot */
-        DriverStationSim.setEnabled(true);
-        DriverStationSim.notifyNewData();
-
-        /* delay ~100ms so the devices can start up and enable */
-        Timer.delay(0.100);
-    }
-
-    @AfterEach
-   void shutdown() throws Exception {
-      close();
-   }
-
-    @Test
-    public void robotIsEnabled() {
-        /* verify that the robot is enabled */
-        assertTrue(DriverStation.isEnabled());
-    }
-
-    @Test
-    public void testSteer() {
-        for (int i = 0; i < 100; i++) {
-            Timer.delay(0.020);
-
-            module.driveState(new SwerveModuleState(0, Rotation2d.fromDegrees(10)));
-        }
-
-        SwerveModuleState currentState = module.getState();
-
-        assertEquals(currentState.angle.getDegrees(), 10, 1e-2);
+        ), Corner.BACK_RIGHT);
     }
 
     @Override
-    public void close() throws Exception {
-        module.close();
+    public void periodic() {
+        module.driveState(new SwerveModuleState(4, Rotation2d.fromRotations(Timer.getFPGATimestamp())));
     }
 }

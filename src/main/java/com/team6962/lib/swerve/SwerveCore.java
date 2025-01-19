@@ -107,17 +107,19 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         SwerveModuleState[] states = currentMovement.getStates();
 
         if (states == null) {
-            states = getModuleStates();
+            states = KinematicsUtils.getStoppedStates(getModuleStates());
         }
 
-        Logger.log("Drivetrain/targetModuleStates", states);
-
         states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed(), constants.maxSteerSpeed());
+
+        Logger.log("Drivetrain/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+        Logger.log("Drivetrain/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
+        Logger.log("Drivetrain/targetModuleStates", states);
 
         Pose2d[] poses = getModulePoses();
 
         for (int i = 0; i < 4; i++) {
-            modules[i].driveState(states[i]);
+            modules[i].driveState(new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle));
             poses[i] = new Pose2d(poses[i].getTranslation(), poseEstimator.getEstimatedPose().getRotation().plus(states[i].angle));
         }
 

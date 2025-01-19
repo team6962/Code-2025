@@ -103,7 +103,7 @@ public final class MathUtils {
    * @param r The modulus.
    * @return x mod r, rounded down.
   */
-  public static double mod(double x, double r) {
+  public static double floorMod(double x, double r) {
     return ((x % r) + r) % r;
   }
 

@@ -1,0 +1,6 @@
+TODO: Finish testing swerve modules at different orientations
+ - Write integration tests?
+TODO: Rebuild swerve drive with kinematics testing
+ - Don't immediately make the robot pose change
+TODO: Test and fix with actual robot pose
+TODO: Move to swerve drive

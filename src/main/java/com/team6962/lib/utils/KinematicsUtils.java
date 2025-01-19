@@ -100,25 +100,20 @@ public final class KinematicsUtils {
     }
 
     public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed, AngularVelocity maxRotation) {
-        LinearVelocity topSpeed = MetersPerSecond.of(0);
-        AngularVelocity topRotation = RotationsPerSecond.of(0);
+        double fraction = 1.0;
 
         for (SwerveModuleState state : states) {
             LinearVelocity moduleSpeed = MetersPerSecond.of(Math.abs(state.speedMetersPerSecond));
             AngularVelocity moduleRotation = RotationsPerSecond.of(Math.abs(state.angle.getRotations()));
 
-            if (moduleSpeed.gt(topSpeed)) topSpeed = moduleSpeed;
-            if (moduleRotation.gt(topRotation)) topRotation = moduleRotation;
+            fraction = Math.min(fraction, maxSpeed.in(MetersPerSecond) / moduleSpeed.in(MetersPerSecond));
+            fraction = Math.min(fraction, maxRotation.in(RotationsPerSecond) / moduleRotation.in(RotationsPerSecond));
         }
-
-        double speedScalar = topSpeed.gt(maxSpeed) ? maxSpeed.in(MetersPerSecond) / topSpeed.in(MetersPerSecond) : 1.0;
-        double rotationScalar = topRotation.gt(maxRotation) ? maxRotation.in(RotationsPerSecond) / topRotation.in(RotationsPerSecond) : 1.0;
-        double scalar = Math.min(speedScalar, rotationScalar);
 
         SwerveModuleState[] limitedStates = new SwerveModuleState[states.length];
 
         for (int i = 0; i < states.length; i++) {
-            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * scalar, states[i].angle.times(scalar));
+            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * fraction, states[i].angle.times(fraction));
         }
 
         return limitedStates;
@@ -138,7 +133,10 @@ public final class KinematicsUtils {
         SwerveModuleState[] output = new SwerveModuleState[4];
 
         for (int i = 0; i < 4; i++) {
-            output[i] = new SwerveModuleState(0, Rotation2d.fromDegrees(45 + 90 * i));
+            output[i] = new SwerveModuleState(0,
+                Rotation2d.fromDegrees(135).plus(
+                    new Rotation2d(SwerveModule.Corner.fromIndex(i).getModuleRotation())
+                ));
         }
 
         return output;
@@ -185,9 +183,5 @@ public final class KinematicsUtils {
         if (speeds == null) speeds = new ChassisSpeeds();
 
         return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed.getRadians());
-    }
-
-    public static Rotation2d toRotation2d(Angle angle) {
-        return Rotation2d.fromRotations(angle.in(Rotations));
     }
 }

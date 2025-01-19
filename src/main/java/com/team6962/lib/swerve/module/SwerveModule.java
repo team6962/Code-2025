@@ -23,7 +23,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
-import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -101,7 +101,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         // Set the absolute steer encoder offset to the value given in the
         // swerve module's configuration
         CTREUtils.check(steerEncoderConfig.apply(new MagnetSensorConfigs()
-            .withMagnetOffset(moduleConstants.steerEncoderOffset().in(Rotations))));
+            .withMagnetOffset(moduleConstants.steerEncoderOffset()
+                .minus(corner.getModuleRotation()))
+            .withAbsoluteSensorDiscontinuityPoint(0.5)
+        ));
 
         // Connect to the module's steer motor
         steerMotor = new TalonFX(moduleConstants.steerMotorId());
@@ -186,9 +189,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
-        targetState.optimize(KinematicsUtils.toRotation2d(getSteerAngle()));
+        targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
         Logger.log(getName() + "/targetState", targetState);
+        Logger.log(getName() + "/isValid", Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
 
         CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
@@ -384,6 +388,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 default -> throw new IllegalArgumentException("Invalid module index");
             };
         }
+
+        public Angle getModuleRotation() {
+            return Rotations.of(0.25).times(index < 2 ? index : -index + 5);
+        }
     }
 
     /**
@@ -394,8 +402,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
      */
     public static Translation2d calculateRelativeTranslation(int cornerIndex, SwerveConfig.Chassis chassis) {
         return new Translation2d(
-            (cornerIndex >= 2 ? -1 : 1) * chassis.wheelBase().in(Meters) / 2,
-            (cornerIndex % 2 == 1 ? -1 : 1) * chassis.trackWidth().in(Meters) / 2
+            (cornerIndex < 2 ? 1. : -1.) * chassis.wheelBase().in(Meters) / 2.,
+            (cornerIndex % 2 == 0 ? 1. : -1.) * chassis.trackWidth().in(Meters) / 2.
         );
     }
 
@@ -408,5 +416,29 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             .withKV(-configs.kV)
             .withKA(-configs.kA)
             .withKG(-configs.kG);
+    }
+
+    public static SwerveModuleState optimizeStateForTalon(SwerveModuleState targetState, Angle currentAngle) {
+        Angle difference = MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
+        SwerveModuleState relativeOptimized = optimizeStateRelative(targetState.speedMetersPerSecond, difference);
+
+        SwerveModuleState optimized = new SwerveModuleState(
+            relativeOptimized.speedMetersPerSecond,
+            new Rotation2d(currentAngle.plus(relativeOptimized.angle.getMeasure()))
+        );
+
+        return optimized;
+    }
+
+    public static SwerveModuleState optimizeStateRelative(double speedMetersPerSecond, Angle angle) {
+        if (angle.in(Rotations) < -0.25) {
+            angle = angle.plus(Rotations.of(0.5));
+            speedMetersPerSecond = -speedMetersPerSecond;
+        } else if (angle.in(Rotations) > 0.25) {
+            angle = angle.minus(Rotations.of(0.5));
+            speedMetersPerSecond = -speedMetersPerSecond;
+        }
+
+        return new SwerveModuleState(speedMetersPerSecond, new Rotation2d(angle));
     }
 }
