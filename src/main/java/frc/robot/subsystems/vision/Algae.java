@@ -22,6 +22,8 @@ public class Algae {
 
         if (table.getEntry("tv").getDouble(0) == 0) return null; //check if detection is valid
 
+        if (!table.getEntry("tclass").getString("").equals("algae")) return null;
+    
         Translation2d algaePosition = new Translation2d();
         
         double horizontalOffset = table.getEntry("tx").getDouble(0); //the horizontal offset angle of target from center of camera
@@ -56,5 +58,6 @@ public class Algae {
           }
 
         return algaePosition;
+        
     }
 }
