@@ -22,8 +22,8 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Field {
-  public static final double WIDTH = 8.21;
-  public static final double LENGTH = 16.54;
+  public static final double WIDTH = 8.05; //meters
+  public static final double LENGTH = 17.55; //meters
   
   public static final Map<String, Supplier<Pose2d>> AUTO_MOVE_POSITIONS = Map.of(
     "AMP", pose2d(1.85, 7.5, 90.0),
