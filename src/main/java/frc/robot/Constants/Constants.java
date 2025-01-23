@@ -6,12 +6,15 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.SwerveConfig.Chassis;
@@ -95,9 +98,17 @@ public final class Constants {
 
   public static final class SWERVE {
     public static final Slot0Configs DRIVE_MOTOR_GAINS = new Slot0Configs()
-      .withKP(0.1);
+      .withKP(0.01)
+      .withKD(0.01)
+      .withKI(0.1)
+      .withKV(0.117)
+      .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKP(1000);
+      .withKP(10);
+      // .withKI(1)
+      // .withKS(0.5)
+      // .withKV(10)
+      // .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
       new PIDConstants(1, 0, 0),
       new PIDConstants(1, 0, 0)

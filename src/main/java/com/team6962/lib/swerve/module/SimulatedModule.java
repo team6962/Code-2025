@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * A simulated swerve module, using the same code as the real one, plus some

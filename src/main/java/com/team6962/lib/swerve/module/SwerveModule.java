@@ -14,12 +14,15 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
@@ -91,6 +94,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         CTREUtils.check(driveConfig.apply(new MotorOutputConfigs()
             .withNeutralMode(NeutralModeValue.Brake)));
 
+        CTREUtils.check(driveConfig.apply(new FeedbackConfigs()
+            .withRotorToSensorRatio(1)
+            .withSensorToMechanismRatio(1)));
+
         // Connect to the module's steer encoder
         steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
@@ -127,7 +134,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         // gear ratio to the value given in the swerve drive configuration
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
             .withFusedCANcoder(steerEncoder)
-            .withRotorToSensorRatio(config.gearing().steer())));
+            .withRotorToSensorRatio(config.gearing().steer())
+            .withSensorToMechanismRatio(1)));
 
         setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
         
@@ -194,11 +202,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         Logger.log(getName() + "/targetState", targetState);
         Logger.log(getName() + "/isValid", Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
 
-        CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(
+        CTREUtils.check(driveMotor.setControl(new VelocityVoltage(
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
         )));
 
-        CTREUtils.check(steerMotor.setControl(new PositionTorqueCurrentFOC(targetState.angle.getRotations())));
+        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
     }
 
     /**

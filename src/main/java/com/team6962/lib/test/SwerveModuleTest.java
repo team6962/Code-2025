@@ -2,6 +2,8 @@ package com.team6962.lib.test;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.team6962.lib.swerve.SwerveConfig;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants;
 
 public class SwerveModuleTest extends SubsystemBase {
     private SimulatedModule module;
@@ -27,32 +30,11 @@ public class SwerveModuleTest extends SubsystemBase {
         /* create the TalonFX */
         module = new SimulatedModule();
 
-        module.configureModule(new SwerveConfig(
-            null,
-            Gearing.MK4I_L2_PLUS,
-            new Module[] {
-                new Module(13, 11, 12, Degrees.of(0)),
-                new Module(20, 21, 22, Degrees.of(0)),
-                new Module(30, 31, 32, Degrees.of(0)),
-                new Module(40, 41, 42, Degrees.of(0))
-            },
-            new Motor(
-                DCMotor.getKrakenX60(1),
-                new Slot0Configs().withKP(1000),
-                Amps.of(300)
-            ),
-            new Motor(
-                DCMotor.getKrakenX60(1),
-                new Slot0Configs().withKP(1000),
-                Amps.of(300)
-            ),
-            Wheel.COLSON,
-            null
-        ), Corner.BACK_RIGHT);
+        module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
     }
 
     @Override
     public void periodic() {
-        module.driveState(new SwerveModuleState(4, Rotation2d.fromRotations(Timer.getFPGATimestamp())));
+        module.driveState(new SwerveModuleState(FeetPerSecond.of(Math.sin(Timer.getFPGATimestamp() * 0.1) * 15).in(MetersPerSecond), Rotation2d.fromDegrees(Timer.getFPGATimestamp() * 0.1)));
     }
 }
