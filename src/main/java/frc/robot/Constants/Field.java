@@ -44,6 +44,9 @@ public final class Field {
     point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -2.0)
   );
 
+  public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
+
+
   private static List<Translation2d> getReefPolePositions() {
     List<Translation2d> positions = new ArrayList<Translation2d>();
 
