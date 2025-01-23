@@ -47,7 +47,7 @@ public class SteerModuleTest extends SubsystemBase {
         CANcoderConfigurator encoderConfig = encoder.getConfigurator();
 
         CTREUtils.check(encoderConfig.apply(new MagnetSensorConfigs()
-            .withMagnetOffset(0)));
+            .withMagnetOffset(0.25)));
 
         steerMotor = new TalonFX(10);
 

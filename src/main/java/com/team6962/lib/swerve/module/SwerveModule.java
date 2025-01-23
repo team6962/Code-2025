@@ -110,7 +110,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         CTREUtils.check(steerEncoderConfig.apply(new MagnetSensorConfigs()
             .withMagnetOffset(moduleConstants.steerEncoderOffset()
                 .minus(corner.getModuleRotation()))
-            .withAbsoluteSensorDiscontinuityPoint(0.5)
         ));
 
         // Connect to the module's steer motor
@@ -134,8 +133,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         // gear ratio to the value given in the swerve drive configuration
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
             .withFusedCANcoder(steerEncoder)
-            .withRotorToSensorRatio(config.gearing().steer())
-            .withSensorToMechanismRatio(1)));
+            .withRotorToSensorRatio(config.gearing().steer())));
 
         setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
         
@@ -206,7 +204,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
         )));
 
-        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
+        CTREUtils.check(steerMotor.setControl(new PositionTorqueCurrentFOC(targetState.angle.getRotations())));
     }
 
     /**

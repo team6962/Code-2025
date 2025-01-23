@@ -104,11 +104,11 @@ public final class Constants {
       .withKV(0.117)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKP(10);
+      .withKP(1000)
       // .withKI(1)
       // .withKS(0.5)
       // .withKV(10)
-      // .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+      .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
       new PIDConstants(1, 0, 0),
       new PIDConstants(1, 0, 0)

@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.test.SteerModuleTest;
 import com.team6962.lib.test.SwerveModuleTest;
 import com.team6962.lib.test.Talon10Test;
 
@@ -48,7 +49,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private SwerveModuleTest swerveModuleTest;
+  private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   // private SteerModuleTest steerModuleTest = new SteerModuleTest();
 
@@ -99,7 +100,7 @@ public class RobotContainer {
 
     // Pathfinding.ensureInitialized();
 
-    swerveModuleTest = new SwerveModuleTest();
+    // swerveModuleTest = new SwerveModuleTest();
 
     // new Talon10Test();
 
