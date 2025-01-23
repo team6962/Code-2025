@@ -369,15 +369,17 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
      * Represents a corner of the robot that a module can be on.
      */
     public static enum Corner {
-        FRONT_LEFT(0),
-        FRONT_RIGHT(1),
-        BACK_LEFT(2),
-        BACK_RIGHT(3);
+        FRONT_LEFT(0, Rotations.of(0)),
+        FRONT_RIGHT(1, Rotations.of(0.75)),
+        BACK_LEFT(2, Rotations.of(0.25)),
+        BACK_RIGHT(3, Rotations.of(0.5));
 
         public final int index;
+        private final Angle moduleRotation;
 
-        private Corner(int index) {
+        private Corner(int index, Angle moduleRotation) {
             this.index = index;
+            this.moduleRotation = moduleRotation;
         }
 
         /**
@@ -396,7 +398,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         }
 
         public Angle getModuleRotation() {
-            return Rotations.of(0.25).times(index < 2 ? index : -index + 5);
+            return moduleRotation;
         }
     }
 
