@@ -81,11 +81,13 @@ public class SwerveGyroscope extends SubsystemBase {
         if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
             absoluteHeading = Degrees.of(navx.getAngle());
         } else {
+            Logger.log(getName() + "/moduleDeltas2", moduleDeltasSupplier.get());
+
             Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 
-            System.out.println(headingChange);
+            Logger.log(getName() + "/headingChange", headingChange);
 
-            if (headingChange.in(Radians) < 0.01) {
+            if (Math.abs(headingChange.in(Radians)) < 0.01) {
                 headingChange = Radians.of(0);
             }
 
