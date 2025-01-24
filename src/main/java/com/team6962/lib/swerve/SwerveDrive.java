@@ -1,5 +1,7 @@
 package com.team6962.lib.swerve;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -23,6 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -217,10 +220,10 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindTo(Pose2d target, GoalEndState endState) {
-        return pathfindTo(target, endState, 0);
+        return pathfindTo(target, endState, Meters.of(0));
     }
 
-    public Command pathfindTo(Pose2d target, GoalEndState endState, double rotationDelayDistance) {
+    public Command pathfindTo(Pose2d target, GoalEndState endState, Distance rotationDelayDistance) {
         return pathfindTo(target, false, endState, rotationDelayDistance);
     }
 
@@ -229,11 +232,11 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindTo(Translation2d target, GoalEndState endState) {
-        return pathfindTo(new Pose2d(target, new Rotation2d()), true, endState, 0);
+        return pathfindTo(new Pose2d(target, new Rotation2d()), true, endState, Meters.of(0));
     }
 
     public Command pathfindTo(
-        Pose2d target, boolean ignoreRotation, GoalEndState endState, double rotationDelayDistance
+        Pose2d target, boolean ignoreRotation, GoalEndState endState, Distance rotationDelayDistance
     ) {
         return new FactoryCommand(() -> {
             Pose2d startPose = new Pose2d(
@@ -246,7 +249,7 @@ public class SwerveDrive extends SwerveCore {
                 ignoreRotation ? new Pose2d(target.getTranslation(), new Rotation2d()) : target
             );
 
-            return pathfindThrough(bezierPoints, ignoreRotation, endState, rotationDelayDistance);
+            return pathfindThrough(bezierPoints, ignoreRotation, endState, rotationDelayDistance.in(Meters));
         });
     }
 
