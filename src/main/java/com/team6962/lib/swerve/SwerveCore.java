@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing
@@ -105,16 +106,28 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
      */
     public void latePeriodic() {
         SwerveModuleState[] states = currentMovement.getStates();
-
+        
         if (states == null) {
             states = KinematicsUtils.getStoppedStates(getModuleStates());
         }
 
-        states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed(), constants.maxSteerSpeed());
+        Logger.log("SwerveCore/speedse", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+
+        states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed());
+
+        Logger.log("SwerveCore/speedsf", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
 
         Logger.log("Drivetrain/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
         Logger.log("Drivetrain/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
         Logger.log("Drivetrain/targetModuleStates", states);
+        Logger.log("Drivetrain/currentModuleStates", getModuleStates());
+
+        // states = new SwerveModuleState[] {
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0))
+        // };
 
         Pose2d[] poses = getModulePoses();
 

@@ -61,7 +61,7 @@ public final class KinematicsUtils {
         SwerveModulePosition[] differences = new SwerveModulePosition[newPositions.length];
 
         for (int i = 0; i < newPositions.length; i++) {
-            differences[i] = new SwerveModulePosition(newPositions[i].distanceMeters - oldPositions[i].distanceMeters, newPositions[i].angle.minus(oldPositions[i].angle));
+            differences[i] = new SwerveModulePosition(newPositions[i].distanceMeters - oldPositions[i].distanceMeters, newPositions[i].angle);
         }
 
         return differences;
@@ -71,7 +71,7 @@ public final class KinematicsUtils {
         SwerveModulePosition[] scaled = new SwerveModulePosition[positions.length];
 
         for (int i = 0; i < positions.length; i++) {
-            scaled[i] = new SwerveModulePosition(positions[i].distanceMeters * scalar, positions[i].angle.times(scalar));
+            scaled[i] = new SwerveModulePosition(positions[i].distanceMeters * scalar, positions[i].angle);
         }
 
         return scaled;
@@ -99,21 +99,19 @@ public final class KinematicsUtils {
         return Rotation2d.fromRadians(speeds.omegaRadiansPerSecond);
     }
 
-    public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed, AngularVelocity maxRotation) {
+    public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed) {
         double fraction = 1.0;
 
         for (SwerveModuleState state : states) {
             LinearVelocity moduleSpeed = MetersPerSecond.of(Math.abs(state.speedMetersPerSecond));
-            AngularVelocity moduleRotation = RotationsPerSecond.of(Math.abs(state.angle.getRotations()));
 
             fraction = Math.min(fraction, maxSpeed.in(MetersPerSecond) / moduleSpeed.in(MetersPerSecond));
-            fraction = Math.min(fraction, maxRotation.in(RotationsPerSecond) / moduleRotation.in(RotationsPerSecond));
         }
 
         SwerveModuleState[] limitedStates = new SwerveModuleState[states.length];
 
         for (int i = 0; i < states.length; i++) {
-            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * fraction, states[i].angle.times(fraction));
+            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * fraction, states[i].angle);
         }
 
         return limitedStates;
@@ -150,7 +148,7 @@ public final class KinematicsUtils {
         return new ChassisSpeeds(
             -speeds.vxMetersPerSecond,
             -speeds.vyMetersPerSecond,
-            -speeds.omegaRadiansPerSecond
+            speeds.omegaRadiansPerSecond
         );
     }
 
@@ -183,5 +181,25 @@ public final class KinematicsUtils {
         if (speeds == null) speeds = new ChassisSpeeds();
 
         return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed.getRadians());
+    }
+
+    public static SwerveModuleState[] blankModuleStates(int count) {
+        SwerveModuleState[] states = new SwerveModuleState[count];
+
+        for (int i = 0; i < count; i++) {
+            states[i] = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
+        }
+
+        return states;
+    }
+
+    public static SwerveModulePosition[] blankModulePositions(int count) {
+        SwerveModulePosition[] positions = new SwerveModulePosition[count];
+
+        for (int i = 0; i < count; i++) {
+            positions[i] = new SwerveModulePosition(0, Rotation2d.fromDegrees(0));
+        }
+
+        return positions;
     }
 }

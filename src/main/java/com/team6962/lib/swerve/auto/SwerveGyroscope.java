@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -37,6 +38,13 @@ public class SwerveGyroscope extends SubsystemBase {
 
         this.moduleDeltasSupplier = moduleDeltasSupplier;
         this.kinematics = kinematics;
+
+        setName("Swerve Drive/Gyroscope");
+
+        System.out.println(moduleDeltasSupplier.get()[0]);
+
+        Logger.logSwerveModulePositions(getName() + "/moduleDeltas", moduleDeltasSupplier);
+        Logger.logRotation(getName() + "/absoluteHeading", this::getAbsoluteHeading);
     }
 
     private void connectNavX() {
@@ -70,6 +78,8 @@ public class SwerveGyroscope extends SubsystemBase {
             absoluteHeading = Rotation2d.fromDegrees(navx.getAngle());
         } else {
             Rotation2d headingChange = Rotation2d.fromRadians(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
+
+            System.out.println(headingChange);
 
             if (headingChange.getRadians() < 0.01) {
                 headingChange = Rotation2d.fromDegrees(0);

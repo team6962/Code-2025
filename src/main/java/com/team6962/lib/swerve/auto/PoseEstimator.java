@@ -11,6 +11,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -38,7 +39,7 @@ public class PoseEstimator extends SubsystemBase {
     private Supplier<SwerveModuleState[]> moduleStatesSupplier;
 
     private SwerveModulePosition[] lastPositions;
-    private SwerveModulePosition[] positionChanges = new SwerveModulePosition[4];
+    private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
     private Twist2d chassisVelocity = new Twist2d();
 
     public PoseEstimator(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> modulePositions, Supplier<SwerveModuleState[]> moduleStates) {
