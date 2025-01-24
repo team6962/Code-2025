@@ -202,4 +202,14 @@ public final class KinematicsUtils {
 
         return positions;
     }
+
+    public static Rotation2d getAngle(double x, double y) {
+        Translation2d translation = new Translation2d(x, y);
+
+        if (translation.getNorm() <= 1e-6) {
+            return Rotation2d.fromRotations(0);
+        }
+
+        return translation.getAngle();
+    }
 }
