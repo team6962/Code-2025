@@ -1,84 +1,103 @@
 package com.team6962.lib.swerve.module;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.team6962.lib.swerve.SwerveConfig;
+import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.utils.CTREUtils;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 /**
  * A simulated swerve module, using the same code as the real one, plus some
  * simulation code.
  */
 public class SimulatedModule extends SwerveModule {
-    private FlywheelSim driveFlywheel;
+    private Timer deltaTimer = new Timer();
+    private Time delta;
 
-    /**
-     * Flywheel simulation representing the steer motor, working in mechanism
-     * rotations.
-     */
-    private FlywheelSim steerFlywheel;
-
-    private Angle drivePosition = Rotations.of(0);
-
-    /**
-     * The current position of the steer motor in mechanism rotations.
-     */
-    private Angle steerAngle = Rotations.of(0);
+    private DriveSim driveSim;
+    private SteerSim steerSim;
 
     @Override
     public void configureModule(SwerveConfig constants, Corner corner) {
         super.configureModule(constants, corner);
 
-        driveFlywheel = constants.createDriveMotorSimulation();
-        steerFlywheel = constants.createSteerMotorSimulation();
+        driveSim = new DriveSim();
+        steerSim = new SteerSim();
     }
 
     @Override
     public void periodic() {
+        deltaTimer.stop();
+
+        delta = Seconds.of(deltaTimer.get());
+
+        deltaTimer.reset();
+        deltaTimer.start();
+
         super.periodic();
 
-        Voltage busVoltage = Volts.of(12.0); // TODO: Use BatterySim to estimate bus voltage
+        driveSim.update();
+        steerSim.update();
+    }
 
-        TalonFXSimState driveSim = getDriveMotor().getSimState();
+    private class SteerSim {
+        private DCMotorSim steerMotorSim;
 
-        driveFlywheel.setInputVoltage(MathUtil.clamp(-12.0, driveSim.getMotorVoltage(), 12.0));
-        driveFlywheel.update(0.02);
+        public SteerSim() {
+            steerMotorSim = getDrivetrainConstants().createSteerMotorSimulation();
+        }
 
-        drivePosition = drivePosition.plus(driveFlywheel.getAngularVelocity().times(Seconds.of(0.02)));
+        public void update() {
+            TalonFXSimState steerSimState = getSteerMotor().getSimState();
 
-        driveSim.setRawRotorPosition(drivePosition);
-        driveSim.setRotorVelocity(driveFlywheel.getAngularVelocity());
-        driveSim.setSupplyVoltage(busVoltage);
+            steerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-        TalonFXSimState steerSim = getSteerMotor().getSimState();
+            Logger.log(getName() + "/steerSimInVolts", steerSimState.getMotorVoltage());
 
-        System.out.println("Motor voltage: " + steerSim.getMotorVoltage());
+            steerMotorSim.setInputVoltage(steerSimState.getMotorVoltage());
+            steerMotorSim.update(delta.in(Seconds));
 
-        steerFlywheel.setInputVoltage(MathUtil.clamp(-12.0, steerSim.getMotorVoltage(), 12.0));
-        steerFlywheel.update(0.02);
+            CTREUtils.check(steerSimState.setRawRotorPosition(steerMotorSim.getAngularPosition().times(getDrivetrainConstants().gearing().steer())));
 
-        AngularVelocity steerVelocity = steerFlywheel.getAngularVelocity();
+            CANcoderSimState encoderSimState = getSteerEncoder().getSimState();
 
-        steerAngle = steerAngle.plus(steerVelocity.times(Seconds.of(0.02)));
+            CTREUtils.check(encoderSimState.setRawPosition(steerMotorSim.getAngularPosition()));
+        }
+    }
 
-        steerSim.setRawRotorPosition(steerAngle.times(getDrivetrainConstants().gearing().steer));
-        steerSim.setRotorVelocity(steerVelocity.times(getDrivetrainConstants().gearing().steer));
-        steerSim.setSupplyVoltage(busVoltage);
+    private class DriveSim {
+        private DCMotorSim driveMotorSim;
 
-        CANcoderSimState steerEncoderSim = getSteerEncoder().getSimState();
+        public DriveSim() {
+            driveMotorSim = getDrivetrainConstants().createDriveMotorSimulation();
+        }
 
-        steerEncoderSim.setRawPosition(steerAngle);
-        steerEncoderSim.setSupplyVoltage(busVoltage);
+        public void update() {
+            TalonFXSimState driveSimState = getDriveMotor().getSimState();
+
+            Logger.log(getName() + "/driveSimInputVoltage", driveSimState.getMotorVoltage());
+
+            driveSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+            driveMotorSim.setInputVoltage(driveSimState.getMotorVoltage());
+            driveMotorSim.update(delta.in(Seconds));
+
+            double gearing = getDrivetrainConstants().gearing().drive();
+
+            Logger.log(getName() + "/driveSimRotorPosition", driveMotorSim.getAngularPosition().times(gearing));
+            Logger.log(getName() + "/driveSimRotorVelocity", driveMotorSim.getAngularVelocity().times(gearing));
+            Logger.log(getName() + "/driveSimRotorAcceleration", driveMotorSim.getAngularAcceleration().times(gearing));
+
+            CTREUtils.check(driveSimState.setRawRotorPosition(driveMotorSim.getAngularPosition().times(gearing)));
+            CTREUtils.check(driveSimState.setRotorVelocity(driveMotorSim.getAngularVelocity().times(gearing)));
+            CTREUtils.check(driveSimState.setRotorAcceleration(driveMotorSim.getAngularAcceleration().times(gearing)));
+        }
     }
 }

@@ -4,13 +4,16 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import frc.robot.util.software.MathUtils;
 
 public final class MeasureMath {
     private MeasureMath() {
@@ -67,5 +70,30 @@ public final class MeasureMath {
 
     public static AngularVelocity linearToAngularVelocity(Distance radius, LinearVelocity linearVelocity) {
         return RadiansPerSecond.of(linearVelocity.in(MetersPerSecond) / radius.in(Meters));
+    }
+
+    public static Rotation2d round(Rotation2d rotation) {
+        return Rotation2d.fromRotations(Math.round(rotation.getRotations()));
+    }
+
+    public static Rotation2d floor(Rotation2d rotation) {
+        return Rotation2d.fromRotations(Math.floor(rotation.getRotations()));
+    }
+
+    public static Rotation2d ceil(Rotation2d rotation) {
+        return Rotation2d.fromRotations(Math.ceil(rotation.getRotations()));
+    }
+
+    public static Rotation2d abs(Rotation2d rotation) {
+        return Rotation2d.fromRotations(Math.abs(rotation.getRotations()));
+    }
+
+    /**
+     * Returns the difference between two angles, in the range [-0.5, 0.5]
+     */
+    public static Angle differenceUnderHalf(Angle a, Angle b) {
+        return Rotations.of(
+            MathUtils.floorMod(a.in(Rotations) - b.in(Rotations) - 0.5, 1) - 0.5
+        );
     }
 }

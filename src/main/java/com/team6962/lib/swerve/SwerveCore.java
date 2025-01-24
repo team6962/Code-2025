@@ -12,6 +12,7 @@ import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -21,6 +22,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing
@@ -34,7 +36,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
     private SwerveDriveKinematics kinematics;
     private SwerveConfig constants;
 
-    private SwerveMovement currentMovement = new SwerveMovement(kinematics);
+    private SwerveMovement currentMovement;
 
     public SwerveCore(SwerveConfig constants) {
         this.constants = constants;
@@ -50,6 +52,8 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
         kinematics = KinematicsUtils.kinematicsFromChassis(constants.chassis());
         poseEstimator = new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
+
+        currentMovement = new SwerveMovement(kinematics);
     }
 
     public SwerveConfig getConstants() {
@@ -89,9 +93,9 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         Pose2d[] poses = new Pose2d[4];
 
         for (int i = 0; i < 4; i++) {
-            Pose2d relativePose = modules[i].getRelativePose();
+            Transform2d relativeTransform = modules[i].getRelativeTransform();
 
-            poses[i] = relativePose.transformBy(KinematicsUtils.toTransform2d(poseEstimator.getEstimatedPose()));
+            poses[i] = poseEstimator.getEstimatedPose().transformBy(relativeTransform);
         }
 
         return poses;
@@ -102,19 +106,33 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
      */
     public void latePeriodic() {
         SwerveModuleState[] states = currentMovement.getStates();
-
+        
         if (states == null) {
-            states = getModuleStates();
+            states = KinematicsUtils.getStoppedStates(getModuleStates());
         }
 
-        Logger.log("Drivetrain/targetModuleStates", states);
+        Logger.log("SwerveCore/speedse", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
 
-        states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed(), constants.maxSteerSpeed());
+        states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed());
+
+        Logger.log("SwerveCore/speedsf", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+
+        Logger.log("Drivetrain/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+        Logger.log("Drivetrain/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
+        Logger.log("Drivetrain/targetModuleStates", states);
+        Logger.log("Drivetrain/currentModuleStates", getModuleStates());
+
+        // states = new SwerveModuleState[] {
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
+        //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0))
+        // };
 
         Pose2d[] poses = getModulePoses();
 
         for (int i = 0; i < 4; i++) {
-            modules[i].driveState(states[i]);
+            modules[i].driveState(new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle));
             poses[i] = new Pose2d(poses[i].getTranslation(), poseEstimator.getEstimatedPose().getRotation().plus(states[i].angle));
         }
 

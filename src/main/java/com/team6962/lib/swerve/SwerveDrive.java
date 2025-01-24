@@ -1,5 +1,7 @@
 package com.team6962.lib.swerve;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -23,6 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -67,11 +70,6 @@ public class SwerveDrive extends SwerveCore {
         FieldObject2d modules = field.getObject("Swerve Modules");
 
         modules.setPoses(getModulePoses());
-    }
-
-    @Override
-    public void latePeriodic() {
-        super.latePeriodic();
     }
 
     public Pose2d getFuturePose(Time time) {
@@ -124,6 +122,8 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
+        Logger.log("Swerve Drive/driveSpeeds", speeds.get());
+
         return Commands.run(() ->
             setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
             useMotion()
@@ -131,7 +131,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveSpeeds(Supplier<ChassisSpeeds> speeds) {
-        return driveSpeeds(speeds, Coordinates.MovementSystem.ROBOT);
+        return driveSpeeds(speeds, Coordinates.MovementSystem.ALLIANCE);
     }
 
     public Command drive(ChassisSpeeds speeds) {
@@ -146,7 +146,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveTranslation(Supplier<Translation2d> translation) {
-        return driveTranslation(translation, Coordinates.MovementSystem.ROBOT);
+        return driveTranslation(translation, Coordinates.MovementSystem.ALLIANCE);
     }
 
     public Command drive(Translation2d translation) {
@@ -161,7 +161,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveRotation(Supplier<Rotation2d> rotation) {
-        return driveRotation(rotation, Coordinates.MovementSystem.ROBOT);
+        return driveRotation(rotation, Coordinates.MovementSystem.ALLIANCE);
     }
 
     public Command drive(Rotation2d rotation) {
@@ -200,7 +200,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command driveHeading(Supplier<Rotation2d> heading) {
-        return driveHeading(heading, Coordinates.MovementSystem.ROBOT);
+        return driveHeading(heading, Coordinates.MovementSystem.ALLIANCE);
     }
 
     public Command driveHeading(Rotation2d heading) {
@@ -220,10 +220,10 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindTo(Pose2d target, GoalEndState endState) {
-        return pathfindTo(target, endState, 0);
+        return pathfindTo(target, endState, Meters.of(0));
     }
 
-    public Command pathfindTo(Pose2d target, GoalEndState endState, double rotationDelayDistance) {
+    public Command pathfindTo(Pose2d target, GoalEndState endState, Distance rotationDelayDistance) {
         return pathfindTo(target, false, endState, rotationDelayDistance);
     }
 
@@ -232,11 +232,11 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindTo(Translation2d target, GoalEndState endState) {
-        return pathfindTo(new Pose2d(target, new Rotation2d()), true, endState, 0);
+        return pathfindTo(new Pose2d(target, new Rotation2d()), true, endState, Meters.of(0));
     }
 
     public Command pathfindTo(
-        Pose2d target, boolean ignoreRotation, GoalEndState endState, double rotationDelayDistance
+        Pose2d target, boolean ignoreRotation, GoalEndState endState, Distance rotationDelayDistance
     ) {
         return new FactoryCommand(() -> {
             Pose2d startPose = new Pose2d(
@@ -249,7 +249,7 @@ public class SwerveDrive extends SwerveCore {
                 ignoreRotation ? new Pose2d(target.getTranslation(), new Rotation2d()) : target
             );
 
-            return pathfindThrough(bezierPoints, ignoreRotation, endState, rotationDelayDistance);
+            return pathfindThrough(bezierPoints, ignoreRotation, endState, rotationDelayDistance.in(Meters));
         });
     }
 

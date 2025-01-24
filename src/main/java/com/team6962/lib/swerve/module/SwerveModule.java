@@ -2,8 +2,6 @@ package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -13,18 +11,26 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team6962.lib.swerve.SwerveConfig;
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
+import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -43,14 +49,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 /**
  * A swerve module, consisting of a drive motor, a steer motor, and a steer encoder.
  */
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule extends SubsystemBase implements AutoCloseable {
     /**
-     * The drive motor for this module.
+     * The drive motor for this module. Works in rotor units.
      */
     private TalonFX driveMotor;
 
     /**
-     * The steer motor for this module.
+     * The steer motor for this module. Works in mechanism units.
      */
     private TalonFX steerMotor;
 
@@ -85,11 +91,12 @@ public class SwerveModule extends SubsystemBase {
         CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
         // Configure the drive motor to brake automatically when not driven
-        CTREUtils.check(driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
+        CTREUtils.check(driveConfig.apply(new MotorOutputConfigs()
+            .withNeutralMode(NeutralModeValue.Brake)));
 
-        // Set the drive motor gear ratio to the value given in the swerve drive
-        // configuration
-        CTREUtils.check(driveConfig.apply(new FeedbackConfigs().withSensorToMechanismRatio(config.gearing().drive())));
+        CTREUtils.check(driveConfig.apply(new FeedbackConfigs()
+            .withRotorToSensorRatio(1)
+            .withSensorToMechanismRatio(1)));
 
         // Connect to the module's steer encoder
         steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -101,7 +108,9 @@ public class SwerveModule extends SubsystemBase {
         // Set the absolute steer encoder offset to the value given in the
         // swerve module's configuration
         CTREUtils.check(steerEncoderConfig.apply(new MagnetSensorConfigs()
-            .withMagnetOffset(moduleConstants.steerEncoderOffset().in(Rotations))));
+            .withMagnetOffset(moduleConstants.steerEncoderOffset()
+                .minus(corner.getModuleRotation()))
+        ));
 
         // Connect to the module's steer motor
         steerMotor = new TalonFX(moduleConstants.steerMotorId());
@@ -112,12 +121,11 @@ public class SwerveModule extends SubsystemBase {
 
         // Apply the PID/feedforward/Motion Magic configuration given in the
         // swerve drive configuration to the steer motor
-        CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
+        CTREUtils.check(steerConfig.apply(invertGains(config.steerMotor().gains())));
 
-        // Configure the steer motor to be inverted, and brake automatically
-        // when not driven
+        // Configure the steer motor to brake automatically when not driven
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
-            //.withInverted(InvertedValue.Clockwise_Positive)
+            .withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)));
         
         // Configure the fusing of the absolute steer encoder's reported position
@@ -125,8 +133,11 @@ public class SwerveModule extends SubsystemBase {
         // gear ratio to the value given in the swerve drive configuration
         CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
             .withFusedCANcoder(steerEncoder)
-            .withRotorToSensorRatio(config.gearing().steer())
-            .withSensorToMechanismRatio(1)));
+            .withRotorToSensorRatio(config.gearing().steer())));
+
+        setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
+        
+        Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
     }
 
     /**
@@ -184,10 +195,16 @@ public class SwerveModule extends SubsystemBase {
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
-        targetState.optimize(getState().angle);
+        targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
-        CTREUtils.check(driveMotor.setControl(new VelocityTorqueCurrentFOC(targetState.speedMetersPerSecond)));
-        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
+        Logger.log(getName() + "/targetState", targetState);
+        Logger.log(getName() + "/isValid", Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
+
+        CTREUtils.check(driveMotor.setControl(new VelocityVoltage(
+            constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
+        )));
+
+        CTREUtils.check(steerMotor.setControl(new PositionTorqueCurrentFOC(targetState.angle.getRotations())));
     }
 
     /**
@@ -195,7 +212,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link SwerveModulePosition}
      */
     public Distance getDrivePosition() {
-        return constants.wheel().diameter().times(CTREUtils.unwrap(driveMotor.getPosition()).in(Radians));
+        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getPosition()));
     }
 
     /**
@@ -203,7 +220,7 @@ public class SwerveModule extends SubsystemBase {
      * @return The current {@link LinearVelocity}
      */
     public LinearVelocity getDriveSpeed() {
-        return MetersPerSecond.of(constants.wheel().radius().in(Meters) * CTREUtils.unwrap(driveMotor.getVelocity()).in(RadiansPerSecond));
+        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getVelocity()));
     }
 
     /**
@@ -247,11 +264,11 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Gets the pose of the module relative to the robot's center.
+     * Gets the transform of the module relative to the robot's center.
      * @return The relative {@link Pose2d}
      */
-    public Pose2d getRelativePose() {
-        return new Pose2d(
+    public Transform2d getRelativeTransform() {
+        return new Transform2d(
             calculateRelativeTranslation(corner.index, constants.chassis()),
             new Rotation2d(getSteerAngle())
         );
@@ -311,6 +328,13 @@ public class SwerveModule extends SubsystemBase {
         );
     }
 
+    @Override
+    public void close() throws Exception {
+        driveMotor.close();
+        steerMotor.close();
+        steerEncoder.close();
+    }
+
     /**
      * Gets the name of a module given its index (e.g. 0 -> "Front Left").
      * @param moduleIndex The index of the module
@@ -345,15 +369,17 @@ public class SwerveModule extends SubsystemBase {
      * Represents a corner of the robot that a module can be on.
      */
     public static enum Corner {
-        FRONT_LEFT(0),
-        FRONT_RIGHT(1),
-        BACK_LEFT(2),
-        BACK_RIGHT(3);
+        FRONT_LEFT(0, Rotations.of(0)),
+        FRONT_RIGHT(1, Rotations.of(0.75)),
+        BACK_LEFT(2, Rotations.of(0.25)),
+        BACK_RIGHT(3, Rotations.of(0.5));
 
         public final int index;
+        private final Angle moduleRotation;
 
-        private Corner(int index) {
+        private Corner(int index, Angle moduleRotation) {
             this.index = index;
+            this.moduleRotation = moduleRotation;
         }
 
         /**
@@ -370,6 +396,10 @@ public class SwerveModule extends SubsystemBase {
                 default -> throw new IllegalArgumentException("Invalid module index");
             };
         }
+
+        public Angle getModuleRotation() {
+            return moduleRotation;
+        }
     }
 
     /**
@@ -380,8 +410,43 @@ public class SwerveModule extends SubsystemBase {
      */
     public static Translation2d calculateRelativeTranslation(int cornerIndex, SwerveConfig.Chassis chassis) {
         return new Translation2d(
-            (cornerIndex >= 2 ? -1 : 1) * chassis.wheelBase().in(Meters) / 2,
-            (cornerIndex % 2 == 1 ? -1 : 1) * chassis.trackWidth().in(Meters) / 2
+            (cornerIndex < 2 ? 1. : -1.) * chassis.wheelBase().in(Meters) / 2.,
+            (cornerIndex % 2 == 0 ? 1. : -1.) * chassis.trackWidth().in(Meters) / 2.
         );
+    }
+
+    public static Slot0Configs invertGains(Slot0Configs configs) {
+        return new Slot0Configs()
+            .withKP(-configs.kP)
+            .withKI(-configs.kI)
+            .withKD(-configs.kD)
+            .withKS(-configs.kS)
+            .withKV(-configs.kV)
+            .withKA(-configs.kA)
+            .withKG(-configs.kG);
+    }
+
+    public static SwerveModuleState optimizeStateForTalon(SwerveModuleState targetState, Angle currentAngle) {
+        Angle difference = MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
+        SwerveModuleState relativeOptimized = optimizeStateRelative(targetState.speedMetersPerSecond, difference);
+
+        SwerveModuleState optimized = new SwerveModuleState(
+            relativeOptimized.speedMetersPerSecond,
+            new Rotation2d(currentAngle.plus(relativeOptimized.angle.getMeasure()))
+        );
+
+        return optimized;
+    }
+
+    public static SwerveModuleState optimizeStateRelative(double speedMetersPerSecond, Angle angle) {
+        if (angle.in(Rotations) < -0.25) {
+            angle = angle.plus(Rotations.of(0.5));
+            speedMetersPerSecond = -speedMetersPerSecond;
+        } else if (angle.in(Rotations) > 0.25) {
+            angle = angle.minus(Rotations.of(0.5));
+            speedMetersPerSecond = -speedMetersPerSecond;
+        }
+
+        return new SwerveModuleState(speedMetersPerSecond, new Rotation2d(angle));
     }
 }

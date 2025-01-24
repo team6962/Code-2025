@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import java.util.function.Supplier;
 
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.RotationUtils;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -38,7 +39,7 @@ public class PoseEstimator extends SubsystemBase {
     private Supplier<SwerveModuleState[]> moduleStatesSupplier;
 
     private SwerveModulePosition[] lastPositions;
-    private SwerveModulePosition[] positionChanges = new SwerveModulePosition[4];
+    private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
     private Twist2d chassisVelocity = new Twist2d();
 
     public PoseEstimator(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> modulePositions, Supplier<SwerveModuleState[]> moduleStates) {
@@ -49,7 +50,7 @@ public class PoseEstimator extends SubsystemBase {
 
         lastPositions = modulePositions.get();
 
-        poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyroscope.getHeading(), modulePositions.get(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(kinematics, RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions.get(), new Pose2d());
     }
 
     @Override
@@ -57,11 +58,13 @@ public class PoseEstimator extends SubsystemBase {
         SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
         Time timestamp = Seconds.of(Timer.getFPGATimestamp());
 
-        poseEstimator.updateWithTime(timestamp.in(Seconds), gyroscope.getHeading(), modulePositions);
+        poseEstimator.updateWithTime(timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
         
         chassisVelocity = kinematics.toTwist2d(KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
 
         positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
+        
+        lastPositions = modulePositions;
     }
 
     public SwerveGyroscope getGyroscope() {
@@ -81,7 +84,7 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     public void resetPosition(Pose2d expectedPose) {
-        poseEstimator.resetPosition(gyroscope.getHeading(), lastPositions, expectedPose);
+        poseEstimator.resetPosition(RotationUtils.fromAngle(gyroscope.getHeading()), modulePositionsSupplier.get(), expectedPose);
     }
 
     public Pose2d getEstimatedPose() {

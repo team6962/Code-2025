@@ -65,16 +65,21 @@ public final class MathUtils {
       return 0.0;
     }
 
+    /**
+     * Deadband must be greater than 1e-6
+     */
     public static Translation2d addCircularDeadband(Translation2d input, double deadband) {
       double magnitude = input.getNorm();
-      double direction = input.getAngle().getRadians();
+
       if (Math.abs(magnitude) <= deadband) return new Translation2d();
-      magnitude = nonLinear(map(magnitude, deadband, 1.0, 0.0, 1.0));
-      return new Translation2d(magnitude * Math.cos(direction), magnitude * Math.sin(direction));
+
+      double mappedMagnitude = nonLinear(map(magnitude, deadband, 1.0, 0.0, 1.0));
+
+      return input.times(mappedMagnitude / magnitude);
     }
 
     public static double nonLinear(double x) {
-      return (1 - Math.cos(Math.abs(x) * Math.PI / 2.0)) * Math.signum(x);
+      return 1 - Math.cos(x * Math.PI / 2.0);
     }
   }
 
@@ -98,7 +103,7 @@ public final class MathUtils {
    * @param r The modulus.
    * @return x mod r, rounded down.
   */
-  public static double mod(double x, double r) {
+  public static double floorMod(double x, double r) {
     return ((x % r) + r) % r;
   }
 

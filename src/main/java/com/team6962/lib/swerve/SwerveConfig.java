@@ -6,12 +6,15 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.NewtonMeter;
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Ohms;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -47,7 +50,7 @@ import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 /**
  * Represents the configuration of a swerve drive
@@ -73,8 +76,14 @@ public class SwerveConfig {
         this.wheel = wheel;
         this.driveGains = driveGains;
 
-        driveMotor.gains.kV = 1.0 / maxDriveSpeed().in(MetersPerSecond);
-        steerMotor.gains.kV = 1.0 / maxSteerSpeed().in(RadiansPerSecond);
+        // if (driveMotor != null && gearing != null) {
+        //     driveMotor.gains.kS = driveMotor().stats().getVoltage(getDriveFrictionTorque().in(NewtonMeters), driveMotor().freeSpeedRotor().in(RadiansPerSecond));
+        // }
+
+        // if (steerMotor != null && gearing != null) {
+        //     steerMotor.gains.kV = 12.0 / maxSteerSpeed().in(RadiansPerSecond);
+        //     steerMotor.gains.kA = 12.0 / maxWheelRotationAcceleration(Amps.of(60)).in(RadiansPerSecondPerSecond);
+        // }
     }
 
     public Chassis chassis() {
@@ -132,6 +141,11 @@ public class SwerveConfig {
         public final double drive;
         public final double steer;
 
+        /**
+         * Creates a new Gearing
+         * @param driveRatio The drive ratio reduction
+         * @param steerRatio The steer ratio reduction
+         */
         private Gearing(double driveRatio, double steerRatio) {
             this.drive = driveRatio;
             this.steer = steerRatio;
@@ -188,20 +202,26 @@ public class SwerveConfig {
     }
 
     public static enum Wheel {
-        COLSON(Inches.of(4), 1.0),
-        BILLET_NITRILE(Inches.of(4), 1.0),
-        BILLET_PRINTED(Inches.of(4), 1.5);
+        COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
 
         public final Distance diameter;
+        public final Distance width;
         public final double staticFriction;
+        public final Mass mass;
 
-        private Wheel(Distance diameter, double staticFriction) {
+        private Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
             this.diameter = diameter;
+            this.width = width;
             this.staticFriction = staticFriction;
+            this.mass = mass;
         }
 
         public Distance diameter() {
             return diameter;
+        }
+
+        public Distance width() {
+            return width;
         }
 
         public double staticFriction() {
@@ -210,6 +230,14 @@ public class SwerveConfig {
 
         public Distance radius() {
             return diameter.div(2);
+        }
+
+        public MomentOfInertia driveMomentOfInertia() {
+            return KilogramSquareMeters.of(0.5 * mass.in(Kilograms) * radius().in(Meters) * radius().in(Meters));
+        }
+
+        public MomentOfInertia steerMomentOfInertia() {
+            return KilogramSquareMeters.of(1.0 / 12.0 * mass.in(Kilograms) * (3.0 * radius().in(Meters) * radius().in(Meters) + width().in(Meters) * width().in(Meters)));
         }
     }
 
@@ -230,7 +258,6 @@ public class SwerveConfig {
         }
     }
 
-    // TODO: [EASY] Consider using conversion functions instead of manual conversion
     public LinearVelocity maxDriveSpeed() {
         return driveMotorRotorToMechanism(driveMotor.freeSpeedRotor());
     }
@@ -268,6 +295,14 @@ public class SwerveConfig {
         return NewtonMeter.of(driveMotor.stats.getTorque(drivenCurrent.in(Amps))).times(gearing.drive);
     }
 
+    public Torque getDriveFrictionTorque() {
+        Force linearFriction = chassis().mass().times(MetersPerSecondPerSecond.of(-9.8));
+        Torque wheelFriction = wheel().diameter().times(linearFriction);
+        Torque rotorFriction = wheelFriction.times(gearing.drive);
+
+        return rotorFriction;
+    }
+
     public LinearAcceleration maxLinearAcceleration(Current drivenCurrent) {
         return MeasureMath.min(driveTorque(drivenCurrent).div(wheel.radius()), staticFriction())
                 .div(chassis.mass);
@@ -278,50 +313,70 @@ public class SwerveConfig {
     }
 
     public AngularAcceleration maxAngularAcceleration(Current driveCurrent) {
-        double friction = staticFriction().in(Newtons) / chassis.driveRadius().in(Meters) / chassis.mass.in(Kilograms);
-        double torque = driveTorque(driveCurrent).in(NewtonMeters) / chassis.driveRadius().in(Meters) / momentOfInertia().in(KilogramSquareMeters);
+        double frictionLimitedRps = staticFriction().in(Newtons) / chassis.driveRadius().in(Meters) / chassis.mass.in(Kilograms);
+        double torqueLimitedRps = driveTorque(driveCurrent).in(NewtonMeters) / chassis.driveRadius().in(Meters) / momentOfInertia().in(KilogramSquareMeters);
 
-        return RadiansPerSecond.per(Second).of(Math.min(friction, torque));
+        return RadiansPerSecond.per(Second).of(Math.min(frictionLimitedRps, torqueLimitedRps));
     }
 
-    public FlywheelSim createDriveMotorSimulation() {
-        return new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                driveMotor.gains.kV * wheel.radius().in(Meters),
-                driveMotor.gains.kA * wheel.radius().in(Meters)
+    public AngularAcceleration maxWheelRotationAcceleration(Current steerCurrent) {
+        Torque torque = NewtonMeters.of(steerMotor.stats.getTorque(steerCurrent.in(Amps))).times(gearing().steer());
+        MomentOfInertia steerMomentOfInertia = wheel().steerMomentOfInertia();
+
+        // τ = Iα where τ is torque, I is moment of inertia, and α is angular acceleration
+        // α = τ / I
+
+        return RadiansPerSecondPerSecond.of(torque.in(NewtonMeters) / steerMomentOfInertia.in(KilogramSquareMeters));
+    }
+
+    public DCMotorSim createDriveMotorSimulation() {
+        return new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                driveMotor().stats(),
+                wheel().driveMomentOfInertia().in(KilogramSquareMeters),
+                gearing().drive()
             ),
-            driveMotor.stats,
-            gearing.drive
+            driveMotor().stats()
         );
     }
 
-    public FlywheelSim createSteerMotorSimulation() {
-        return new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                steerMotor.gains.kV,
-                steerMotor.gains.kA
+    public DCMotorSim createSteerMotorSimulation() {
+        return new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                steerMotor().stats(),
+                wheel().steerMomentOfInertia().in(KilogramSquareMeters),
+                gearing().steer()
             ),
-            steerMotor.stats,
-            gearing.steer
+            steerMotor().stats()
         );
     }
+
+    /*
+     * Drive Motor Conversions
+     * 
+     * Mechanism Position = Wheel Angle (in radians) * Wheel Radius
+     * Wheel Angle = Rotor Angle / Gear Reduction
+     * 
+     * Mechanism Position = (Rotor Angle / Gear Reduction) in radians * Wheel Radius
+     * Rotor Angle = (Mechanism Position / Wheel Radius) to radians * Gear Reduction
+     */
 
     public Distance driveMotorRotorToMechanism(Angle movement) {
-        return Meters.of(movement.in(Radians) * wheel.radius().in(Meters) / gearing.drive);
+        return Meters.of(movement.in(Radians) / gearing.drive * wheel.radius().in(Meters));
     }
 
     public LinearVelocity driveMotorRotorToMechanism(AngularVelocity movement) {
-        return MetersPerSecond.of(movement.in(RadiansPerSecond) * wheel.radius().in(Meters) / gearing.drive);
+        return MetersPerSecond.of(movement.in(RadiansPerSecond) / gearing.drive * wheel.radius().in(Meters));
     }
 
     public Angle driveMotorMechanismToRotor(Distance movement) {
-        return Radians.of(movement.in(Meters) * gearing.drive / wheel.radius().in(Meters));
+        return Radians.of(movement.in(Meters) / wheel.radius().in(Meters) * gearing.drive);
     }
 
     public AngularVelocity driveMotorMechanismToRotor(LinearVelocity movement) {
-        return RadiansPerSecond.of(movement.in(MetersPerSecond) * gearing.drive / wheel.radius().in(Meters));
+        return RadiansPerSecond.of(movement.in(MetersPerSecond) / wheel.radius().in(Meters) * gearing.drive);
     }
-    
+
     public Angle steerMotorRotorToMechanism(Angle movement) {
         return movement.div(gearing.steer);
     }

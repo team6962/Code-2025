@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,11 +29,11 @@ public class XBoxSwerve extends Command {
   private SwerveDrive swerveDrive;
   private RobotStateController stateController;
 
-  public final double MAX_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(MetersPerSecond);
-  public final double NOMINAL_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER).in(MetersPerSecond);
-  public final double FINE_TUNE_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER).in(MetersPerSecond);
-  public final double NOMINAL_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER).in(RadiansPerSecond);
-  public final double MAX_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(RadiansPerSecond); // TODO: use physics from constants file
+  public double MAX_DRIVE_VELOCITY;
+  public double NOMINAL_DRIVE_VELOCITY;
+  public double FINE_TUNE_DRIVE_VELOCITY;
+  public double NOMINAL_ANGULAR_VELOCITY;
+  public double MAX_ANGULAR_VELOCITY;
   
   private Translation2d velocity = new Translation2d();
   private double angularVelocity = 0.0;
@@ -45,6 +46,12 @@ public class XBoxSwerve extends Command {
     this.stateController = stateController;
     // controller.setRumble(RumbleType.kBothRumble, 1.0);
     addRequirements(swerveDrive);
+
+    MAX_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(MetersPerSecond);
+    NOMINAL_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER).in(MetersPerSecond);
+    FINE_TUNE_DRIVE_VELOCITY = swerveDrive.getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER).in(MetersPerSecond);
+    NOMINAL_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER).in(RadiansPerSecond);
+    MAX_ANGULAR_VELOCITY = swerveDrive.getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER).in(RadiansPerSecond);
   }
 
   // Called when the command is initially scheduled.
@@ -100,8 +107,10 @@ public class XBoxSwerve extends Command {
       Rotation2d newHeading = new Rotation2d();
       if (!Constants.IS_BLUE_TEAM.get()) {
         newHeading = Rotation2d.fromDegrees(180.0);
+      } else if (Constants.IS_BLUE_TEAM.get()) {
+        newHeading = Rotation2d.fromDegrees(0);
       }
-      swerveDrive.getGyroscope().setHeading(newHeading);
+      swerveDrive.getGyroscope().setHeading(newHeading.getMeasure());
     }
 
     if (controller.getAButton()) {
@@ -116,7 +125,11 @@ public class XBoxSwerve extends Command {
       }
     }
 
-    driveCommand = swerveDrive.drive(new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity));
+    ChassisSpeeds drivenSpeeds = new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
+
+    Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
+
+    driveCommand = swerveDrive.drive(drivenSpeeds);
     driveCommand.schedule();
 
     // if (leftStick.getNorm() > 0.05 && (controller.getLeftBumper() || controller.getRightBumper())) {

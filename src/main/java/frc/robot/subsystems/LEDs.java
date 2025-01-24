@@ -25,8 +25,8 @@ public class LEDs extends SubsystemBase {
     OFF,
     DISABLED,
     ENABLED,
-    CAN_SEE_NOTE,
-    HAS_NOTE,
+    CAN_SEE_ALGAE,
+    HAS_ALGAE,
     HAS_VISION_TARGET_SPEAKER,
     RUNNING_COMMAND,
     AIMING,
@@ -72,13 +72,13 @@ public class LEDs extends SubsystemBase {
       case HAS_VISION_TARGET_SPEAKER:
         setRainbow(0, length);
         break;
-      case CAN_SEE_NOTE:
+      case CAN_SEE_ALGAE:
         setColorWave(0, length, new int[] {255, 25, 0}, 1.0, Direction.LEFT);
         break;
       case ENABLED:
         setBumperColorWave(0, length, 1.0);
         break;
-      case HAS_NOTE:
+      case HAS_ALGAE:
         setBumperColorWaveWithPurple(0, length, 1.0);
         break;
       case RUNNING_COMMAND:

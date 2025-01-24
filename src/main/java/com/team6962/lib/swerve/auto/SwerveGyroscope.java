@@ -1,14 +1,19 @@
 package com.team6962.lib.swerve.auto;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
 import java.util.function.Supplier;
 
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,11 +29,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * {@link PoseEstimator#getEstimatedPose()} or {@link SwerveDrive#getEstimatedPose()}.</i>
  */
 public class SwerveGyroscope extends SubsystemBase {
-    private Rotation2d offset = new Rotation2d();
+    private Angle offset = Radians.of(0);
     private AHRS navx;
     private Supplier<SwerveModulePosition[]> moduleDeltasSupplier;
     private SwerveDriveKinematics kinematics;
-    private Rotation2d absoluteHeading = new Rotation2d();
+    private Angle absoluteHeading = Radians.of(0);
 
     public SwerveGyroscope(Supplier<SwerveModulePosition[]> moduleDeltasSupplier, SwerveDriveKinematics kinematics) {
         if (RobotBase.isReal()) {
@@ -37,6 +42,13 @@ public class SwerveGyroscope extends SubsystemBase {
 
         this.moduleDeltasSupplier = moduleDeltasSupplier;
         this.kinematics = kinematics;
+
+        setName("Swerve Drive/Gyroscope");
+
+        System.out.println(moduleDeltasSupplier.get()[0]);
+
+        Logger.logSwerveModulePositions(getName() + "/moduleDeltas", moduleDeltasSupplier);
+        Logger.logMeasure(getName() + "/absoluteHeading", this::getAbsoluteHeading);
     }
 
     private void connectNavX() {
@@ -67,9 +79,15 @@ public class SwerveGyroscope extends SubsystemBase {
     @Override
     public void periodic() {
         if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
-            absoluteHeading = Rotation2d.fromDegrees(navx.getAngle());
+            absoluteHeading = Degrees.of(navx.getAngle());
         } else {
-            Rotation2d headingChange = Rotation2d.fromRadians(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
+            Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
+
+            System.out.println(headingChange);
+
+            if (headingChange.in(Radians) < 0.01) {
+                headingChange = Radians.of(0);
+            }
 
             absoluteHeading = absoluteHeading.plus(headingChange);
         }
@@ -89,7 +107,7 @@ public class SwerveGyroscope extends SubsystemBase {
      * it's starting position.
      * @return
      */
-    public Rotation2d getAbsoluteHeading() {
+    public Angle getAbsoluteHeading() {
         return absoluteHeading;
     }
 
@@ -98,23 +116,27 @@ public class SwerveGyroscope extends SubsystemBase {
      * starting position, with the offset applied.
      * @return The robot's current heading
      */
-    public Rotation2d getHeading() {
+    public Angle getHeading() {
         return getAbsoluteHeading().plus(offset);
     }
+    
+    // h = a + o
+    // 0 = a + o
+    // o = -a
 
     /**
      * Reset the robot's heading to zero.
      */
     public void resetHeading() {
-        offset = Rotation2d.fromDegrees(-getAbsoluteHeading().getDegrees());
+        offset = getAbsoluteHeading().unaryMinus();
     }
 
     /**
      * Set the robot's heading to a specific angle.
      * @param angle The angle to set the robot's heading to
      */
-    public void setHeading(Rotation2d angle) {
-        Rotation2d absoluteAngle = getAbsoluteHeading();
+    public void setHeading(Angle angle) {
+        Angle absoluteAngle = getAbsoluteHeading();
 
         offset = angle.minus(absoluteAngle);
     }

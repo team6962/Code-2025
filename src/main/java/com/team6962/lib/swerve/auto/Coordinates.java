@@ -73,18 +73,24 @@ public interface Coordinates {
         return DriverStation.getAlliance().isPresent();
     }
 
+    public default Rotation2d getAbsoluteEstimatedHeading(){
+        return isAllianceInverted().orElse(false) ?
+            getEstimatedPose().getRotation().rotateBy(Rotation2d.fromRotations(0.5)) :
+            getEstimatedPose().getRotation();
+    }
+
     /**
      * Converts {@link ChassisSpeeds} from robot coordinates to absolute coordinates.
      */
     public default ChassisSpeeds robotToAbsoluteSpeeds(ChassisSpeeds speeds) {
-        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation().unaryMinus());
+        return ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getEstimatedPose().getRotation());
     }
 
     /**
      * Converts {@link ChassisSpeeds} from absolute coordinates to robot coordinates.
      */
     public default ChassisSpeeds absoluteToRobotSpeeds(ChassisSpeeds speeds) {
-        return KinematicsUtils.rotateSpeeds(speeds, getEstimatedPose().getRotation());
+        return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getEstimatedPose().getRotation());
     }
 
     /**
@@ -92,7 +98,7 @@ public interface Coordinates {
      */
     public default ChassisSpeeds allianceToAbsoluteSpeeds(ChassisSpeeds speeds) {
         return isAllianceInverted().orElse(false) ?
-            KinematicsUtils.rotateSpeeds(speeds, Rotation2d.fromRotations(0.5)) :
+            KinematicsUtils.allianceInvertSpeeds(speeds) :
             speeds;
     }
 
@@ -107,14 +113,14 @@ public interface Coordinates {
      * Converts {@link ChassisSpeeds} from robot coordinates to alliance coordinates.
      */
     public default ChassisSpeeds robotToAllianceSpeeds(ChassisSpeeds speeds) {
-        return absoluteToAllianceSpeeds(robotToAbsoluteSpeeds(speeds));
+        return ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getAbsoluteEstimatedHeading());
     }
 
     /**
      * Converts {@link ChassisSpeeds} from alliance coordinates to robot coordinates.
      */
     public default ChassisSpeeds allianceToRobotSpeeds(ChassisSpeeds speeds) {
-        return absoluteToRobotSpeeds(allianceToAbsoluteSpeeds(speeds));
+        return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAbsoluteEstimatedHeading());
     }
 
     /**

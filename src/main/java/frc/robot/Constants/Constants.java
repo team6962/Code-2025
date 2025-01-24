@@ -6,13 +6,15 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Newton;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.SwerveConfig;
@@ -21,8 +23,6 @@ import com.team6962.lib.swerve.SwerveConfig.DriveGains;
 import com.team6962.lib.swerve.SwerveConfig.Gearing;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
-import com.team6962.lib.swerve.module.SwerveModule;
-import com.team6962.lib.swerve.module.SwerveModule.Corner;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,12 +30,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.Constants.Constants.NEO;
-import frc.robot.Constants.Preferences.SWERVE_DRIVE;
 
 
 /**
@@ -78,6 +73,10 @@ public final class Constants {
     public static final String TAB_NAME = "SwerveDrive";
   }
 
+  public static final class ALGAE {
+    public static final double ALGAE_DIAMETER = 16.25; //inches
+  }
+
   // LIMELIGHT
   // Exposure: 750
   // Sensor Gain: 10
@@ -90,26 +89,38 @@ public final class Constants {
       "limelight-btag", new Pose3d(Units.inchesToMeters(2.670592), Units.inchesToMeters(-3.0), Units.inchesToMeters(25.283), new Rotation3d(0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0)))
     );
 
-    public static final String NOTE_CAMERA_NAME = "limelight-fnote";
+    public static final String ALGAE_CAMERA_NAME = "limelight-balgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
-    public static final Rotation2d NOTE_CAMERA_PITCH = Rotation2d.fromDegrees(-24);
+    public static final double SPHERE_TOLERANCE = 0.5;
+
+    public static final Rotation2d ALGAE_CAMERA_PITCH = Rotation2d.fromDegrees(-24); //CHANGE (DEGREES)
     // x is forward, y is left, z is up
-    public static final Translation3d NOTE_CAMERA_POSITION = new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
+    public static final Translation3d ALGAE_CAMERA_POSITION = new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
 
     public static final Rotation2d FOV_HEIGHT = Rotation2d.fromDegrees(48.9); // Degrees
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
-    public static final double NOTE_CAMERA_HEIGHT_PIXELS = 960;
+    public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
+
+    public static final double MAX_DETECTION_RANGE = 19.30;
   }
 
   public static final class SWERVE {
     public static final Slot0Configs DRIVE_MOTOR_GAINS = new Slot0Configs()
-      .withKA(0.1);
+      .withKP(0.01)
+      .withKD(0.01)
+      .withKI(0.1)
+      .withKV(0.117)
+      .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKA(0.5);
+      .withKP(1000)
+      // .withKI(1)
+      // .withKS(0.5)
+      // .withKV(10)
+      .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
-      new PIDConstants(1, 1, 1, 0),
-      new PIDConstants(1, 1, 1, 0)
+      new PIDConstants(1, 0, 0),
+      new PIDConstants(1, 0, 0)
     );
 
     public static final Chassis CHASSIS = new Chassis(

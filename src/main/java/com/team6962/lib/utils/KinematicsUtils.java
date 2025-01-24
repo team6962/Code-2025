@@ -1,6 +1,7 @@
 package com.team6962.lib.utils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -15,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -59,7 +61,7 @@ public final class KinematicsUtils {
         SwerveModulePosition[] differences = new SwerveModulePosition[newPositions.length];
 
         for (int i = 0; i < newPositions.length; i++) {
-            differences[i] = new SwerveModulePosition(newPositions[i].distanceMeters - oldPositions[i].distanceMeters, newPositions[i].angle.minus(oldPositions[i].angle));
+            differences[i] = new SwerveModulePosition(newPositions[i].distanceMeters - oldPositions[i].distanceMeters, newPositions[i].angle);
         }
 
         return differences;
@@ -69,7 +71,7 @@ public final class KinematicsUtils {
         SwerveModulePosition[] scaled = new SwerveModulePosition[positions.length];
 
         for (int i = 0; i < positions.length; i++) {
-            scaled[i] = new SwerveModulePosition(positions[i].distanceMeters * scalar, positions[i].angle.times(scalar));
+            scaled[i] = new SwerveModulePosition(positions[i].distanceMeters * scalar, positions[i].angle);
         }
 
         return scaled;
@@ -97,26 +99,19 @@ public final class KinematicsUtils {
         return Rotation2d.fromRadians(speeds.omegaRadiansPerSecond);
     }
 
-    public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed, AngularVelocity maxRotation) {
-        LinearVelocity topSpeed = MetersPerSecond.of(0);
-        AngularVelocity topRotation = RotationsPerSecond.of(0);
+    public static SwerveModuleState[] desaturateWheelSpeeds(SwerveModuleState[] states, LinearVelocity maxSpeed) {
+        double fraction = 1.0;
 
         for (SwerveModuleState state : states) {
             LinearVelocity moduleSpeed = MetersPerSecond.of(Math.abs(state.speedMetersPerSecond));
-            AngularVelocity moduleRotation = RotationsPerSecond.of(Math.abs(state.angle.getRotations()));
 
-            if (moduleSpeed.gt(topSpeed)) topSpeed = moduleSpeed;
-            if (moduleRotation.gt(topRotation)) topRotation = moduleRotation;
+            fraction = Math.min(fraction, maxSpeed.in(MetersPerSecond) / moduleSpeed.in(MetersPerSecond));
         }
-
-        double speedScalar = topSpeed.gt(maxSpeed) ? maxSpeed.in(MetersPerSecond) / topSpeed.in(MetersPerSecond) : 1.0;
-        double rotationScalar = topRotation.gt(maxRotation) ? maxRotation.in(RotationsPerSecond) / topRotation.in(RotationsPerSecond) : 1.0;
-        double scalar = Math.min(speedScalar, rotationScalar);
 
         SwerveModuleState[] limitedStates = new SwerveModuleState[states.length];
 
         for (int i = 0; i < states.length; i++) {
-            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * scalar, states[i].angle.times(scalar));
+            limitedStates[i] = new SwerveModuleState(states[i].speedMetersPerSecond * fraction, states[i].angle);
         }
 
         return limitedStates;
@@ -133,22 +128,35 @@ public final class KinematicsUtils {
     }
 
     public static SwerveModuleState[] getParkedStates() {
-        // TODO: Implement
-        throw new RuntimeException("Not implemented");
+        SwerveModuleState[] output = new SwerveModuleState[4];
+
+        for (int i = 0; i < 4; i++) {
+            output[i] = new SwerveModuleState(0,
+                Rotation2d.fromDegrees(135).plus(
+                    new Rotation2d(SwerveModule.Corner.fromIndex(i).getModuleRotation())
+                ));
+        }
+
+        return output;
     }
 
     public static Transform2d toTransform2d(Pose2d pose) {
         return new Transform2d(pose.getTranslation(), pose.getRotation());
     }
 
+    public static ChassisSpeeds allianceInvertSpeeds(ChassisSpeeds speeds) {
+        return new ChassisSpeeds(
+            -speeds.vxMetersPerSecond,
+            -speeds.vyMetersPerSecond,
+            speeds.omegaRadiansPerSecond
+        );
+    }
+
     public static ChassisSpeeds rotateSpeeds(ChassisSpeeds speeds, Rotation2d angle) {
-        double sin = Math.sin(angle.getRadians());
-        double cos = Math.cos(angle.getRadians());
+        Translation2d translation = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
+            .rotateBy(angle);
 
-        double x = speeds.vxMetersPerSecond * cos - speeds.vyMetersPerSecond * sin;
-        double y = speeds.vxMetersPerSecond * sin + speeds.vyMetersPerSecond * cos;
-
-        return new ChassisSpeeds(x, y, speeds.omegaRadiansPerSecond);
+        return new ChassisSpeeds(translation.getX(), translation.getY(), speeds.omegaRadiansPerSecond);
     }
 
     public static ChassisSpeeds createChassisSpeeds(Translation2d translation, Rotation2d rotation) {
@@ -173,5 +181,25 @@ public final class KinematicsUtils {
         if (speeds == null) speeds = new ChassisSpeeds();
 
         return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, rotationSpeed.getRadians());
+    }
+
+    public static SwerveModuleState[] blankModuleStates(int count) {
+        SwerveModuleState[] states = new SwerveModuleState[count];
+
+        for (int i = 0; i < count; i++) {
+            states[i] = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
+        }
+
+        return states;
+    }
+
+    public static SwerveModulePosition[] blankModulePositions(int count) {
+        SwerveModulePosition[] positions = new SwerveModulePosition[count];
+
+        for (int i = 0; i < count; i++) {
+            positions[i] = new SwerveModulePosition(0, Rotation2d.fromDegrees(0));
+        }
+
+        return positions;
     }
 }
