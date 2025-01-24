@@ -5,13 +5,13 @@ import static edu.wpi.first.units.Units.Seconds;
 import java.util.function.Supplier;
 
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.RotationUtils;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -50,7 +50,7 @@ public class PoseEstimator extends SubsystemBase {
 
         lastPositions = modulePositions.get();
 
-        poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyroscope.getHeading(), modulePositions.get(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(kinematics, RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions.get(), new Pose2d());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class PoseEstimator extends SubsystemBase {
         SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
         Time timestamp = Seconds.of(Timer.getFPGATimestamp());
 
-        poseEstimator.updateWithTime(timestamp.in(Seconds), gyroscope.getHeading(), modulePositions);
+        poseEstimator.updateWithTime(timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
         
         chassisVelocity = kinematics.toTwist2d(KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
 
@@ -84,7 +84,7 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     public void resetPosition(Pose2d expectedPose) {
-        poseEstimator.resetPosition(gyroscope.getHeading(), modulePositionsSupplier.get(), expectedPose);
+        poseEstimator.resetPosition(RotationUtils.fromAngle(gyroscope.getHeading()), modulePositionsSupplier.get(), expectedPose);
     }
 
     public Pose2d getEstimatedPose() {

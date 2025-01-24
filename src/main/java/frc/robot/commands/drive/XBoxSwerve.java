@@ -110,7 +110,7 @@ public class XBoxSwerve extends Command {
       } else if (Constants.IS_BLUE_TEAM.get()) {
         newHeading = Rotation2d.fromDegrees(0);
       }
-      swerveDrive.getGyroscope().setHeading(newHeading);
+      swerveDrive.getGyroscope().setHeading(newHeading.getMeasure());
     }
 
     if (controller.getAButton()) {

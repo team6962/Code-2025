@@ -1,6 +1,11 @@
 package com.team6962.lib.utils;
 
+import static edu.wpi.first.units.Units.Degrees;
+
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 
 public final class RotationUtils {
     private RotationUtils() {
@@ -24,5 +29,13 @@ public final class RotationUtils {
      */
     public static Rotation2d normalize(Rotation2d angle) {
         return Rotation2d.fromRotations(Math.IEEEremainder(angle.getRotations(), 1));
+    }
+
+    public static Rotation2d fromAngle(Angle angle) {
+        return Rotation2d.fromDegrees(angle.in(Degrees));
+    }
+
+    public static Rotation2d fromAngle(Supplier<Angle> supplier) {
+        return Rotation2d.fromDegrees(supplier.get().in(Degrees));
     }
 }
