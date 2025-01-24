@@ -72,7 +72,6 @@ public final class Field {
 
   public static final Translation2d reefPoleOffset(double angle) { return new Translation2d(12.94/2, Rotation2d.fromDegrees(angle)); }
 
-
   public static Supplier<Pose2d> pose2d(double x, double y, double degrees) {
     return () -> flipIfRed(new Pose2d(x, y, Rotation2d.fromDegrees(degrees))).get();
   }

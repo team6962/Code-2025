@@ -17,37 +17,37 @@ import frc.robot.Constants.Field;
 import frc.robot.subsystems.LEDs;
 
 public class Notes {
-  public static Translation2d getNotePosition(String name, Rotation2d pitch, SwerveDrive swerveDrive, Translation2d fieldVelocity, Translation3d cameraToRobot) {
-    NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
+  // public static Translation2d getNotePosition(String name, Rotation2d pitch, SwerveDrive swerveDrive, Translation2d fieldVelocity, Translation3d cameraToRobot) {
+  //   NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
     
-    if (table.getEntry("tv").getDouble(0) == 0) return null;
+  //   if (table.getEntry("tv").getDouble(0) == 0) return null;
 
-    Translation2d notePosition = new Translation2d();
-    double x = table.getEntry("tx").getDouble(0);
-    double y = table.getEntry("ty").getDouble(0);// - Math.sqrt(Constants.LIMELIGHT.FOV_HEIGHT.getDegrees() * Constants.LIMELIGHT.FOV_HEIGHT.getDegrees() * target.ta)/2;
+  //   Translation2d notePosition = new Translation2d();
+  //   double x = table.getEntry("tx").getDouble(0);
+  //   double y = table.getEntry("ty").getDouble(0);// - Math.sqrt(Constants.LIMELIGHT.FOV_HEIGHT.getDegrees() * Constants.LIMELIGHT.FOV_HEIGHT.getDegrees() * target.ta)/2;
 
 
-    y += table.getEntry("tvert").getDouble(0) / 2.0 / LIMELIGHT.NOTE_CAMERA_HEIGHT_PIXELS * LIMELIGHT.FOV_HEIGHT.getDegrees();
+  //   y += table.getEntry("tvert").getDouble(0) / 2.0 / LIMELIGHT.NOTE_CAMERA_HEIGHT_PIXELS * LIMELIGHT.FOV_HEIGHT.getDegrees();
     
-    if (Units.degreesToRadians(y) + pitch.getRadians() > 0) return null;
+  //   if (Units.degreesToRadians(y) + pitch.getRadians() > 0) return null;
     
-    double latency = (table.getEntry("tl").getDouble(0) + table.getEntry("cl").getDouble(0));
-    double distance = ((cameraToRobot.getZ() - Units.inchesToMeters(0.521453)) / - Math.tan(Units.degreesToRadians(y - 3.59747) + pitch.getRadians())) - (Field.NOTE_LENGTH / 2.0) * 1.97022 + Units.inchesToMeters(4); // empirical offset
+  //   double latency = (table.getEntry("tl").getDouble(0) + table.getEntry("cl").getDouble(0));
+  //   double distance = ((cameraToRobot.getZ() - Units.inchesToMeters(0.521453)) / - Math.tan(Units.degreesToRadians(y - 3.59747) + pitch.getRadians())) - (Field.NOTE_LENGTH / 2.0) * 1.97022 + Units.inchesToMeters(4); // empirical offset
 
-    Translation2d relativePosition = new Translation2d(
-      distance * Math.cos(Units.degreesToRadians(x)),
-      -distance * Math.sin(Units.degreesToRadians(x))
-    ).plus(cameraToRobot.toTranslation2d());
+  //   Translation2d relativePosition = new Translation2d(
+  //     distance * Math.cos(Units.degreesToRadians(x)),
+  //     -distance * Math.sin(Units.degreesToRadians(x))
+  //   ).plus(cameraToRobot.toTranslation2d());
     
-    double timestamp = (table.getEntry("hb").getLastChange() / 1000000.0) - (latency / 1000.0);
+  //   double timestamp = (table.getEntry("hb").getLastChange() / 1000000.0) - (latency / 1000.0);
 
-    Pose2d robotPosition = swerveDrive.getEstimatedPose(Seconds.of(timestamp));
-    notePosition = robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
+  //   Pose2d robotPosition = swerveDrive.getEstimatedPose(Seconds.of(timestamp));
+  //   notePosition = robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
     
-    if (!RobotState.isDisabled()) {
-      LEDs.setState(LEDs.State.CAN_SEE_NOTE);
-    }
+  //   if (!RobotState.isDisabled()) {
+  //     LEDs.setState(LEDs.State.CAN_SEE_NOTE);
+  //   }
 
-    return notePosition;
-  }
+  //   return notePosition;
+  // }
 }

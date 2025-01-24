@@ -3,6 +3,8 @@ package frc.robot.commands.autonomous;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -33,7 +35,16 @@ public class Autonomous extends Command {
         PROCESSOR,
       }
     
-      public State state;
+    public State state;
+
+    public List<Waypoint> topCoralBezier = PathPlannerPath.waypointsFromPoses(
+        new Pose2d(3, 6, new Rotation2d()),
+        new Pose2d(2, 8, new Rotation2d()),
+        new Pose2d(6, 1, new Rotation2d())
+    );
+
+    public PathPlannerPath topCoralPath = new PathPlannerPath(topCoralBezier, null, null, null);
+    
     // private final ExampleSubsystem m_subsystem;
 
     public Debouncer hasCoralDebouncer = new Debouncer(0.1, DebounceType.kFalling);
@@ -104,11 +115,11 @@ public class Autonomous extends Command {
     }
 
     public Command processor(){
-
+        return null;
     }
 
-    public Command scoreCoral(){
-
+    public Command scoreCoral() {
+        return null;
         // for (int i = 0; i < 6; i ++) {
         //     Pose2d aprilTagPose = new Pose2d(
         //         (176.745 + Math.cos(i * Math.PI / 3) * 32.75), // x
@@ -122,21 +133,23 @@ public class Autonomous extends Command {
     }
 
     public Command coralStation(){
-
+        return null;
     }
 
 
-    public Command pickupAlgae(){
+    public Command pickupAlgae() {
+        return null;
         //we have no beam breaks in the algae manipulator.
     }
     
     public boolean hasCoral() {
-        if (RobotBase.isSimulation()) {
-            return hasCoralDebouncer.calculate(simulatedCoral);
-        // return hasNote.getEntry().getBoolean(false);
-        } else {
-            return hasCoralDebouncer.calculate(controller.hasCoral());
-        }
+        // if (RobotBase.isSimulation()) {
+        //     return hasCoralDebouncer.calculate(simulatedCoral);
+        // // return hasNote.getEntry().getBoolean(false);
+        // } else {
+        //     return hasCoralDebouncer.calculate(controller.hasCoral());
+        // }
+        return false;
     }
 
     @Override

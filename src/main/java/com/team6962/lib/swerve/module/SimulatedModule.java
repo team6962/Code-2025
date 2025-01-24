@@ -63,7 +63,7 @@ public class SimulatedModule extends SwerveModule {
 
         TalonFXSimState steerSim = getSteerMotor().getSimState();
 
-        System.out.println(steerSim.getMotorVoltage());
+        System.out.println("Motor voltage: " + steerSim.getMotorVoltage());
 
         steerFlywheel.setInputVoltage(MathUtil.clamp(-12.0, steerSim.getMotorVoltage(), 12.0));
         steerFlywheel.update(0.02);
