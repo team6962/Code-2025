@@ -88,8 +88,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive);
-    // return Commands.run(() -> {});
+    // return new Autonomous(stateController, swerveDrive);
+    return Commands.run(() -> {});
   }
 
   public static double getVoltage() {

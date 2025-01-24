@@ -36,14 +36,6 @@ public class Autonomous extends Command {
       }
     
     public State state;
-
-    public List<Waypoint> topCoralBezier = PathPlannerPath.waypointsFromPoses(
-        new Pose2d(3, 6, new Rotation2d()),
-        new Pose2d(2, 8, new Rotation2d()),
-        new Pose2d(6, 1, new Rotation2d())
-    );
-
-    public PathPlannerPath topCoralPath = new PathPlannerPath(topCoralBezier, null, null, null);
     
     // private final ExampleSubsystem m_subsystem;
 
