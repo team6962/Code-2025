@@ -283,7 +283,7 @@ public class SwerveConfig {
         Translation2d outer = chassis.outerDimensions();
 
         return KilogramSquareMeters.of(
-            (1 / 12) * chassis.mass.in(Kilograms) * (outer.getX() * outer.getX() + outer.getY() * outer.getY())
+            (1.0 / 12.0) * chassis.mass.in(Kilograms) * (outer.getX() * outer.getX() + outer.getY() * outer.getY())
         );
     }
 
