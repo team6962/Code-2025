@@ -144,9 +144,9 @@ public final class Constants {
 
     public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {
       MODULE_CONFIGS[0], // front-left
-      MODULE_CONFIGS[1], // front-right
-      MODULE_CONFIGS[2], // back-left
-      MODULE_CONFIGS[3]  // back-right
+      MODULE_CONFIGS[3], // front-right
+      MODULE_CONFIGS[1], // back-left
+      MODULE_CONFIGS[2]  // back-right
     };
 
     public static final SwerveConfig CONFIG = new SwerveConfig(
