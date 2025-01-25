@@ -7,6 +7,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.swerve.module.SwerveModule.Corner;
@@ -30,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -133,10 +138,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return new Autonomous(stateController, swerveDrive, AutonChooser.getNotes());
+    return new Autonomous(stateController, swerveDrive, new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)), false, true, false);
     // return Commands.run(() -> {});
-    // return Commands.run(() -> module.driveState(new SwerveModuleState(0, Rotation2d.fromDegrees(0))));//swerveDrive.park();
-    return swerveDrive.drive(KinematicsUtils.getStoppedStates(swerveDrive.getKinematics().toSwerveModuleStates(new ChassisSpeeds(1, 0, 0))));
   }
 
   public static double getVoltage() {

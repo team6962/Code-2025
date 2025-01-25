@@ -18,6 +18,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.SwerveConfig.Chassis;
 import com.team6962.lib.swerve.SwerveConfig.DriveGains;
@@ -224,6 +225,19 @@ public final class Constants {
       return STATS.stallTorqueNewtonMeters / STATS.stallCurrentAmps * currentLimit;
     }
   }
+
+  // public static final class AUTONOMOUS {
+  //   public static final double ACCELERATION_REDUCTION = ((SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION * SWERVE_DRIVE.ROBOT_MASS + ((SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA * SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION) / SWERVE_DRIVE.PHYSICS.DRIVE_RADIUS)) / (9.80 * SWERVE_DRIVE.ROBOT_MASS * SWERVE_DRIVE.FRICTION_COEFFICIENT));
+
+  //   public static final PathConstraints DEFAULT_PATH_CONSTRAINTS =
+  //       new PathConstraints(
+  //         SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
+  //         SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION / ACCELERATION_REDUCTION,
+  //         SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_VELOCITY,
+  //         SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION / ACCELERATION_REDUCTION
+  //       );
+  //   }
+  // }
 
   public static final class ELEVATOR {
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE

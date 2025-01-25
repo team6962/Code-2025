@@ -3,6 +3,7 @@ package com.team6962.lib.swerve;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
@@ -15,7 +16,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
-import com.team6962.lib.utils.FactoryCommand;
 import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -238,10 +238,10 @@ public class SwerveDrive extends SwerveCore {
     public Command pathfindTo(
         Pose2d target, boolean ignoreRotation, GoalEndState endState, Distance rotationDelayDistance
     ) {
-        return new FactoryCommand(() -> {
+        return Commands.defer(() -> {
             Pose2d startPose = new Pose2d(
                 getEstimatedPose().getTranslation(),
-                new Translation2d(getEstimatedSpeeds().vxMetersPerSecond, getEstimatedSpeeds().vyMetersPerSecond).getAngle()
+                KinematicsUtils.getAngle(getEstimatedSpeeds().vxMetersPerSecond, getEstimatedSpeeds().vyMetersPerSecond)
             );
 
             List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(
@@ -250,7 +250,7 @@ public class SwerveDrive extends SwerveCore {
             );
 
             return pathfindThrough(bezierPoints, ignoreRotation, endState, rotationDelayDistance.in(Meters));
-        });
+        }, Set.of());
     }
 
     public Command pathfindThroughPoints(List<Translation2d> points) {
@@ -258,13 +258,13 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindThroughPoints(List<Translation2d> points, GoalEndState endState) {
-        return new FactoryCommand(() -> {
+        return Commands.defer(() -> {
             List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(
                 points.stream().map(p -> new Pose2d(p, new Rotation2d())).toList()
             );
 
             return pathfindThrough(bezierPoints, false, endState, 0);
-        });
+        }, Set.of());
     }
 
     public Command pathfindThroughPoses(List<Pose2d> poses) {
@@ -276,17 +276,17 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindThroughPoses(List<Pose2d> poses, GoalEndState endState, double rotationDelayDistance) {
-        return new FactoryCommand(() -> {
+        return Commands.defer(() -> {
             List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(poses);
 
             return pathfindThrough(bezierPoints, false, endState, rotationDelayDistance);
-        });
+        }, Set.of());
     }
 
     public Command pathfindThrough(
         List<Waypoint> bezierPoints, boolean ignoreRotation, GoalEndState endState, double rotationDelayDistance
     ) {
-        return new FactoryCommand(() -> {
+        return Commands.defer(() -> {
             PathConstraints constraints = getConstants().pathConstraints();
 
             PathPlannerPath path = new PathPlannerPath(
@@ -317,8 +317,10 @@ public class SwerveDrive extends SwerveCore {
             if (ignoreRotation) command.addRequirements(useTranslation());
             else command.addRequirements(useMotion());
 
+            System.out.println("based");
+
             return command;
-        });
+        }, Set.of());
     }
 
     private IdealStartingState getPathplannerStartingState() {
