@@ -3,6 +3,8 @@ package frc.robot.commands.autonomous;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.swerve.SwerveDrive;
@@ -36,18 +38,24 @@ public class Autonomous extends Command {
       }
     
     public State state;
+
+    private List<Waypoint> testBezier = PathPlannerPath.waypointsFromPoses(
+        new Pose2d(100.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+        new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90))
+    );
     
     // private final ExampleSubsystem m_subsystem;
 
     public Debouncer hasCoralDebouncer = new Debouncer(0.1, DebounceType.kFalling);
 
 
-    public Autonomous(RobotStateController controller, SwerveDrive swerveDrive, List<Integer> reefFaces, boolean startAlgae, boolean leftStation, boolean rightStaiton) {
+    public Autonomous(RobotStateController controller, SwerveDrive swerveDrive, List<Integer> reefFaces, boolean startAlgae, boolean leftStation, boolean rightStation) {
         this.controller = controller;
         this.swerveDrive = swerveDrive;
         this.startingAlgae = startAlgae;
         this.leftCoralStation = leftStation;
-        this.rightCoralStation = rightStaiton;
+        this.rightCoralStation = rightStation;
         this.reefFaces = reefFaces;
     }
 
@@ -55,52 +63,54 @@ public class Autonomous extends Command {
     public void initialize() {
         this.state = null;
         this.simulatedCoral = true;
+        swerveDrive.pathfindThrough(testBezier, false, new GoalEndState(2, Rotation2d.fromDegrees(0)), 0).schedule();
     }
-
+    
     @Override
     public void execute() {
+        
         if (!RobotState.isAutonomous()) {
             runningCommand.cancel();
             this.cancel();
             return;
-          }
+        }
         
-        if (startingAlgae && (state != State.PROCESSOR || !runningCommand.isScheduled())) {
-            if (runningCommand != null) runningCommand.cancel();
-            runningCommand = processor();
-            runningCommand.schedule();
-            state = State.PROCESSOR;
-            System.out.println("SCORING PROCESSOR");
-            return;
-        }
+        // if (startingAlgae && (state != State.PROCESSOR || !runningCommand.isScheduled())) {
+        //     if (runningCommand != null) runningCommand.cancel();
+        //     runningCommand = processor();
+        //     runningCommand.schedule();
+        //     state = State.PROCESSOR;
+        //     System.out.println("SCORING PROCESSOR");
+        //     return;
+        // }
 
-        if ((state != State.PLACE_CORAL || !runningCommand.isScheduled()) && hasCoral() && !reefFaces.isEmpty()) {
-            if (runningCommand != null) runningCommand.cancel();
-            runningCommand = scoreCoral();
-            runningCommand.schedule();
-            state = State.PLACE_CORAL;
-            System.out.println("PLACING CORAL");
-            return;
-        }
+        // if ((state != State.PLACE_CORAL || !runningCommand.isScheduled()) && hasCoral() && !reefFaces.isEmpty()) {
+        //     if (runningCommand != null) runningCommand.cancel();
+        //     runningCommand = scoreCoral();
+        //     runningCommand.schedule();
+        //     state = State.PLACE_CORAL;
+        //     System.out.println("PLACING CORAL");
+        //     return;
+        // }
 
-        if ((state != State.CORAL_STATION || !runningCommand.isScheduled()) && !hasCoral() && (leftCoralStation || rightCoralStation)) {
-            state = State.CORAL_STATION;
-            if (runningCommand != null) runningCommand.cancel();
-            runningCommand = coralStation();
-            runningCommand.schedule();
-            System.out.println("PICKING UP FROM CORAL STATION");
-            return;
-        }
+        // if ((state != State.CORAL_STATION || !runningCommand.isScheduled()) && !hasCoral() && (leftCoralStation || rightCoralStation)) {
+        //     state = State.CORAL_STATION;
+        //     if (runningCommand != null) runningCommand.cancel();
+        //     runningCommand = coralStation();
+        //     runningCommand.schedule();
+        //     System.out.println("PICKING UP FROM CORAL STATION");
+        //     return;
+        // }
 
 
-        if (state != State.PICKUP_ALGAE || !runningCommand.isScheduled()) {
-            state = State.PICKUP_ALGAE;
-            if (runningCommand != null) runningCommand.cancel();
-            runningCommand = pickupAlgae();
-            runningCommand.schedule();
-            System.out.println("PICKING UP ALGAE");
-            return;
-        }
+        // if (state != State.PICKUP_ALGAE || !runningCommand.isScheduled()) {
+        //     state = State.PICKUP_ALGAE;
+        //     if (runningCommand != null) runningCommand.cancel();
+        //     runningCommand = pickupAlgae();
+        //     runningCommand.schedule();
+        //     System.out.println("PICKING UP ALGAE");
+        //     return;
+        // }
 
         
         

@@ -6,6 +6,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
@@ -121,8 +125,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return new Autonomous(stateController, swerveDrive);
-    return Commands.run(() -> {});
+    return new Autonomous(stateController, swerveDrive, new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)), false, true, false);
+    // return Commands.run(() -> {});
   }
 
   public static double getVoltage() {
