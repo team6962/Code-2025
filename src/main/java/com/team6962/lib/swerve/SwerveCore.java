@@ -72,6 +72,10 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
     }
 
+    public SwerveModule[] getModules() {
+        return modules;
+    }
+
     public PoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
