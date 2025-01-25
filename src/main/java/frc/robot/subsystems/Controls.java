@@ -1,9 +1,10 @@
 package frc.robot.subsystems;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
-import com.team6962.lib.utils.FactoryCommand;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -44,8 +45,9 @@ public class Controls {
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));    
 
     if (RobotBase.isSimulation()) {
-      driver.button(1).whileTrue(new FactoryCommand(() ->
-        swerveDrive.pathfindTo(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get())
+      driver.button(1).whileTrue(Commands.defer(() ->
+        swerveDrive.pathfindTo(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
+        Set.of()
       ));
       
       // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
