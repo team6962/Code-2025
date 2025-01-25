@@ -9,11 +9,13 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
@@ -112,10 +114,8 @@ public final class Constants {
       .withKV(0.117)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKP(1000)
-      // .withKI(1)
-      // .withKS(0.5)
-      // .withKV(10)
+      .withKP(20)
+      .withKI(1)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
       new PIDConstants(1, 0, 0),
@@ -131,10 +131,10 @@ public final class Constants {
     );
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(10, 20, 30, Degrees.of(0)),
-      new SwerveConfig.Module(11, 21, 31, Degrees.of(0)),
-      new SwerveConfig.Module(12, 22, 32, Degrees.of(0)),
-      new SwerveConfig.Module(13, 23, 33, Degrees.of(0)),
+      new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
+      new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
+      new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
+      new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
       new SwerveConfig.Module(14, 24, 34, Degrees.of(0)),
       new SwerveConfig.Module(15, 25, 35, Degrees.of(0)),
       new SwerveConfig.Module(16, 26, 36, Degrees.of(0)),
@@ -151,7 +151,7 @@ public final class Constants {
 
     public static final SwerveConfig CONFIG = new SwerveConfig(
       CHASSIS,
-      Gearing.MK4I_L2,
+      Gearing.MK4I_L2_PLUS,
       SELECTED_MODULE_CONFIGS,
       new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(40)),
       new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(40)),

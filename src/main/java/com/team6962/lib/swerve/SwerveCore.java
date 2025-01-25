@@ -111,11 +111,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
             states = KinematicsUtils.getStoppedStates(getModuleStates());
         }
 
-        Logger.log("SwerveCore/speedse", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
-
         states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed());
-
-        Logger.log("SwerveCore/speedsf", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
 
         Logger.log("Drivetrain/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
         Logger.log("Drivetrain/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));

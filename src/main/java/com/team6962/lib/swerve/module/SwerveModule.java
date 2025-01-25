@@ -8,16 +8,19 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.Consumer;
 
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -119,14 +122,16 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         // configure the motor's settings
         TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 
+        CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
+
         // Apply the PID/feedforward/Motion Magic configuration given in the
         // swerve drive configuration to the steer motor
-        CTREUtils.check(steerConfig.apply(invertGains(config.steerMotor().gains())));
+        CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
 
         // Configure the steer motor to brake automatically when not driven
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
             .withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Brake)));
+            .withNeutralMode(NeutralModeValue.Coast)));
         
         // Configure the fusing of the absolute steer encoder's reported position
         // with the motor's internal relative encoder, and set the steer motor
@@ -195,7 +200,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
-        targetState = optimizeStateForTalon(targetState, getSteerAngle());
+        // targetState = optimizeStateForTalon(targetState, getSteerAngle());
+
 
         Logger.log(getName() + "/targetState", targetState);
         Logger.log(getName() + "/isValid", Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
@@ -204,7 +210,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
         )));
 
-        CTREUtils.check(steerMotor.setControl(new PositionTorqueCurrentFOC(targetState.angle.getRotations())));
+        // CTREUtils.check(steerMotor.setControl(new VoltageOut(12.0)));
+
+        Logger.log(getName() + "/ewjdhbs", targetState.angle.getRotations());
+
+        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
     }
 
     /**
@@ -420,7 +430,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             .withKP(-configs.kP)
             .withKI(-configs.kI)
             .withKD(-configs.kD)
-            .withKS(-configs.kS)
+            .withKS(configs.kS)
             .withKV(-configs.kV)
             .withKA(-configs.kA)
             .withKG(-configs.kG);
