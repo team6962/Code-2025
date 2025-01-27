@@ -82,6 +82,11 @@ public final class Preferences {
     public static final double MANIPUALTOR_OUT_SPEED = 1.0;
     public static final double MANIPUALTOR_IN_SPEED = 1.0;
   }
+
+  public static final class MANIPULATOR_PIVOT {
+    public static final Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(0.0); 
+  }
   
   public static final class ELEVATOR {
     public static final double POWER = 0.5;

@@ -177,7 +177,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int AMP_PIVOT = 1;
-    public static final int SHOOTER_PIVOT = 2;
+    public static final int MANIPULATOR_PIVOT = 2;
     public static final int BEAM_BREAK = 3;
     public static final int HANG_ENCODER = 0; //UPDATE
     public static final int ELEVATOR_ENCODER = 4;
@@ -264,7 +264,7 @@ public final class Constants {
     }
   }
 
-  public static final class SHOOTER_PIVOT {
+  public static final class MANIPULATOR_PIVOT {
     public static final double GEARING = 15.0 * (78.0 / 20.0) * (200.0 / 19.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
