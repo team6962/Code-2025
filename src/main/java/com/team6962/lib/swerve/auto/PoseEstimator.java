@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
 
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
 
@@ -30,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * <p>
  * Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
  */
-public class PoseEstimator extends SubsystemBase {
+public class PoseEstimator extends SubsystemBase implements Coordinates {
     private SwerveDriveKinematics kinematics;
     private SwerveGyroscope gyroscope;
     private SwerveDrivePoseEstimator poseEstimator;
@@ -51,6 +52,8 @@ public class PoseEstimator extends SubsystemBase {
         lastPositions = modulePositions.get();
 
         poseEstimator = new SwerveDrivePoseEstimator(kinematics, RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions.get(), new Pose2d());
+
+        Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
     }
 
     @Override
@@ -107,6 +110,6 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     public ChassisSpeeds getEstimatedSpeeds() {
-        return kinematics.toChassisSpeeds(moduleStatesSupplier.get());
+        return robotToAllianceSpeeds(kinematics.toChassisSpeeds(moduleStatesSupplier.get()));
     }
 }

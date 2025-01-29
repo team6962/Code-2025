@@ -200,7 +200,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     public void driveState(SwerveModuleState targetState) {
         if (isCalibrating) return;
 
-        // targetState = optimizeStateForTalon(targetState, getSteerAngle());
+        targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
 
         Logger.log(getName() + "/targetState", targetState);

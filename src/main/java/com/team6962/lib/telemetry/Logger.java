@@ -39,11 +39,13 @@ public class Logger {
     private static Field2d field2d = new Field2d();
 
     public static void start(Time period) {
+        System.out.println("Starting periodic");
         notifier.startPeriodic(period.in(Seconds));
         SmartDashboard.putData(field2d);
     }
     
     private static void update() {
+        System.out.println("Updating " + updates.size() + " fields");
         updates.forEach(Runnable::run);
     }
 
