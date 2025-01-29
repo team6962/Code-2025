@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
@@ -54,6 +55,8 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         poseEstimator = new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
 
         currentMovement = new SwerveMovement(kinematics);
+
+        Logger.logPose("Swerve Drive/robotPose", poseEstimator::getEstimatedPose);
     }
 
     public SwerveConfig getConstants() {
@@ -146,6 +149,8 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
     }
 
     public void setMovement(ChassisSpeeds speeds) {
+        Logger.log("Swerve Drive/motionSpeeds", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(speeds));
+
         currentMovement.setSpeeds(speeds);
     }
 
