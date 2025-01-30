@@ -17,7 +17,7 @@ import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.subsystems.LEDs;
 
 public class Algae {
-    public static Translation2d getAlgaePosition(String name, Rotation2d pitch, SwerveDrive swerveDrive, Translation2d fieldVelocity, Translation3d cameraToRobot){
+    public static Translation2d getAlgaePosition(String name, Rotation2d pitch, SwerveDrive swerveDrive, Translation3d cameraToRobot){
         NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
 
         if (table.getEntry("tv").getDouble(0) == 0) return null; //check if detection is valid

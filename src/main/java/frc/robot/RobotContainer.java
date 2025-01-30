@@ -35,9 +35,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.vision.Algae;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
@@ -63,6 +65,7 @@ public class RobotContainer {
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
   public final LEDs ledStrip;
+  public final Algae algaeDetector;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -109,6 +112,7 @@ public class RobotContainer {
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
     ledStrip = new LEDs(stateController);
+    algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();
 
     // System.out.println(swerveDrive);
@@ -160,7 +164,7 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
-
+      Logger.log("AlgaePosition", Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, LIMELIGHT.ALGAE_CAMERA_PITCH, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
   }
 
   public void disabledInit() {
