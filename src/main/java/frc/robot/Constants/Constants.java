@@ -76,7 +76,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final double ALGAE_DIAMETER = 16.25; //inches
+    public static final double ALGAE_DIAMETER = Units.inchesToMeters(16.25); //meters
   }
 
   // LIMELIGHT
