@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.subsystems.LEDs;
+import io.limelightvision.LimelightHelpers;
 
 public class Algae {
     public static Translation2d getAlgaePosition(String name, Rotation2d pitch, SwerveDrive swerveDrive, Translation3d cameraToRobot){
@@ -22,26 +23,30 @@ public class Algae {
 
         if (table.getEntry("tv").getDouble(0) == 0) return null; //check if detection is valid
 
-        if (!table.getEntry("tclass").getString("").equals("algae")) return null;
-    
-        Translation2d algaePosition = new Translation2d();
+        if (!table.getEntry("tdclass").getString("").equals("algae")) return null;
+        //System.out.println("EIIMA CRAHSIGN OUT");
+        Translation2d algaePosition = new Translation2d(0,0);
         
         double horizontalOffset = table.getEntry("tx").getDouble(0); //the horizontal offset angle of target from center of camera
         
-        double[] t2d = NetworkTableInstance.getDefault().getTable("limelight").getEntry("t2d").getDoubleArray(new double[]{});
-
-        double pixelHeight = t2d[15];
+        double[] t2d = LimelightHelpers.getT2DArray(name);
+        System.out.println(t2d[16]);
+        /*double pixelHeight = t2d[15];
         double pixelRatio = pixelHeight/t2d[14];
-        
+        System.out.println("wawiefawpeiofjapweiofjawfea" + t2d);
         // Validate the object is approximately spherical
         if ((pixelRatio < 1.0 + LIMELIGHT.SPHERE_TOLERANCE) && (pixelRatio > 1.0 - LIMELIGHT.SPHERE_TOLERANCE) && (pixelHeight > 0)) return null; // Not spherical
+        System.out.println("fovhegith" + LIMELIGHT.FOV_HEIGHT.getRadians());
+        System.out.println("pixelHieght" + pixelHeight);
         double targetFOVRatio = LIMELIGHT.FOV_HEIGHT.getRadians() * (pixelHeight/ LIMELIGHT.ALGAE_CAMERA_HEIGHT_PIXELS);//portion of height target occupies in radians
         if (targetFOVRatio > Math.PI/2) return null;
-        
+        System.out.println("targetFOVRATION" + targetFOVRatio);
         // Calculate distance using apparent size
         double distance = (ALGAE.ALGAE_DIAMETER / 2) / Math.tan(targetFOVRatio);
-        if (distance > LIMELIGHT.MAX_DETECTION_RANGE) return null;
+        //if (distance > LIMELIGHT.MAX_DETECTION_RANGE) return null;
         // Calculate relative position
+        System.out.println("debugger");
+        System.out.println("distance:" + distance);
         Translation2d relativePosition = new Translation2d(
             distance * Math.cos(Units.degreesToRadians(horizontalOffset)),
             -distance * Math.sin(Units.degreesToRadians(horizontalOffset))
@@ -56,7 +61,7 @@ public class Algae {
         if (!RobotState.isDisabled()) {
             LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
           }
-
+*/
         return algaePosition;
         
     }

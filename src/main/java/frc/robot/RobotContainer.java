@@ -23,6 +23,7 @@ import com.team6962.lib.test.Talon10Test;
 import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -164,7 +165,8 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
-      Logger.log("AlgaePosition", Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, LIMELIGHT.ALGAE_CAMERA_PITCH, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
+    //System.out.println(new Translation2d(0.0,0.0));
+    System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, LIMELIGHT.ALGAE_CAMERA_PITCH, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION)));
   }
 
   public void disabledInit() {

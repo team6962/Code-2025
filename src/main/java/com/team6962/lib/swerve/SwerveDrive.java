@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.subsystems.vision.Algae;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore}
@@ -64,7 +66,7 @@ public class SwerveDrive extends SwerveCore {
     @Override
     public void periodic() {
         Field2d field = Logger.getField();
-
+        // Logger.log("Swerve Drive/AlgaePosition", );
         field.setRobotPose(getEstimatedPose());
 
         FieldObject2d modules = field.getObject("Swerve Modules");
@@ -123,7 +125,7 @@ public class SwerveDrive extends SwerveCore {
 
     public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
         Logger.log("Swerve Drive/driveSpeeds", speeds.get());
-
+        
         return Commands.run(() ->
             setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
             useMotion()
