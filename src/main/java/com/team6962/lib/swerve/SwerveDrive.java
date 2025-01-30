@@ -317,6 +317,8 @@ public class SwerveDrive extends SwerveCore {
             if (ignoreRotation) command.addRequirements(useTranslation());
             else command.addRequirements(useMotion());
 
+            System.out.println("based");
+
             return command;
         }, Set.of());
     }

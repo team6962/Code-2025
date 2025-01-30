@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -43,26 +44,33 @@ public final class Field {
     point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -2.0)
   );
 
+  public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
+
+
+  private static List<Translation2d> getReefPolePositions() {
+    List<Translation2d> positions = new ArrayList<Translation2d>();
+
+    for (int i = 0; i < 6; i ++) {
+      final double shiftAngle = Math.atan2(6.46, 32.75); // The angle from the middle of one side and a reef pole
+      final double reefPoleRadius = Math.hypot(6.46, 32.75); // Individual REEF distance from the center 
+
+      positions.add(new Translation2d(
+          176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius,
+          158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius
+      ));
+
+      positions.add(new Translation2d(
+          176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius,
+          158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius
+      ));
+    }
+
+    return positions;
+  }
+
+  public static final List<Translation2d> REEF_POLE_POSITIONS = getReefPolePositions();
+
   public static final Translation2d reefPoleOffset(double angle) { return new Translation2d(12.94/2, Rotation2d.fromDegrees(angle)); }
-  
-  public static final Supplier<Translation3d> SPEAKER = point3d(0.23, WIDTH / 2.0 + Units.inchesToMeters(57) * 1.0, 2.055);
-
-  public static final double SPEAKER_WIDTH = 1.0;
-  public static final double SPEAKER_HEIGHT = 0.45;
-  public static final double SPEAKER_ANGLE = Units.degreesToRadians(14.0);
-  public static final double NOTE_THICKNESS = Units.inchesToMeters(1.0);
-  public static final double NOTE_LENGTH    = Units.inchesToMeters(14.0);
-
-  public static final List<Supplier<Translation2d>> SHOT_POSITIONS = List.of(
-    // point2d(4.5, 6.50),
-    // point2d(BLUE_WING_X, 1.75),
-    // point2d(4.3, 5.3)
-    // point2d(1.5, 5.5),
-    // point2d(1.5, 3.5),
-    // point2d(1.5, 7.0)
-    point2d(2.0, 3.5),
-    () -> new Translation2d(flipIfRed(1.5).get(), Field.SPEAKER.get().getY())
-  );
 
   public static Supplier<Pose2d> pose2d(double x, double y, double degrees) {
     return () -> flipIfRed(new Pose2d(x, y, Rotation2d.fromDegrees(degrees))).get();

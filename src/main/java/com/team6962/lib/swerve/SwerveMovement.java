@@ -94,8 +94,6 @@ public class SwerveMovement {
     public SwerveModuleState[] getStates() {
         if (speeds != null) {
             states = kinematics.toSwerveModuleStates(speeds);
-
-            Logger.log("SwerveMovement/speedsd", RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
         }
 
         return states;
