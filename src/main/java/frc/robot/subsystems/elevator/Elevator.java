@@ -56,7 +56,13 @@ public class Elevator extends SubsystemBase {
       Inches.of(1),
       false
     );
-
+    
+    // encoder.setDistancePerRotation(1.0); // Set distance per rotation to 1.0
+    // Configure the TalonFX using Phoenix 6 configuration
+    TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+    motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    motorConfig.Voltage.PeakForwardVoltage = 12.0; // Example voltage limit
+    motorConfig.Voltage.PeakReverseVoltage = -12.0;
 
     // motor1.getConfigurator().apply((new FeedbackConfigs()).withFusedCANcoder(encoder));
 

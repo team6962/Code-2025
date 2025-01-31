@@ -44,7 +44,9 @@ public class PivotController {
   // Rev absolute through-bore encoder
   private DutyCycleEncoder absoluteEncoder;
 
-  private Angle minAngle, maxAngle, tolerance;
+  private Angle minAngle, maxAngle;
+
+  public final Angle tolerance;
 
   private double encoderOffset = 0.0;
 
@@ -194,7 +196,7 @@ public class PivotController {
     }
   }
 
-  public boolean isAngleAchievable(Angle angle) {
+  public boolean isInRange(Angle angle) {
     return angle.gt(minAngle) && angle.lt(maxAngle);
   }
 

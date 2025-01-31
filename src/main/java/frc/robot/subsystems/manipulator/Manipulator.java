@@ -1,74 +1,34 @@
 package frc.robot.subsystems.manipulator;
 
-import com.revrobotics.spark.SparkMax;
+import static edu.wpi.first.units.Units.Seconds;
 
-
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
-import frc.robot.Constants.Preferences;
+import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import frc.robot.Constants.Preferences.MANIPULATOR;
 
-// Manipulator is for the coral
 public class Manipulator extends SubsystemBase {
-    private SparkMax ManipulatorMotor;
+    public final ManipulatorPivot pivot;
+    public final ManipulatorGrabber algae;
+    public final ManipulatorGrabber coral;
 
-    public static enum State {
-        IN,
-        OUT,
-        OFF
-    }
-    public State state;
+    public Manipulator() {
+        pivot = new ManipulatorPivot();
 
-    public Command setState(State state) {
-        return runEnd(
-            () -> this.state = state,
-            () -> this.state = State.OFF
+        algae = new ManipulatorGrabber(
+            Constants.CAN.MANIPULATOR_ALGAE,
+            new ManipulatorGrabber.DigitalSensor(Constants.DIO.ALGAE_BEAM_BREAK),
+            MANIPULATOR.ALGAE_IN_SPEED,
+            MANIPULATOR.ALGAE_OUT_SPEED,
+            () -> ENABLED_SYSTEMS.ENABLE_MANIPULATOR
         );
-    }
 
-    @Override
-    public void periodic() {
-        if (!ENABLED_SYSTEMS.ENABLE_MANIPULATOR){ 
-            return;
-        }
-
-        if (RobotState.isDisabled()) {
-            state = State.OFF;
-        }
-
-        double motorPower = 0.0;
-
-        switch(state) {
-            case OFF:
-                motorPower = 0.0;
-                break;
-            case IN:
-                motorPower = Preferences.MANIPULATOR.MANIPUALTOR_IN_SPEED;
-                break;
-            case OUT:
-                motorPower = -Preferences.MANIPULATOR.MANIPUALTOR_OUT_SPEED; // Positive and negative might need to be switched for IN and OUT
-                break;
-        }
-        
-        ManipulatorMotor.set(motorPower);
-
-        if (RobotContainer.getVoltage() < Preferences.VOLTAGE_LADDER.MANIPULATOR) {
-            ManipulatorMotor.stopMotor();
-        }
-    }
-
-    public boolean hasGamepiece() {
-        return state == State.IN;
-    }
-
-    public Command intake() {
-        return Commands.sequence(
-            setState(State.IN),
-            Commands.waitUntil(this::hasGamepiece),
-            setState(State.OFF)
+        coral = new ManipulatorGrabber(
+            Constants.CAN.MANIPULATOR_CORAL,
+            new ManipulatorGrabber.TimeSensor(false, Seconds.of(1), Seconds.of(1)),
+            MANIPULATOR.CORAL_IN_SPEED,
+            MANIPULATOR.CORAL_OUT_SPEED,
+            () -> ENABLED_SYSTEMS.ENABLE_MANIPULATOR
         );
     }
 }

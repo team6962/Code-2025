@@ -20,7 +20,7 @@ public class IntakeWheels extends SubsystemBase {
     private SparkMaxConfig motorConfig;
 
     public IntakeWheels() {
-        motor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
+        motor = new SparkMax(CAN.INTAKE_WHEELS, MotorType.kBrushless);
         motorConfig = new SparkMaxConfig();
         SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
         SparkMaxUtil.saveAndLog(this, motor, motorConfig);
@@ -30,7 +30,7 @@ public class IntakeWheels extends SubsystemBase {
 
     public Command setSpeed(DoubleSupplier speed) {
         // TODO: Check for REVLibErrors
-        return Commands.run(() -> motor.set(speed.getAsDouble()));
+        return Commands.run(() -> motor.set(speed.getAsDouble()), this);
     }
 
     public Command intake() {

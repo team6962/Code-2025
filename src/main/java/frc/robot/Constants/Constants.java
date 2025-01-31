@@ -165,11 +165,14 @@ public final class Constants {
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back
     public static final int PDH = 1;
-    public static final int INTAKE = 29; 
+    public static final int INTAKE_WHEELS = 28; 
+    public static final int INTAKE_PIVOT = 29; 
     public static final int HANG = 0; // UPDATE 
     public static final int ELEVATOR_LEFT = 0; // UPDATE
     public static final int ELEVATOR_RIGHT = 0; // UPDATE
-    public static final int MANIPULATOR_PIVOT = 0; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 32; // UPDATE
+    public static final int MANIPULATOR_ALGAE = 33; // UPDATE
+    public static final int MANIPULATOR_CORAL = 34; // UPDATE
   }
 
   public static final class DIO {
@@ -178,7 +181,7 @@ public final class Constants {
     public static final int BEAM_BREAK = 3;
     public static final int HANG_ENCODER = 0; //UPDATE
     public static final int ELEVATOR_ENCODER = 4;
-    
+    public static final int ALGAE_BEAM_BREAK = 5;
   }
 
   public static final class NEO {

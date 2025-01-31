@@ -26,7 +26,7 @@ public class IntakePivot extends SubsystemBase {
     private SparkClosedLoopController closedLoopController;
 
     public IntakePivot() {
-        motor = new SparkMax(CAN.INTAKE, MotorType.kBrushless);
+        motor = new SparkMax(CAN.INTAKE_PIVOT, MotorType.kBrushless);
         motorConfig = new SparkMaxConfig();
         SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
         SparkMaxUtil.configurePID(motorConfig, 1.0, 0.0, 0.0, 0.0, false);
@@ -39,7 +39,7 @@ public class IntakePivot extends SubsystemBase {
 
     public Command setAngle(Supplier<Angle> angle) {
          // TODO: Check for REVLibErrors
-        return Commands.run(() -> closedLoopController.setReference(angle.get().in(Rotations), ControlType.kPosition))
+        return Commands.run(() -> closedLoopController.setReference(angle.get().in(Rotations), ControlType.kPosition), this)
             .until(() -> motor.get() == angle.get().in(Rotations));
     }
 

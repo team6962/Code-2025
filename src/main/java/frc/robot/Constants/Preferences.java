@@ -51,8 +51,10 @@ public final class Preferences {
   }
 
   public static final class MANIPULATOR {
-    public static final double MANIPUALTOR_OUT_SPEED = 1.0;
-    public static final double MANIPUALTOR_IN_SPEED = 1.0;
+    public static final double ALGAE_OUT_SPEED = 1.0;
+    public static final double ALGAE_IN_SPEED = -1.0;
+    public static final double CORAL_OUT_SPEED = 1.0;
+    public static final double CORAL_IN_SPEED = -1.0;
   }
 
   public static final class MANIPULATOR_PIVOT {
