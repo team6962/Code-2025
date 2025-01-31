@@ -7,11 +7,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindThenFollowPath;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.swerve.auto.Coordinates;
@@ -286,41 +284,24 @@ public class SwerveDrive extends SwerveCore {
     public Command pathfindThrough(
         List<Waypoint> bezierPoints, boolean ignoreRotation, GoalEndState endState, double rotationDelayDistance
     ) {
-        return Commands.defer(() -> {
-            PathConstraints constraints = getConstants().pathConstraints();
+        PathPlannerPath path = new PathPlannerPath(
+            bezierPoints,
+            getConstants().pathConstraints(),
+            getPathplannerStartingState(),
+            endState
+        );
 
-            PathPlannerPath path = new PathPlannerPath(
-                bezierPoints,
-                constraints,
-                getPathplannerStartingState(),
-                endState
-            );
-
-            SwerveConfig config = getConstants();
-
-            PathfindThenFollowPath command = new PathfindThenFollowPath(
+        return new FollowPathCommand(
                 path,
-                constraints,
                 this::getEstimatedPose,
-                () -> this.getEstimatedSpeeds(Coordinates.MovementSystem.ROBOT),
-                (speeds, feedforwards) -> { // TODO: Figure out if we should use feedforwards
-                    speeds = allianceToRobotSpeeds(speeds);
-
+                getPoseEstimator()::getEstimatedSpeeds,
+                (speeds, feedforwards) -> {
                     if (ignoreRotation) setMovement(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
                     else setMovement(speeds);
                 },
-                config.driveGains().pathController(),
-                config.pathRobotConfig(),
-                () -> Coordinates.isAllianceInverted().orElse(false)
-            );
-
-            if (ignoreRotation) command.addRequirements(useTranslation());
-            else command.addRequirements(useMotion());
-
-            System.out.println("based");
-
-            return command;
-        }, Set.of());
+                getConstants().driveGains().pathController(),
+                getConstants().pathRobotConfig(),
+                () -> false);
     }
 
     private IdealStartingState getPathplannerStartingState() {
