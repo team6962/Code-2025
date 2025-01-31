@@ -59,9 +59,9 @@ public class SimulatedModule extends SwerveModule {
 
             steerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-            Logger.log(getName() + "/steerSimInVolts", steerSimState.getMotorVoltage());
+            Logger.log(getName() + "/steerSimInVolts", -steerSimState.getMotorVoltage());
 
-            steerMotorSim.setInputVoltage(steerSimState.getMotorVoltage());
+            steerMotorSim.setInputVoltage(-steerSimState.getMotorVoltage());
             steerMotorSim.update(delta.in(Seconds));
 
             CTREUtils.check(steerSimState.setRawRotorPosition(steerMotorSim.getAngularPosition().times(getDrivetrainConstants().gearing().steer())));

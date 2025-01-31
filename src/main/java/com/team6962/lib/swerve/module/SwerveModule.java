@@ -131,7 +131,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         // Configure the steer motor to brake automatically when not driven
         CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
             .withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)));
+            .withNeutralMode(NeutralModeValue.Brake)));
         
         // Configure the fusing of the absolute steer encoder's reported position
         // with the motor's internal relative encoder, and set the steer motor

@@ -167,9 +167,9 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28; 
     public static final int INTAKE_PIVOT = 29; 
-    public static final int HANG = 0; // UPDATE 
-    public static final int ELEVATOR_LEFT = 0; // UPDATE
-    public static final int ELEVATOR_RIGHT = 0; // UPDATE
+    public static final int HANG = 37; // UPDATE 
+    public static final int ELEVATOR_LEFT = 36; // UPDATE
+    public static final int ELEVATOR_RIGHT = 35; // UPDATE
     public static final int MANIPULATOR_PIVOT = 32; // UPDATE
     public static final int MANIPULATOR_ALGAE = 33; // UPDATE
     public static final int MANIPULATOR_CORAL = 34; // UPDATE

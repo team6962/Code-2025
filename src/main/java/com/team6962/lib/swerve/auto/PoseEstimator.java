@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * <p>
  * Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
  */
-public class PoseEstimator extends SubsystemBase implements Coordinates {
+public class PoseEstimator extends SubsystemBase {
     private SwerveDriveKinematics kinematics;
     private SwerveGyroscope gyroscope;
     private SwerveDrivePoseEstimator poseEstimator;
@@ -110,6 +110,6 @@ public class PoseEstimator extends SubsystemBase implements Coordinates {
     }
 
     public ChassisSpeeds getEstimatedSpeeds() {
-        return robotToAllianceSpeeds(kinematics.toChassisSpeeds(moduleStatesSupplier.get()));
+        return kinematics.toChassisSpeeds(moduleStatesSupplier.get());
     }
 }
