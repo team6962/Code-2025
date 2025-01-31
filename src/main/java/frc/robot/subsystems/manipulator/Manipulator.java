@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Preferences;
@@ -59,5 +60,15 @@ public class Manipulator extends SubsystemBase {
         }
     }
 
-    
+    public boolean hasGamepiece() {
+        return state == State.IN;
+    }
+
+    public Command intake() {
+        return Commands.sequence(
+            setState(State.IN),
+            Commands.waitUntil(this::hasGamepiece),
+            setState(State.OFF)
+        );
+    }
 }
