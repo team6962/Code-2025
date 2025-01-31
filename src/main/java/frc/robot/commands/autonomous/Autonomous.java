@@ -33,6 +33,14 @@ public class Autonomous extends SequentialCommandGroup {
         return swerveDrive.pathfindTo(new Pose2d(6.172, 0.508, Rotation2d.fromDegrees(-90)));
     }
 
+    public Command pathfindToTopCoralStation() {
+        return swerveDrive.pathfindTo(new Pose2d(1.1, 7.0, Rotation2d.fromDegrees(135)));
+    }
+
+    public Command pathfindToTopLeftReefPoles() {
+        return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(-60)));
+    }
+
     public Command scoreCoral() {
         return null;
     }
