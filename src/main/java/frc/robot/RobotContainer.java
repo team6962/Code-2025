@@ -25,8 +25,9 @@ import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.manipulator.AlgaeManipulator;
+import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
 
@@ -52,7 +53,8 @@ public class RobotContainer {
   public final RobotStateController stateController;
   public final LEDs ledStrip;
   public final Intake intake;
-  public final AlgaeManipulator algaeManipulator;
+  public final Manipulator manipulator;
+  public final Elevator elevator;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -100,7 +102,8 @@ public class RobotContainer {
     stateController = new RobotStateController(swerveDrive);
     ledStrip = new LEDs(stateController, () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     intake = new Intake();
-    algaeManipulator = new AlgaeManipulator();
+    manipulator = new Manipulator();
+    elevator = new Elevator();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
@@ -131,7 +134,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, algaeManipulator, intake);
+    return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
     // return Commands.run(() -> {});
   }
 
