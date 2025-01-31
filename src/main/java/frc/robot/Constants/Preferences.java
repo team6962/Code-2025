@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -73,6 +76,9 @@ public final class Preferences {
   public static final class INTAKE {
     public static final double IN_POWER = 0.5;
     public static final double OUT_POWER = 0.5; // Placeholder value
+
+    public static final Angle PIVOT_DOWN = Degrees.of(0.0);
+    public static final Angle PIVOT_UP = Degrees.of(90.0);
 
     public static final double TO_SHOOTER_POWER = 0.3;
     public static final double SLOW_OUT_POWER = 0.4;
