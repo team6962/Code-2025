@@ -214,7 +214,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     public Command pathfindTo(Pose2d target) {
-        return pathfindTo(target, new GoalEndState(0, new Rotation2d()));
+        return pathfindTo(target, new GoalEndState(0, target.getRotation()));
     }
 
     public Command pathfindTo(Pose2d target, GoalEndState endState) {

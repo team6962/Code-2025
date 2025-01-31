@@ -125,7 +125,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)), false, true, false);
+    return new Autonomous(stateController, swerveDrive);
     // return Commands.run(() -> {});
   }
 
