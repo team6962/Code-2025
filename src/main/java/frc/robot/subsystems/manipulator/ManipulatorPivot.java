@@ -1,11 +1,14 @@
 package frc.robot.subsystems.manipulator;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.util.function.Supplier;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,7 +29,7 @@ public class ManipulatorPivot extends SubsystemBase{
     private boolean isCalibrating = false;
     
     public ManipulatorPivot(){
-        motor = new SparkMax(CAN.SHOOTER_PIVOT, MotorType.kBrushless);
+        motor = new SparkMax(CAN.MANIPULATOR_PIVOT, MotorType.kBrushless);
         controller = new PivotController(
             this,
             motor,
@@ -37,7 +40,7 @@ public class ManipulatorPivot extends SubsystemBase{
             MANIPULATOR_PIVOT.GEARING,
             Preferences.MANIPULATOR_PIVOT.MIN_ANGLE,
             Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-            Rotation2d.fromDegrees(0.25),
+            Degrees.of(0.25),
             true
         );
     }
@@ -52,49 +55,39 @@ public class ManipulatorPivot extends SubsystemBase{
   
       controller.run();
   
-      // motor.set(0.33);
-      
-      if (motor.getAppliedOutput() > 0.0 && getPosition().getRadians() > Preferences.SHOOTER_PIVOT.MAX_ANGLE.getRadians()) {
-        motor.stopMotor();
-      }
-  
-      if (motor.getAppliedOutput() < 0.0 && getPosition().getRadians() < Preferences.SHOOTER_PIVOT.MIN_ANGLE.getRadians()) {
-        motor.stopMotor();
-      }
-  
       if (RobotContainer.getVoltage() < VOLTAGE_LADDER.SHOOTER) motor.stopMotor();
     }
 
-    public Command setTargetAngleCommand(Supplier<Rotation2d> angleSupplier) {
+    public Command setTargetAngleCommand(Supplier<Angle> angleSupplier) {
         return Commands.runEnd(
           () -> setTargetAngle(angleSupplier.get()),
-          () -> setTargetAngle(Preferences.SHOOTER_PIVOT.IDLE_ANGLE)
+          () -> setTargetAngle(Preferences.MANIPULATOR_PIVOT.MIN_ANGLE)
         );
       }
     
-    public boolean isAngleAchievable(Rotation2d angle) {
-        if (angle == null) return false;
-        return controller.isAngleAchievable(angle);
+    public boolean isAngleAchievable(Angle angle) {
+      if (angle == null) return false;
+      return controller.isAngleAchievable(angle);
     }
 
-    public void setTargetAngle(Rotation2d angle) {
-        if (angle == null) return;
-            controller.setTargetAngle(angle);
+    public void setTargetAngle(Angle angle) {
+      if (angle == null) return;
+      controller.setTargetAngle(angle);
     }
 
-    public Rotation2d getTargetAngle() {
-        return controller.getTargetAngle();
+    public Angle getTargetAngle() {
+      return controller.getTargetAngle();
     }
 
-    public Rotation2d getPosition() {
-        return controller.getPosition();
+    public Angle getPosition() {
+      return controller.getPosition();
     }
 
     public boolean doneMoving() {
-        return controller.doneMoving();
+      return controller.doneMoving();
     }
 
-    public void setMaxAngle(Rotation2d angle) {
-        controller.setMaxAngle(angle);
+    public void setMaxAngle(Angle angle) {
+      controller.setMaxAngle(angle);
     }
 }

@@ -4,8 +4,14 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotation;
+
 import com.revrobotics.AbsoluteEncoder;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,19 +22,31 @@ import frc.robot.Constants.Constants.HANG;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences;
 import frc.robot.util.hardware.SparkMaxUtil;
+import frc.robot.util.hardware.MotionControl.PivotController;
 
 public class Hang extends SubsystemBase {
     private State state = State.OFF;
     private SparkMax motor;
     private SparkMaxConfig motorConfig;
     private DutyCycleEncoder hangEncoder;
+    private PivotController controller;
 
     public Hang() {
         motor = new SparkMax(CAN.HANG, MotorType.kBrushless);
         motorConfig = new SparkMaxConfig();
         SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
         SparkMaxUtil.saveAndLog(this, motor, motorConfig);
-        hangEncoder = new DutyCycleEncoder(DIO.HANG_ENCODER);
+        controller = new PivotController(
+            this, 
+            motor,
+            DIO.HANG_ENCODER, 0,
+            0, 0,
+            0, 
+            Preferences.HANG_PIVOT.MIN_ANGLE,
+            Preferences.HANG_PIVOT.MAX_ANGLE,
+            Degrees.of(2.0), 
+            false
+        );
     }
 
     public enum State {
@@ -58,13 +76,14 @@ public class Hang extends SubsystemBase {
 
         switch (state) {
             case REVERSE:
-                motorPower = -Preferences.HANG.REVERSE_POWER;
+                controller.setTargetAngle(Preferences.HANG_PIVOT.STOW_ANGLE);
+                controller.run();
                 break;
             case CLIMB:
-                motorPower = Preferences.HANG.CLIMB_POWER;
+                controller.setTargetAngle(Preferences.HANG_PIVOT.HANG_ANGLE);
+                controller.run();
                 break;
             case OFF:
-                motorPower = 0;
                 break;
         }
 
@@ -73,8 +92,6 @@ public class Hang extends SubsystemBase {
         }
     
         // Makes sure we dont overshoot our limits for left hang arm
-
-        motor.set(motorPower);
 
     }
     
