@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 
@@ -32,6 +33,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 
@@ -76,7 +78,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final double ALGAE_DIAMETER = Units.inchesToMeters(16.25); //meters
+    public static final Distance ALGAE_DIAMETER = Inches.of(16.25); //meters
   }
 
   // LIMELIGHT
@@ -104,7 +106,7 @@ public final class Constants {
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
     public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
 
-    public static final double MAX_DETECTION_RANGE = 19.30;
+    public static final Distance MAX_DETECTION_RANGE = Meters.of(19.30); //Max distance an algae can be while being on the field
   }
 
   public static final class SWERVE {

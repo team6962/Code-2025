@@ -1,7 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
@@ -166,7 +165,7 @@ public class RobotContainer {
 
   public void disabledPeriodic() {
     //System.out.println(new Translation2d(0.0,0.0));
-    System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, LIMELIGHT.ALGAE_CAMERA_PITCH, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION)));
+    System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION)));
   }
 
   public void disabledInit() {
