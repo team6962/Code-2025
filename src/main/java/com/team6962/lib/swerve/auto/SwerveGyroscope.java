@@ -45,8 +45,6 @@ public class SwerveGyroscope extends SubsystemBase {
 
         setName("Swerve Drive/Gyroscope");
 
-        System.out.println(moduleDeltasSupplier.get()[0]);
-
         Logger.logSwerveModulePositions(getName() + "/moduleDeltas", moduleDeltasSupplier);
         Logger.logMeasure(getName() + "/absoluteHeading", this::getAbsoluteHeading);
     }
@@ -79,7 +77,7 @@ public class SwerveGyroscope extends SubsystemBase {
     @Override
     public void periodic() {
         if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
-            absoluteHeading = Degrees.of(navx.getAngle());
+            absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
         } else {
             Logger.log(getName() + "/moduleDeltas2", moduleDeltasSupplier.get());
 

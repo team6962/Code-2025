@@ -9,11 +9,13 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.PathConstraints;
@@ -30,6 +32,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 
@@ -113,10 +116,8 @@ public final class Constants {
       .withKV(0.117)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final Slot0Configs STEER_MOTOR_GAINS = new Slot0Configs()
-      .withKP(1000)
-      // .withKI(1)
-      // .withKS(0.5)
-      // .withKV(10)
+      .withKP(20)
+      .withKI(1)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
       new PIDConstants(5.0, 1.0, 0),
@@ -132,10 +133,10 @@ public final class Constants {
     );
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(10, 20, 30, Degrees.of(0)),
-      new SwerveConfig.Module(11, 21, 31, Degrees.of(0)),
-      new SwerveConfig.Module(12, 22, 32, Degrees.of(0)),
-      new SwerveConfig.Module(13, 23, 33, Degrees.of(0)),
+      new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
+      new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
+      new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
+      new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
       new SwerveConfig.Module(14, 24, 34, Degrees.of(0)),
       new SwerveConfig.Module(15, 25, 35, Degrees.of(0)),
       new SwerveConfig.Module(16, 26, 36, Degrees.of(0)),
@@ -145,14 +146,14 @@ public final class Constants {
 
     public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {
       MODULE_CONFIGS[0], // front-left
-      MODULE_CONFIGS[1], // front-right
-      MODULE_CONFIGS[2], // back-left
-      MODULE_CONFIGS[3]  // back-right
+      MODULE_CONFIGS[3], // front-right
+      MODULE_CONFIGS[1], // back-left
+      MODULE_CONFIGS[2]  // back-right
     };
 
     public static final SwerveConfig CONFIG = new SwerveConfig(
       CHASSIS,
-      Gearing.MK4I_L2,
+      Gearing.MK4I_L2_PLUS,
       SELECTED_MODULE_CONFIGS,
       new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(60)),
       new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(60)),
@@ -164,21 +165,16 @@ public final class Constants {
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back
     public static final int PDH = 1;
-    public static final int SHOOTER_WHEELS_TOP = 19;
-    public static final int SHOOTER_WHEELS_BOTTOM = 26;
-    public static final int SHOOTER_PIVOT = 18;
-    public static final int SHOOTER_FEED = 20;
-    public static final int TRANSFER_OUT = 24;
-    public static final int TRANSFER_IN = 22;
     public static final int INTAKE = 29; 
     public static final int HANG = 0; // UPDATE 
-    public static final int ELEVATOR_ENCODER = 0; // UPDATE
-    
+    public static final int ELEVATOR_LEFT = 0; // UPDATE
+    public static final int ELEVATOR_RIGHT = 0; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 0; // UPDATE
   }
 
   public static final class DIO {
     public static final int AMP_PIVOT = 1;
-    public static final int SHOOTER_PIVOT = 2;
+    public static final int MANIPULATOR_PIVOT = 2;
     public static final int BEAM_BREAK = 3;
     public static final int HANG_ENCODER = 0; //UPDATE
     public static final int ELEVATOR_ENCODER = 4;
@@ -240,9 +236,10 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
+    public static final double GEARING = 1.0; // CALCULATE
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
-    public static final double ELEVATOR_MAX_HEIGHT = 40; // Placeholder, in inches
-    public static final double ELEVATOR_MIN_HEIGHT = 2; // Placeholder, in inches
+    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(80);
+    public static final Distance ELEVATOR_MIN_HEIGHT = Inches.of(0);
   }
   public static final class SHOOTER_FEED {
     public static final double GEARING = 1.0;
@@ -278,7 +275,7 @@ public final class Constants {
     }
   }
 
-  public static final class SHOOTER_PIVOT {
+  public static final class MANIPULATOR_PIVOT {
     public static final double GEARING = 15.0 * (78.0 / 20.0) * (200.0 / 19.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);

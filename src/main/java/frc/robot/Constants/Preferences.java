@@ -5,8 +5,6 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 
 /**
@@ -20,52 +18,20 @@ import edu.wpi.first.units.measure.Angle;
 public final class Preferences {
   public static final class SWERVE_DRIVE {
     public static final double   TELEOPERATED_FINE_TUNE_DRIVE_POWER = 0.1; // Percent driving power when using d-pad
-    public static final double   TELEOPERATED_DRIVE_POWER           = 0.5; // Percent driving power
-    public static final double   TELEOPERATED_BOOST_POWER           = 1.0; // Percent power when using the triggers
-    public static final double   TELEOPERATED_ROTATE_POWER          = 0.5; // Percent rotating power
-    public static final double   TELEOPERATED_SHOOTER_SPEED         = 1.5; // m/s
-  }
-
-  public final class NOTE_DETECTION {
-    public static final double THRESHOLD = 1.0;
-  }
-
-  public static final class SHOOTER_FEED {
-    public static final double POWER_SHOOT = 1.0;
-    public static final double POWER_IN = 0.5;
-  }
-  
-  public static final class SHOOTER_WHEELS {
-    public static final double TARGET_SPEED = Units.rotationsPerMinuteToRadiansPerSecond(10000);
-  }
-
-  public static final class SHOOTER_PIVOT {
-    public static final Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(60.0); // 63.0
-    public static final Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(26.5); // 21.148 (really 21.6626)
-    public static final Rotation2d IDLE_ANGLE = Rotation2d.fromDegrees(30.0);
-    public static final Rotation2d MAX_ANGLE_UNDER_STAGE = Rotation2d.fromDegrees(50.0);
+    public static final double   TELEOPERATED_DRIVE_POWER           = 0.05; // Percent driving power
+    public static final double   TELEOPERATED_BOOST_POWER           = 0.15; // Percent power when using the triggers
+    public static final double   TELEOPERATED_ROTATE_POWER          = 0.05; // Percent rotating power
   }
 
   public static final class AMP_WHEELS {
     public static final double POWER = 1.0;
   }
 
-  public static final class AMP_PIVOT {
-    public static final Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(90.0);
-    public static final Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-60.0);
-    public static final Rotation2d OUTPUT_ANGLE = Rotation2d.fromDegrees(68.0);
-    public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(-50.0);
-    public static final Rotation2d MAX_ANGLE_UNDER_STAGE = Rotation2d.fromDegrees(-40.0);
-  }
-
-  public static final class TRANSFER {
-    public static final double IN_POWER = 0.5;
-    public static final double SLOW_IN_POWER = 0.5;
-    public static final double OUT_POWER_BOTTOM = 0.5;
-    public static final double OUT_POWER_TOP = 1.0;
-    public static final double TO_SHOOTER_FAST_POWER = 0.2;
-    public static final double TO_SHOOTER_SLOW_POWER = 0.1;
-    public static final double TO_AMP_POWER = 0.4;
+  public static final class HANG_PIVOT {
+    public static final Angle MAX_ANGLE = Degrees.of(90.0);
+    public static final Angle MIN_ANGLE = Degrees.of(-60.0);
+    public static final Angle STOW_ANGLE = Degrees.of(68.0);
+    public static final Angle HANG_ANGLE = Degrees.of(-50.0);
   }
 
   public static final class HANG { // Adjust these as needed
@@ -88,10 +54,17 @@ public final class Preferences {
     public static final double MANIPUALTOR_OUT_SPEED = 1.0;
     public static final double MANIPUALTOR_IN_SPEED = 1.0;
   }
+
+  public static final class MANIPULATOR_PIVOT {
+    public static final Angle MAX_ANGLE = Degrees.of(0.0);
+    public static final Angle MIN_ANGLE = Degrees.of(0.0); 
+  }
   
   public static final class ELEVATOR {
     public static final double POWER = 0.5;
     public static final double SLOW_POWER = 0.2;  
+    public static final double MAX_HEIGHT = 80.0;
+    public static final double MIN_HEIGHT = 0.0;
   }
 
   public static final class VOLTAGE_LADDER {

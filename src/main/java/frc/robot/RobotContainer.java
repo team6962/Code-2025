@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.team6962.lib.swerve.MusicDrive;
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.swerve.module.SwerveModule.Corner;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.test.SteerModuleTest;
@@ -18,6 +22,9 @@ import com.team6962.lib.test.SwerveModuleTest;
 import com.team6962.lib.test.Talon10Test;
 import com.team6962.lib.utils.KinematicsUtils;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -68,6 +75,8 @@ public class RobotContainer {
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
+  SwerveModule module;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     instance = this;
@@ -106,6 +115,10 @@ public class RobotContainer {
     
     // // Configure the trigger bindings
     Controls.configureBindings(stateController, swerveDrive);
+
+    // module = new SwerveModule();
+
+    // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
     // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
 
@@ -155,5 +168,6 @@ public class RobotContainer {
   }
 
   public void testInit() {
+    // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(), Amps.of(60)).schedule();
   }
 }
