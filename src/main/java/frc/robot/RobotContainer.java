@@ -16,6 +16,7 @@ import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.test.SteerModuleTest;
 import com.team6962.lib.test.SwerveModuleTest;
 import com.team6962.lib.test.Talon10Test;
+import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -98,8 +99,8 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    ledStrip = new LEDs(stateController);
-    // // collisionDetector = new CollisionDetector();
+    ledStrip = new LEDs(stateController, () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
     

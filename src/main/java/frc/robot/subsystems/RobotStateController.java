@@ -16,11 +16,6 @@ public class RobotStateController extends SubsystemBase {
   // private static ShuffleboardTab tab = Shuffleboard.getTab("Auto");
   // private static SimpleWidget hasNote = tab.add("has Note", true).withWidget(BuiltInWidgets.kToggleButton).withSize(1, 1).withPosition(0, 0);
 
-
-
-  public enum State {
-  }
-
   public RobotStateController(SwerveDrive swerveDrive) {
     this.swerveDrive = swerveDrive;
 
@@ -28,19 +23,6 @@ public class RobotStateController extends SubsystemBase {
     Logger.logNumber(getName() + "/Compute Time", () -> Robot.getComputeTime());
   }
 
-  /**
-   * Sets the state of the robot
-   * @param state
-   * @return
-   */
-  public Command setState(State state) {
-    return new Command() {};
-  }
-
-  public Translation2d getFieldVelocity() {
-    return KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds());
-  }
-  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

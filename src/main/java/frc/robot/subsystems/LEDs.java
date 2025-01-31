@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 // import com.github.tommyettinger.colorful.oklab.ColorTools;
 
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -49,9 +52,13 @@ public class LEDs extends SubsystemBase {
   public static final int[] GREEN = { 0, 255, 0 };
   public static final int[] BLUE = { 0, 20, 255 };
   public static final int[] PURPLE = { 100, 0, 255 };
+
+  private DoubleSupplier animationSpeed;
   
-  public LEDs(RobotStateController stateController) {
+  public LEDs(RobotStateController stateController, DoubleSupplier animationSpeed) {
     this.stateController = stateController;
+    this.animationSpeed = animationSpeed;
+
     strip = new AddressableLED(9);
     buffer = new AddressableLEDBuffer(length);
     strip.setLength(buffer.getLength());
@@ -110,7 +117,7 @@ public class LEDs extends SubsystemBase {
 
     state = State.OFF;
 
-    time += Robot.getLoopTime() * (1.0 + stateController.getFieldVelocity().getNorm());
+    time += Robot.getLoopTime() * animationSpeed.getAsDouble();
 
     if (!centerFillCalled) {
       centerFillTimer = 0;
