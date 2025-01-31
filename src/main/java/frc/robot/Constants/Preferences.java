@@ -18,9 +18,9 @@ import edu.wpi.first.units.measure.Angle;
 public final class Preferences {
   public static final class SWERVE_DRIVE {
     public static final double   TELEOPERATED_FINE_TUNE_DRIVE_POWER = 0.1; // Percent driving power when using d-pad
-    public static final double   TELEOPERATED_DRIVE_POWER           = 0.05; // Percent driving power
-    public static final double   TELEOPERATED_BOOST_POWER           = 0.15; // Percent power when using the triggers
-    public static final double   TELEOPERATED_ROTATE_POWER          = 0.05; // Percent rotating power
+    public static final double   TELEOPERATED_DRIVE_POWER           = 0.5; // Percent driving power
+    public static final double   TELEOPERATED_BOOST_POWER           = 1.0; // Percent power when using the triggers
+    public static final double   TELEOPERATED_ROTATE_POWER          = 0.5; // Percent rotating power
   }
 
   public static final class AMP_WHEELS {
