@@ -75,15 +75,6 @@ public class SwerveConfig {
         this.steerMotor = steerMotor;
         this.wheel = wheel;
         this.driveGains = driveGains;
-
-        // if (driveMotor != null && gearing != null) {
-        //     driveMotor.gains.kS = driveMotor().stats().getVoltage(getDriveFrictionTorque().in(NewtonMeters), driveMotor().freeSpeedRotor().in(RadiansPerSecond));
-        // }
-
-        // if (steerMotor != null && gearing != null) {
-        //     steerMotor.gains.kV = 12.0 / maxSteerSpeed().in(RadiansPerSecond);
-        //     steerMotor.gains.kA = 12.0 / maxWheelRotationAcceleration(Amps.of(60)).in(RadiansPerSecondPerSecond);
-        // }
     }
 
     public Chassis chassis() {
@@ -401,7 +392,7 @@ public class SwerveConfig {
                 wheel().radius(),
                 maxDriveSpeed(),
                 wheel().staticFriction(),
-                driveMotor().stats(),
+                driveMotor().stats().withReduction(gearing().drive()),
                 driveMotor().maxCurrent(),
                 1
             ),

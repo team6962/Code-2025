@@ -119,16 +119,16 @@ public final class Constants {
       // .withKV(10)
       .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final DriveGains DRIVE_GAINS = new DriveGains(
-      new PIDConstants(1, 0, 0),
-      new PIDConstants(1, 0, 0)
+      new PIDConstants(5.0, 1.0, 0),
+      new PIDConstants(5.0, 1.0, 0)
     );
 
     public static final Chassis CHASSIS = new Chassis(
       Inches.of(30),
       Inches.of(30),
-      Inches.of(30), 
-      Inches.of(30),
-      Pounds.of(30)
+      Inches.of(24.75),
+      Inches.of(24.75),
+      Pounds.of(135)
     );
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
@@ -154,8 +154,8 @@ public final class Constants {
       CHASSIS,
       Gearing.MK4I_L2,
       SELECTED_MODULE_CONFIGS,
-      new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(40)),
-      new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(40)),
+      new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(60)),
+      new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(60)),
       Wheel.COLSON,
       DRIVE_GAINS
     );
