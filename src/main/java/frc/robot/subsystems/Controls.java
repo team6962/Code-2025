@@ -15,6 +15,25 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.drive.XBoxSwerve;
 
+// Driver
+// Move swerve chassis
+// Rotate Swerve Chassis
+// Button to move to processor 
+// Button to move to source
+// Auto orient towards algae 
+// Button to move to left/right reef
+// Button for aligning to algae on the reef
+// Operator
+// Button to L2-L4, and Barge Height
+// Intake Algae with The Box
+// Output Algae from The Box
+// Output Coral
+// Deploy Hang
+// Retract Hang
+// L2 Algae Removal height
+// L3 Algae Removal Height
+// Algae ground Height
+
 public class Controls {
   public static final CommandXboxController operator = new CommandXboxController(DEVICES.OPERATOR_XBOX_CONTROLLER);
   public static final CommandXboxController driver = new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
@@ -22,7 +41,7 @@ public class Controls {
   public static void configureBindings(
       RobotStateController stateController,
       SwerveDrive swerveDrive
-)
+      )
     {
 
     driver.a();

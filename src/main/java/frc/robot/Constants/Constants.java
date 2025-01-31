@@ -32,6 +32,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 
@@ -164,16 +165,11 @@ public final class Constants {
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back
     public static final int PDH = 1;
-    public static final int SHOOTER_WHEELS_TOP = 19;
-    public static final int SHOOTER_WHEELS_BOTTOM = 26;
-    public static final int SHOOTER_PIVOT = 18;
-    public static final int SHOOTER_FEED = 20;
-    public static final int TRANSFER_OUT = 24;
-    public static final int TRANSFER_IN = 22;
     public static final int INTAKE = 29; 
     public static final int HANG = 0; // UPDATE 
-    public static final int ELEVATOR_ENCODER = 0; // UPDATE
-    
+    public static final int ELEVATOR_LEFT = 0; // UPDATE
+    public static final int ELEVATOR_RIGHT = 0; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 0; // UPDATE
   }
 
   public static final class DIO {
@@ -240,9 +236,10 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
+    public static final double GEARING = 1.0; // CALCULATE
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
-    public static final double ELEVATOR_MAX_HEIGHT = 40; // Placeholder, in inches
-    public static final double ELEVATOR_MIN_HEIGHT = 2; // Placeholder, in inches
+    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(80);
+    public static final Distance ELEVATOR_MIN_HEIGHT = Inches.of(0);
   }
   public static final class SHOOTER_FEED {
     public static final double GEARING = 1.0;

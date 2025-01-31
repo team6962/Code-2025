@@ -1,20 +1,31 @@
 package frc.robot.subsystems.elevator;
 
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Preferences;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
-import frc.robot.Constants.Constants.ELEVATOR;;
+import frc.robot.Constants.Constants.ELEVATOR;
+import frc.robot.util.hardware.MotionControl.LinearController;;
 
 public class Elevator extends SubsystemBase {
     public static enum State {
@@ -25,29 +36,35 @@ public class Elevator extends SubsystemBase {
         OFF
     }
 
-    private TalonFX motor1;
-    private DutyCycleEncoder encoder;
-    private TalonFX motor2;
+    private LinearController controller;
+    private SparkMax motorLeft = new SparkMax(CAN.ELEVATOR_LEFT, MotorType.kBrushless);
+    private SparkMax motorRight = new SparkMax(CAN.ELEVATOR_RIGHT, MotorType.kBrushless);
     private State state = State.OFF;
-    private double currentElevatorHeight;
+    private Distance currentHeight;
 
   public Elevator() {
-    motor1 = new TalonFX(CAN.INTAKE);
-    encoder = new DutyCycleEncoder(DIO.ELEVATOR_ENCODER);
-    motor2 = new TalonFX(CAN.INTAKE);
-    
-    // encoder.setDistancePerRotation(1.0); // Set distance per rotation to 1.0
-    // Configure the TalonFX using Phoenix 6 configuration
-    TalonFXConfiguration motorConfig = new TalonFXConfiguration();
-    motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    motorConfig.Voltage.PeakForwardVoltage = 12.0; // Example voltage limit
-    motorConfig.Voltage.PeakReverseVoltage = -12.0;
+    controller = new LinearController(
+      this,
+      motorLeft,
+      DIO.ELEVATOR_ENCODER,
+      0124124, // CHANGE
+      4.0,
+      4.0,
+      ELEVATOR.GEARING,
+      ELEVATOR.ELEVATOR_MIN_HEIGHT,
+      ELEVATOR.ELEVATOR_MAX_HEIGHT,
+      Inches.of(1),
+      false
+    );
+
 
     // motor1.getConfigurator().apply((new FeedbackConfigs()).withFusedCANcoder(encoder));
 
-    motor1.getConfigurator().apply(motorConfig);
-    motor2.getConfigurator().apply(motorConfig);
-    currentElevatorHeight = 0;
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.follow(motorLeft, true);
+
+    motorRight.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    currentHeight = ELEVATOR.ELEVATOR_MIN_HEIGHT; // CHANGE
   }
 
   public Command setState(State state) {
@@ -59,35 +76,15 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    controller.run();
+  }
 
-    currentElevatorHeight = encoder.get();
+  public void setElevatorHeight(Distance height) {
+    controller.setTargetHeight(height);
+  }
 
-    switch (state) {
-        case UP:
-            if(currentElevatorHeight > ELEVATOR.ELEVATOR_MAX_HEIGHT) break;
-            motor1.setControl(new DutyCycleOut(Preferences.ELEVATOR.POWER));
-            motor2.setControl(new DutyCycleOut(Preferences.ELEVATOR.POWER));
-            break;
-        case DOWN:
-            if(currentElevatorHeight < ELEVATOR.ELEVATOR_MIN_HEIGHT) break;
-            motor1.setControl(new DutyCycleOut(-Preferences.ELEVATOR.POWER));
-            motor2.setControl(new DutyCycleOut(-Preferences.ELEVATOR.POWER));
-            break;
-        case SLOW_UP:
-            if(currentElevatorHeight > ELEVATOR.ELEVATOR_MAX_HEIGHT) break;
-            motor1.setControl(new DutyCycleOut(Preferences.ELEVATOR.SLOW_POWER));
-            motor2.setControl(new DutyCycleOut(Preferences.ELEVATOR.SLOW_POWER));
-            break;
-        case SLOW_DOWN:
-            if(currentElevatorHeight < ELEVATOR.ELEVATOR_MIN_HEIGHT) break;
-            motor1.setControl(new DutyCycleOut(-Preferences.ELEVATOR.SLOW_POWER));
-            motor2.setControl(new DutyCycleOut(-Preferences.ELEVATOR.SLOW_POWER));
-            break;
-        case OFF:
-            motor1.stopMotor();
-            motor2.stopMotor();
-            break;
-        }
+  public Distance getCurrentHeight() {
+    return currentHeight;
   }
 
   @Override

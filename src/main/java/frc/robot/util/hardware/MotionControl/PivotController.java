@@ -65,8 +65,9 @@ public class PivotController {
     // );
     this.kS = kS;
     encoder = motor.getEncoder();
-    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO);
+    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
+    pid = motor.getClosedLoopController();
 
     this.motor = motor;
     this.minAngle = minAngle;
@@ -196,7 +197,7 @@ public class PivotController {
     // ((0.26934 + x) * -1)
 
     // Map absolute encoder position from 0 - 1 rotations to -pi - pi radians, where 0 is straight out
-    double absoluteAngle = (absoluteEncoder.get() + encoderOffset) * factor;
+    double absoluteAngle = absoluteEncoder.get() * factor;
     while (absoluteAngle < 0) absoluteAngle++;
     absoluteAngle %= 1.0;
     
