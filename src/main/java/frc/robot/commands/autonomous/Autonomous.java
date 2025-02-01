@@ -83,18 +83,20 @@ public class Autonomous extends SequentialCommandGroup {
 
     Command setupCommand =
         swerveDrive.pathfindTo(
-            new Pose2d(ALGAE_SETUP.plus(offset), angle), new GoalEndState(5, angle));
+            new Pose2d(ALGAE_SETUP.plus(offset), angle), new GoalEndState(0, angle));
     Command driveOverCommand =
         swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
 
-    if (mechanism == AlgaePickupMechanism.INTAKE) {
-      return Commands.sequence(
-          setupCommand,
-          Commands.deadline(driveOverCommand, intake.wheels.intake(), intake.pivot.lower()),
-          intake.pivot.raise());
-    } else {
-      return Commands.sequence(setupCommand, driveOverCommand);
-    }
+    return Commands.sequence(setupCommand, driveOverCommand);
+
+    // if (mechanism == AlgaePickupMechanism.INTAKE) {
+    //   return Commands.sequence(
+    //       setupCommand,
+    //       Commands.deadline(driveOverCommand, intake.wheels.intake(), intake.pivot.lower()),
+    //       intake.pivot.raise());
+    // } else {
+    //   
+    // }
   }
 
   public boolean hasCoral() {

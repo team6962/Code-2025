@@ -40,6 +40,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+
 import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
@@ -197,23 +199,23 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public void driveState(SwerveModuleState targetState) {
     if (isCalibrating) return;
+    if (!ENABLED_SYSTEMS.DRIVE) {
+        driveMotor.setNeutralMode(NeutralModeValue.Coast);
+        driveMotor.stopMotor();
+        steerMotor.setNeutralMode(NeutralModeValue.Coast);
+        steerMotor.stopMotor();
+        return;
+    }
 
     targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
     Logger.log(getName() + "/targetState", targetState);
-    Logger.log(
-        getName() + "/isValid",
-        Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
 
     CTREUtils.check(
         driveMotor.setControl(
             new VelocityVoltage(
                 constants.driveMotorMechanismToRotor(
                     MetersPerSecond.of(targetState.speedMetersPerSecond)))));
-
-    // CTREUtils.check(steerMotor.setControl(new VoltageOut(12.0)));
-
-    Logger.log(getName() + "/ewjdhbs", targetState.angle.getRotations());
 
     CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
   }

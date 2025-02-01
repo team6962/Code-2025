@@ -25,6 +25,7 @@ import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.software.Dashboard.AutonChooser;
@@ -54,6 +55,7 @@ public class RobotContainer {
   public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
+  public final Hang hang;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -106,12 +108,13 @@ public class RobotContainer {
     intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
+    hang = new Hang();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang);
 
     // module = new SwerveModule();
 
