@@ -309,9 +309,7 @@ public final class Constants {
   }
 
   public static final class INTAKE {
-    public static final double GEARING = (38.0 / 16.0) * (15.0 / 18.0);
-    public static final double RADIUS = Units.inchesToMeters(0.5);
-    public static final double MAX_LINEAR_SPEED = NEO.STATS.freeSpeedRadPerSec / GEARING * RADIUS;
+    public static final double PIVOT_GEARING = 10.0; // TODO: Use actual gear ratio instead of test value
   }
 
   public static final class HANG_PIVOT {

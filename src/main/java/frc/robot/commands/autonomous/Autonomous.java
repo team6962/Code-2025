@@ -1,5 +1,8 @@
 package frc.robot.commands.autonomous;
 
+import java.util.List;
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -81,25 +84,31 @@ public class Autonomous extends SequentialCommandGroup {
     Rotation2d angle =
         Rotation2d.fromDegrees(mechanism == AlgaePickupMechanism.MANIPULATOR ? -180 : 0);
 
-    Command setupCommand =
-        swerveDrive.pathfindTo(
-            new Pose2d(ALGAE_SETUP.plus(offset), angle));
-    Command driveOverCommand =
-        swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
+        // Pose2d setupPosition = new Pose2d(ALGAE_SETUP.plus(offset), angle);
+        Pose2d driveOverPosition = new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle);
 
-    return Commands.sequence(setupCommand, driveOverCommand);
+        Command setupCommand = swerveDrive.pathfindTo(driveOverPosition);
 
-    // if (mechanism == AlgaePickupMechanism.INTAKE) {
-    //   return Commands.sequence(
-    //       setupCommand,
-    //       Commands.deadline(driveOverCommand, intake.wheels.intake(), intake.pivot.lower()),
-    //       intake.pivot.raise());
-    // } else {
-    //   
-    // }
-  }
+        BooleanSupplier isPickupDistance = () -> {
+            return swerveDrive.getEstimatedPose().getTranslation().getDistance(driveOverPosition.getTranslation()) < 0.25;
+        };
 
-  public boolean hasCoral() {
-    return false;
-  }
+        if (mechanism == AlgaePickupMechanism.INTAKE) {
+            return Commands.parallel(
+                setupCommand,
+                Commands.waitUntil(isPickupDistance)
+                    .andThen(Commands.parallel(
+                        intake.pivot.lower(),
+                        intake.wheels.intake()
+                            .withDeadline(Commands.waitSeconds(1))
+                    ))
+            );
+        } else {
+            return pickupPreplacedAlgae(algaePosition, AlgaePickupMechanism.INTAKE);
+        }
+    }
+    
+    public boolean hasCoral() {
+        return false;
+    }
 }
