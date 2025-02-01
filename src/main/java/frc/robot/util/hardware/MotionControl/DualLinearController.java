@@ -26,6 +26,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
+
 public class DualLinearController extends SubsystemBase {
   private Distance targetHeight = null;
   private double kS = 0.0;
@@ -44,6 +45,22 @@ public class DualLinearController extends SubsystemBase {
 
   private Distance achievableHeight = Meters.of(0.0);
 
+
+  /**
+   * Constructs a new DualLinearController.
+   *
+   * @param leaderCAN The CAN ID for the leader motor controller.
+   * @param followerCAN The CAN ID for the follower motor controller.
+   * @param absoluteEncoderDIO The DIO port for the absolute encoder.
+   * @param absolutePositionOffset The offset for the absolute encoder position.
+   * @param kP The proportional gain for the PID controller.
+   * @param kS The static gain for the PID controller.
+   * @param sensorToMotorRatio The ratio of the sensor to motor.
+   * @param mechanismToSensor The ratio of the mechanism to sensor.
+   * @param minHeight The minimum height the mechanism can achieve.
+   * @param maxHeight The maximum height the mechanism can achieve.
+   * @param tolerance The tolerance for the height control.
+   */
   public DualLinearController(
       int leaderCAN,
       int followerCAN,
@@ -51,8 +68,8 @@ public class DualLinearController extends SubsystemBase {
       double absolutePositionOffset,
       double kP,
       double kS,
-      double motorToSensorRatio,
-      double sensorToMechanismRatio,
+      double gearing,
+      double mechanismToSensor,
       Distance minHeight,
       Distance maxHeight,
       Distance tolerance) {
@@ -67,7 +84,7 @@ public class DualLinearController extends SubsystemBase {
     leaderPID = leader.getClosedLoopController();
     followerPID = follower.getClosedLoopController();
     absoluteEncoder =
-        new DutyCycleEncoder(absoluteEncoderDIO, sensorToMechanismRatio, encoderOffset);
+        new DutyCycleEncoder(absoluteEncoderDIO, mechanismToSensor, encoderOffset);
 
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
@@ -76,12 +93,12 @@ public class DualLinearController extends SubsystemBase {
     encoderOffset = absolutePositionOffset;
 
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, motorToSensorRatio / sensorToMechanismRatio);
+    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, leader, motorConfig);
 
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, motorToSensorRatio / sensorToMechanismRatio);
+    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, follower, motorConfig);
 

@@ -87,7 +87,7 @@ public class PivotController {
 
     this.reversed = reversed;
     encoderOffset = absolutePositionOffset;
-    SparkMaxUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
 
     Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Radians));

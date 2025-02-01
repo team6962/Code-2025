@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import frc.robot.Constants.Constants.ALGAE;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -62,19 +63,43 @@ public final class Preferences {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final Angle MAX_ANGLE = Degrees.of(0.0);
-    public static final Angle MIN_ANGLE = Degrees.of(0.0);
+    public static final Angle MAX_ANGLE   = Degrees.of(0.0);
+    public static final Angle MIN_ANGLE   = Degrees.of(0.0);
+    public static final Angle STOW_ANGLE  = Degrees.of(0.0);
+    
+    public static final class CORAL {
+      public static final Angle L23_ANGLE   = Degrees.of(0.0);
+      public static final Angle L4_ANGLE    = Degrees.of(0.0);
+      public static final Angle INTAKE_ANGLE = Degrees.of(0.0);      
+    }
+
+    public static final class ALGAE {
+      public static final Angle BARGE_ANGLE = Degrees.of(0.0);
+      public static final Angle REEF_ANGLE = Degrees.of(0.0);
+      public static final Angle GROUND_ANGLE = Degrees.of(0.0);
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0); 
+    }
   }
 
   public static final class ELEVATOR {
     public static final Distance MAX_HEIGHT = Inches.of(80);
     public static final Distance MIN_HEIGHT = Inches.of(0);
     public static final Distance STOW_HEIGHT = Inches.of(0);
-    public static final Distance L1_HEIGHT = Inches.of(0);
-    public static final Distance L2_HEIGHT = Inches.of(0);
-    public static final Distance L3_HEIGHT = Inches.of(0);
-    public static final Distance L4_HEIGHT = Inches.of(0);
-    public static final Distance BARGE_HEIGHT = Inches.of(0);
+
+    public static final class CORAL {
+      public static final Distance L1_HEIGHT = Inches.of(0);
+      public static final Distance L2_HEIGHT = Inches.of(0);
+      public static final Distance L3_HEIGHT = Inches.of(0);
+      public static final Distance L4_HEIGHT = Inches.of(0);
+      public static final Distance INTAKE_HEIGHT = STOW_HEIGHT;
+    }
+
+    public static final class ALGAE {
+      public static final Distance L2_HEIGHT = Inches.of(0);
+      public static final Distance L3_HEIGHT = Inches.of(0);
+      public static final Distance BARGE_HEIGHT = Inches.of(0);
+      public static final Distance GROUND_HEIGHT = STOW_HEIGHT;
+    }
   }
 
   public static final class VOLTAGE_LADDER {

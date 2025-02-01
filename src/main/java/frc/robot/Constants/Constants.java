@@ -243,9 +243,8 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double MOTOR_TO_SENSOR = 1.0; // CALCULATE
-    public static final double SENSOR_TO_MECHANISM = 1.0; // CALCULATE
-    public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
+    public static final double SENSOR_TO_MOTOR = 1.0; // CALCULATE
+    public static final double MECHANISM_TO_SENSOR = 6.13; // CALCULATE
     public static final double ENCODER_OFFSET = 0.0; // CALCULATE
     public static final class PROFILE {
       public static final double kP = 0.0;
@@ -316,7 +315,7 @@ public final class Constants {
   }
 
   public static final class HANG_PIVOT {
-    public static final double GEARING = 1.0;
+    public static final double GEARING = (9.0 / 1.0) * (9.0 / 1.0) * (3.0 / 1.0) * (26.0 / 12.0);
     public static final double ENCODER_OFFSET = 0.0;
     public static final class PROFILE {
       public static final double kP = 0.0;

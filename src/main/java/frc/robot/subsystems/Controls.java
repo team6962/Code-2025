@@ -84,14 +84,14 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(elevator.L2());
-    operator.b().onTrue(elevator.L3());
-    operator.x().onTrue(elevator.L4());
-    operator.y().onTrue(elevator.barge());
+    operator.a().onTrue(elevator.coralL2());
+    operator.b().onTrue(elevator.coralL3());
+    operator.x().onTrue(elevator.coralL4());
+    operator.y().onTrue(elevator.algaeBarge());
     operator.start().onTrue(elevator.stow()); // assume this is processor height
     operator.back();
-    operator.leftStick();
-    operator.rightStick();
+    operator.leftStick().onTrue(elevator.algaeL2());
+    operator.rightStick().onTrue(elevator.algaeL3());
     operator.povCenter();
     operator.povUp().whileTrue(elevator.up());
     operator.povDown().whileTrue(elevator.down());

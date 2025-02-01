@@ -20,8 +20,8 @@ public class Elevator extends DualLinearController {
         Constants.ELEVATOR.ENCODER_OFFSET, // CHANGE THIS
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
-        Constants.ELEVATOR.MOTOR_TO_SENSOR,
-        Constants.ELEVATOR.SENSOR_TO_MECHANISM,
+        Constants.ELEVATOR.SENSOR_TO_MOTOR,
+        Constants.ELEVATOR.MECHANISM_TO_SENSOR,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
@@ -39,24 +39,40 @@ public class Elevator extends DualLinearController {
     return setHeightCommand(getHeight().minus(Inches.of(1)));
   }
 
-  public Command L1() {
-    return setHeightCommand(ELEVATOR.L1_HEIGHT);
+  public Command coralL1() {
+    return setHeightCommand(ELEVATOR.CORAL.L1_HEIGHT);
   }
 
-  public Command L2() {
-    return setHeightCommand(ELEVATOR.L2_HEIGHT);
+  public Command coralL2() {
+    return setHeightCommand(ELEVATOR.CORAL.L2_HEIGHT);
   }
 
-  public Command L3() {
-    return setHeightCommand(ELEVATOR.L3_HEIGHT);
+  public Command coralL3() {
+    return setHeightCommand(ELEVATOR.CORAL.L3_HEIGHT);
   }
 
-  public Command L4() {
-    return setHeightCommand(ELEVATOR.L4_HEIGHT);
+  public Command coralL4() {
+    return setHeightCommand(ELEVATOR.CORAL.L4_HEIGHT);
   }
 
-  public Command barge() {
-    return setHeightCommand(ELEVATOR.BARGE_HEIGHT);
+  public Command coralIntake() {
+    return setHeightCommand(ELEVATOR.CORAL.INTAKE_HEIGHT);
+  }
+
+  public Command algaeGround() {
+    return setHeightCommand(ELEVATOR.ALGAE.GROUND_HEIGHT);
+  }
+
+  public Command algaeL2() {
+    return setHeightCommand(ELEVATOR.ALGAE.L2_HEIGHT);
+  }
+
+  public Command algaeL3() {
+    return setHeightCommand(ELEVATOR.ALGAE.L3_HEIGHT);
+  }
+
+  public Command algaeBarge() {
+    return setHeightCommand(ELEVATOR.ALGAE.BARGE_HEIGHT);
   }
 
   public Command stow() {

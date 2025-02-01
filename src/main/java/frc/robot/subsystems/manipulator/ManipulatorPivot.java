@@ -40,7 +40,7 @@ public class ManipulatorPivot extends SubsystemBase {
             Degrees.of(0.25),
             true);
 
-    setDefaultCommand(pivotTo(() -> Preferences.MANIPULATOR_PIVOT.MIN_ANGLE));
+    setDefaultCommand(stow());
   }
 
   @Override
@@ -55,6 +55,39 @@ public class ManipulatorPivot extends SubsystemBase {
 
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.SHOOTER) motor.stopMotor();
   }
+
+  public Command intakeCoral() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
+  }
+
+  public Command coralL23() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L23_ANGLE);
+  }
+
+  public Command coralL4() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
+  }
+
+  public Command stow() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
+  }
+
+  public Command algaeReef() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE);
+  }
+
+  public Command algaeBarge() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE);
+  }
+
+  public Command algaeProcessor() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.PROCESSOR_ANGLE);
+  }
+
+  public Command algaeGround() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
+  }
+
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     return Commands.run(() -> controller.setTargetAngle(angleSupplier.get()), this)
