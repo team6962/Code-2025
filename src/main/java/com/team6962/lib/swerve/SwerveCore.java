@@ -151,10 +151,6 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
   }
 
   public void setMovement(ChassisSpeeds speeds) {
-    Logger.log(
-        "Swerve Drive/motionSpeeds",
-        RobotContainer.getInstance().swerveDrive.robotToAllianceSpeeds(speeds));
-
     currentMovement.setSpeeds(speeds);
   }
 
