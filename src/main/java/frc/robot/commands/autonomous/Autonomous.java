@@ -83,7 +83,7 @@ public class Autonomous extends SequentialCommandGroup {
 
     Command setupCommand =
         swerveDrive.pathfindTo(
-            new Pose2d(ALGAE_SETUP.plus(offset), angle), new GoalEndState(0, angle));
+            new Pose2d(ALGAE_SETUP.plus(offset), angle));
     Command driveOverCommand =
         swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
 
