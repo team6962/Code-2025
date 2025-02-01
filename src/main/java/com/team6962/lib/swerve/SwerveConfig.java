@@ -274,9 +274,9 @@ public class SwerveConfig {
   public PathConstraints pathConstraints() {
     return new PathConstraints(
         maxDriveSpeed(),
-        maxLinearAcceleration(Amps.of(60)),
+        maxLinearAcceleration(Amps.of(40)),
         maxRotationSpeed(),
-        maxAngularAcceleration(Amps.of(60)));
+        maxAngularAcceleration(Amps.of(40)));
   }
 
   public MomentOfInertia momentOfInertia() {
