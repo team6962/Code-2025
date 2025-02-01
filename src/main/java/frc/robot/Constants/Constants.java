@@ -40,7 +40,7 @@ public final class Constants {
     public static final boolean DASHBOARD = true;
     public static final boolean SHOOTER = true;
     public static final boolean INTAKE = true;
-    public static final boolean HANG = false;
+    public static final boolean HANG = true;
     public static final boolean MANIPULATOR = false;
     public static final boolean ELEVATOR = true;
   }
@@ -127,7 +127,7 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
-    public static final int HANG = 37; // UPDATE
+    public static final int HANG = 27;
     public static final int ELEVATOR_LEFT = 36; // UPDATE
     public static final int ELEVATOR_RIGHT = 35; // UPDATE
     public static final int MANIPULATOR_PIVOT = 32; // UPDATE
@@ -138,7 +138,7 @@ public final class Constants {
   public static final class DIO {
     public static final int AMP_PIVOT = 1;
     public static final int MANIPULATOR_PIVOT = 2;
-    public static final int HANG_ENCODER = 0; // UPDATE
+    public static final int HANG_ENCODER = 0;
     public static final int ELEVATOR_ENCODER = 4;
     public static final int ALGAE_BEAM_BREAK = 5;
   }
@@ -202,11 +202,11 @@ public final class Constants {
     public static final double SENSOR_TO_MOTOR = 1.0; // CALCULATE
     public static final double MECHANISM_TO_SENSOR = 6.13; // CALCULATE
     public static final double ENCODER_OFFSET = 0.0; // CALCULATE
+
     public static final class PROFILE {
       public static final double kP = 0.0;
       public static final double kS = 0.0;
     }
-
   }
 
   public static final class SHOOTER_WHEELS {
@@ -273,10 +273,10 @@ public final class Constants {
   public static final class HANG_PIVOT {
     public static final double GEARING = (9.0 / 1.0) * (9.0 / 1.0) * (3.0 / 1.0) * (26.0 / 12.0);
     public static final double ENCODER_OFFSET = 0.0;
+
     public static final class PROFILE {
       public static final double kP = 0.0;
       public static final double kS = 0.0; // volts per rad/s
-      
     }
   }
 

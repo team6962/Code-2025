@@ -30,7 +30,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  */
 
 public class PivotController {
-  private Angle targetAngle = null;
+  private Angle targetAngle = Degrees.of(0);
   // State setpointState;
   private double kS = 0.0;
   // Onboard spark max PID controller. Runs at 1kHz
@@ -90,16 +90,6 @@ public class PivotController {
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
 
-    Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Radians));
-    Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().in(Radians));
-    Logger.logNumber(
-        subsystem.getName() + "/relativePosition",
-        () -> Rotations.of(encoder.getPosition()).in(Radians));
-    Logger.logNumber(
-        subsystem.getName() + "/rawAbsolutePosition",
-        () -> Rotations.of(absoluteEncoder.get()).in(Radians));
-    Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
-
     StatusChecks.Category statusChecks = StatusChecks.under(subsystem);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
@@ -115,6 +105,20 @@ public class PivotController {
             false,
             0.0);
     simPID = new PIDController(kP, 0, 0);
+
+
+
+    Logger.log(subsystem.getName(), "TEST");
+    Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Radians));
+    Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().in(Radians));
+    Logger.logNumber(
+        subsystem.getName() + "/relativePosition",
+        () -> Rotations.of(encoder.getPosition()).in(Radians));
+    Logger.logNumber(
+        subsystem.getName() + "/rawAbsolutePosition",
+        () -> Rotations.of(absoluteEncoder.get()).in(Radians));
+    Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
+
   }
 
   public void run() {
