@@ -228,4 +228,8 @@ public class PivotController {
   public void setMaxAngle(Angle newMaxAngle) {
     maxAngle = newMaxAngle;
   }
+
+  public void stop() {
+    motor.stopMotor();
+  }
 }

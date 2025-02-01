@@ -4,8 +4,10 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -65,10 +67,13 @@ public final class Preferences {
   }
 
   public static final class ELEVATOR {
-    public static final double POWER = 0.5;
-    public static final double SLOW_POWER = 0.2;
-    public static final double MAX_HEIGHT = 80.0;
-    public static final double MIN_HEIGHT = 0.0;
+    public static final Distance MAX_HEIGHT = Inches.of(80);
+    public static final Distance MIN_HEIGHT = Inches.of(0);
+    public static final Distance STOW_HEIGHT = Inches.of(0);
+    public static final Distance L1_HEIGHT = Inches.of(0);
+    public static final Distance L2_HEIGHT = Inches.of(0);
+    public static final Distance L3_HEIGHT = Inches.of(0);
+    public static final Distance L4_HEIGHT = Inches.of(0);
   }
 
   public static final class VOLTAGE_LADDER {

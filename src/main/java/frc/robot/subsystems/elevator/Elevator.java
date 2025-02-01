@@ -2,72 +2,80 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
-import frc.robot.Constants.Constants.ELEVATOR;
-import frc.robot.util.hardware.MotionControl.LinearController;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import frc.robot.Constants.Preferences.ELEVATOR;
+import frc.robot.util.hardware.MotionControl.DualLinearController;
 
-public class Elevator extends SubsystemBase {
-  public static enum State {
-    UP,
-    DOWN,
-    SLOW_UP,
-    SLOW_DOWN,
-    OFF
-  }
-
-  private LinearController controller;
-  private SparkMax motorLeft = new SparkMax(CAN.ELEVATOR_LEFT, MotorType.kBrushless);
-  private SparkMax motorRight = new SparkMax(CAN.ELEVATOR_RIGHT, MotorType.kBrushless);
-  private State state = State.OFF;
-  private Distance currentHeight = null;
-  private Distance targetHeight = null;
-
+public class Elevator extends DualLinearController {
   public Elevator() {
-    controller =
-        new LinearController(
-            this,
-            motorLeft,
-            DIO.ELEVATOR_ENCODER,
-            0124124, // CHANGE
-            4.0,
-            4.0,
-            ELEVATOR.GEARING,
-            ELEVATOR.ELEVATOR_MIN_HEIGHT,
-            ELEVATOR.ELEVATOR_MAX_HEIGHT,
-            Inches.of(0.5),
-            false);
-
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.follow(motorLeft, true);
-
-    motorRight.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    super(
+          CAN.ELEVATOR_LEFT,
+          CAN.ELEVATOR_RIGHT,
+          DIO.ELEVATOR_ENCODER,
+          0124124, // CHANGE THIS
+          4.0,
+          1.0,
+          Constants.ELEVATOR.GEARING,
+          Constants.ELEVATOR.GEARING,
+          ELEVATOR.MIN_HEIGHT,
+          ELEVATOR.MAX_HEIGHT,
+          Inches.of(0.5));
   }
 
-  public Command setState(State state) {
-    return runEnd(() -> this.state = state, () -> this.state = State.OFF);
+  public Command setHeightCommand(Distance height) {
+    return this.run(() -> setTargetHeightAndRun(height)).until(this::doneMoving);
+  }
+
+  public Command up() {
+    return setHeightCommand(getHeight().plus(Inches.of(1)));
+  }
+
+  public Command down() {
+    return setHeightCommand(getHeight().minus(Inches.of(1)));
+  }
+
+  public Command L1() {
+    return setHeightCommand(ELEVATOR.L1_HEIGHT);
+  }
+
+  public Command L2() {
+    return setHeightCommand(ELEVATOR.L2_HEIGHT);
+  }
+
+  public Command L3() {
+    return setHeightCommand(ELEVATOR.L3_HEIGHT);
+  }
+
+  public Command L4() {
+    return setHeightCommand(ELEVATOR.L4_HEIGHT);
+  }
+
+  public Command stow() {
+    return setHeightCommand(ELEVATOR.STOW_HEIGHT);
+  }
+
+  public void setTargetHeightAndRun(Distance height) {
+    setTargetHeight(height);
+    run();
+  }
+
+  @Override
+  public void run() {
+    if (!ENABLED_SYSTEMS.ELEVATOR) return;
+    super.run();
   }
 
   @Override
   public void periodic() {
-    controller.run();
-  }
-
-  public void setElevatorHeight(Distance height) {
-    targetHeight = height;
-    controller.setTargetHeight(height);
-  }
-
-  public Distance getCurrentHeight() {
-    return currentHeight;
+    if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
   }
 
   @Override

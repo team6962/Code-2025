@@ -4,32 +4,21 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import frc.robot.Constants.Constants.HANG;
 import frc.robot.Constants.Preferences;
 import frc.robot.util.hardware.MotionControl.PivotController;
-import frc.robot.util.hardware.SparkMaxUtil;
 
 public class Hang extends SubsystemBase {
-  private State state = State.OFF;
   private SparkMax motor;
-  private SparkMaxConfig motorConfig;
-  private DutyCycleEncoder hangEncoder;
   private PivotController controller;
 
   public Hang() {
     motor = new SparkMax(CAN.HANG, MotorType.kBrushless);
-    motorConfig = new SparkMaxConfig();
-    SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.saveAndLog(this, motor, motorConfig);
     controller =
         new PivotController(
             this,
@@ -45,48 +34,34 @@ public class Hang extends SubsystemBase {
             false);
   }
 
-  public enum State {
-    OFF,
-    CLIMB,
-    REVERSE
-  }
-
-  public Command setState(State state) {
-    return runEnd(() -> this.state = state, () -> this.state = State.OFF);
-  }
-
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.ENABLE_HANG) {
-      return;
-    }
+    if (!ENABLED_SYSTEMS.HANG) controller.stop();
+  }
 
-    if (RobotState.isDisabled()) {
-      state = State.OFF;
-    }
+  public Command hang() {
+    return setTargetAngleCommand(Preferences.HANG_PIVOT.HANG_ANGLE);
+  }
 
-    double motorPower = 0.0;
+  public Command stow() {
+    return setTargetAngleCommand(Preferences.HANG_PIVOT.STOW_ANGLE);
+  }
 
-    switch (state) {
-      case REVERSE:
-        controller.setTargetAngle(Preferences.HANG_PIVOT.STOW_ANGLE);
-        controller.run();
-        break;
-      case CLIMB:
-        controller.setTargetAngle(Preferences.HANG_PIVOT.HANG_ANGLE);
-        controller.run();
-        break;
-      case OFF:
-        break;
-    }
+  public Command setTargetAngleCommand(Angle angle) {
+    return run(() -> setTargetAngleAndRun(angle)).until(this::doneMoving);
+  }
 
-    if ((hangEncoder.get() >= HANG.EXTEND_HEIGHT && motorPower > 0.0)
-        || (hangEncoder.get() <= HANG.RETRACT_HEIGHT && motorPower < 0.0)) {
-      motorPower = 0.0;
-    }
+  public void setTargetAngle(Angle angle) {
+    controller.setTargetAngle(angle);
+  }
 
-    // Makes sure we dont overshoot our limits for left hang arm
+  public void setTargetAngleAndRun(Angle angle) {
+    controller.setTargetAngle(angle);
+    controller.run();
+  }
 
+  public boolean doneMoving() {
+    return controller.doneMoving();
   }
 
   @Override

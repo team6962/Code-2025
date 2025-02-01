@@ -26,6 +26,10 @@ public class IntakeWheels extends SubsystemBase {
     setDefaultCommand(stop());
   }
 
+  public Command setSpeed(Double speed) {
+    return setSpeed(() -> speed);
+  }
+
   public Command setSpeed(DoubleSupplier speed) {
     // TODO: Check for REVLibErrors
     return Commands.run(() -> motor.set(speed.getAsDouble()), this);
@@ -45,7 +49,7 @@ public class IntakeWheels extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.ENABLE_INTAKE) {
+    if (!ENABLED_SYSTEMS.INTAKE) {
       motor.disable();
     }
   }
