@@ -5,32 +5,24 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Consumer;
-
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
-import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -48,415 +40,454 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.Consumer;
 
-/**
- * A swerve module, consisting of a drive motor, a steer motor, and a steer encoder.
- */
+/** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
-    /**
-     * The drive motor for this module. Works in rotor units.
-     */
-    private TalonFX driveMotor;
+  /** The drive motor for this module. Works in rotor units. */
+  private TalonFX driveMotor;
 
-    /**
-     * The steer motor for this module. Works in mechanism units.
-     */
-    private TalonFX steerMotor;
+  /** The steer motor for this module. Works in mechanism units. */
+  private TalonFX steerMotor;
 
-    /**
-     * The steer encoder for this module, whose position is directly lined up
-     * with the wheel. This means that the encoder outputs values in mechanism
-     * rotations.
-     */
-    private CANcoder steerEncoder;
+  /**
+   * The steer encoder for this module, whose position is directly lined up with the wheel. This
+   * means that the encoder outputs values in mechanism rotations.
+   */
+  private CANcoder steerEncoder;
 
-    private SwerveConfig constants;
-    private SwerveModule.Corner corner;
+  private SwerveConfig constants;
+  private SwerveModule.Corner corner;
 
-    protected boolean isCalibrating = false;
+  protected boolean isCalibrating = false;
 
-    public void configureModule(SwerveConfig config, SwerveModule.Corner corner) {
-        this.constants = config;
-        this.corner = corner;
+  public void configureModule(SwerveConfig config, SwerveModule.Corner corner) {
+    this.constants = config;
+    this.corner = corner;
 
-        // Get this swerve module's configuration
-        SwerveConfig.Module moduleConstants = getModuleConstants();
+    // Get this swerve module's configuration
+    SwerveConfig.Module moduleConstants = getModuleConstants();
 
-        // Connect to the module's drive motor
-        driveMotor = new TalonFX(moduleConstants.driveMotorId());
+    // Connect to the module's drive motor
+    driveMotor = new TalonFX(moduleConstants.driveMotorId());
 
-        // Get the 'configurator' for the drive motor, which allows us to
-        // configure the motor's settings
-        TalonFXConfigurator driveConfig = driveMotor.getConfigurator();
+    // Get the 'configurator' for the drive motor, which allows us to
+    // configure the motor's settings
+    TalonFXConfigurator driveConfig = driveMotor.getConfigurator();
 
-        // Apply the PID/feedforward/Motion Magic configuration given in the
-        // swerve drive configuration to the drive motor
-        CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
+    // Apply the PID/feedforward/Motion Magic configuration given in the
+    // swerve drive configuration to the drive motor
+    CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
-        // Configure the drive motor to brake automatically when not driven
-        CTREUtils.check(driveConfig.apply(new MotorOutputConfigs()
-            .withNeutralMode(NeutralModeValue.Brake)));
+    // Configure the drive motor to brake automatically when not driven
+    CTREUtils.check(
+        driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
 
-        CTREUtils.check(driveConfig.apply(new FeedbackConfigs()
-            .withRotorToSensorRatio(1)
-            .withSensorToMechanismRatio(1)));
+    CTREUtils.check(
+        driveConfig.apply(
+            new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
-        // Connect to the module's steer encoder
-        steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
+    // Connect to the module's steer encoder
+    steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
-        // Get the 'configurator' for the steer encoder, which allows us to
-        // configure the encoder's settings
-        CANcoderConfigurator steerEncoderConfig = steerEncoder.getConfigurator();
+    // Get the 'configurator' for the steer encoder, which allows us to
+    // configure the encoder's settings
+    CANcoderConfigurator steerEncoderConfig = steerEncoder.getConfigurator();
 
-        // Set the absolute steer encoder offset to the value given in the
-        // swerve module's configuration
-        CTREUtils.check(steerEncoderConfig.apply(new MagnetSensorConfigs()
-            .withMagnetOffset(moduleConstants.steerEncoderOffset()
-                .minus(corner.getModuleRotation()))
-        ));
+    // Set the absolute steer encoder offset to the value given in the
+    // swerve module's configuration
+    CTREUtils.check(
+        steerEncoderConfig.apply(
+            new MagnetSensorConfigs()
+                .withMagnetOffset(
+                    moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
-        // Connect to the module's steer motor
-        steerMotor = new TalonFX(moduleConstants.steerMotorId());
+    // Connect to the module's steer motor
+    steerMotor = new TalonFX(moduleConstants.steerMotorId());
 
-        // Get the 'configurator' for the steer motor, which allows us to
-        // configure the motor's settings
-        TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
+    // Get the 'configurator' for the steer motor, which allows us to
+    // configure the motor's settings
+    TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 
-        CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
+    CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
 
-        // Apply the PID/feedforward/Motion Magic configuration given in the
-        // swerve drive configuration to the steer motor
-        CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
+    // Apply the PID/feedforward/Motion Magic configuration given in the
+    // swerve drive configuration to the steer motor
+    CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
 
-        // Configure the steer motor to brake automatically when not driven
-        CTREUtils.check(steerConfig.apply(new MotorOutputConfigs()
-            .withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Brake)));
-        
-        // Configure the fusing of the absolute steer encoder's reported position
-        // with the motor's internal relative encoder, and set the steer motor
-        // gear ratio to the value given in the swerve drive configuration
-        CTREUtils.check(steerConfig.apply(new FeedbackConfigs()
-            .withFusedCANcoder(steerEncoder)
-            .withRotorToSensorRatio(config.gearing().steer())));
+    // Configure the steer motor to brake automatically when not driven
+    CTREUtils.check(
+        steerConfig.apply(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake)));
 
-        setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
-        
-        Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
-    }
+    // Configure the fusing of the absolute steer encoder's reported position
+    // with the motor's internal relative encoder, and set the steer motor
+    // gear ratio to the value given in the swerve drive configuration
+    CTREUtils.check(
+        steerConfig.apply(
+            new FeedbackConfigs()
+                .withFusedCANcoder(steerEncoder)
+                .withRotorToSensorRatio(config.gearing().steer())));
 
-    /**
-     * Gets the drive motor for this module.
-     * @return The TalonFX drive motor controller
-     */
-    public TalonFX getDriveMotor() {
-        return driveMotor;
-    }
+    setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
 
-    /**
-     * Gets the steer motor for this module.
-     * @return The TalonFX steer motor controller
-     */
-    public TalonFX getSteerMotor() {
-        return steerMotor;
-    }
+    Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
+  }
 
-    /**
-     * Gets the steer encoder for this module.
-     * @return The steer CANcoder
-     */
-    public CANcoder getSteerEncoder() {
-        return steerEncoder;
-    }
+  /**
+   * Gets the drive motor for this module.
+   *
+   * @return The TalonFX drive motor controller
+   */
+  public TalonFX getDriveMotor() {
+    return driveMotor;
+  }
 
-    /**
-     * Gets the swerve drive configuration for this module.
-     * @return The {@link SwerveConfig} instance
-     */
-    public SwerveConfig getDrivetrainConstants() {
-        return constants;
-    }
+  /**
+   * Gets the steer motor for this module.
+   *
+   * @return The TalonFX steer motor controller
+   */
+  public TalonFX getSteerMotor() {
+    return steerMotor;
+  }
 
-    /**
-     * Gets the swerve module configuration for this module.
-     * @return The {@link SwerveConfig.Module} instance
-     */
-    public SwerveConfig.Module getModuleConstants() {
-        return constants.module(corner);
-    }
+  /**
+   * Gets the steer encoder for this module.
+   *
+   * @return The steer CANcoder
+   */
+  public CANcoder getSteerEncoder() {
+    return steerEncoder;
+  }
 
-    /**
-     * Gets the corner of the robot that this module is located in.
-     * @return The {@link Corner} enum value
-     */
-    public Corner getModuleCorner() {
-        return corner;
-    }
+  /**
+   * Gets the swerve drive configuration for this module.
+   *
+   * @return The {@link SwerveConfig} instance
+   */
+  public SwerveConfig getDrivetrainConstants() {
+    return constants;
+  }
 
-    /**
-     * Drives the module to a given state.
-     * @param targetState The desired state to drive to
-     */
-    public void driveState(SwerveModuleState targetState) {
-        if (isCalibrating) return;
+  /**
+   * Gets the swerve module configuration for this module.
+   *
+   * @return The {@link SwerveConfig.Module} instance
+   */
+  public SwerveConfig.Module getModuleConstants() {
+    return constants.module(corner);
+  }
 
-        targetState = optimizeStateForTalon(targetState, getSteerAngle());
+  /**
+   * Gets the corner of the robot that this module is located in.
+   *
+   * @return The {@link Corner} enum value
+   */
+  public Corner getModuleCorner() {
+    return corner;
+  }
 
+  /**
+   * Drives the module to a given state.
+   *
+   * @param targetState The desired state to drive to
+   */
+  public void driveState(SwerveModuleState targetState) {
+    if (isCalibrating) return;
 
-        Logger.log(getName() + "/targetState", targetState);
-        Logger.log(getName() + "/isValid", Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
+    targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
-        CTREUtils.check(driveMotor.setControl(new VelocityVoltage(
-            constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
-        )));
+    Logger.log(getName() + "/targetState", targetState);
+    Logger.log(
+        getName() + "/isValid",
+        Math.abs(getState().angle.getRotations() - targetState.angle.getRotations()) < 0.25);
 
-        // CTREUtils.check(steerMotor.setControl(new VoltageOut(12.0)));
+    CTREUtils.check(
+        driveMotor.setControl(
+            new VelocityVoltage(
+                constants.driveMotorMechanismToRotor(
+                    MetersPerSecond.of(targetState.speedMetersPerSecond)))));
 
-        Logger.log(getName() + "/ewjdhbs", targetState.angle.getRotations());
+    // CTREUtils.check(steerMotor.setControl(new VoltageOut(12.0)));
 
-        CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
-    }
+    Logger.log(getName() + "/ewjdhbs", targetState.angle.getRotations());
 
-    /**
-     * Gets the current position of the drive and steer motors.
-     * @return The current {@link SwerveModulePosition}
-     */
-    public Distance getDrivePosition() {
-        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getPosition()));
-    }
+    CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
+  }
 
-    /**
-     * Gets the current speed of the drive motor.
-     * @return The current {@link LinearVelocity}
-     */
-    public LinearVelocity getDriveSpeed() {
-        return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getVelocity()));
-    }
+  /**
+   * Gets the current position of the drive and steer motors.
+   *
+   * @return The current {@link SwerveModulePosition}
+   */
+  public Distance getDrivePosition() {
+    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getPosition()));
+  }
 
-    /**
-     * Gets the current angle of the steer motor.
-     * @return The current {@link Angle}
-     */
-    public Angle getSteerAngle() {
-        return CTREUtils.unwrap(steerEncoder.getPosition());
-    }
+  /**
+   * Gets the current speed of the drive motor.
+   *
+   * @return The current {@link LinearVelocity}
+   */
+  public LinearVelocity getDriveSpeed() {
+    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getVelocity()));
+  }
 
-    /**
-     * Gets the current velocity of the steer motor.
-     * @return The current {@link AngularVelocity}
-     */
-    public AngularVelocity getSteerVelocity() {
-        return CTREUtils.unwrap(steerEncoder.getVelocity());
-    }
+  /**
+   * Gets the current angle of the steer motor.
+   *
+   * @return The current {@link Angle}
+   */
+  public Angle getSteerAngle() {
+    return CTREUtils.unwrap(steerEncoder.getPosition());
+  }
 
-    /**
-     * Gets the current state of the module.
-     * @return The measured {@link SwerveModuleState}
-     */
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
-    }
+  /**
+   * Gets the current velocity of the steer motor.
+   *
+   * @return The current {@link AngularVelocity}
+   */
+  public AngularVelocity getSteerVelocity() {
+    return CTREUtils.unwrap(steerEncoder.getVelocity());
+  }
 
-    /**
-     * Gets the current position of the module.
-     * @return The measured {@link SwerveModulePosition}
-     */
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerAngle()));
-    }
+  /**
+   * Gets the current state of the module.
+   *
+   * @return The measured {@link SwerveModuleState}
+   */
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
+  }
 
-    /**
-     * Gets the current current consumed by the module.
-     * @return The measured {@link Current}
-     */
-    public Current getConsumedCurrent() {
-        return CTREUtils.unwrap(driveMotor.getSupplyCurrent()).plus(CTREUtils.unwrap(steerMotor.getSupplyCurrent()));
-    }
+  /**
+   * Gets the current position of the module.
+   *
+   * @return The measured {@link SwerveModulePosition}
+   */
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerAngle()));
+  }
 
-    /**
-     * Gets the transform of the module relative to the robot's center.
-     * @return The relative {@link Pose2d}
-     */
-    public Transform2d getRelativeTransform() {
-        return new Transform2d(
-            calculateRelativeTranslation(corner.index, constants.chassis()),
-            new Rotation2d(getSteerAngle())
-        );
-    }
+  /**
+   * Gets the current current consumed by the module.
+   *
+   * @return The measured {@link Current}
+   */
+  public Current getConsumedCurrent() {
+    return CTREUtils.unwrap(driveMotor.getSupplyCurrent())
+        .plus(CTREUtils.unwrap(steerMotor.getSupplyCurrent()));
+  }
 
-    /**
-     * Creates a command to calibrate the steer motor.
-     * @param averageBusVoltage The expected average bus voltage to during calibration
-     * @param maxCurrent The maximum current to use during calibration
-     * @return The calibration {@link Command}
-     */
-    public Command calibrateSteerMotor(Voltage averageBusVoltage, Current maxCurrent) {
-        return calibrateMotor("steer", getSteerMotor(), averageBusVoltage, maxCurrent, log ->
-            log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
-    }
+  /**
+   * Gets the transform of the module relative to the robot's center.
+   *
+   * @return The relative {@link Pose2d}
+   */
+  public Transform2d getRelativeTransform() {
+    return new Transform2d(
+        calculateRelativeTranslation(corner.index, constants.chassis()),
+        new Rotation2d(getSteerAngle()));
+  }
 
-    /**
-     * Creates a command to calibrate the drive motor.
-     * @param averageBusVoltage The expected average bus voltage to during calibration
-     * @param maxCurrent The maximum current to use during calibration
-     * @return The calibration {@link Command}
-     */
-    public Command calibrateDriveMotor(Voltage averageBusVoltage, Current maxCurrent) {
-        return calibrateMotor("drive", getDriveMotor(), averageBusVoltage, maxCurrent, log ->
-            log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
-    }
+  /**
+   * Creates a command to calibrate the steer motor.
+   *
+   * @param averageBusVoltage The expected average bus voltage to during calibration
+   * @param maxCurrent The maximum current to use during calibration
+   * @return The calibration {@link Command}
+   */
+  public Command calibrateSteerMotor(Voltage averageBusVoltage, Current maxCurrent) {
+    return calibrateMotor(
+        "steer",
+        getSteerMotor(),
+        averageBusVoltage,
+        maxCurrent,
+        log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
+  }
 
-    private Command calibrateMotor(String motorName, TalonFX motor, Voltage averageBusVoltage, Current maxCurrent, Consumer<MotorLog> logEncoder) {
-        SysIdRoutine calibrationRoutine = new SysIdRoutine(
+  /**
+   * Creates a command to calibrate the drive motor.
+   *
+   * @param averageBusVoltage The expected average bus voltage to during calibration
+   * @param maxCurrent The maximum current to use during calibration
+   * @return The calibration {@link Command}
+   */
+  public Command calibrateDriveMotor(Voltage averageBusVoltage, Current maxCurrent) {
+    return calibrateMotor(
+        "drive",
+        getDriveMotor(),
+        averageBusVoltage,
+        maxCurrent,
+        log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
+  }
+
+  private Command calibrateMotor(
+      String motorName,
+      TalonFX motor,
+      Voltage averageBusVoltage,
+      Current maxCurrent,
+      Consumer<MotorLog> logEncoder) {
+    SysIdRoutine calibrationRoutine =
+        new SysIdRoutine(
             new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
                 voltage -> motor.setControl(new TorqueCurrentFOC(voltage.in(Volts))),
-                log -> logEncoder.accept(
-                    log.motor("swerve-module-" + SwerveModule.getModuleSysIdName(getModuleCorner().index) + "-" + motorName)
-                        .voltage(CTREUtils.unwrap(motor.getMotorVoltage()))
-                ),
-                this
-            )
-        );
+                log ->
+                    logEncoder.accept(
+                        log.motor(
+                                "swerve-module-"
+                                    + SwerveModule.getModuleSysIdName(getModuleCorner().index)
+                                    + "-"
+                                    + motorName)
+                            .voltage(CTREUtils.unwrap(motor.getMotorVoltage()))),
+                this));
 
-        return Commands.sequence(
-            Commands.runOnce(() -> isCalibrating = true),
-            Commands.waitSeconds(1.0),
-            calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-            Commands.runOnce(() -> motor.stopMotor()),
-            Commands.waitSeconds(1.0),
-            calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-            Commands.runOnce(() -> motor.stopMotor()),
-            Commands.waitSeconds(1.0),
-            calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-            Commands.runOnce(() -> motor.stopMotor()),
-            Commands.waitSeconds(1.0),
-            calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
-            Commands.runOnce(() -> motor.stopMotor()),
-            Commands.waitSeconds(1.0),
-            Commands.runOnce(() -> isCalibrating = false)
-        );
-    }
+    return Commands.sequence(
+        Commands.runOnce(() -> isCalibrating = true),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.runOnce(() -> motor.stopMotor()),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+        Commands.runOnce(() -> motor.stopMotor()),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.runOnce(() -> motor.stopMotor()),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+        Commands.runOnce(() -> motor.stopMotor()),
+        Commands.waitSeconds(1.0),
+        Commands.runOnce(() -> isCalibrating = false));
+  }
 
-    @Override
-    public void close() throws Exception {
-        driveMotor.close();
-        steerMotor.close();
-        steerEncoder.close();
-    }
+  @Override
+  public void close() throws Exception {
+    driveMotor.close();
+    steerMotor.close();
+    steerEncoder.close();
+  }
 
-    /**
-     * Gets the name of a module given its index (e.g. 0 -> "Front Left").
-     * @param moduleIndex The index of the module
-     * @return The name of the module, formatted with spaces and capitalization
-     */
-    public static String getModuleName(int moduleIndex) {
-        return switch (moduleIndex) {
-            case 0 -> "Front Left";
-            case 1 -> "Front Right";
-            case 2 -> "Back Left";
-            case 3 -> "Back Right";
-            default -> throw new IllegalArgumentException("Invalid module index");
-        };
-    }
+  /**
+   * Gets the name of a module given its index (e.g. 0 -> "Front Left").
+   *
+   * @param moduleIndex The index of the module
+   * @return The name of the module, formatted with spaces and capitalization
+   */
+  public static String getModuleName(int moduleIndex) {
+    return switch (moduleIndex) {
+      case 0 -> "Front Left";
+      case 1 -> "Front Right";
+      case 2 -> "Back Left";
+      case 3 -> "Back Right";
+      default -> throw new IllegalArgumentException("Invalid module index");
+    };
+  }
 
-    /**
-     * Gets the name of a module given its index (e.g. 0 -> "front-left").
-     * @param moduleIndex The index of the module
-     * @return The name of the module, formatted with hyphens and lowercase
-     */
-    public static String getModuleSysIdName(int moduleIndex) {
-        return switch (moduleIndex) {
-            case 0 -> "front-left";
-            case 1 -> "front-right";
-            case 2 -> "back-left";
-            case 3 -> "back-right";
-            default -> throw new IllegalArgumentException("Invalid module index");
-        };
-    }
-    
-    /**
-     * Represents a corner of the robot that a module can be on.
-     */
-    public static enum Corner {
-        FRONT_LEFT(0, Rotations.of(0)),
-        FRONT_RIGHT(1, Rotations.of(0.75)),
-        BACK_LEFT(2, Rotations.of(0.25)),
-        BACK_RIGHT(3, Rotations.of(0.5));
+  /**
+   * Gets the name of a module given its index (e.g. 0 -> "front-left").
+   *
+   * @param moduleIndex The index of the module
+   * @return The name of the module, formatted with hyphens and lowercase
+   */
+  public static String getModuleSysIdName(int moduleIndex) {
+    return switch (moduleIndex) {
+      case 0 -> "front-left";
+      case 1 -> "front-right";
+      case 2 -> "back-left";
+      case 3 -> "back-right";
+      default -> throw new IllegalArgumentException("Invalid module index");
+    };
+  }
 
-        public final int index;
-        private final Angle moduleRotation;
+  /** Represents a corner of the robot that a module can be on. */
+  public static enum Corner {
+    FRONT_LEFT(0, Rotations.of(0)),
+    FRONT_RIGHT(1, Rotations.of(0.75)),
+    BACK_LEFT(2, Rotations.of(0.25)),
+    BACK_RIGHT(3, Rotations.of(0.5));
 
-        private Corner(int index, Angle moduleRotation) {
-            this.index = index;
-            this.moduleRotation = moduleRotation;
-        }
+    public final int index;
+    private final Angle moduleRotation;
 
-        /**
-         * Converts an index to a {@link Corner} object.
-         * @param index
-         * @return
-         */
-        public static Corner fromIndex(int index) {
-            return switch (index) {
-                case 0 -> FRONT_LEFT;
-                case 1 -> FRONT_RIGHT;
-                case 2 -> BACK_LEFT;
-                case 3 -> BACK_RIGHT;
-                default -> throw new IllegalArgumentException("Invalid module index");
-            };
-        }
-
-        public Angle getModuleRotation() {
-            return moduleRotation;
-        }
+    private Corner(int index, Angle moduleRotation) {
+      this.index = index;
+      this.moduleRotation = moduleRotation;
     }
 
     /**
-     * Calculates the relative translation of a module given its corner index.
-     * @param cornerIndex The index of the corner
-     * @param chassis The chassis configuration
-     * @return The relative translation of the module
+     * Converts an index to a {@link Corner} object.
+     *
+     * @param index
+     * @return
      */
-    public static Translation2d calculateRelativeTranslation(int cornerIndex, SwerveConfig.Chassis chassis) {
-        return new Translation2d(
-            (cornerIndex < 2 ? 1. : -1.) * chassis.wheelBase().in(Meters) / 2.,
-            (cornerIndex % 2 == 0 ? 1. : -1.) * chassis.trackWidth().in(Meters) / 2.
-        );
+    public static Corner fromIndex(int index) {
+      return switch (index) {
+        case 0 -> FRONT_LEFT;
+        case 1 -> FRONT_RIGHT;
+        case 2 -> BACK_LEFT;
+        case 3 -> BACK_RIGHT;
+        default -> throw new IllegalArgumentException("Invalid module index");
+      };
     }
 
-    public static Slot0Configs invertGains(Slot0Configs configs) {
-        return new Slot0Configs()
-            .withKP(-configs.kP)
-            .withKI(-configs.kI)
-            .withKD(-configs.kD)
-            .withKS(configs.kS)
-            .withKV(-configs.kV)
-            .withKA(-configs.kA)
-            .withKG(-configs.kG);
+    public Angle getModuleRotation() {
+      return moduleRotation;
     }
+  }
 
-    public static SwerveModuleState optimizeStateForTalon(SwerveModuleState targetState, Angle currentAngle) {
-        Angle difference = MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
-        SwerveModuleState relativeOptimized = optimizeStateRelative(targetState.speedMetersPerSecond, difference);
+  /**
+   * Calculates the relative translation of a module given its corner index.
+   *
+   * @param cornerIndex The index of the corner
+   * @param chassis The chassis configuration
+   * @return The relative translation of the module
+   */
+  public static Translation2d calculateRelativeTranslation(
+      int cornerIndex, SwerveConfig.Chassis chassis) {
+    return new Translation2d(
+        (cornerIndex < 2 ? 1. : -1.) * chassis.wheelBase().in(Meters) / 2.,
+        (cornerIndex % 2 == 0 ? 1. : -1.) * chassis.trackWidth().in(Meters) / 2.);
+  }
 
-        SwerveModuleState optimized = new SwerveModuleState(
+  public static Slot0Configs invertGains(Slot0Configs configs) {
+    return new Slot0Configs()
+        .withKP(-configs.kP)
+        .withKI(-configs.kI)
+        .withKD(-configs.kD)
+        .withKS(configs.kS)
+        .withKV(-configs.kV)
+        .withKA(-configs.kA)
+        .withKG(-configs.kG);
+  }
+
+  public static SwerveModuleState optimizeStateForTalon(
+      SwerveModuleState targetState, Angle currentAngle) {
+    Angle difference =
+        MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
+    SwerveModuleState relativeOptimized =
+        optimizeStateRelative(targetState.speedMetersPerSecond, difference);
+
+    SwerveModuleState optimized =
+        new SwerveModuleState(
             relativeOptimized.speedMetersPerSecond,
-            new Rotation2d(currentAngle.plus(relativeOptimized.angle.getMeasure()))
-        );
+            new Rotation2d(currentAngle.plus(relativeOptimized.angle.getMeasure())));
 
-        return optimized;
+    return optimized;
+  }
+
+  public static SwerveModuleState optimizeStateRelative(double speedMetersPerSecond, Angle angle) {
+    if (angle.in(Rotations) < -0.25) {
+      angle = angle.plus(Rotations.of(0.5));
+      speedMetersPerSecond = -speedMetersPerSecond;
+    } else if (angle.in(Rotations) > 0.25) {
+      angle = angle.minus(Rotations.of(0.5));
+      speedMetersPerSecond = -speedMetersPerSecond;
     }
 
-    public static SwerveModuleState optimizeStateRelative(double speedMetersPerSecond, Angle angle) {
-        if (angle.in(Rotations) < -0.25) {
-            angle = angle.plus(Rotations.of(0.5));
-            speedMetersPerSecond = -speedMetersPerSecond;
-        } else if (angle.in(Rotations) > 0.25) {
-            angle = angle.minus(Rotations.of(0.5));
-            speedMetersPerSecond = -speedMetersPerSecond;
-        }
-
-        return new SwerveModuleState(speedMetersPerSecond, new Rotation2d(angle));
-    }
+    return new SwerveModuleState(speedMetersPerSecond, new Rotation2d(angle));
+  }
 }

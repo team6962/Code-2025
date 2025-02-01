@@ -2,12 +2,9 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.Supplier;
-
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,95 +18,111 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 
 /**
- * {@code PoseEstimator} is a class that estimates the pose of a swerve drive
- * robot using a combination of odometry, gyroscope, and vision measurements.
- * A PoseEstimator contains a {@link SwerveDrivePoseEstimator} that is updated
- * with the latest measurements. It also contains a {@link SwerveGyroscope} that
- * can be used to get and reset the robot's heading.
- * <p>
- * Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
+ * {@code PoseEstimator} is a class that estimates the pose of a swerve drive robot using a
+ * combination of odometry, gyroscope, and vision measurements. A PoseEstimator contains a {@link
+ * SwerveDrivePoseEstimator} that is updated with the latest measurements. It also contains a {@link
+ * SwerveGyroscope} that can be used to get and reset the robot's heading.
+ *
+ * <p>Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
  */
 public class PoseEstimator extends SubsystemBase {
-    private SwerveDriveKinematics kinematics;
-    private SwerveGyroscope gyroscope;
-    private SwerveDrivePoseEstimator poseEstimator;
+  private SwerveDriveKinematics kinematics;
+  private SwerveGyroscope gyroscope;
+  private SwerveDrivePoseEstimator poseEstimator;
 
-    private Supplier<SwerveModulePosition[]> modulePositionsSupplier;
-    private Supplier<SwerveModuleState[]> moduleStatesSupplier;
+  private Supplier<SwerveModulePosition[]> modulePositionsSupplier;
+  private Supplier<SwerveModuleState[]> moduleStatesSupplier;
 
-    private SwerveModulePosition[] lastPositions;
-    private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
-    private Twist2d chassisVelocity = new Twist2d();
+  private SwerveModulePosition[] lastPositions;
+  private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
+  private Twist2d chassisVelocity = new Twist2d();
 
-    public PoseEstimator(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> modulePositions, Supplier<SwerveModuleState[]> moduleStates) {
-        this.kinematics = kinematics;
-        this.gyroscope = new SwerveGyroscope(() -> positionChanges, kinematics);
-        this.modulePositionsSupplier = modulePositions;
-        this.moduleStatesSupplier = moduleStates;
+  public PoseEstimator(
+      SwerveDriveKinematics kinematics,
+      Supplier<SwerveModulePosition[]> modulePositions,
+      Supplier<SwerveModuleState[]> moduleStates) {
+    this.kinematics = kinematics;
+    this.gyroscope = new SwerveGyroscope(() -> positionChanges, kinematics);
+    this.modulePositionsSupplier = modulePositions;
+    this.moduleStatesSupplier = moduleStates;
 
-        lastPositions = modulePositions.get();
+    lastPositions = modulePositions.get();
 
-        poseEstimator = new SwerveDrivePoseEstimator(kinematics, RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions.get(), new Pose2d());
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            RotationUtils.fromAngle(gyroscope.getHeading()),
+            modulePositions.get(),
+            new Pose2d());
 
-        Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
-    }
+    Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
+  }
 
-    @Override
-    public void periodic() {
-        SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
-        Time timestamp = Seconds.of(Timer.getFPGATimestamp());
+  @Override
+  public void periodic() {
+    SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
+    Time timestamp = Seconds.of(Timer.getFPGATimestamp());
 
-        poseEstimator.updateWithTime(timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
-        
-        chassisVelocity = kinematics.toTwist2d(KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
+    poseEstimator.updateWithTime(
+        timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
 
-        positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
-        
-        lastPositions = modulePositions;
-    }
+    chassisVelocity =
+        kinematics.toTwist2d(
+            KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
 
-    public SwerveGyroscope getGyroscope() {
-        return gyroscope;
-    }
+    positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
 
-    public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
-        poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
-    }
+    lastPositions = modulePositions;
+  }
 
-    public void addVisionMeasurement(
-        Pose2d visionRobotPoseMeters,
-        Time timestamp,
-        Matrix<N3, N1> visionMeasurementStdDevs
-    ) {
-        poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
-    }
+  public SwerveGyroscope getGyroscope() {
+    return gyroscope;
+  }
 
-    public void resetPosition(Pose2d expectedPose) {
-        poseEstimator.resetPosition(RotationUtils.fromAngle(gyroscope.getHeading()), modulePositionsSupplier.get(), expectedPose);
-    }
+  public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
+  }
 
-    public Pose2d getEstimatedPose() {
-        return poseEstimator.getEstimatedPosition();
-    }
+  public void addVisionMeasurement(
+      Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
+  }
 
-    public Pose2d getFuturePose(Time time) {
-        Pose2d currentPose = getEstimatedPose();
-        
-        if (chassisVelocity == null) return currentPose;
+  public void resetPosition(Pose2d expectedPose) {
+    poseEstimator.resetPosition(
+        RotationUtils.fromAngle(gyroscope.getHeading()),
+        modulePositionsSupplier.get(),
+        expectedPose);
+  }
 
-        double deltaSeconds = time.in(Seconds);
-        Twist2d deltaTwist = new Twist2d(chassisVelocity.dx * deltaSeconds, chassisVelocity.dy * deltaSeconds, chassisVelocity.dtheta * deltaSeconds);
+  public Pose2d getEstimatedPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
 
-        return currentPose.exp(deltaTwist);
-    }
+  public Pose2d getFuturePose(Time time) {
+    Pose2d currentPose = getEstimatedPose();
 
-    public Pose2d getEstimatedPose(Time timestamp) {
-        return poseEstimator.sampleAt(timestamp.in(Seconds)).orElseGet(this::getEstimatedPose);
-    }
+    if (chassisVelocity == null) return currentPose;
 
-    public ChassisSpeeds getEstimatedSpeeds() {
-        return kinematics.toChassisSpeeds(moduleStatesSupplier.get());
-    }
+    double deltaSeconds = time.in(Seconds);
+    Twist2d deltaTwist =
+        new Twist2d(
+            chassisVelocity.dx * deltaSeconds,
+            chassisVelocity.dy * deltaSeconds,
+            chassisVelocity.dtheta * deltaSeconds);
+
+    return currentPose.exp(deltaTwist);
+  }
+
+  public Pose2d getEstimatedPose(Time timestamp) {
+    return poseEstimator.sampleAt(timestamp.in(Seconds)).orElseGet(this::getEstimatedPose);
+  }
+
+  public ChassisSpeeds getEstimatedSpeeds() {
+    return kinematics.toChassisSpeeds(moduleStatesSupplier.get());
+  }
 }

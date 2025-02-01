@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -14,13 +10,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.drive.XBoxSwerve;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 // Driver
 // Move swerve chassis
 // Rotate Swerve Chassis
-// Button to move to processor 
+// Button to move to processor
 // Button to move to source
-// Auto orient towards algae 
+// Auto orient towards algae
 // Button to move to left/right reef
 // Button for aligning to algae on the reef
 // Operator
@@ -35,20 +33,20 @@ import frc.robot.commands.drive.XBoxSwerve;
 // Algae ground Height
 
 public class Controls {
-  public static final CommandXboxController operator = new CommandXboxController(DEVICES.OPERATOR_XBOX_CONTROLLER);
-  public static final CommandXboxController driver = new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
+  public static final CommandXboxController operator =
+      new CommandXboxController(DEVICES.OPERATOR_XBOX_CONTROLLER);
+  public static final CommandXboxController driver =
+      new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
 
   public static void configureBindings(
-      RobotStateController stateController,
-      SwerveDrive swerveDrive
-      )
-    {
+      RobotStateController stateController, SwerveDrive swerveDrive) {
 
     driver.a();
     driver.b();
     driver.x();
     driver.y(); // USED
-    // driver.start().whileTrue(new GoToPose(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP"), swerveDrive));
+    // driver.start().whileTrue(new
+    // GoToPose(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP"), swerveDrive));
     driver.back();
     driver.leftBumper();
     driver.rightBumper();
@@ -61,14 +59,18 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));    
+    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
     if (RobotBase.isSimulation()) {
-      driver.button(1).whileTrue(Commands.defer(() ->
-        swerveDrive.pathfindTo(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
-        Set.of()
-      ));
-      
+      driver
+          .button(1)
+          .whileTrue(
+              Commands.defer(
+                  () ->
+                      swerveDrive.pathfindTo(
+                          frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
+                  Set.of()));
+
       // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
     }
 
@@ -98,7 +100,10 @@ public class Controls {
     //   .withSize(2, 2)
     //   .withProperties(Map.of("min", 0, "max", 100));
 
-    // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE < RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() / ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) / (Constants.SWERVE_DRIVE.BATTERY_RESISTANCE)) * 100.0))
+    // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
+    // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
+    // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /
+    // (Constants.SWERVE_DRIVE.BATTERY_RESISTANCE)) * 100.0))
     //   .withWidget(BuiltInWidgets.kDial)
     //   .withPosition(3, 2)
     //   .withSize(2, 2)
@@ -106,29 +111,30 @@ public class Controls {
   }
 
   private static Command rumble(CommandXboxController controller) {
-    return Commands.runEnd(() -> {
-      controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-      LEDs.setState(LEDs.State.GOOD);
-    },
-    () -> {
-      controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-    }
-    ).withTimeout(0.25);
+    return Commands.runEnd(
+            () -> {
+              controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+              LEDs.setState(LEDs.State.GOOD);
+            },
+            () -> {
+              controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+            })
+        .withTimeout(0.25);
   }
 
   private static Command rumble(CommandXboxController controller, BooleanSupplier booleanSupplier) {
-    return Commands.runEnd(() -> {
-      if (booleanSupplier.getAsBoolean()) {
-        controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-        LEDs.setState(LEDs.State.GOOD);
-      } else {
-        controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-      }
-    },
-    () -> {
-      controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-    }
-    );
+    return Commands.runEnd(
+        () -> {
+          if (booleanSupplier.getAsBoolean()) {
+            controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+            LEDs.setState(LEDs.State.GOOD);
+          } else {
+            controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+          }
+        },
+        () -> {
+          controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+        });
   }
 
   public static Command rumbleDriver() {

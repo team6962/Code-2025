@@ -11,7 +11,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -30,7 +29,6 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -42,6 +40,7 @@ public class RobotContainer {
 
   /**
    * Get the RobotContainer instance (for testing or competition only!)
+   *
    * @return
    */
   public static RobotContainer getInstance() {
@@ -79,9 +78,9 @@ public class RobotContainer {
 
     Logger.start(Milliseconds.of(20));
     AutonChooser.init();
-    
+
     LiveWindow.disableAllTelemetry();
-    
+
     DriverStation.silenceJoystickConnectionWarning(true);
 
     StatusChecks.Category statusChecks = StatusChecks.under("General");
@@ -100,14 +99,17 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    ledStrip = new LEDs(stateController, () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    ledStrip =
+        new LEDs(
+            stateController,
+            () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
-    
+
     // // Configure the trigger bindings
     Controls.configureBindings(stateController, swerveDrive);
 
@@ -130,7 +132,8 @@ public class RobotContainer {
     // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
 
     // Logger.log("conversionTest/speeds", testSpeeds);
-    // Logger.log("conversionTest/states", KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
+    // Logger.log("conversionTest/states",
+    // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
   }
 
   public Command getAutonomousCommand() {
@@ -154,15 +157,12 @@ public class RobotContainer {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
   }
 
-  public void disabledPeriodic() {
+  public void disabledPeriodic() {}
 
-  }
-
-  public void disabledInit() {
-    
-  }
+  public void disabledInit() {}
 
   public void testInit() {
-    // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(), Amps.of(60)).schedule();
+    // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
+    // Amps.of(60)).schedule();
   }
 }

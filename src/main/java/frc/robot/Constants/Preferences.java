@@ -17,10 +17,12 @@ import edu.wpi.first.units.measure.Angle;
  */
 public final class Preferences {
   public static final class SWERVE_DRIVE {
-    public static final double   TELEOPERATED_FINE_TUNE_DRIVE_POWER = 0.1; // Percent driving power when using d-pad
-    public static final double   TELEOPERATED_DRIVE_POWER           = 0.5; // Percent driving power
-    public static final double   TELEOPERATED_BOOST_POWER           = 1.0; // Percent power when using the triggers
-    public static final double   TELEOPERATED_ROTATE_POWER          = 0.5; // Percent rotating power
+    public static final double TELEOPERATED_FINE_TUNE_DRIVE_POWER =
+        0.1; // Percent driving power when using d-pad
+    public static final double TELEOPERATED_DRIVE_POWER = 0.5; // Percent driving power
+    public static final double TELEOPERATED_BOOST_POWER =
+        1.0; // Percent power when using the triggers
+    public static final double TELEOPERATED_ROTATE_POWER = 0.5; // Percent rotating power
   }
 
   public static final class AMP_WHEELS {
@@ -59,12 +61,12 @@ public final class Preferences {
 
   public static final class MANIPULATOR_PIVOT {
     public static final Angle MAX_ANGLE = Degrees.of(0.0);
-    public static final Angle MIN_ANGLE = Degrees.of(0.0); 
+    public static final Angle MIN_ANGLE = Degrees.of(0.0);
   }
-  
+
   public static final class ELEVATOR {
     public static final double POWER = 0.5;
-    public static final double SLOW_POWER = 0.2;  
+    public static final double SLOW_POWER = 0.2;
     public static final double MAX_HEIGHT = 80.0;
     public static final double MIN_HEIGHT = 0.0;
   }

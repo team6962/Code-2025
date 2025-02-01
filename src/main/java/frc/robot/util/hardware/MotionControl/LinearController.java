@@ -1,6 +1,5 @@
 package frc.robot.util.hardware.MotionControl;
 
-
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -13,18 +12,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 /*
@@ -43,7 +37,7 @@ public class LinearController {
   // Built-in relative NEO encoder
   private RelativeEncoder encoder;
   // Rev absolute through-bore encoder
-  private DutyCycleEncoder absoluteEncoder; 
+  private DutyCycleEncoder absoluteEncoder;
 
   private Distance minHeight, maxHeight, tolerance;
 
@@ -59,19 +53,18 @@ public class LinearController {
 
   private PIDController simPID;
 
-
   public LinearController(
-    SubsystemBase subsystem,
-    SparkMax motor,
-    int absoluteEncoderDIO,
-    double absolutePositionOffset,
-    double kP,
-    double kS,
-    double gearing,
-    Distance minHeight,
-    Distance maxHeight,
-    Distance tolerance,
-    boolean reversed) {
+      SubsystemBase subsystem,
+      SparkMax motor,
+      int absoluteEncoderDIO,
+      double absolutePositionOffset,
+      double kP,
+      double kS,
+      double gearing,
+      Distance minHeight,
+      Distance maxHeight,
+      Distance tolerance,
+      boolean reversed) {
     // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
     // profile = new TrapezoidProfile(
     //   new Constraints(maxVelocity, maxAcceleration)
@@ -92,23 +85,25 @@ public class LinearController {
     encoderOffset = absolutePositionOffset;
     SparkMaxUtil.configureEncoder(motorConfig, 2.0 * Math.PI / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
-    
+
     Logger.logNumber(subsystem.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(subsystem.getName() + "/position", () -> getHeight().in(Meters));
     Logger.logNumber(subsystem.getName() + "/relativePosition", () -> encoder.getPosition());
-    Logger.logNumber(subsystem.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()).in(Radians));
+    Logger.logNumber(
+        subsystem.getName() + "/rawAbsolutePosition",
+        () -> Rotations.of(absoluteEncoder.get()).in(Radians));
     Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(subsystem);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
-    statusChecks.add("absoluteEncoderUpdated",   () -> absoluteEncoder.get() != 0.0);
+    statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
 
     // sim = new SingleJointedArmSim(
     //   DCMotor.getNEO(1),
-    //   gearing, 
-    //   SingleJointedArmSim.estimateMOI(1.0, 5.0), 
+    //   gearing,
+    //   SingleJointedArmSim.estimateMOI(1.0, 5.0),
     //   1.0,
-    //   Units.degreesToRadians(-180.0), 
+    //   Units.degreesToRadians(-180.0),
     //   Units.degreesToRadians(180.0),
     //   false,
     //   0.0
@@ -124,7 +119,7 @@ public class LinearController {
     }
 
     encoder.setPosition(getHeight().in(Meters));
-    
+
     setAchievableHeight();
 
     if (doneMoving()) {
@@ -134,12 +129,7 @@ public class LinearController {
     }
 
     // Set onboard PID controller to follow
-    pid.setReference(
-      achievableHeight.in(Meters),
-      ControlType.kPosition,
-      ClosedLoopSlot.kSlot0,
-      kS
-    );
+    pid.setReference(achievableHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
 
     // System.out.println(Math.signum(targetHeight.getRadians() - getHeight().getRadians()));
     // System.out.println("kS: " + kS);
@@ -164,15 +154,16 @@ public class LinearController {
   }
 
   public boolean isPastLimit() {
-    return encoder.getPosition() > maxHeight.in(Meters) || encoder.getPosition() < minHeight.in(Meters);
+    return encoder.getPosition() > maxHeight.in(Meters)
+        || encoder.getPosition() < minHeight.in(Meters);
   }
 
   private void setAchievableHeight() {
     achievableHeight = targetHeight;
     if (achievableHeight.lt(minHeight)) {
-        achievableHeight = minHeight;
+      achievableHeight = minHeight;
     } else if (achievableHeight.gt(maxHeight)) {
-        achievableHeight = maxHeight;
+      achievableHeight = maxHeight;
     }
   }
 
@@ -188,8 +179,8 @@ public class LinearController {
 
     // ((0.26934 + x) * -1)
 
-
-    // Map absolute encoder position from 0 - 1 rotations to -pi - pi radians, where 0 is straight out
+    // Map absolute encoder position from 0 - 1 rotations to -pi - pi radians, where 0 is straight
+    // out
     double absoluteHeight = (absoluteEncoder.get() + encoderOffset) * factor;
 
     return Meters.of(absoluteHeight);
@@ -197,9 +188,10 @@ public class LinearController {
 
   public boolean doneMoving() {
     if (getTargetHeight() == null) return true;
-    return debouncer.calculate(getHeight().minus(achievableHeight).abs(Meters) < tolerance.in(Meters));
+    return debouncer.calculate(
+        getHeight().minus(achievableHeight).abs(Meters) < tolerance.in(Meters));
   }
-  
+
   public void setMaxHeight(Distance newMaxHeight) {
     maxHeight = newMaxHeight;
   }

@@ -6,18 +6,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.XboxController;
 
-/**
- * Some math utility functions for the swerve drive and input processing.
-*/
+/** Some math utility functions for the swerve drive and input processing. */
 public final class MathUtils {
-    /**
-     * Math for controlling the swerve drive.
-    */
-    public static final class SwerveMath {
+  /** Math for controlling the swerve drive. */
+  public static final class SwerveMath {
     /**
      * Finds the distance in radians between specified angles.
+     *
      * @return The number of radians between the two angles, from 0 to π.
-    */
+     */
     public static double angleDistance(double alpha, double beta) {
       // Calculates the difference between the angles in a range from 0 to 2π.
       double phi = Math.abs(beta - alpha) % (2.0 * Math.PI);
@@ -34,26 +31,29 @@ public final class MathUtils {
      * @return {@link Twist2d} of the transformed pose.
      */
     public static Twist2d PoseLog(final Pose2d transform) {
-      final double kEps          = 1E-9;
-      final double dtheta        = transform.getRotation().getRadians();
-      final double half_dtheta   = 0.5 * dtheta;
+      final double kEps = 1E-9;
+      final double dtheta = transform.getRotation().getRadians();
+      final double half_dtheta = 0.5 * dtheta;
       final double cos_minus_one = transform.getRotation().getCos() - 1.0;
-      double       halftheta_by_tan_of_halfdtheta;
+      double halftheta_by_tan_of_halfdtheta;
       if (Math.abs(cos_minus_one) < kEps) {
         halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
       } else {
-        halftheta_by_tan_of_halfdtheta = -(half_dtheta * transform.getRotation().getSin()) / cos_minus_one;
+        halftheta_by_tan_of_halfdtheta =
+            -(half_dtheta * transform.getRotation().getSin()) / cos_minus_one;
       }
-      final Translation2d translation_part = transform.getTranslation().rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
+      final Translation2d translation_part =
+          transform
+              .getTranslation()
+              .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
       return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
     }
   }
 
-  /**
-     * Math for taking input from the controller.
-    */
+  /** Math for taking input from the controller. */
   public static final class InputMath {
-    public static double addLinearDeadband(double input, double deadband) { // input ranges from -1 to 1
+    public static double addLinearDeadband(
+        double input, double deadband) { // input ranges from -1 to 1
       if (Math.abs(input) <= deadband) return 0.0;
       if (input > 0) return map(input, deadband, 1.0, 0.0, 1.0);
       return map(input, -deadband, -1.0, 0.0, -1.0);
@@ -65,9 +65,7 @@ public final class MathUtils {
       return 0.0;
     }
 
-    /**
-     * Deadband must be greater than 1e-6
-     */
+    /** Deadband must be greater than 1e-6 */
     public static Translation2d addCircularDeadband(Translation2d input, double deadband) {
       double magnitude = input.getNorm();
 
@@ -85,6 +83,7 @@ public final class MathUtils {
 
   /**
    * Maps a value from one range to another.
+   *
    * @param X The value to map.
    * @param A The lower bound of the value's current range.
    * @param B The upper bound of the value's current range.
@@ -97,12 +96,13 @@ public final class MathUtils {
   }
 
   /**
-   * Computes the modulus of a number rounding down instead of towards 0.
-   * Also equivalent to x - floor(x / r) * r.
+   * Computes the modulus of a number rounding down instead of towards 0. Also equivalent to x -
+   * floor(x / r) * r.
+   *
    * @param x The number to mod.
    * @param r The modulus.
    * @return x mod r, rounded down.
-  */
+   */
   public static double floorMod(double x, double r) {
     return ((x % r) + r) % r;
   }
@@ -118,19 +118,26 @@ public final class MathUtils {
   }
 
   // public static double trangleArea(Translation2d p1, Translation2d p2, Translation2d p3) {
-  //   return Math.abs((p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY())) / 2.0);
+  //   return Math.abs((p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) +
+  // p3.getX() * (p1.getY() - p2.getY())) / 2.0);
   // }
-  public static boolean isInsideTriangle(Translation2d A, Translation2d B, Translation2d C, Translation2d P) {
+  public static boolean isInsideTriangle(
+      Translation2d A, Translation2d B, Translation2d C, Translation2d P) {
     // Calculate the barycentric coordinates
     // of point P with respect to triangle ABC
-    double denominator = ((B.getY() - C.getY()) * (A.getX() - C.getX()) +
-                          (C.getX() - B.getX()) * (A.getY() - C.getY()));
-    double a = ((B.getY() - C.getY()) * (P.getX() - C.getX()) +
-                (C.getX() - B.getX()) * (P.getY() - C.getY())) / denominator;
-    double b = ((C.getY() - A.getY()) * (P.getX() - C.getX()) +
-                (A.getX() - C.getX()) * (P.getY() - C.getY())) / denominator;
+    double denominator =
+        ((B.getY() - C.getY()) * (A.getX() - C.getX())
+            + (C.getX() - B.getX()) * (A.getY() - C.getY()));
+    double a =
+        ((B.getY() - C.getY()) * (P.getX() - C.getX())
+                + (C.getX() - B.getX()) * (P.getY() - C.getY()))
+            / denominator;
+    double b =
+        ((C.getY() - A.getY()) * (P.getX() - C.getX())
+                + (A.getX() - C.getX()) * (P.getY() - C.getY()))
+            / denominator;
     double c = 1 - a - b;
- 
+
     // Check if all barycentric coordinates
     // are non-negative
     if (a >= 0 && b >= 0 && c >= 0) {
