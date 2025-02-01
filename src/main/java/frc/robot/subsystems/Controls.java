@@ -89,7 +89,7 @@ public class Controls {
     operator.x().onTrue(elevator.coralL4());
     operator.y().onTrue(elevator.algaeBarge());
     operator.start().onTrue(elevator.stow()); // assume this is processor height
-    operator.back();
+    operator.back().onTrue(elevator.algaeGround());
     operator.leftStick().onTrue(elevator.algaeL2());
     operator.rightStick().onTrue(elevator.algaeL3());
     operator.povCenter();
