@@ -3,31 +3,21 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import com.pathplanner.lib.config.PIDConstants;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import com.team6962.lib.swerve.SwerveConfig;
-import com.team6962.lib.swerve.SwerveConfig.Chassis;
-import com.team6962.lib.swerve.SwerveConfig.DriveGains;
-import com.team6962.lib.swerve.SwerveConfig.Gearing;
-import com.team6962.lib.swerve.SwerveConfig.Motor;
-import com.team6962.lib.swerve.SwerveConfig.Wheel;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -117,25 +107,6 @@ public final class Constants {
   }
 
   public static final class SWERVE {
-    public static final Slot0Configs DRIVE_MOTOR_GAINS =
-        new Slot0Configs()
-            .withKP(0.01)
-            .withKD(0.01)
-            .withKI(0.1)
-            .withKV(0.117)
-            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
-    public static final Slot0Configs STEER_MOTOR_GAINS =
-        new Slot0Configs()
-            .withKP(20)
-            .withKI(1)
-            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
-    public static final DriveGains DRIVE_GAINS =
-        new DriveGains(new PIDConstants(5.0, 1.0, 0), new PIDConstants(5.0, 1.0, 0));
-
-    public static final Chassis CHASSIS =
-        new Chassis(
-            Inches.of(30), Inches.of(30), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
-
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
@@ -148,22 +119,7 @@ public final class Constants {
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
-    public static final SwerveConfig.Module[] SELECTED_MODULE_CONFIGS = {
-      MODULE_CONFIGS[0], // front-left
-      MODULE_CONFIGS[3], // front-right
-      MODULE_CONFIGS[1], // back-left
-      MODULE_CONFIGS[2] // back-right
-    };
-
-    public static final SwerveConfig CONFIG =
-        new SwerveConfig(
-            CHASSIS,
-            Gearing.MK4I_L2_PLUS,
-            SELECTED_MODULE_CONFIGS,
-            new Motor(DCMotor.getKrakenX60(1), DRIVE_MOTOR_GAINS, Amps.of(60)),
-            new Motor(DCMotor.getKrakenX60(1), STEER_MOTOR_GAINS, Amps.of(60)),
-            Wheel.COLSON,
-            DRIVE_GAINS);
+    public static final SwerveConfig CONFIG = SwerveConstants.get();
   }
 
   public static final class CAN {
