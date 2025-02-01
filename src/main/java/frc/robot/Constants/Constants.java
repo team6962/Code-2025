@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -242,8 +243,15 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double GEARING = 1.0; // CALCULATE
+    public static final double MOTOR_TO_SENSOR = 1.0; // CALCULATE
+    public static final double SENSOR_TO_MECHANISM = 1.0; // CALCULATE
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
+    public static final double ENCODER_OFFSET = 0.0; // CALCULATE
+    public static final class PROFILE {
+      public static final double kP = 0.0;
+      public static final double kS = 0.0;
+    }
+
   }
 
   public static final class SHOOTER_WHEELS {
@@ -307,9 +315,14 @@ public final class Constants {
     public static final double MAX_LINEAR_SPEED = NEO.STATS.freeSpeedRadPerSec / GEARING * RADIUS;
   }
 
-  public static final class HANG {
-    public static final Double EXTEND_HEIGHT = 0.0; // CHANGE
-    public static final Double RETRACT_HEIGHT = 0.0; // CHANGE
+  public static final class HANG_PIVOT {
+    public static final double GEARING = 1.0;
+    public static final double ENCODER_OFFSET = 0.0;
+    public static final class PROFILE {
+      public static final double kP = 0.0;
+      public static final double kS = 0.0; // volts per rad/s
+      
+    }
   }
 
   // LED

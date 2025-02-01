@@ -74,6 +74,7 @@ public final class Preferences {
     public static final Distance L2_HEIGHT = Inches.of(0);
     public static final Distance L3_HEIGHT = Inches.of(0);
     public static final Distance L4_HEIGHT = Inches.of(0);
+    public static final Distance BARGE_HEIGHT = Inches.of(0);
   }
 
   public static final class VOLTAGE_LADDER {

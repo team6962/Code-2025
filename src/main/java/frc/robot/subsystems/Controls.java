@@ -10,27 +10,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.drive.XBoxSwerve;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.manipulator.Manipulator;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-
-// Driver
-// Move swerve chassis
-// Rotate Swerve Chassis
-// Button to move to processor
-// Button to move to source
-// Auto orient towards algae
-// Button to move to left/right reef
-// Button for aligning to algae on the reef
-// Operator
-// Button to L2-L4, and Barge Height
-// Intake Algae with The Box
-// Output Algae from The Box
-// Output Coral
-// Deploy Hang
-// Retract Hang
-// L2 Algae Removal height
-// L3 Algae Removal Height
-// Algae ground Height
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -39,14 +24,28 @@ public class Controls {
       new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
 
   public static void configureBindings(
-      RobotStateController stateController, SwerveDrive swerveDrive) {
+      RobotStateController stateController,
+      SwerveDrive swerveDrive,
+      Elevator elevator,
+      Manipulator manipulator,
+      Intake intake,
+      Hang hang) {
+
+    // Driver
+    // Move swerve chassis
+    // Rotate Swerve Chassis
+    // ^^^ see xbox swerve.java
+
+    // Button to move to processor
+    // Button to move to source
+    // Auto orient towards algae
+    // Button to move to left/right reef
+    // Button for aligning to algae on the reef
 
     driver.a();
     driver.b();
     driver.x();
-    driver.y(); // USED
-    // driver.start().whileTrue(new
-    // GoToPose(frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP"), swerveDrive));
+    driver.y();
     driver.back();
     driver.leftBumper();
     driver.rightBumper();
@@ -74,23 +73,34 @@ public class Controls {
       // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
     }
 
-    operator.a();
-    operator.b();
-    operator.x();
-    operator.y(); // USED
-    operator.start();
+    // Operator
+    // Button to L2-L4, and Barge Height
+    // Intake Algae with The Box
+    // Output Algae from The Box
+    // Output Coral
+    // Deploy Hang
+    // Retract Hang
+    // L2 Algae Removal height
+    // L3 Algae Removal Height
+    // Algae ground Height
+
+    operator.a().onTrue(elevator.L2());
+    operator.b().onTrue(elevator.L3());
+    operator.x().onTrue(elevator.L4());
+    operator.y().onTrue(elevator.barge());
+    operator.start().onTrue(elevator.stow()); // assume this is processor height
     operator.back();
-    operator.leftBumper();
-    operator.rightBumper();
     operator.leftStick();
     operator.rightStick();
-    operator.povCenter(); // USED
-    operator.povUp(); // USED
-    operator.povDown(); // USED
-    operator.povLeft(); // USED
-    operator.povRight(); // USED
-    operator.leftTrigger(); // USED
-    operator.rightTrigger(); // USED
+    operator.povCenter();
+    operator.povUp().whileTrue(elevator.up());
+    operator.povDown().whileTrue(elevator.down());
+    operator.povLeft().whileTrue(hang.deploy());
+    operator.povRight().whileTrue(hang.stow());
+    operator.leftBumper().onTrue(manipulator.coral.intake());
+    operator.rightBumper().onTrue(manipulator.coral.drop());
+    operator.leftTrigger().onTrue(manipulator.algae.intake());
+    operator.rightTrigger().onTrue(manipulator.algae.drop());
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 

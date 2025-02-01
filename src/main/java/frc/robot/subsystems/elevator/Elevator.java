@@ -17,11 +17,11 @@ public class Elevator extends DualLinearController {
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
         DIO.ELEVATOR_ENCODER,
-        0124124, // CHANGE THIS
-        4.0,
-        1.0,
-        Constants.ELEVATOR.GEARING,
-        Constants.ELEVATOR.GEARING,
+        Constants.ELEVATOR.ENCODER_OFFSET, // CHANGE THIS
+        Constants.ELEVATOR.PROFILE.kP,
+        Constants.ELEVATOR.PROFILE.kS,
+        Constants.ELEVATOR.MOTOR_TO_SENSOR,
+        Constants.ELEVATOR.SENSOR_TO_MECHANISM,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
@@ -53,6 +53,10 @@ public class Elevator extends DualLinearController {
 
   public Command L4() {
     return setHeightCommand(ELEVATOR.L4_HEIGHT);
+  }
+
+  public Command barge() {
+    return setHeightCommand(ELEVATOR.BARGE_HEIGHT);
   }
 
   public Command stow() {
