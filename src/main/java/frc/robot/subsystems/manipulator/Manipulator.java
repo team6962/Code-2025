@@ -21,7 +21,7 @@ public class Manipulator extends SubsystemBase {
             new ManipulatorGrabber.DigitalSensor(Constants.DIO.ALGAE_BEAM_BREAK),
             MANIPULATOR.ALGAE_IN_SPEED,
             MANIPULATOR.ALGAE_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.ENABLE_MANIPULATOR);
+            () -> ENABLED_SYSTEMS.MANIPULATOR);
 
     coral =
         new ManipulatorGrabber(
@@ -29,6 +29,6 @@ public class Manipulator extends SubsystemBase {
             new ManipulatorGrabber.TimeSensor(false, Seconds.of(1), Seconds.of(1)),
             MANIPULATOR.CORAL_IN_SPEED,
             MANIPULATOR.CORAL_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.ENABLE_MANIPULATOR);
+            () -> ENABLED_SYSTEMS.MANIPULATOR);
   }
 }

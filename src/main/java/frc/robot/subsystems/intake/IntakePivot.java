@@ -54,7 +54,7 @@ public class IntakePivot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.ENABLE_INTAKE) {
+    if (!ENABLED_SYSTEMS.INTAKE) {
       motor.disable();
     }
   }

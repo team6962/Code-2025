@@ -45,7 +45,7 @@ public class ManipulatorPivot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.ENABLE_SHOOTER) return;
+    if (!ENABLED_SYSTEMS.SHOOTER) return;
     if (isCalibrating) return;
     if (RobotState.isDisabled()) {
       controller.setTargetAngle(controller.getPosition());

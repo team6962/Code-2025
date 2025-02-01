@@ -24,7 +24,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -46,14 +45,13 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean ENABLE_DRIVE = true;
-    public static final boolean ENABLE_DASHBOARD = true;
-    public static final boolean ENABLE_SHOOTER = true;
-    public static final boolean ENABLE_INTAKE = true;
-    public static final boolean ENABLE_TRANSFER = true;
-    public static final boolean ENABLE_HANG = false;
-    public static final boolean ENABLE_MANIPULATOR = false;
-    public static final boolean ENABLE_AMP = true;
+    public static final boolean DRIVE = true;
+    public static final boolean DASHBOARD = true;
+    public static final boolean SHOOTER = true;
+    public static final boolean INTAKE = true;
+    public static final boolean HANG = false;
+    public static final boolean MANIPULATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -183,7 +181,6 @@ public final class Constants {
   public static final class DIO {
     public static final int AMP_PIVOT = 1;
     public static final int MANIPULATOR_PIVOT = 2;
-    public static final int BEAM_BREAK = 3;
     public static final int HANG_ENCODER = 0; // UPDATE
     public static final int ELEVATOR_ENCODER = 4;
     public static final int ALGAE_BEAM_BREAK = 5;
@@ -247,16 +244,8 @@ public final class Constants {
   public static final class ELEVATOR {
     public static final double GEARING = 1.0; // CALCULATE
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
-    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(80);
-    public static final Distance ELEVATOR_MIN_HEIGHT = Inches.of(0);
   }
-
-  public static final class SHOOTER_FEED {
-    public static final double GEARING = 1.0;
-    public static final double FREE_TORQUE = 1.0; // TODO
-    public static final double RADIUS = Units.inchesToMeters(1.0);
-  }
-
+  
   public static final class SHOOTER_WHEELS {
     public static final double GEARBOX_STEP_UP = 2.0;
     public static final double ENCODER_CONVERSION_FACTOR = 2.0 * Math.PI * GEARBOX_STEP_UP;
