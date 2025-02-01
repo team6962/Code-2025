@@ -7,8 +7,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -26,15 +26,14 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-public class DualLinearController extends SubsystemBase{
+public class DualLinearController extends SubsystemBase {
   private Distance targetHeight = null;
   private double kS = 0.0;
 
-  
   private SparkMax leader, follower;
   private RelativeEncoder leaderEncoder, followerEncoder;
   private SparkClosedLoopController leaderPID, followerPID;
-  
+
   private DutyCycleEncoder absoluteEncoder;
 
   private Distance minHeight, maxHeight, tolerance;
@@ -67,7 +66,8 @@ public class DualLinearController extends SubsystemBase{
     followerEncoder = follower.getEncoder();
     leaderPID = leader.getClosedLoopController();
     followerPID = follower.getClosedLoopController();
-    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, sensorToMechanismRatio, encoderOffset);
+    absoluteEncoder =
+        new DutyCycleEncoder(absoluteEncoderDIO, sensorToMechanismRatio, encoderOffset);
 
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
@@ -115,8 +115,7 @@ public class DualLinearController extends SubsystemBase{
 
   private Distance clampHeight(Distance height) {
     return Meters.of(
-            MathUtil.clamp(
-                achievableHeight.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
+        MathUtil.clamp(achievableHeight.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
   }
 
   public boolean isHeightAchievable(Distance height) {
@@ -182,7 +181,5 @@ public class DualLinearController extends SubsystemBase{
   }
 
   @Override
-  public void periodic() {
-    
-  }
+  public void periodic() {}
 }

@@ -245,7 +245,7 @@ public final class Constants {
     public static final double GEARING = 1.0; // CALCULATE
     public static final double ENCODER_CONVERSION_FACTOR = 1.0; // CALCULATE
   }
-  
+
   public static final class SHOOTER_WHEELS {
     public static final double GEARBOX_STEP_UP = 2.0;
     public static final double ENCODER_CONVERSION_FACTOR = 2.0 * Math.PI * GEARBOX_STEP_UP;

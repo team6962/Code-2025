@@ -2,11 +2,8 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
@@ -17,17 +14,17 @@ import frc.robot.util.hardware.MotionControl.DualLinearController;
 public class Elevator extends DualLinearController {
   public Elevator() {
     super(
-          CAN.ELEVATOR_LEFT,
-          CAN.ELEVATOR_RIGHT,
-          DIO.ELEVATOR_ENCODER,
-          0124124, // CHANGE THIS
-          4.0,
-          1.0,
-          Constants.ELEVATOR.GEARING,
-          Constants.ELEVATOR.GEARING,
-          ELEVATOR.MIN_HEIGHT,
-          ELEVATOR.MAX_HEIGHT,
-          Inches.of(0.5));
+        CAN.ELEVATOR_LEFT,
+        CAN.ELEVATOR_RIGHT,
+        DIO.ELEVATOR_ENCODER,
+        0124124, // CHANGE THIS
+        4.0,
+        1.0,
+        Constants.ELEVATOR.GEARING,
+        Constants.ELEVATOR.GEARING,
+        ELEVATOR.MIN_HEIGHT,
+        ELEVATOR.MAX_HEIGHT,
+        Inches.of(0.5));
   }
 
   public Command setHeightCommand(Distance height) {
