@@ -8,6 +8,7 @@ import com.team6962.lib.utils.RotationUtils;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
@@ -57,6 +59,10 @@ public class PoseEstimator extends SubsystemBase {
             RotationUtils.fromAngle(gyroscope.getHeading()),
             modulePositions.get(),
             new Pose2d());
+
+    if (RobotBase.isSimulation()) {
+      poseEstimator.resetPose(new Pose2d(7.57, 5.75, Rotation2d.fromDegrees(0)));
+    }
 
     Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
   }
