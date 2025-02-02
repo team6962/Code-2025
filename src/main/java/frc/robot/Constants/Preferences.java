@@ -33,10 +33,10 @@ public final class Preferences {
   }
 
   public static final class HANG_PIVOT {
-    public static final Angle MAX_ANGLE = Degrees.of(90.0);
-    public static final Angle MIN_ANGLE = Degrees.of(-60.0);
-    public static final Angle STOW_ANGLE = Degrees.of(68.0);
-    public static final Angle HANG_ANGLE = Degrees.of(-50.0);
+    public static final Angle MAX_ANGLE = Degrees.of(225.0);
+    public static final Angle MIN_ANGLE = Degrees.of(-20.0);
+    public static final Angle STOW_ANGLE = Degrees.of(90.0);
+    public static final Angle HANG_ANGLE = Degrees.of(180.0);
   }
 
   public static final class HANG { // Adjust these as needed

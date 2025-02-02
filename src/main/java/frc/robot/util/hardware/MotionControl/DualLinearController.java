@@ -28,7 +28,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
 
 
 public class DualLinearController extends SubsystemBase {
-  private Distance targetHeight = null;
+  private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
   private SparkMax leader, follower;

@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -54,7 +53,7 @@ public class RobotContainer {
   public final LEDs ledStrip;
   public final Intake intake;
   public final Manipulator manipulator;
-  public final Elevator elevator;
+  // public final Elevator elevator;
   public final Hang hang;
   // private final CollisionDetector collisionDetector;
 
@@ -78,7 +77,6 @@ public class RobotContainer {
     DriverStation.startDataLog(DataLogManager.getLog(), true);
     // Logger.autoLog("PDH", PDH);
 
-    Logger.start(Milliseconds.of(20));
     AutonChooser.init();
 
     LiveWindow.disableAllTelemetry();
@@ -107,14 +105,14 @@ public class RobotContainer {
             () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     intake = new Intake();
     manipulator = new Manipulator();
-    elevator = new Elevator();
+    // elevator = new Elevator();
     hang = new Hang();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang);
+    Controls.configureBindings(stateController, swerveDrive, manipulator, intake, hang);
 
     // module = new SwerveModule();
 
@@ -137,10 +135,13 @@ public class RobotContainer {
     // Logger.log("conversionTest/speeds", testSpeeds);
     // Logger.log("conversionTest/states",
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
+
+    Logger.start(Milliseconds.of(20));
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    // return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    return hang.stow();
     // return Commands.run(() -> {});
   }
 

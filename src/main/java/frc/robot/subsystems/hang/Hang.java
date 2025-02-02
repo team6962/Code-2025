@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hang;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -25,7 +26,7 @@ public class Hang extends SubsystemBase {
             this,
             motor,
             DIO.HANG_ENCODER,
-            Constants.HANG_PIVOT.ENCODER_OFFSET,
+            Constants.HANG_PIVOT.ENCODER_OFFSET.in(Rotations),
             Constants.HANG_PIVOT.PROFILE.kP,
             Constants.HANG_PIVOT.PROFILE.kS,
             Constants.HANG_PIVOT.GEARING,

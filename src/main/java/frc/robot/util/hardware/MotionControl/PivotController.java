@@ -76,6 +76,7 @@ public class PivotController {
     // );
     this.kS = kS;
     encoder = motor.getEncoder();
+    this.encoderOffset = absolutePositionOffset;          
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     pid = motor.getClosedLoopController();
@@ -86,9 +87,9 @@ public class PivotController {
     this.tolerance = tolerance;
 
     this.reversed = reversed;
-    encoderOffset = absolutePositionOffset;
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.saveAndLog(subsystem, motor, motorConfig);
 
     StatusChecks.Category statusChecks = StatusChecks.under(subsystem);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
@@ -108,7 +109,6 @@ public class PivotController {
 
 
 
-    Logger.log(subsystem.getName(), "TEST");
     Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Radians));
     Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().in(Radians));
     Logger.logNumber(
@@ -132,7 +132,7 @@ public class PivotController {
 
     // Re-seed the relative encoder with the absolute encoder when not moving
     // if (doneMoving()) {
-    encoder.setPosition(getPosition().in(Radians));
+    encoder.setPosition(getPosition().in(Rotations));
     // }
 
     // if (setpointState == null) {

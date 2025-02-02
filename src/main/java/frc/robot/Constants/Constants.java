@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
@@ -127,7 +128,7 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
-    public static final int HANG = 27;
+    public static final int HANG = 2;
     public static final int ELEVATOR_LEFT = 36; // UPDATE
     public static final int ELEVATOR_RIGHT = 35; // UPDATE
     public static final int MANIPULATOR_PIVOT = 32; // UPDATE
@@ -272,11 +273,11 @@ public final class Constants {
 
   public static final class HANG_PIVOT {
     public static final double GEARING = (9.0 / 1.0) * (9.0 / 1.0) * (3.0 / 1.0) * (26.0 / 12.0);
-    public static final double ENCODER_OFFSET = 0.0;
+    public static final Angle ENCODER_OFFSET = Radians.of(0.545);
 
     public static final class PROFILE {
-      public static final double kP = 0.0;
-      public static final double kS = 0.0; // volts per rad/s
+      public static final double kP = 1.0;
+      public static final double kS = 3.0; // volts per rad/s
     }
   }
 

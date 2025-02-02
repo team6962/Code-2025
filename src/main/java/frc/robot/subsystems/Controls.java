@@ -26,7 +26,7 @@ public class Controls {
   public static void configureBindings(
       RobotStateController stateController,
       SwerveDrive swerveDrive,
-      Elevator elevator,
+      // Elevator elevator,
       Manipulator manipulator,
       Intake intake,
       Hang hang) {
@@ -39,8 +39,8 @@ public class Controls {
     // Button to move to processor
     // Button to move to source
     // Auto orient towards algae
-    // Button to move to left/right reef
-    // Button for aligning to algae on the reef
+    // Button to move to left/right reef (dpad left right)
+    // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
     driver.b();
@@ -84,17 +84,17 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(elevator.coralL2());
-    operator.b().onTrue(elevator.coralL3());
-    operator.x().onTrue(elevator.coralL4());
-    operator.y().onTrue(elevator.algaeBarge());
-    operator.start().onTrue(elevator.stow()); // assume this is processor height
-    operator.back().onTrue(elevator.algaeGround());
-    operator.leftStick().onTrue(elevator.algaeL2());
-    operator.rightStick().onTrue(elevator.algaeL3());
-    operator.povCenter();
-    operator.povUp().whileTrue(elevator.up());
-    operator.povDown().whileTrue(elevator.down());
+    // operator.a().onTrue(elevator.coralL2());
+    // operator.b().onTrue(elevator.coralL3());
+    // operator.x().onTrue(elevator.coralL4());
+    // operator.y().onTrue(elevator.algaeBarge());
+    // operator.start().onTrue(elevator.stow()); // assume this is processor height
+    // operator.back().onTrue(elevator.algaeGround());
+    // operator.leftStick().onTrue(elevator.algaeL2());
+    // operator.rightStick().onTrue(elevator.algaeL3());
+    // operator.povCenter();
+    // operator.povUp().whileTrue(elevator.up());
+    // operator.povDown().whileTrue(elevator.down());
     operator.povLeft().whileTrue(hang.deploy());
     operator.povRight().whileTrue(hang.stow());
     operator.leftBumper().onTrue(manipulator.coral.intake());
