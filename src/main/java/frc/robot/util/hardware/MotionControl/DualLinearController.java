@@ -1,5 +1,7 @@
 package frc.robot.util.hardware.MotionControl;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -17,6 +19,7 @@ import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -31,9 +34,9 @@ public class DualLinearController extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
-  private SparkMax leader, follower;
-  private RelativeEncoder leaderEncoder, followerEncoder;
-  private SparkClosedLoopController leaderPID, followerPID;
+  private SparkMax leftMotor, rightMotor;
+  private RelativeEncoder leftEncoder, rightEncoder;
+  private SparkClosedLoopController leftPID, rightPID;
 
   private DutyCycleEncoder absoluteEncoder;
 
@@ -45,12 +48,14 @@ public class DualLinearController extends SubsystemBase {
 
   private Distance achievableHeight = Meters.of(0.0);
 
+  private Distance cycleHeight;
+
 
   /**
    * Constructs a new DualLinearController.
    *
-   * @param leaderCAN The CAN ID for the leader motor controller.
-   * @param followerCAN The CAN ID for the follower motor controller.
+   * @param leftCAN The CAN ID for the left motor controller.
+   * @param rightCAN The CAN ID for the right motor controller.
    * @param absoluteEncoderDIO The DIO port for the absolute encoder.
    * @param absolutePositionOffset The offset for the absolute encoder position.
    * @param kP The proportional gain for the PID controller.
@@ -62,14 +67,14 @@ public class DualLinearController extends SubsystemBase {
    * @param tolerance The tolerance for the height control.
    */
   public DualLinearController(
-      int leaderCAN,
-      int followerCAN,
+      int leftCAN,
+      int rightCAN,
       int absoluteEncoderDIO,
       double absolutePositionOffset,
       double kP,
       double kS,
       double gearing,
-      double mechanismToSensor,
+      Distance mechanismToSensor,
       Distance minHeight,
       Distance maxHeight,
       Distance tolerance) {
@@ -77,34 +82,35 @@ public class DualLinearController extends SubsystemBase {
     this.kS = kS;
     SparkMaxConfig motorConfig = new SparkMaxConfig();
 
-    leader = new SparkMax(leaderCAN, MotorType.kBrushless);
-    follower = new SparkMax(followerCAN, MotorType.kBrushless);
-    leaderEncoder = leader.getEncoder();
-    followerEncoder = follower.getEncoder();
-    leaderPID = leader.getClosedLoopController();
-    followerPID = follower.getClosedLoopController();
+    leftMotor = new SparkMax(leftCAN, MotorType.kBrushless);
+    rightMotor = new SparkMax(rightCAN, MotorType.kBrushless);
+    leftEncoder = leftMotor.getEncoder();
+    rightEncoder = rightMotor.getEncoder();
+    leftPID = leftMotor.getClosedLoopController();
+    rightPID = rightMotor.getClosedLoopController();
     absoluteEncoder =
-        new DutyCycleEncoder(absoluteEncoderDIO, mechanismToSensor, encoderOffset);
+        new DutyCycleEncoder(absoluteEncoderDIO, mechanismToSensor.in(Meters), encoderOffset);
 
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
+    this.cycleHeight = mechanismToSensor;
 
     encoderOffset = absolutePositionOffset;
 
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
-    SparkMaxUtil.saveAndLog(this, leader, motorConfig);
+    SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
-    SparkMaxUtil.saveAndLog(this, follower, motorConfig);
+    SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/position", () -> getHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/relativePosition", () -> leaderEncoder.getPosition());
+    Logger.logNumber(this.getName() + "/position", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/relativePosition", () -> leftEncoder.getPosition());
     Logger.logNumber(
         this.getName() + "/rawAbsolutePosition",
         () -> Rotations.of(absoluteEncoder.get()).in(Radians));
@@ -113,6 +119,9 @@ public class DualLinearController extends SubsystemBase {
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
+
+    leftEncoder.setPosition(getCycleDelta().in(Meters));
+    rightEncoder.setPosition(getCycleDelta().in(Meters));
   }
 
   public void setTargetHeight(Distance height) {
@@ -124,10 +133,10 @@ public class DualLinearController extends SubsystemBase {
   }
 
   public boolean isPastLimit() {
-    return leaderEncoder.getPosition() > maxHeight.in(Meters)
-        || leaderEncoder.getPosition() < minHeight.in(Meters)
-        || followerEncoder.getPosition() > maxHeight.in(Meters)
-        || followerEncoder.getPosition() < minHeight.in(Meters);
+    return leftEncoder.getPosition() > maxHeight.in(Meters)
+        || leftEncoder.getPosition() < minHeight.in(Meters)
+        || rightEncoder.getPosition() > maxHeight.in(Meters)
+        || rightEncoder.getPosition() < minHeight.in(Meters);
   }
 
   private Distance clampHeight(Distance height) {
@@ -139,19 +148,32 @@ public class DualLinearController extends SubsystemBase {
     return height.gt(minHeight) && height.lt(maxHeight);
   }
 
-  public Distance getHeight() {
-    return Meters.of(absoluteEncoder.get());
+
+  public Distance getLeftHeight() {
+    return cycleHeight.times(leftEncoder.getPosition());
+  }
+
+  public Distance getRightHeight() {
+    return cycleHeight.times(rightEncoder.getPosition());
+  }
+
+  public Distance getAverageHeight() {
+    return getLeftHeight().plus(getRightHeight()).div(2);
+  }
+
+  public Distance getCycleDelta() {
+    return Meters.of(encoderOffset);
   }
 
   public boolean doneMoving() {
     if (getTargetHeight() == null) return true;
     return debouncer.calculate(
-        getHeight().minus(achievableHeight).abs(Meters) < tolerance.in(Meters));
+        getAverageHeight().minus(achievableHeight).abs(Meters) < tolerance.in(Meters));
   }
 
   public void stopMotors() {
-    leader.stopMotor();
-    follower.stopMotor();
+    leftMotor.stopMotor();
+    rightMotor.stopMotor();
   }
 
   public void run() {
@@ -162,39 +184,48 @@ public class DualLinearController extends SubsystemBase {
       return;
     }
 
-    if (leader.getFaults() != null || follower.getFaults() != null) {
+    if (leftMotor.getFaults() != null || rightMotor.getFaults() != null) {
       stopMotors();
       return;
     }
 
-    leaderEncoder.setPosition(getHeight().in(Meters));
-    followerEncoder.setPosition(getHeight().in(Meters));
+
+    // remove?
+    // leftEncoder.setPosition(getAverageHeight().in(Meters));
+    // rightEncoder.setPosition(getAverageHeight().in(Meters));
 
     if (doneMoving()) {
       stopMotors();
       return;
     }
+    
+
+    if (getLeftHeight().minus(getRightHeight()).abs(Inches) > 0.2) {
+      DriverStation.reportError("ELEVATOR TORQUED ===========", null);
+      stopMotors();
+    }
+
+    if (leftMotor.getAppliedOutput() > 0.0 && getAverageHeight().gt(maxHeight)) {
+      stopMotors();
+    }
+
+    if (leftMotor.getAppliedOutput() < 0.0 && getAverageHeight().lt(minHeight)) {
+      stopMotors();
+    }
+
+    if (rightMotor.getAppliedOutput() > 0.0 && getAverageHeight().gt(maxHeight)) {
+      stopMotors();
+    }
+
+    if (rightMotor.getAppliedOutput() < 0.0 && getAverageHeight().lt(minHeight)) {
+      stopMotors();
+    }
+
     // Set onboard PID controller to follow
-    leaderPID.setReference(
+    leftPID.setReference(
         achievableHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-    followerPID.setReference(
+    rightPID.setReference(
         achievableHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-
-    if (leader.getAppliedOutput() > 0.0 && getHeight().gt(maxHeight)) {
-      stopMotors();
-    }
-
-    if (leader.getAppliedOutput() < 0.0 && getHeight().lt(minHeight)) {
-      stopMotors();
-    }
-
-    if (follower.getAppliedOutput() > 0.0 && getHeight().gt(maxHeight)) {
-      stopMotors();
-    }
-
-    if (follower.getAppliedOutput() < 0.0 && getHeight().lt(minHeight)) {
-      stopMotors();
-    }
   }
 
   @Override

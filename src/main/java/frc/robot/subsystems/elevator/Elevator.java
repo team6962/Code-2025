@@ -20,8 +20,8 @@ public class Elevator extends DualLinearController {
         Constants.ELEVATOR.ENCODER_OFFSET, // CHANGE THIS
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
-        Constants.ELEVATOR.SENSOR_TO_MOTOR,
-        Constants.ELEVATOR.MECHANISM_TO_SENSOR,
+        Constants.ELEVATOR.GEARING,
+        Constants.ELEVATOR.CYCLE_HEIGHT,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
@@ -32,11 +32,11 @@ public class Elevator extends DualLinearController {
   }
 
   public Command up() {
-    return setHeightCommand(getHeight().plus(Inches.of(1)));
+    return setHeightCommand(getAverageHeight().plus(Inches.of(1)));
   }
 
   public Command down() {
-    return setHeightCommand(getHeight().minus(Inches.of(1)));
+    return setHeightCommand(getAverageHeight().minus(Inches.of(1)));
   }
 
   public Command coralL1() {

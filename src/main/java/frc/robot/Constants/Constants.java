@@ -4,7 +4,9 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
@@ -39,11 +42,10 @@ public final class Constants {
   public static final class ENABLED_SYSTEMS {
     public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
-    public static final boolean SHOOTER = true;
-    public static final boolean INTAKE = true;
+    public static final boolean INTAKE = false;
     public static final boolean HANG = true;
     public static final boolean MANIPULATOR = false;
-    public static final boolean ELEVATOR = true;
+    public static final boolean ELEVATOR = false;
   }
 
   public static final class LOGGING {
@@ -200,8 +202,8 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double SENSOR_TO_MOTOR = 1.0; // CALCULATE
-    public static final double MECHANISM_TO_SENSOR = 6.13; // CALCULATE
+    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0); // CALCULATE
+    public static final Distance CYCLE_HEIGHT = Inches.of(6.13); // CALCULATE
     public static final double ENCODER_OFFSET = 0.0; // CALCULATE
 
     public static final class PROFILE {
@@ -259,8 +261,8 @@ public final class Constants {
     public static final double SHOOTER_LENGTH = Units.inchesToMeters(15.023);
 
     public static final class PROFILE {
-      public static final double kP = 15.0;
-      public static final double kS = 0.2;
+      public static final double kP = 0.5;
+      public static final double kS = 0.0;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }
@@ -273,11 +275,11 @@ public final class Constants {
 
   public static final class HANG_PIVOT {
     public static final double GEARING = (9.0 / 1.0) * (9.0 / 1.0) * (3.0 / 1.0) * (26.0 / 12.0);
-    public static final Angle ENCODER_OFFSET = Radians.of(0.545);
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.085);
 
     public static final class PROFILE {
-      public static final double kP = 1.0;
-      public static final double kS = 3.0; // volts per rad/s
+      public static final double kP = 0.5;
+      public static final double kS = 0.5; // volts per rad/s
     }
   }
 
