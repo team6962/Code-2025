@@ -2,6 +2,8 @@ package frc.robot.commands.autonomous;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,6 +14,7 @@ import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.util.software.MathUtils;
 
 public class Autonomous extends SequentialCommandGroup {
   private RobotStateController controller;
@@ -32,6 +35,7 @@ public class Autonomous extends SequentialCommandGroup {
     this.intake = intake;
     this.elevator = elevator;
 
+    addCommands(driveToBarge());
     addCommands(pathfindToProcessor());
     addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
     addCommands(pathfindToProcessor());
@@ -87,7 +91,17 @@ public class Autonomous extends SequentialCommandGroup {
     Command driveOverCommand =
         swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
 
-    return Commands.sequence(setupCommand, driveOverCommand);
+    return Commands.sequence(
+      setupCommand,
+      Commands.deadline(
+        Commands.sequence(
+          driveOverCommand,
+          intake.pivot.lower()
+        ),
+        intake.wheels.intake()
+      ),
+      intake.pivot.raise()
+    );
 
     // if (mechanism == AlgaePickupMechanism.INTAKE) {
     //   return Commands.sequence(
@@ -97,6 +111,18 @@ public class Autonomous extends SequentialCommandGroup {
     // } else {
     //   
     // }
+  }
+  
+  final double BARGE_X = 7.75;
+  final double BARGE_MIN = 4.63;
+  final double BARGE_MAX = 7.41;
+
+  public Command driveToBarge() {
+    double y = swerveDrive.getEstimatedPose().getY();
+
+    y = MathUtil.clamp(y, BARGE_MIN, BARGE_MAX);
+
+    return swerveDrive.pathfindTo(new Pose2d(BARGE_X, y, Rotation2d.fromDegrees(180)));
   }
 
   public boolean hasCoral() {

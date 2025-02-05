@@ -192,6 +192,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return corner;
   }
 
+  @Override
+  public void periodic() {
+    Logger.log(getName() + "/consumedCurrent", driveMotor.getStatorCurrent().getValue());
+  }
+
   /**
    * Drives the module to a given state.
    *

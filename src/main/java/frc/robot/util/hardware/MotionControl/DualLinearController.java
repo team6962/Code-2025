@@ -107,9 +107,9 @@ public class DualLinearController extends SubsystemBase {
     SparkMaxUtil.configureEncoder(motorConfig, mechanismToSensor.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
-
-    Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/position", () -> getAverageHeight().in(Meters));
+    
+    Logger.logMeasure(this.getName() + "/targetHeight", () -> getTargetHeight());
+    Logger.logMeasure(this.getName() + "/position", () -> getAverageHeight());
     Logger.logNumber(this.getName() + "/relativePosition", () -> leftEncoder.getPosition());
     Logger.logNumber(
         this.getName() + "/rawAbsolutePosition",
