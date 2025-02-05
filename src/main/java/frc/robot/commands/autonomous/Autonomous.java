@@ -91,7 +91,17 @@ public class Autonomous extends SequentialCommandGroup {
     Command driveOverCommand =
         swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
 
-    return Commands.sequence(setupCommand, driveOverCommand);
+    return Commands.sequence(
+      setupCommand,
+      Commands.deadline(
+        Commands.sequence(
+          driveOverCommand,
+          intake.pivot.lower()
+        ),
+        intake.wheels.intake()
+      ),
+      intake.pivot.raise()
+    );
 
     // if (mechanism == AlgaePickupMechanism.INTAKE) {
     //   return Commands.sequence(

@@ -90,14 +90,14 @@ public class PivotController {
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
 
-    Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Radians));
-    Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().in(Radians));
-    Logger.logNumber(
+    Logger.logMeasure(subsystem.getName() + "/targetPosition", () -> getTargetAngle());
+    Logger.logMeasure(subsystem.getName() + "/position", () -> getPosition());
+    Logger.logMeasure(
         subsystem.getName() + "/relativePosition",
-        () -> Rotations.of(encoder.getPosition()).in(Radians));
-    Logger.logNumber(
+        () -> Rotations.of(encoder.getPosition()));
+    Logger.logMeasure(
         subsystem.getName() + "/rawAbsolutePosition",
-        () -> Rotations.of(absoluteEncoder.get()).in(Radians));
+        () -> Rotations.of(absoluteEncoder.get()));
     Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(subsystem);

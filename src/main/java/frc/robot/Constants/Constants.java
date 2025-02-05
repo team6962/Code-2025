@@ -6,6 +6,7 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 
@@ -25,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -309,9 +311,10 @@ public final class Constants {
   }
 
   public static final class INTAKE {
-    public static final double GEARING = (38.0 / 16.0) * (15.0 / 18.0);
-    public static final double RADIUS = Units.inchesToMeters(0.5);
-    public static final double MAX_LINEAR_SPEED = NEO.STATS.freeSpeedRadPerSec / GEARING * RADIUS;
+    public static final double GEARING = 10.0;
+    public static final Distance LENGTH = Inches.of(16.5);
+    public static final Mass MASS = Kilograms.of(1.85);
+    public static final PIDConstants PID = new PIDConstants(10.0, 0.0, 0.0);
   }
 
   public static final class HANG_PIVOT {
