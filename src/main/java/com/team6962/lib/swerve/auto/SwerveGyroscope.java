@@ -76,8 +76,6 @@ public class SwerveGyroscope extends SubsystemBase {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
     } else {
-      Logger.log(getName() + "/moduleDeltas2", moduleDeltasSupplier.get());
-
       Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 
       Logger.log(getName() + "/headingChange", headingChange);

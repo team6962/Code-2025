@@ -1,5 +1,7 @@
 package com.team6962.lib.telemetry;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
@@ -25,40 +27,53 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Logger {
+public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
   private static List<Updatable> updates = new ArrayList<>();
   private static Notifier notifier = new Notifier(Logger::update);
   private static Field2d field2d = new Field2d();
+  private static double threadLastPing = Timer.getFPGATimestamp();
 
   private static record Updatable(
-      String key,
-      Runnable runnable) {
-        public void run() {
-          try {
-            runnable.run();
-          } catch (Exception exception) {
-            System.out.println("Error logging field: " + key + "\n");
-            exception.printStackTrace();
-          }
-        }
+    String key,
+    Runnable runnable
+  ) {
+    public void run() {
+      try {
+        runnable.run();
+      } catch (Exception exception) {
+        System.out.println("Error logging field: " + key + "\n");
+        exception.printStackTrace();
       }
+    }
+  }
+  
+  @Override
+  public void periodic() {
+    Logger.log("Logger/bhobeKilledMe", Timer.getFPGATimestamp() - threadLastPing > 1.0);
+  }
 
   public static void start(Time period) {
     System.out.println("Starting periodic");
     notifier.startPeriodic(period.in(Seconds));
     SmartDashboard.putData(field2d);
+
+    new Logger();
   }
 
   private static void update() {
-    Logger.log("Logger/survivedBhobe", true);
+    threadLastPing = Timer.getFPGATimestamp();
 
     synchronized (updates) {
       for (Updatable update : updates) {
@@ -105,15 +120,26 @@ public class Logger {
     addUpdate(key, () -> log(key, supplier.get()));
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends Unit> void log(String key, Measure<T> value) {
     if (value == null) {
       table.getEntry(key).setValue("null");
       return;
     }
 
-    key += reformatMeasureName(value.unit().name());
+    T unit = value.unit();
 
-    table.getEntry(key).setValue(value.in(value.unit()));
+    if (value instanceof Angle) {
+      unit = (T) Rotations;
+    } else if (value instanceof Distance) {
+      unit = (T) Meters;
+    } else if (value instanceof Time) {
+      unit = (T) Seconds;
+    }
+
+    key += reformatMeasureName(unit.name());
+
+    table.getEntry(key).setValue(value.in(unit));
   }
 
   private static String reformatMeasureName(String name) {

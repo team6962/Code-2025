@@ -36,6 +36,8 @@ public class SimIntakePivot extends IntakePivot {
         );
 
         pidController = new PIDController(INTAKE.PID.kP, INTAKE.PID.kI, INTAKE.PID.kD);
+        pidController.setSetpoint(0.25);
+        pidController.setTolerance(Degrees.of(1.0).in(Radians));
     }
 
     private Angle getAngle() {
