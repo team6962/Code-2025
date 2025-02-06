@@ -6,6 +6,8 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
@@ -67,7 +69,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final double ALGAE_DIAMETER = 16.25; // inches
+    public static final Distance ALGAE_DIAMETER = Inches.of(16.25); //meters
   }
 
   // LIMELIGHT
@@ -77,23 +79,24 @@ public final class Constants {
     // x is front-to-back
     // y is left-to-right
     // z it top-to-bottom
-    public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES =
-        Map.of(
-            "limelight-ftag",
-                new Pose3d(
-                    Units.inchesToMeters(7.442142),
-                    Units.inchesToMeters(1.0),
-                    Units.inchesToMeters(25.283),
-                    new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
-            "limelight-btag",
-                new Pose3d(
-                    Units.inchesToMeters(2.670592),
-                    Units.inchesToMeters(-3.0),
-                    Units.inchesToMeters(25.283),
-                    new Rotation3d(
-                        0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0))));
+    public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES = Map.of(
+      "limelight-ftag", new Pose3d(
+        Units.inchesToMeters(7.442142),
+        Units.inchesToMeters(1.0),
+        Units.inchesToMeters(25.283),
+        new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
+      "limelight-btag", new Pose3d(
+        Units.inchesToMeters(2.670592),
+        Units.inchesToMeters(-3.0), Units.inchesToMeters(25.283),
+        new Rotation3d(0.0, Units.degreesToRadians(24.0),
+        Units.degreesToRadians(180.0))),
+      "limelight-falgae", new Pose3d(
+        Units.inchesToMeters(0),
+        Units.inchesToMeters(0),
+        Units.inchesToMeters(0),
+        new Rotation3d(0.0, 0, 0.0)));
 
-    public static final String ALGAE_CAMERA_NAME = "limelight-balgae";
+    public static final String ALGAE_CAMERA_NAME = "limelight-falgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
     public static final double SPHERE_TOLERANCE = 0.5;
@@ -109,7 +112,7 @@ public final class Constants {
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
     public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
 
-    public static final double MAX_DETECTION_RANGE = 19.30;
+    public static final Distance MAX_DETECTION_RANGE = Meters.of(19.30); //Max distance an algae can be while being on the field
   }
 
   public static final class SWERVE {
