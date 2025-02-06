@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.team6962.lib.utils.CTREUtils;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -109,6 +110,12 @@ public final class StatusChecks {
       add(
           motor.getDeviceId() + ". " + name + " Faults",
           () -> motor.getFaults().rawBits != 0 || motor.getStickyFaults().rawBits != 0);
+    }
+
+    public void add(String name, DutyCycleEncoder encoder) {
+      add(
+          name + " Connected",
+          () -> encoder.isConnected());
     }
   }
 }

@@ -120,6 +120,10 @@ public final class SparkMaxUtil {
   }
 
   public static void saveAndLog(Subsystem subsystem, SparkMax motor, SparkMaxConfig config) {
+    saveAndLog(subsystem.getName(), motor, config);
+  }
+
+  public static void saveAndLog(String name, SparkMax motor, SparkMaxConfig config) {
     configure(() -> motor.setCANTimeout(0), motor);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -135,7 +139,7 @@ public final class SparkMaxUtil {
     // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
     // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
 
-    StatusChecks.under(subsystem).add("Spark MAX", motor);
+    StatusChecks.under(name).add("Spark MAX", motor);
     // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <=
     // NEO.SAFE_TEMPERATURE);
     // configure(() -> motor.burnFlash(), motor);
