@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
@@ -26,6 +27,9 @@ public class Elevator extends DualLinearController {
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
+
+
+    // setDefaultCommand(Commands.run(this::stopMotors, this));
   }
 
   public Command setHeightCommand(Distance height) {
@@ -33,11 +37,11 @@ public class Elevator extends DualLinearController {
   }
 
   public Command up() {
-    return setHeightCommand(getAverageHeight().plus(Inches.of(1)));
+    return Commands.runEnd(this::moveUp, this::stopMotors);
   }
 
   public Command down() {
-    return setHeightCommand(getAverageHeight().minus(Inches.of(1)));
+    return Commands.runEnd(this::moveDown, this::stopMotors);
   }
 
   public Command coralL1() {

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -31,7 +32,7 @@ public class ManipulatorPivot extends SubsystemBase {
             this,
             motor,
             DIO.MANIPULATOR_ENCODER,
-            MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET,
+            MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
             MANIPULATOR_PIVOT.PROFILE.kP,
             MANIPULATOR_PIVOT.PROFILE.kS,
             MANIPULATOR_PIVOT.GEARING,

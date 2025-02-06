@@ -5,6 +5,8 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -83,14 +85,14 @@ public final class Preferences {
 
   public static final class ELEVATOR {
     public static final Distance MAX_HEIGHT = Inches.of(80);
-    public static final Distance MIN_HEIGHT = Inches.of(-1.0);
-    public static final Distance STOW_HEIGHT = Inches.of(0);
+    public static final Distance MIN_HEIGHT = Inches.of(0.0);
+    public static final Distance STOW_HEIGHT = Inches.of(30);
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(0);
-      public static final Distance L2_HEIGHT = Inches.of(0);
-      public static final Distance L3_HEIGHT = Inches.of(0);
-      public static final Distance L4_HEIGHT = Inches.of(0);
+      public static final Distance L1_HEIGHT = Meters.of(0.5);
+      public static final Distance L2_HEIGHT = Meters.of(1.0);
+      public static final Distance L3_HEIGHT = Meters.of(1.5);
+      public static final Distance L4_HEIGHT = Meters.of(2);
       public static final Distance INTAKE_HEIGHT = STOW_HEIGHT;
     }
 

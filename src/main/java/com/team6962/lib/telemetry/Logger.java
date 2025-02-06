@@ -91,7 +91,7 @@ public class Logger extends SubsystemBase {
   public static Field2d getField() {
     return field2d;
   }
-
+  
   public static void logBoolean(String key, Supplier<Boolean> supplier) {
     addUpdate(key, () -> log(key, supplier.get()));
   }

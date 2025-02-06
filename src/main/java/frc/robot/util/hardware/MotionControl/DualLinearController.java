@@ -48,8 +48,6 @@ public class DualLinearController extends SubsystemBase {
 
   private Debouncer debouncer = new Debouncer(0.1);
 
-  private Distance achievableHeight = Meters.of(0.0);
-
   private Distance cycleHeight;
 
 
@@ -150,7 +148,7 @@ public class DualLinearController extends SubsystemBase {
 
   private Distance clampHeight(Distance height) {
     return Meters.of(
-        MathUtil.clamp(achievableHeight.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
+        MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
   }
 
   public boolean isHeightAchievable(Distance height) {
@@ -174,10 +172,20 @@ public class DualLinearController extends SubsystemBase {
     return cycleHeight.times(absoluteEncoder.get());
   }
 
+  public void moveUp() {
+    leftMotor.set(0.15);
+    rightMotor.set(0.15);
+  }
+
+  public void moveDown() {
+    leftMotor.set(-0.15);
+    rightMotor.set(-0.15);
+  }
+
   public boolean doneMoving() {
     if (getTargetHeight() == null) return true;
     return debouncer.calculate(
-        getAverageHeight().minus(achievableHeight).abs(Meters) < tolerance.in(Meters));
+        getAverageHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
   }
 
   public void stopMotors() {
@@ -242,13 +250,13 @@ public class DualLinearController extends SubsystemBase {
 
     System.out.println("TRYING TO MOVE ===========");
     // Set onboard PID controller to follow
-    // leftPID.setReference(
-    //     achievableHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-    // rightPID.setReference(
-    //     achievableHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    leftPID.setReference(
+        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    rightPID.setReference(
+        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
 
-    leftMotor.set(-0.1);
-    rightMotor.set(-0.1);
+    // leftMotor.set(-0.1);
+    // rightMotor.set(-0.1);
   }
 
   @Override
