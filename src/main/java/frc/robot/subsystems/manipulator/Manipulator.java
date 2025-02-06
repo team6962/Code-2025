@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
@@ -61,5 +62,23 @@ public class Manipulator extends SubsystemBase {
 
   public Command placeProcessorAlgae() {
     return pivot.algaeProcessor().andThen(algae.drop());
+  }
+
+  public Command stow() {
+    return pivot.stow();
+  }
+
+  public Command stop() {
+    return pivot.stop().alongWith(coral.stop(), algae.stop());
+  }
+  
+  public Command test() {
+    return Commands.sequence(
+      intakeCoral(),
+      placeCoralL23(),
+      pickupGroundAlgae(),
+      placeProcessorAlgae(),
+      stow()
+    );
   }
 }

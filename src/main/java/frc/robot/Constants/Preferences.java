@@ -109,8 +109,9 @@ public final class Preferences {
 
   public static final class VOLTAGE_LADDER {
     public static final double SWERVE_DRIVE = 7.0;
-    public static final double SHOOTER = 8.0;
+    public static final double ELEVATOR = 7.5;
+    public static final double MANIPULATOR = 8.0;
     public static final double INTAKE = 8.5;
-    public static final double MANIPULATOR = 8; // placeholder value
+    public static final double HANG = 9.0;
   }
 }

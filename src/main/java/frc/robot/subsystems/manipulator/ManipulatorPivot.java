@@ -48,13 +48,15 @@ public class ManipulatorPivot extends SubsystemBase {
   public void periodic() {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return;
     if (isCalibrating) return;
+    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
+      motor.stopMotor();
+      return;
+    }
     if (RobotState.isDisabled()) {
       controller.setTargetAngle(controller.getPosition());
     }
 
     controller.run();
-
-    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.SHOOTER) motor.stopMotor();
   }
 
   public Command intakeCoral() {
@@ -67,10 +69,6 @@ public class ManipulatorPivot extends SubsystemBase {
 
   public Command coralL4() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
-  }
-
-  public Command stow() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
   public Command algaeReef() {
@@ -89,6 +87,13 @@ public class ManipulatorPivot extends SubsystemBase {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
   }
 
+  public Command stow() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
+  }
+
+  public Command stop() {
+    return Commands.run(controller::stop, this);
+  }
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     return Commands.run(() -> controller.setTargetAngle(angleSupplier.get()), this)

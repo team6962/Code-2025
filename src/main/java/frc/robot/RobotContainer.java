@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
@@ -169,5 +170,7 @@ public class RobotContainer {
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
+    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, hang, intake);
+    checks.schedule();
   }
 }

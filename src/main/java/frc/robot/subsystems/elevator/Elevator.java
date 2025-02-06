@@ -6,11 +6,13 @@ import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.ELEVATOR;
+import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
 import frc.robot.util.hardware.MotionControl.DualLinearController;
 
 /**
@@ -113,6 +115,20 @@ public class Elevator extends DualLinearController {
     return setHeightCommand(ELEVATOR.STOW_HEIGHT);
   }
 
+  public Command stop() {
+    return Commands.run(this::stopMotors, this);
+  }
+
+  public Command test() {
+    return Commands.sequence(
+      stow(),
+      coralL1(),
+      coralL3(),
+      algaeBarge(),
+      stow()
+    );
+  }
+
   private void setTargetHeightAndRun(Distance height) {
     setTargetHeight(height);
     run();
@@ -120,13 +136,17 @@ public class Elevator extends DualLinearController {
 
   @Override
   public void run() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) return;
+    if (!ENABLED_SYSTEMS.ELEVATOR) {
+      stopMotors();
+      return;
+    }
     super.run();
   }
 
   @Override
   public void periodic() {
     if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
+    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.ELEVATOR) stopMotors();
   }
 
   @Override

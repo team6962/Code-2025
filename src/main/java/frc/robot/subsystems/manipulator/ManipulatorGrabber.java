@@ -52,6 +52,10 @@ public class ManipulatorGrabber extends SubsystemBase {
     return run(dropSpeed).until(() -> !sensor.hasGamePiece()).alongWith(sensor.duringDrop());
   }
 
+  public Command stop() {
+    return Commands.run(motor::disable, this);
+  }
+
   public static interface ManipulatorSensor {
     public boolean hasGamePiece();
 

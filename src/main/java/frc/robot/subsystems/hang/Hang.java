@@ -7,7 +7,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
@@ -39,6 +41,7 @@ public class Hang extends SubsystemBase {
   @Override
   public void periodic() {
     if (!ENABLED_SYSTEMS.HANG) controller.stop();
+    if (RobotContainer.getVoltage() < Preferences.VOLTAGE_LADDER.HANG) controller.stop();
   }
 
   public Command deploy() {
@@ -47,6 +50,17 @@ public class Hang extends SubsystemBase {
 
   public Command stow() {
     return setTargetAngleCommand(Preferences.HANG_PIVOT.STOW_ANGLE);
+  }
+
+  public Command stop() {
+    return Commands.runOnce(controller::stop);
+  }
+
+  public Command test() {
+    return Commands.sequence(
+      deploy(),
+      stow()
+    );
   }
 
   public Command setTargetAngleCommand(Angle angle) {
