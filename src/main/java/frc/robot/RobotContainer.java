@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -53,7 +54,7 @@ public class RobotContainer {
   public final LEDs ledStrip;
   public final Intake intake;
   public final Manipulator manipulator;
-  // public final Elevator elevator;
+  public final Elevator elevator;
   public final Hang hang;
   // private final CollisionDetector collisionDetector;
 
@@ -105,7 +106,7 @@ public class RobotContainer {
             () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     intake = new Intake();
     manipulator = new Manipulator();
-    // elevator = new Elevator();
+    elevator = new Elevator();
     hang = new Hang();
     // // collisionDetector = new CollisionDetector();x
 
@@ -140,8 +141,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
-    return hang.stow();
+    return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    // return hang.stow();
     // return Commands.run(() -> {});
   }
 
