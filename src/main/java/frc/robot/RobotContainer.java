@@ -113,7 +113,7 @@ public class RobotContainer {
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, manipulator, intake, hang);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang);
 
     // module = new SwerveModule();
 

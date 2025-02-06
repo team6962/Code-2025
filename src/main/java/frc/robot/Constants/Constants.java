@@ -46,9 +46,9 @@ public final class Constants {
     public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
-    public static final boolean HANG = true;
+    public static final boolean HANG = false;
     public static final boolean MANIPULATOR = false;
-    public static final boolean ELEVATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -133,19 +133,18 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
-    public static final int HANG = 2;
-    public static final int ELEVATOR_LEFT = 36; // UPDATE
-    public static final int ELEVATOR_RIGHT = 35; // UPDATE
+    public static final int HANG = 100;
+    public static final int ELEVATOR_LEFT = 2; // UPDATE
+    public static final int ELEVATOR_RIGHT = 27; // UPDATE
     public static final int MANIPULATOR_PIVOT = 32; // UPDATE
     public static final int MANIPULATOR_ALGAE = 33; // UPDATE
     public static final int MANIPULATOR_CORAL = 34; // UPDATE
   }
 
   public static final class DIO {
-    public static final int AMP_PIVOT = 1;
-    public static final int MANIPULATOR_PIVOT = 2;
     public static final int HANG_ENCODER = 0;
-    public static final int ELEVATOR_ENCODER = 4;
+    public static final int ELEVATOR_ENCODER = 1;
+    public static final int MANIPULATOR_ENCODER = 2;
     public static final int ALGAE_BEAM_BREAK = 5;
   }
 
@@ -206,11 +205,11 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0); // CALCULATE
-    public static final Distance CYCLE_HEIGHT = Inches.of(6.13); // CALCULATE
-    public static final double ENCODER_OFFSET = 0.0; // CALCULATE
+    public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.782);
 
     public static final class PROFILE {
-      public static final double kP = 0.0;
+      public static final double kP = 0.5;
       public static final double kS = 0.0;
     }
   }

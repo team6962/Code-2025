@@ -83,7 +83,7 @@ public final class Preferences {
 
   public static final class ELEVATOR {
     public static final Distance MAX_HEIGHT = Inches.of(80);
-    public static final Distance MIN_HEIGHT = Inches.of(0);
+    public static final Distance MIN_HEIGHT = Inches.of(-1.0);
     public static final Distance STOW_HEIGHT = Inches.of(0);
 
     public static final class CORAL {

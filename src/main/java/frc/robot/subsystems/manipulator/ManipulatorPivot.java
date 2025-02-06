@@ -30,7 +30,7 @@ public class ManipulatorPivot extends SubsystemBase {
         new PivotController(
             this,
             motor,
-            DIO.MANIPULATOR_PIVOT,
+            DIO.MANIPULATOR_ENCODER,
             MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET,
             MANIPULATOR_PIVOT.PROFILE.kP,
             MANIPULATOR_PIVOT.PROFILE.kS,

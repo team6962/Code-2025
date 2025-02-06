@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,7 +18,7 @@ public class Elevator extends DualLinearController {
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
         DIO.ELEVATOR_ENCODER,
-        Constants.ELEVATOR.ENCODER_OFFSET, // CHANGE THIS
+        Constants.ELEVATOR.ENCODER_OFFSET.in(Rotations), // CHANGE THIS
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
         Constants.ELEVATOR.GEARING,
@@ -80,6 +81,7 @@ public class Elevator extends DualLinearController {
   }
 
   public void setTargetHeightAndRun(Distance height) {
+    System.out.println("MOVING UP =====");
     setTargetHeight(height);
     run();
   }
