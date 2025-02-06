@@ -4,6 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -103,5 +106,37 @@ public class ManipulatorGrabber extends SubsystemBase {
     public Command duringDrop() {
       return Commands.waitTime(dropTime).andThen(() -> hasGamePiece = false);
     }
+  }
+
+  public static class CurrentSensor implements ManipulatorSensor {
+    private boolean hasGamePiece;
+    private Debouncer stallDebouncer;
+    private SparkMax motor;
+
+    public CurrentSensor(boolean startsWithGamePiece, int motorID) {
+      this.motor = new SparkMax(motorID, MotorType.kBrushless);
+      this.hasGamePiece = startsWithGamePiece;
+      this.stallDebouncer = new Debouncer(0.4, DebounceType.kRising);
+    }
+
+    @Override
+    public boolean hasGamePiece() {
+      return hasGamePiece;
+    }
+
+    private boolean isStalled() {
+      return stallDebouncer.calculate(motor.getEncoder().getVelocity() == 0.0 && motor.getOutputCurrent() > 0.0);
+    }
+
+    @Override
+    public Command duringIntake() {
+      return Commands.waitUntil(this::isStalled).andThen(() -> hasGamePiece = true);
+    }
+
+    @Override
+    public Command duringDrop() {
+      return Commands.runOnce(() -> hasGamePiece = false);
+    }
+    
   }
 }
