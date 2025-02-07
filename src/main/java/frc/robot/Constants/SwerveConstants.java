@@ -76,7 +76,7 @@ public final class SwerveConstants {
     private static ChassisType getChassisType() {
         String idString = Preferences.getString("Chassis", "COMPETITION");
 
-        if (idString == "TEST") {
+        if (idString.equals("TEST")) {
             System.out.println("████████╗███████╗░██████╗████████╗  ░█████╗░██╗░░██╗░█████╗░░██████╗░██████╗██╗░██████╗██╗\n" +
                                "╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝  ██╔══██╗██║░░██║██╔══██╗██╔════╝██╔════╝██║██╔════╝██║\n" +
                                "░░░██║░░░█████╗░░╚█████╗░░░░██║░░░  ██║░░╚═╝███████║███████║╚█████╗░╚█████╗░██║╚█████╗░██║\n" +
@@ -84,7 +84,7 @@ public final class SwerveConstants {
                                "░░░██║░░░███████╗██████╔╝░░░██║░░░  ╚█████╔╝██║░░██║██║░░██║██████╔╝██████╔╝██║██████╔╝██╗\n" +
                                "░░░╚═╝░░░╚══════╝╚═════╝░░░░╚═╝░░░  ░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░╚═════╝░╚═╝╚═════╝░╚═╝");
             return ChassisType.TEST;
-        } else if (idString == "COMPETITION") {
+        } else if (idString.equals("COMPETITION")) {
             System.out.println("█▀▀ █▀█ █▀▄▀█ █▀█ █▀▀ ▀█▀ █ ▀█▀ █ █▀█ █▄░█ █\n" +
                                "█▄▄ █▄█ █░▀░█ █▀▀ ██▄ ░█░ █ ░█░ █ █▄█ █░▀█ ▄");
             
