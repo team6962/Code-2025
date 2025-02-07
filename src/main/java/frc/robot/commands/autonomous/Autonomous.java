@@ -3,6 +3,8 @@ package frc.robot.commands.autonomous;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.List;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
 
@@ -39,19 +41,36 @@ public class Autonomous extends SequentialCommandGroup {
     this.intake = intake;
     this.elevator = elevator;
 
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(1, AlgaePickupMechanism.MANIPULATOR));
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(2, AlgaePickupMechanism.INTAKE));
-    // addCommands(pathfindToProcessor());
+    // addCommands(pathfindToReefPole(2));
     
     addCommands(cycleTopCoral());
 
     for (int i = 0; i < Field.CORAL_PLACEMENT_POSES.size(); i ++) {
       System.out.println(Field.CORAL_PLACEMENT_POSES.get(i).getX() + ", " + Field.CORAL_PLACEMENT_POSES.get(i).getY());
     }
+  }
+
+  public int getClosestReefFace(Pose2d robotPose) {
+    List<Translation2d> reefFaces = Field.REEF_FACE_POSITIONS;
+
+    double closestDist = Integer.MAX_VALUE;
+    int closestFace = -1;
+
+    for (int i = 0; i < reefFaces.size(); i ++) {
+      Translation2d curFace = reefFaces.get(i);
+      
+      double distance = Math.hypot(
+        swerveDrive.getEstimatedPose().getX() - curFace.getX(),
+        swerveDrive.getEstimatedPose().getY() - curFace.getY()
+      );
+
+      if (distance < closestDist) {
+        closestDist = distance;
+        closestFace = i;
+      }
+    }
+
+    return closestFace;
   }
 
   public Command pathfindToProcessor() {
@@ -85,8 +104,6 @@ public class Autonomous extends SequentialCommandGroup {
 
   public Command cycleTopCoral() {
     return Commands.sequence(
-      pathfindToReefPole(5),
-      pathfindToTopCoralStation(),
       pathfindToReefPole(4),
       pathfindToTopCoralStation(),
       pathfindToReefPole(3),
@@ -94,6 +111,8 @@ public class Autonomous extends SequentialCommandGroup {
       pathfindToReefPole(2),
       pathfindToTopCoralStation(),
       pathfindToReefPole(1),
+      pathfindToTopCoralStation(),
+      pathfindToReefPole(0),
       pathfindToTopCoralStation()
     );
   }

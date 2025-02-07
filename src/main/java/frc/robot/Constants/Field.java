@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -45,6 +46,23 @@ public final class Field {
 
   public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
 
+  public static List<Translation2d> getReefFacePositions() {
+    List<Translation2d> positions = new ArrayList<Translation2d>();
+
+    for (int i = 0; i < 6; i++) {
+      final double reefRadius = 32.75;
+
+      positions.add(
+          new Translation2d(
+              176.745 + Math.cos(i * (Math.PI / 3)) * reefRadius,
+              158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius
+          )
+      );
+    }
+
+    return positions;
+  }
+
   private static List<Pose2d> getCoralPlacementPoses() {
     List<Pose2d> positions = new ArrayList<Pose2d>();
 
@@ -55,6 +73,14 @@ public final class Field {
           Math.hypot(6.46, 32.75); // Individual REEF distance from the center
 
       positions.add(
+        new Pose2d(
+            176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
+            158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
+            new Rotation2d(i * (Math.PI / 3) + Math.PI)
+        )
+      );
+      
+      positions.add(
           new Pose2d(
               176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
               158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
@@ -62,17 +88,13 @@ public final class Field {
           )
       );
 
-      positions.add(
-          new Pose2d(
-              176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
-              158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
-              new Rotation2d(i * (Math.PI / 3) + Math.PI)
-          )
-      );
+      
     }
 
     return positions;
   }
+
+  public static final List<Translation2d> REEF_FACE_POSITIONS = getReefFacePositions();
 
   public static final List<Pose2d> CORAL_PLACEMENT_POSES = getCoralPlacementPoses();
 
