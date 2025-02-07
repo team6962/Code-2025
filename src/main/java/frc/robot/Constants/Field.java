@@ -45,8 +45,8 @@ public final class Field {
 
   public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
 
-  private static List<Translation2d> getReefPolePositions() {
-    List<Translation2d> positions = new ArrayList<Translation2d>();
+  private static List<Pose2d> getCoralPlacementPoses() {
+    List<Pose2d> positions = new ArrayList<Pose2d>();
 
     for (int i = 0; i < 6; i++) {
       final double shiftAngle =
@@ -55,20 +55,26 @@ public final class Field {
           Math.hypot(6.46, 32.75); // Individual REEF distance from the center
 
       positions.add(
-          new Translation2d(
-              176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius,
-              158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius));
+          new Pose2d(
+              176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
+              158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
+              new Rotation2d(i * (Math.PI / 3) + Math.PI)
+          )
+      );
 
       positions.add(
-          new Translation2d(
-              176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius,
-              158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius));
+          new Pose2d(
+              176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
+              158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
+              new Rotation2d(i * (Math.PI / 3) + Math.PI)
+          )
+      );
     }
 
     return positions;
   }
 
-  public static final List<Translation2d> REEF_POLE_POSITIONS = getReefPolePositions();
+  public static final List<Pose2d> CORAL_PLACEMENT_POSES = getCoralPlacementPoses();
 
   public static final Translation2d reefPoleOffset(double angle) {
     return new Translation2d(12.94 / 2, Rotation2d.fromDegrees(angle));

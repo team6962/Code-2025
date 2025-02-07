@@ -1,5 +1,8 @@
 package frc.robot.commands.autonomous;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
 
@@ -10,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.Field;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -35,14 +39,19 @@ public class Autonomous extends SequentialCommandGroup {
     this.intake = intake;
     this.elevator = elevator;
 
-    addCommands(driveToBarge());
-    addCommands(pathfindToProcessor());
-    addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
-    addCommands(pathfindToProcessor());
-    addCommands(pickupPreplacedAlgae(1, AlgaePickupMechanism.MANIPULATOR));
-    addCommands(pathfindToProcessor());
-    addCommands(pickupPreplacedAlgae(2, AlgaePickupMechanism.INTAKE));
-    addCommands(pathfindToProcessor());
+    // addCommands(pathfindToProcessor());
+    // addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
+    // addCommands(pathfindToProcessor());
+    // addCommands(pickupPreplacedAlgae(1, AlgaePickupMechanism.MANIPULATOR));
+    // addCommands(pathfindToProcessor());
+    // addCommands(pickupPreplacedAlgae(2, AlgaePickupMechanism.INTAKE));
+    // addCommands(pathfindToProcessor());
+    
+    addCommands(cycleTopCoral());
+
+    for (int i = 0; i < Field.CORAL_PLACEMENT_POSES.size(); i ++) {
+      System.out.println(Field.CORAL_PLACEMENT_POSES.get(i).getX() + ", " + Field.CORAL_PLACEMENT_POSES.get(i).getY());
+    }
   }
 
   public Command pathfindToProcessor() {
@@ -54,11 +63,39 @@ public class Autonomous extends SequentialCommandGroup {
   }
 
   public Command pathfindToTopLeftReefPoles() {
-    return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(-60)));
+    return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(300)));
+  }
+
+  /**
+   * Pathfinds to reef pole based on pole number
+   * @param poleNum Number from 1-12 starting on the right side top pole, moving counterclockwise
+   * @return
+   */
+  public Command pathfindToReefPole(int poleNum) {
+    return swerveDrive.pathfindTo(new Pose2d(
+      Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
+      Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
+      Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()
+    ));
   }
 
   public Command scoreCoral() {
     return null;
+  }
+
+  public Command cycleTopCoral() {
+    return Commands.sequence(
+      pathfindToReefPole(5),
+      pathfindToTopCoralStation(),
+      pathfindToReefPole(4),
+      pathfindToTopCoralStation(),
+      pathfindToReefPole(3),
+      pathfindToTopCoralStation(),
+      pathfindToReefPole(2),
+      pathfindToTopCoralStation(),
+      pathfindToReefPole(1),
+      pathfindToTopCoralStation()
+    );
   }
 
   public Command coralStation() {
