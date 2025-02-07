@@ -95,6 +95,22 @@ public class ManipulatorPivot extends SubsystemBase {
     return Commands.run(controller::stop, this);
   }
 
+  public Command up() {
+    return Commands.runEnd(this::moveUp, this::stop);
+  }
+
+  public Command down() {
+    return Commands.runEnd(this::moveDown, this::stop);
+  }
+
+  public void moveUp(){
+    motor.set(0.05);
+  }
+
+  public void moveDown(){
+    motor.set(-0.05);
+  }
+
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     return Commands.run(() -> controller.setTargetAngle(angleSupplier.get()), this)
         .until(this::doneMoving);

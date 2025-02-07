@@ -50,7 +50,7 @@ public final class Constants {
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = true;
+    public static final boolean ELEVATOR = false;
   }
 
   public static final class LOGGING {
@@ -139,7 +139,7 @@ public final class Constants {
     public static final int HANG = 100;
     public static final int ELEVATOR_LEFT = 2; // UPDATE
     public static final int ELEVATOR_RIGHT = 27; // UPDATE
-    public static final int MANIPULATOR_PIVOT = 32; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 24; // UPDATE
     public static final int MANIPULATOR_ALGAE = 33; // UPDATE
     public static final int MANIPULATOR_CORAL = 34; // UPDATE
   }
@@ -209,7 +209,7 @@ public final class Constants {
   public static final class ELEVATOR {
     public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0); // CALCULATE
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
-    public static final Angle ENCODER_OFFSET = Rotations.of(0.0);
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.891);
 
     public static final class PROFILE {
       public static final double kP = 0.5;
@@ -226,7 +226,7 @@ public final class Constants {
     public static final Translation3d POSITION =
         new Translation3d(Units.inchesToMeters(3.33), 0.0, Units.inchesToMeters(12.1));
     public static final Angle ABSOLUTE_POSITION_OFFSET =
-        Rotations.of(0.0); //  - [ rawAbsolutePosition from logs ] - 93.15 + [ the angle measured from
+        Rotations.of(0.697); //  - [ rawAbsolutePosition from logs ] - 93.15 + [ the angle measured from
     // the front plate of shooter ]
     public static final double SHOOTER_LENGTH = Units.inchesToMeters(15.023);
 

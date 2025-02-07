@@ -173,13 +173,13 @@ public class DualLinearController extends SubsystemBase {
   }
 
   public void moveUp() {
-    leftMotor.set(0.15);
-    rightMotor.set(0.15);
+    leftMotor.set(0.10);
+    rightMotor.set(0.10);
   }
 
   public void moveDown() {
-    leftMotor.set(-0.15);
-    rightMotor.set(-0.15);
+    leftMotor.set(-0.10);
+    rightMotor.set(-0.10);
   }
 
   public boolean doneMoving() {
