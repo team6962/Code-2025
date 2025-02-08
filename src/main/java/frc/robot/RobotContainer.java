@@ -56,6 +56,7 @@ public class RobotContainer {
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
+  public final Autonomous autonomous;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -108,12 +109,13 @@ public class RobotContainer {
     manipulator = new Manipulator();
     elevator = new Elevator();
     hang = new Hang();
+    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, manipulator, intake, hang);
+    Controls.configureBindings(stateController, swerveDrive, manipulator, intake, hang, autonomous);
 
     // module = new SwerveModule();
 
@@ -141,7 +143,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    return autonomous.createAutonomousCommand();
     // return hang.stow();
     // return Commands.run(() -> {});
   }

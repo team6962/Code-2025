@@ -22,7 +22,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.software.MathUtils;
 
-public class Autonomous extends SequentialCommandGroup {
+public class Autonomous {
   private RobotStateController controller;
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
@@ -40,17 +40,18 @@ public class Autonomous extends SequentialCommandGroup {
     this.manipulator = manipulator;
     this.intake = intake;
     this.elevator = elevator;
-
-    // addCommands(pathfindToReefPole(2));
     
-    addCommands(cycleTopCoral());
+    
+    
+    // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " + swerveDrive.getEstimatedPose().getY());
+    // addCommands(cycleTopCoral());
 
-    for (int i = 0; i < Field.CORAL_PLACEMENT_POSES.size(); i ++) {
-      System.out.println(Field.CORAL_PLACEMENT_POSES.get(i).getX() + ", " + Field.CORAL_PLACEMENT_POSES.get(i).getY());
-    }
+    // for (int i = 0; i < Field.REEF_FACE_POSITIONS.size(); i ++) {
+    //   System.out.println(Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getX(), Inches) + ", " + Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getY(), Inches));
+    // }
   }
 
-  public int getClosestReefFace(Pose2d robotPose) {
+  public int getClosestReefFace() {
     List<Translation2d> reefFaces = Field.REEF_FACE_POSITIONS;
 
     double closestDist = Integer.MAX_VALUE;
@@ -64,6 +65,8 @@ public class Autonomous extends SequentialCommandGroup {
         swerveDrive.getEstimatedPose().getY() - curFace.getY()
       );
 
+      System.out.println(distance);
+
       if (distance < closestDist) {
         closestDist = distance;
         closestFace = i;
@@ -73,12 +76,33 @@ public class Autonomous extends SequentialCommandGroup {
     return closestFace;
   }
 
+  /**
+   * Outputs the numbers of the reef pole on a certain reef face
+   * @param face
+   * @return Index 0 is the left pole (from the robot's perspective), index 1 is on the right
+   */
+  public int[] reefPolesFromReefFace(int face) {
+    return new int[] {
+      face * 2,
+      face * 2 + 1
+    };
+  }
+
   public Command pathfindToProcessor() {
     return swerveDrive.pathfindTo(new Pose2d(6.172, 0.508, Rotation2d.fromDegrees(-90)));
   }
 
   public Command pathfindToTopCoralStation() {
     return swerveDrive.pathfindTo(new Pose2d(1.1, 7.0, Rotation2d.fromDegrees(135)));
+  }
+
+  /**
+   * Aligns to either reef pole on the closest reef face
+   * @param side 0 means left, 1 means right
+   * @return
+   */
+  public Command reefPoleAlign(int side) {
+    return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[0]);
   }
 
   public Command pathfindToTopLeftReefPoles() {
@@ -92,8 +116,8 @@ public class Autonomous extends SequentialCommandGroup {
    */
   public Command pathfindToReefPole(int poleNum) {
     return swerveDrive.pathfindTo(new Pose2d(
-      Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
-      Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
+      Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(),
+      Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(),
       Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()
     ));
   }
@@ -183,5 +207,11 @@ public class Autonomous extends SequentialCommandGroup {
 
   public boolean hasCoral() {
     return false;
+  }
+
+  public Command createAutonomousCommand() {
+    return Commands.sequence(
+      reefPoleAlign(0)
+    );
   }
 }

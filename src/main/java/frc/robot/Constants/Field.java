@@ -9,6 +9,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +58,8 @@ public final class Field {
 
       positions.add(
           new Translation2d(
-              176.745 + Math.cos(i * (Math.PI / 3)) * reefRadius,
-              158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius
+              Meters.convertFrom(176.745 + Math.cos(i * (Math.PI / 3)) * reefRadius, Inches),
+              Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius, Inches)
           )
       );
     }
@@ -67,6 +71,7 @@ public final class Field {
     List<Pose2d> positions = new ArrayList<Pose2d>();
 
     for (int i = 0; i < 6; i++) {
+      // All the numbers are in inches because that's what the field map uses
       final double shiftAngle =
           Math.atan2(6.46, 32.75); // The angle from the middle of one side and a reef pole
       final double reefPoleRadius =
@@ -74,21 +79,19 @@ public final class Field {
 
       positions.add(
         new Pose2d(
-            176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
-            158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
+            Meters.convertFrom(176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20, Inches),
+            Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20, Inches),
             new Rotation2d(i * (Math.PI / 3) + Math.PI)
         )
       );
       
       positions.add(
           new Pose2d(
-              176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
-              158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
+              Meters.convertFrom(176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20, Inches),
+              Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20, Inches),
               new Rotation2d(i * (Math.PI / 3) + Math.PI)
           )
       );
-
-      
     }
 
     return positions;

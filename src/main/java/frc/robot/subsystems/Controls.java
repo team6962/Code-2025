@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
+import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -29,7 +30,7 @@ public class Controls {
       // Elevator elevator,
       Manipulator manipulator,
       Intake intake,
-      Hang hang) {
+      Hang hang, Autonomous autonomous) {
 
     // Driver
     // Move swerve chassis
@@ -66,8 +67,14 @@ public class Controls {
           .whileTrue(
               Commands.defer(
                   () ->
-                      swerveDrive.pathfindTo(
-                          frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
+                    autonomous.reefPoleAlign(0),
+                  Set.of()));
+      driver
+          .button(5)
+          .onTrue(
+              Commands.defer(
+                  () ->
+                      autonomous.reefPoleAlign(0),
                   Set.of()));
 
       // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
@@ -101,6 +108,7 @@ public class Controls {
     operator.rightBumper().onTrue(manipulator.coral.drop());
     operator.leftTrigger().onTrue(manipulator.algae.intake());
     operator.rightTrigger().onTrue(manipulator.algae.drop());
+    operator.y().onTrue(autonomous.reefPoleAlign(0));
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 
