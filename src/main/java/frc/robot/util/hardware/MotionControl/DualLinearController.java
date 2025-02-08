@@ -97,9 +97,9 @@ public class DualLinearController extends SubsystemBase {
 
     absoluteEncoder =
         new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
-
     
-
+    Logger.log(this.getName() + "/leftB4Config", leftEncoder.getPosition());
+    Logger.log(this.getName() + "/rightB4Config", rightEncoder.getPosition());
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -111,6 +111,11 @@ public class DualLinearController extends SubsystemBase {
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
+    leftEncoder.setPosition(getCycleDelta().in(Meters));
+    rightEncoder.setPosition(getCycleDelta().in(Meters));
+
+    Logger.log(this.getName() + "/leftAfterConfig", leftEncoder.getPosition());
+    Logger.log(this.getName() + "/rightAfterConfig", rightEncoder.getPosition());
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
@@ -118,17 +123,15 @@ public class DualLinearController extends SubsystemBase {
     Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
     
     Logger.logNumber(
-        this.getName() + "/rawAbsoluteHeight",
-        () -> absoluteEncoder.get());
+        this.getName() + "/rawAbsolutePosition",
+        absoluteEncoder::get);
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
+    Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
-
-    leftEncoder.setPosition(getCycleDelta().in(Meters));
-    rightEncoder.setPosition(getCycleDelta().in(Meters));
   }
 
   public void setTargetHeight(Distance height) {

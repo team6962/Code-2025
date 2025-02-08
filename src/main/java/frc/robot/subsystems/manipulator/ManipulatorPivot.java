@@ -36,7 +36,7 @@ public class ManipulatorPivot extends SubsystemBase {
             MANIPULATOR_PIVOT.PROFILE.kP,
             MANIPULATOR_PIVOT.PROFILE.kS,
             MANIPULATOR_PIVOT.GEARING,
-            Preferences.MANIPULATOR_PIVOT.MIN_ANGLE,
+            Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
             Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
             Degrees.of(0.25),
             true);
@@ -109,6 +109,26 @@ public class ManipulatorPivot extends SubsystemBase {
 
   public void moveDown(){
     motor.set(-0.05);
+  }
+  public Angle getMinAngle() {
+    return controller.getMinAngle();
+  }
+
+  public void setMinAngle(Angle angle) {
+    controller.setMinAngle(angle);
+  }
+
+  public Angle getMaxAngle() {
+    return controller.getMaxAngle();
+  }
+
+  public void setMaxAngle(Angle angle) {
+    controller.setMaxAngle(angle);
+  }
+
+  public void setMinMaxAngle(Angle minAngle, Angle maxAngle) {
+    controller.setMinAngle(minAngle);
+    controller.setMaxAngle(maxAngle);
   }
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {

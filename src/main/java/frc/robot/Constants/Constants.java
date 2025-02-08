@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.config.PIDConstants;
@@ -49,8 +51,8 @@ public final class Constants {
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
-    public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = false;
+    public static final boolean MANIPULATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -207,12 +209,22 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0); // CALCULATE
+    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0) * (3.0 / 2.0); // CALCULATE
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
-    public static final Angle ENCODER_OFFSET = Rotations.of(0.891);
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.502);
+
+    public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
+
+    static {
+      HEIGHT_TO_ANGLE_MAP.put(0.0, new AngleRange(Degrees.of(0.0), Degrees.of(45.0)));
+      HEIGHT_TO_ANGLE_MAP.put(1.0, new AngleRange(Degrees.of(10.0), Degrees.of(40.0)));
+      HEIGHT_TO_ANGLE_MAP.put(2.0, new AngleRange(Degrees.of(20.0), Degrees.of(35.0)));
+      HEIGHT_TO_ANGLE_MAP.put(3.0, new AngleRange(Degrees.of(30.0), Degrees.of(30.0)));
+      HEIGHT_TO_ANGLE_MAP.put(4.0, new AngleRange(Degrees.of(40.0), Degrees.of(25.0)));
+    }    
 
     public static final class PROFILE {
-      public static final double kP = 0.5;
+      public static final double kP = 0.2;
       public static final double kS = 0.0;
     }
   }
@@ -257,5 +269,23 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+  }
+
+  public static class AngleRange {
+    private final Angle minAngle;
+    private final Angle maxAngle;
+
+    public AngleRange(Angle minAngle, Angle maxAngle) {
+      this.minAngle = minAngle;
+      this.maxAngle = maxAngle;
+    }
+
+    public Angle getMinAngle() {
+      return minAngle;
+    }
+
+    public Angle getMaxAngle() {
+      return maxAngle;
+    }
   }
 }

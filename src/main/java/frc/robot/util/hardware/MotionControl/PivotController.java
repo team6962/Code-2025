@@ -179,20 +179,20 @@ public class PivotController {
     // System.out.println("kS: " + kS);
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
-    // if (getPosition().gt(maxAngle)) {
-    //   motor.stopMotor();
-    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-    //   return;
-    // }
+    if (getPosition().gt(maxAngle)) {
+      motor.stopMotor();
+      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
+      return;
+    }
 
-    // if (getPosition().lt(minAngle)) {
-    //   motor.stopMotor();
-    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-    //   return;
-    // }
+    if (getPosition().lt(minAngle)) {
+      motor.stopMotor();
+      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
+      return;
+    }
 
-    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-    pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);
+    pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);
 
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
   }
@@ -205,7 +205,30 @@ public class PivotController {
   public Angle getTargetAngle() {
     return targetAngle;
   }
+  public void setMaxAngle(Angle maxAngle) {
+    this.maxAngle = maxAngle;
+    setAchievableAngle();
+  }
 
+  public Angle getMaxAngle() {
+    return maxAngle;
+  }
+
+  public void setMinAngle(Angle minAngle) {
+    this.minAngle = minAngle;
+    setAchievableAngle();
+  }
+
+  public Angle getMinAngle() {
+    return minAngle;
+  }
+
+  public void setMinMaxAngle(Angle minAngle, Angle maxAngle) {
+    this.minAngle = minAngle;
+    this.maxAngle = maxAngle;
+    setAchievableAngle();
+  }
+  
   private void setAchievableAngle() {
     achievableAngle = targetAngle;
     if (achievableAngle.lt(minAngle)) {
