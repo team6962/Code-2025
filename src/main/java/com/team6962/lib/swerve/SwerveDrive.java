@@ -1,22 +1,9 @@
 package com.team6962.lib.swerve;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import java.io.File;
-import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindThenFollowPath;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
@@ -29,17 +16,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.vision.Algae;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -51,6 +34,9 @@ public class SwerveDrive extends SwerveCore {
 
     /** Subsystem for rotation commands to require. */
     private SubsystemBase rotationSubsysem = new SubsystemBase() {};
+
+    /** Subsystem for max speed commands to require. */
+    private SubsystemBase maxSpeedSubsystem = new SubsystemBase() {};
 
     private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
 
@@ -70,6 +56,8 @@ public class SwerveDrive extends SwerveCore {
             getConstants().pathRobotConfig(),
             () -> false
         );
+
+        maxSpeedSubsystem.setDefaultCommand(limitSpeed(getConstants().maxDriveSpeed()));
     }
 
     @Override
@@ -116,6 +104,18 @@ public class SwerveDrive extends SwerveCore {
 
     public SubsystemBase[] useMotion() {
         return new SubsystemBase[] {translationSubsystem, rotationSubsysem};
+    }
+
+    public SubsystemBase useMaxSpeed() {
+        return maxSpeedSubsystem;
+    }
+
+    public Command limitSpeed(Supplier<LinearVelocity> maxSpeed) {
+        return Commands.run(() -> setMaxDriveSpeed(maxSpeed.get()), useMaxSpeed());
+    }
+
+    public Command limitSpeed(LinearVelocity maxSpeed) {
+        return limitSpeed(() -> maxSpeed);
     }
 
     public LinearVelocity getLinearDriveVelocity(double powerFraction) {

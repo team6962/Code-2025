@@ -1,5 +1,7 @@
 package com.team6962.lib.swerve;
 
+import java.util.Arrays;
+
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.SwerveGyroscope;
@@ -7,6 +9,8 @@ import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -15,14 +19,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
-import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.vision.Algae;
-import java.util.Arrays;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing the swerve modules,
@@ -37,6 +38,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
   private SwerveConfig constants;
 
   private SwerveMovement currentMovement;
+  private LinearVelocity maxSpeed;
 
   public SwerveCore(SwerveConfig constants) {
     this.constants = constants;
@@ -57,6 +59,18 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
     currentMovement = new SwerveMovement(kinematics);
 
     Logger.logPose("Swerve Drive/robotPose", poseEstimator::getEstimatedPose);
+
+    maxSpeed = constants.maxDriveSpeed();
+  }
+
+  /**
+   * Sets the maximum speed of the drive motors. This should only be called
+   * inside commands that require the max speed subsystem.
+   * @param maxSpeed the maximum speed to set, values higher than
+   * {@code getConstants().maxDriveSpeed()} are ignored.
+   */
+  public void setMaxDriveSpeed(LinearVelocity maxSpeed) {
+    this.maxSpeed = maxSpeed;
   }
 
   public SwerveConfig getConstants() {
@@ -118,20 +132,13 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
       states = KinematicsUtils.getStoppedStates(getModuleStates());
     }
 
-    states = KinematicsUtils.desaturateWheelSpeeds(states, constants.maxDriveSpeed());
+    states = KinematicsUtils.desaturateWheelSpeeds(states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
 
     Logger.log(
         "Drivetrain/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
     Logger.log("Drivetrain/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
     Logger.log("Drivetrain/targetModuleStates", states);
     Logger.log("Drivetrain/currentModuleStates", getModuleStates());
-
-    // states = new SwerveModuleState[] {
-    //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
-    //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
-    //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0)),
-    //     new SwerveModuleState(-2, Rotation2d.fromDegrees(0))
-    // };
 
     Pose2d[] poses = getModulePoses();
 
