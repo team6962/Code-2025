@@ -54,7 +54,7 @@ public class LEDs extends SubsystemBase {
   public static final int[] BLUE = {0, 20, 255};
   public static final int[] RSL_ORANGE = {255, 100, 0};
   public static final int[] LIGHT_BLUE = {173, 216, 230};
-  public static final int[] YELLOW = {255,255,0}
+  public static final int[] YELLOW = {255,255,0};
   public static final int[] CYAN = {0, 255, 255};
   public static final int[] DARK_GREEN = {0, 100, 0};
   public static final int[] PURPLE = {108, 59, 170};

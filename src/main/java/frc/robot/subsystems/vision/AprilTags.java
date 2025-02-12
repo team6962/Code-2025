@@ -77,7 +77,7 @@ public class AprilTags extends SubsystemBase {
                       .getTranslation()
                       .getDistance(pose2d.getTranslation())
                   < 1.0;
-      if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
+      // if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
 
       double rotationError = Units.degreesToRadians(15);
       if (!canChangeHeading) {
