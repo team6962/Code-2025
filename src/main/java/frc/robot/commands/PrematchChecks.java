@@ -4,16 +4,11 @@
 
 package frc.robot.commands;
 
-import java.io.ObjectInputFilter.Status;
-import java.util.jar.Manifest;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;

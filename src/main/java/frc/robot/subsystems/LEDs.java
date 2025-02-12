@@ -1,14 +1,15 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants;
 import frc.robot.Robot;
-import java.util.function.DoubleSupplier;
+import frc.robot.Constants.Constants;
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
