@@ -36,6 +36,8 @@ import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.LEDs.LEDs;
+import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -71,6 +73,7 @@ public class RobotContainer {
   public final Hang hang;
   public final AutonomousCommands autonomous;
   public final Algae algaeDetector;
+  private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -124,11 +127,9 @@ public class RobotContainer {
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
-    // ledStrip =
-    //     new LEDs(
-    //         stateController,
-    //         () -> 1.0 +
-    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    stateController = new RobotStateController(swerveDrive);
+    ledStrip = new LEDs(stateController);
+
     manipulator = new Manipulator();
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
@@ -141,7 +142,8 @@ public class RobotContainer {
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+    Controls.configureBindings(
+        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos, ledStrip);
 
     autoGen =
         new AutoGeneration(
