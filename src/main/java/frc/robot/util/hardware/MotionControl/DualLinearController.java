@@ -2,6 +2,8 @@ package frc.robot.util.hardware.MotionControl;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -12,6 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
@@ -24,7 +27,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-public class DualLinearController extends SubsystemBase {
+public class DualLinearController extends SubsystemBase implements LinearController {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
@@ -42,6 +45,7 @@ public class DualLinearController extends SubsystemBase {
 
   private Distance cycleHeight;
 
+  private BooleanSupplier isEnabled;
   /**
    * Constructs a new DualLinearController.
    *
@@ -58,6 +62,7 @@ public class DualLinearController extends SubsystemBase {
    * @param tolerance The tolerance for the height control.
    */
   public DualLinearController(
+      String name,
       int leftCAN,
       int rightCAN,
       int absoluteEncoderDIO,
@@ -68,13 +73,17 @@ public class DualLinearController extends SubsystemBase {
       Distance mechanismToSensor,
       Distance minHeight,
       Distance maxHeight,
-      Distance tolerance) {
+      Distance tolerance,
+      BooleanSupplier isEnabled) {
+
+    setName(name);
 
     this.kS = kS;
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
     this.cycleHeight = mechanismToSensor;
+    this.isEnabled = isEnabled;
     encoderOffset = absolutePositionOffset;
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -107,7 +116,7 @@ public class DualLinearController extends SubsystemBase {
     Logger.log(this.getName() + "/rightAfterConfig", rightEncoder.getPosition());
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/measuredHeight", () -> getMeasuredHeight().in(Meters));
     Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
@@ -129,13 +138,6 @@ public class DualLinearController extends SubsystemBase {
     return targetHeight;
   }
 
-  public boolean isPastLimit() {
-    return leftEncoder.getPosition() > maxHeight.in(Meters)
-        || leftEncoder.getPosition() < minHeight.in(Meters)
-        || rightEncoder.getPosition() > maxHeight.in(Meters)
-        || rightEncoder.getPosition() < minHeight.in(Meters);
-  }
-
   private Distance clampHeight(Distance height) {
     return Meters.of(MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
   }
@@ -152,7 +154,7 @@ public class DualLinearController extends SubsystemBase {
     return Meters.of(rightEncoder.getPosition());
   }
 
-  public Distance getAverageHeight() {
+  public Distance getMeasuredHeight() {
     return getLeftHeight().plus(getRightHeight()).div(2);
   }
 
@@ -173,7 +175,7 @@ public class DualLinearController extends SubsystemBase {
   public boolean doneMoving() {
     if (getTargetHeight() == null) return true;
     return debouncer.calculate(
-        getAverageHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
+        getMeasuredHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
   }
 
   public void stopMotors() {
@@ -181,8 +183,14 @@ public class DualLinearController extends SubsystemBase {
     rightMotor.stopMotor();
   }
 
-  public void run() {
+  @Override
+  public void periodic() {
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
+
+    if (!isEnabled.getAsBoolean()) {
+      stopMotors();
+      return;
+    }
 
     if (!absoluteEncoder.isConnected()) {
       System.out.println("NO ENCODER");
@@ -241,7 +249,4 @@ public class DualLinearController extends SubsystemBase {
     // leftMotor.set(-0.1);
     // rightMotor.set(-0.1);
   }
-
-  @Override
-  public void periodic() {}
 }

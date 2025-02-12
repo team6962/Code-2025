@@ -6,14 +6,17 @@ import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.ELEVATOR;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
-import frc.robot.RobotContainer;
-import frc.robot.util.hardware.MotionControl.DualLinearController;
+import frc.robot.util.hardware.MotionControl.LinearController;
+import frc.robot.util.hardware.MotionControl.RealLinearController;
+import frc.robot.util.hardware.linear.LinearRatios;
 
 /**
  * The Elevator subsystem controls the elevator mechanism of the robot. It extends the
@@ -32,34 +35,36 @@ import frc.robot.util.hardware.MotionControl.DualLinearController;
  * <p>The subsystem also includes methods to run and stop the elevator motors, and to handle
  * periodic updates and simulation-specific behavior.
  */
-public class Elevator extends DualLinearController {
+public class Elevator extends SubsystemBase {
+  private LinearController linearController;
+
   public Elevator() {
-    super(
+    linearController = LinearController.get(
+        "Elevator/LinearController",
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
         DIO.ELEVATOR_ENCODER,
         Constants.ELEVATOR.ENCODER_OFFSET.in(Rotations), // CHANGE THIS
-        Constants.ELEVATOR.PROFILE.kP,
-        Constants.ELEVATOR.PROFILE.kS,
-        Constants.ELEVATOR.GEARING,
-        Constants.ELEVATOR.CYCLE_HEIGHT,
+        new LinearRatios(60.0, Inches.of(0.75), 3),
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
-        Inches.of(0.5));
+        Inches.of(0.5),
+        () -> ENABLED_SYSTEMS.ELEVATOR && RobotContainer.getVoltage() >= VOLTAGE_LADDER.ELEVATOR,
+        new RealLinearController.ControlConstants(1.0, 0.0, 0.0));
 
     // setDefaultCommand(Commands.run(this::stopMotors, this));
   }
 
   public Command setHeightCommand(Distance height) {
-    return this.run(() -> setTargetHeightAndRun(height)).until(this::doneMoving);
+    return run(() -> linearController.setTargetHeight(height)).until(linearController::doneMoving);
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stopMotors);
+    return Commands.runEnd(linearController::moveUp, linearController::stopMotors, this);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stopMotors);
+    return Commands.runEnd(linearController::moveDown, linearController::stopMotors, this);
   }
 
   public Command coralL1() {
@@ -107,31 +112,11 @@ public class Elevator extends DualLinearController {
   }
 
   public Command stop() {
-    return Commands.run(this::stopMotors, this);
+    return run(linearController::stopMotors);
   }
 
   public Command test() {
     return Commands.sequence(stow(), coralL1(), coralL3(), algaeBarge(), stow());
-  }
-
-  private void setTargetHeightAndRun(Distance height) {
-    setTargetHeight(height);
-    run();
-  }
-
-  @Override
-  public void run() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) {
-      stopMotors();
-      return;
-    }
-    super.run();
-  }
-
-  @Override
-  public void periodic() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
-    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.ELEVATOR) stopMotors();
   }
 
   @Override

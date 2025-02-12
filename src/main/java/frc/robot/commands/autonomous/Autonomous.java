@@ -2,6 +2,7 @@ package frc.robot.commands.autonomous;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.math.MathUtil;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Field;
+import frc.robot.Constants.Preferences.ELEVATOR;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -36,14 +38,14 @@ public class Autonomous extends SequentialCommandGroup {
     this.intake = intake;
     this.elevator = elevator;
 
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(1, AlgaePickupMechanism.MANIPULATOR));
-    // addCommands(pathfindToProcessor());
-    // addCommands(pickupPreplacedAlgae(2, AlgaePickupMechanism.INTAKE));
-    // addCommands(pathfindToProcessor());
-
+    addCommands(scoreAlgaeInBarge());
+    addCommands(pathfindToProcessor());
+    addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));
+    addCommands(pathfindToProcessor());
+    addCommands(pickupPreplacedAlgae(1, AlgaePickupMechanism.MANIPULATOR));
+    addCommands(scoreAlgaeInBarge());
+    addCommands(pickupPreplacedAlgae(2, AlgaePickupMechanism.INTAKE));
+    addCommands(pathfindToProcessor());
     addCommands(cycleTopCoral());
 
     for (int i = 0; i < Field.CORAL_PLACEMENT_POSES.size(); i++) {
@@ -54,8 +56,25 @@ public class Autonomous extends SequentialCommandGroup {
     }
   }
 
+  private static final Translation2d ALGAE_PICKUP = new Translation2d(1.98, 2.18);
+
   public Command pathfindToProcessor() {
-    return swerveDrive.pathfindTo(new Pose2d(6.172, 0.508, Rotation2d.fromDegrees(-90)));
+    return swerveDrive.pathfindTo(new Pose2d(ALGAE_PICKUP, Rotation2d.fromDegrees(-90)));
+  }
+
+  public Command scoreAlgaeInProcessor() {
+    return Commands.sequence(
+      Commands.parallel(
+        pathfindToProcessor(),
+        Commands.waitUntil(() ->
+          Meters.of(swerveDrive.getEstimatedPose().getTranslation().minus(ALGAE_PICKUP).getNorm())
+            .div(swerveDrive.getConstants().maxDriveSpeed())
+            .lt(Seconds.of(1.0))
+        ).andThen(intake.pivot.raise())
+      ),
+      intake.wheels.drop()
+        .withDeadline(Commands.waitSeconds(1.0))
+    );
   }
 
   public Command pathfindToTopCoralStation() {
@@ -152,6 +171,21 @@ public class Autonomous extends SequentialCommandGroup {
     y = MathUtil.clamp(y, BARGE_MIN, BARGE_MAX);
 
     return swerveDrive.pathfindTo(new Pose2d(BARGE_X, y, Rotation2d.fromDegrees(180)));
+  }
+
+  public Command placeAlgaeInBarge() {
+    return Commands.sequence(
+      elevator.setHeightCommand(ELEVATOR.MAX_HEIGHT),
+      Commands.waitSeconds(1.0),
+      elevator.setHeightCommand(ELEVATOR.MIN_HEIGHT)
+    );
+  }
+
+  public Command scoreAlgaeInBarge() {
+    return Commands.sequence(
+      driveToBarge(),
+      placeAlgaeInBarge()
+    );
   }
 
   public boolean hasCoral() {
