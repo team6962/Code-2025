@@ -64,8 +64,8 @@ public final class Preferences {
 
   // REFERENCE ANGLES FROM CAD AND https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
   public static final class MANIPULATOR_PIVOT {
-    public static final Angle MAX_ANGLE   = Degrees.of(40.0);
-    public static final Angle MIN_LOW_ANGLE   = Degrees.of(-60.0);
+    public static final Angle MAX_ANGLE   = Degrees.of(20.0); // RESET TO 40.0
+    public static final Angle MIN_LOW_ANGLE   = Degrees.of(-80.0);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
     public static final Angle STOW_ANGLE  = Degrees.of(38.5);
     

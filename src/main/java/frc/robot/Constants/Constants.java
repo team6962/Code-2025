@@ -46,12 +46,12 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = true;
+    public static final boolean DRIVE = false;
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
-    public static final boolean MANIPULATOR = false;
-    public static final boolean ELEVATOR = true;
+    public static final boolean MANIPULATOR = true;
+    public static final boolean ELEVATOR = false;
   }
 
   public static final class LOGGING {
@@ -210,7 +210,7 @@ public final class Constants {
   public static final class ELEVATOR {
     public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0) * (3.0 / 2.0) / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
-    public static final Angle ENCODER_OFFSET = Rotations.of(0.502);
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.715);
     public static final Distance Bhobe_HEIGHT = Inches.of(1); 
 
     public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
@@ -230,21 +230,14 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = 15.0 * (78.0 / 20.0) * (200.0 / 19.0);
+    public static final double GEARING = 5 * 5 * 5;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Rotation2d ANGLE_PRECISION = Rotation2d.fromDegrees(0.25);
-    public static final Rotation2d HEADING_PRECISION = Rotation2d.fromDegrees(0.25);
-    public static final Translation3d POSITION =
-        new Translation3d(Units.inchesToMeters(3.33), 0.0, Units.inchesToMeters(12.1));
-    public static final Angle ABSOLUTE_POSITION_OFFSET =
-        Rotations.of(0.697); //  - [ rawAbsolutePosition from logs ] - 93.15 + [ the angle measured from
-    // the front plate of shooter ]
-    public static final double SHOOTER_LENGTH = Units.inchesToMeters(15.023);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518); 
 
     public static final class PROFILE {
-      public static final double kP = 0.5;
-      public static final double kS = 0.0;
+      public static final double kP = 1.0;
+      public static final double kS = 0.1;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }

@@ -179,17 +179,18 @@ public class PivotController {
     // System.out.println("kS: " + kS);
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
-    if (getPosition().gt(maxAngle)) {
-      motor.stopMotor();
-      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-      return;
-    }
 
-    if (getPosition().lt(minAngle)) {
-      motor.stopMotor();
-      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-      return;
-    }
+    // if (getPosition().gt(maxAngle) && encoder.getVelocity() > 0.0) {
+    //   motor.stopMotor();
+    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
+    //   return;
+    // }
+
+    // if (getPosition().lt(minAngle) && encoder.getVelocity() < -0.0) {
+    //   motor.stopMotor();
+    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
+    //   return;
+    // }
 
     pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);
@@ -245,6 +246,7 @@ public class PivotController {
   public void moveDown(){
     motor.set(-0.05);
   }
+
   public boolean isInRange(Angle angle) {
     return angle.gt(minAngle) && angle.lt(maxAngle);
   }

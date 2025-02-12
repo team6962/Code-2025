@@ -39,9 +39,9 @@ public class ManipulatorPivot extends SubsystemBase {
             Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
             Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
             Degrees.of(0.25),
-            true);
+            false);
 
-    setDefaultCommand(stow());
+    // setDefaultCommand(stow());
   }
 
   @Override
@@ -104,10 +104,18 @@ public class ManipulatorPivot extends SubsystemBase {
   }
 
   public void moveUp(){
+    // if (getPosition().gte(controller.getMaxAngle())) {
+    //   motor.stopMotor();
+    //   return;
+    // }
     motor.set(0.05);
   }
 
   public void moveDown(){
+    // if (getPosition().lte(controller.getMinAngle())) {
+    //   motor.stopMotor();
+    //   return;
+    // }
     motor.set(-0.05);
   }
   public Angle getMinAngle() {
