@@ -34,13 +34,16 @@ public class DualLinearController extends SubsystemBase {
 
   private DutyCycleEncoder absoluteEncoder;
 
-  private Distance minHeight, maxHeight, tolerance;
+  private Distance baseHeight, minHeight, maxHeight, tolerance;
 
   private double encoderOffset = 0.0;
 
   private Debouncer debouncer = new Debouncer(0.1);
 
   private Distance cycleHeight;
+
+  private int cyclesCompleted;
+  private Distance lastPosition = Meters.of(0.0);
 
 
   /**
@@ -54,6 +57,7 @@ public class DualLinearController extends SubsystemBase {
    * @param kS The static gain for the PID controller.
    * @param sensorToMotorRatio The ratio of the sensor to motor.
    * @param mechanismToSensor The ratio of the mechanism to sensor.
+   * @param baseHeight The base height of the mechanism.
    * @param minHeight The minimum height the mechanism can achieve.
    * @param maxHeight The maximum height the mechanism can achieve.
    * @param tolerance The tolerance for the height control.
@@ -67,11 +71,13 @@ public class DualLinearController extends SubsystemBase {
       double kS,
       double gearing,
       Distance mechanismToSensor,
+      Distance baseHeight,
       Distance minHeight,
       Distance maxHeight,
       Distance tolerance) {
 
     this.kS = kS;
+    this.baseHeight = baseHeight;
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
@@ -89,9 +95,8 @@ public class DualLinearController extends SubsystemBase {
 
     absoluteEncoder =
         new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
+    lastPosition = getCycleDelta();
     
-    Logger.log(this.getName() + "/leftB4Config", leftEncoder.getPosition());
-    Logger.log(this.getName() + "/rightB4Config", rightEncoder.getPosition());
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -103,11 +108,11 @@ public class DualLinearController extends SubsystemBase {
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
-    leftEncoder.setPosition(getCycleDelta().in(Meters));
-    rightEncoder.setPosition(getCycleDelta().in(Meters));
+    // leftEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
+    // rightEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
+    leftEncoder.setPosition(baseHeight.in(Meters));
+    rightEncoder.setPosition(baseHeight.in(Meters));
 
-    Logger.log(this.getName() + "/leftAfterConfig", leftEncoder.getPosition());
-    Logger.log(this.getName() + "/rightAfterConfig", rightEncoder.getPosition());
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
@@ -119,6 +124,8 @@ public class DualLinearController extends SubsystemBase {
         absoluteEncoder::get);
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
     Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
+    Logger.logNumber(this.getName() + "/cyclesComplted", () -> cyclesCompleted);
+    Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
@@ -161,6 +168,10 @@ public class DualLinearController extends SubsystemBase {
 
   public Distance getAverageHeight() {
     return getLeftHeight().plus(getRightHeight()).div(2);
+  }
+  
+  public int getMovingDirection() {
+    return (int) Math.signum(leftEncoder.getVelocity());
   }
 
   public Distance getMaxHeight() {
@@ -262,6 +273,20 @@ public class DualLinearController extends SubsystemBase {
     // rightMotor.set(-0.1);
   }
 
+  public Distance calculateHeight() {
+    return cycleHeight.times(cyclesCompleted).plus(getCycleDelta());
+  }
+
   @Override
-  public void periodic() {}
+  public void periodic() {
+    if (lastPosition.gt(cycleHeight.minus(tolerance)) && getCycleDelta().lt(tolerance)) {
+      cyclesCompleted++;
+    } 
+
+    if (lastPosition.lt(tolerance) && getCycleDelta().lt(cycleHeight.minus(tolerance))) {
+      cyclesCompleted--;
+    } 
+
+    lastPosition = getCycleDelta();
+  }
 }

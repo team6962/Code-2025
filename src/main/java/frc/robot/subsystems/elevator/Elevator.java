@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Distance;
@@ -49,6 +50,7 @@ public class Elevator extends DualLinearController {
         Constants.ELEVATOR.PROFILE.kS,
         Constants.ELEVATOR.GEARING,
         Constants.ELEVATOR.CYCLE_HEIGHT,
+        ELEVATOR.BASE_HEIGHT,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));

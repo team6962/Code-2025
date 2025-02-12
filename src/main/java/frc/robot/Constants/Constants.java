@@ -208,8 +208,8 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0) * (3.0 / 2.0); // CALCULATE
-    public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
+    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0) * (3.0 / 2.0) / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
+    public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
     public static final Angle ENCODER_OFFSET = Rotations.of(0.502);
     public static final Distance Bhobe_HEIGHT = Inches.of(1); 
 
@@ -224,7 +224,7 @@ public final class Constants {
     }    
 
     public static final class PROFILE {
-      public static final double kP = 0.2;
+      public static final double kP = 0.5;
       public static final double kS = 0.0;
     }
   }
