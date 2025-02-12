@@ -35,6 +35,7 @@ import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -43,7 +44,6 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -72,6 +72,7 @@ public class RobotContainer {
   public final Hang hang;
   public final AutonomousCommands autonomous;
   public final Algae algaeDetector;
+  private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -126,11 +127,9 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    // ledStrip =
-    //     new LEDs(
-    //         stateController,
-    //         () -> 1.0 +
-    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    ledStrip =
+        new LEDs(
+            stateController);
     manipulator = new Manipulator();
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
@@ -144,7 +143,7 @@ public class RobotContainer {
 
     // // Configure the trigger bindings
     Controls.configureBindings(
-        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos, ledStrip);
 
     autoGen = new AutoGeneration(
       autonomous, Milliseconds.of(20), Milliseconds.of(5),

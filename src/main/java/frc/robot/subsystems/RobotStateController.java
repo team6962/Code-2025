@@ -5,6 +5,7 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.CachedRobotState;
+import frc.robot.subsystems.LEDs.LEDs;
 
 // This class is a subsystem that controls the state of the robot. It is used to coordinate the
 // actions of the intake, shooter, transfer, and amp subsystems.

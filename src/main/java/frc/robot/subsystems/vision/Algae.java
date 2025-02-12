@@ -16,8 +16,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.LEDs;
 import frc.robot.util.CachedRobotState;
+import edu.wpi.first.wpilibj.RobotState;
 
 public class Algae {
   private static final double MAX_FOV_RATIO = Math.PI / 2;
@@ -63,8 +63,8 @@ public class Algae {
     algaePosition =
         robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
 
-    if (!CachedRobotState.isDisabled()) {
-      LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
+    if (!RobotState.isDisabled()) {
+      //LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
     }
 
     return algaePosition;

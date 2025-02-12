@@ -396,13 +396,10 @@ public final class Constants {
 
   // LED
   public static final class LED {
-    public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
-  }
-
-  public static final class FUNNEL {
-    public static final boolean MOTOR_INVERTED = false;
-    public static final double INTAKE_SPEED = 0.2;
-    public static final Time INTAKE_TIME = Seconds.of(0.5);
+    public static final Distance Spacing = Meters.of(1 / 60.0);
+    public static final int length = 31;
+    public static final int port = 9;
+    public static final int SIDE_STRIP_HEIGHT = 58;
   }
 
   public static final class VOLTAGE_LADDER {
@@ -417,5 +414,24 @@ public final class Constants {
     public static final Time AUTO_LENGTH = MeasureMath.time(0, 15);
     public static final Time ENDGAME_LENGTH = MeasureMath.time(0, 20);
     public static final Time ENDGAME_START = MATCH_LENGTH.minus(ENDGAME_LENGTH);
+
+  }
+  public static class AngleRange {
+    private final Angle minAngle;
+    private final Angle maxAngle;
+
+    public AngleRange(Angle minAngle, Angle maxAngle) {
+      this.minAngle = minAngle;
+      this.maxAngle = maxAngle;
+    }
+    
+
+    public Angle getMinAngle() {
+      return minAngle;
+    }
+
+    public Angle getMaxAngle() {
+      return maxAngle;
+    }
   }
 }
