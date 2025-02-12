@@ -90,6 +90,7 @@ public final class Preferences {
     public static final Distance MAX_HEIGHT = Inches.of(82);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
+    public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); //AVERAGE
 
     public static final class CORAL {
       public static final Distance L1_HEIGHT = Inches.of(38.0);

@@ -171,6 +171,14 @@ public class DualLinearController extends SubsystemBase {
     return getLeftHeight().plus(getRightHeight()).div(2);
   }
 
+  public Distance getMaxHeight() {
+    return maxHeight;
+  }
+
+  public Distance getMinHeight() {
+    return minHeight;
+  }
+
   public Distance getCycleDelta() {
     return cycleHeight.times(absoluteEncoder.get());
   }
