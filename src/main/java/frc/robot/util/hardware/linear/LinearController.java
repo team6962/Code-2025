@@ -1,6 +1,12 @@
-package frc.robot.util.hardware.MotionControl;
+package frc.robot.util.hardware.linear;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.NewtonMeters;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -14,7 +20,17 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Acceleration;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -24,7 +40,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-public class DualLinearController extends SubsystemBase {
+public class LinearController extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
@@ -36,11 +52,11 @@ public class DualLinearController extends SubsystemBase {
 
   private Distance minHeight, maxHeight, tolerance;
 
-  private double encoderOffset = 0.0;
-
   private Debouncer debouncer = new Debouncer(0.1);
 
-  private Distance cycleHeight;
+  private LinearRatios ratios;
+  private DCMotor motors;
+  private Mass carriageMass;
 
   /**
    * Constructs a new DualLinearController.
@@ -57,25 +73,27 @@ public class DualLinearController extends SubsystemBase {
    * @param maxHeight The maximum height the mechanism can achieve.
    * @param tolerance The tolerance for the height control.
    */
-  public DualLinearController(
+  public LinearController(
       int leftCAN,
       int rightCAN,
       int absoluteEncoderDIO,
-      double absolutePositionOffset,
+      Angle absolutePositionOffset,
       double kP,
       double kS,
-      double gearing,
-      Distance mechanismToSensor,
+      LinearRatios ratios,
       Distance minHeight,
       Distance maxHeight,
-      Distance tolerance) {
+      Distance tolerance,
+      DCMotor motors,
+      Mass carriageMass) {
+    this.ratios = ratios;
+    this.motors = motors;
+    this.carriageMass = carriageMass;
 
     this.kS = kS;
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
-    this.cycleHeight = mechanismToSensor;
-    encoderOffset = absolutePositionOffset;
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     leftMotor = new SparkMax(leftCAN, MotorType.kBrushless);
@@ -85,18 +103,21 @@ public class DualLinearController extends SubsystemBase {
     leftPID = leftMotor.getClosedLoopController();
     rightPID = rightMotor.getClosedLoopController();
 
-    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
+    absoluteEncoder = new DutyCycleEncoder(
+      absoluteEncoderDIO, 1.0,
+      ratios.sensorToCarriage(absolutePositionOffset).in(Meters)
+    );
 
     Logger.log(this.getName() + "/leftB4Config", leftEncoder.getPosition());
     Logger.log(this.getName() + "/rightB4Config", rightEncoder.getPosition());
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, ratios.sensorRotationsToCarriageMeters());
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, ratios.rotorRotationsToCarriageMeters());
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
@@ -107,7 +128,7 @@ public class DualLinearController extends SubsystemBase {
     Logger.log(this.getName() + "/rightAfterConfig", rightEncoder.getPosition());
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/height", () -> getMeasuredHeight().in(Meters));
     Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
@@ -144,28 +165,38 @@ public class DualLinearController extends SubsystemBase {
     return height.gt(minHeight) && height.lt(maxHeight);
   }
 
-  public Distance getLeftHeight() {
+  private Distance getLeftHeight() {
     return Meters.of(leftEncoder.getPosition());
   }
 
-  public Distance getRightHeight() {
+  private Distance getRightHeight() {
     return Meters.of(rightEncoder.getPosition());
   }
 
-  public Distance getAverageHeight() {
+  public Distance getMeasuredHeight() {
     return getLeftHeight().plus(getRightHeight()).div(2);
   }
 
-  public Distance getCycleDelta() {
-    return cycleHeight.times(absoluteEncoder.get());
+  private Distance getCycleDelta() {
+    return ratios.sensorToCarriage(Rotations.of(absoluteEncoder.get()));
   }
 
   public void moveUp() {
+    if (needsToStop()) {
+      stop();
+      return;
+    }
+
     leftMotor.set(0.10);
     rightMotor.set(0.10);
   }
 
   public void moveDown() {
+    if (needsToStop()) {
+      stop();
+      return;
+    }
+
     leftMotor.set(-0.10);
     rightMotor.set(-0.10);
   }
@@ -173,7 +204,7 @@ public class DualLinearController extends SubsystemBase {
   public boolean doneMoving() {
     if (getTargetHeight() == null) return true;
     return debouncer.calculate(
-        getAverageHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
+        getMeasuredHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
   }
 
   public void stopMotors() {
@@ -185,62 +216,64 @@ public class DualLinearController extends SubsystemBase {
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
     if (!absoluteEncoder.isConnected()) {
-      System.out.println("NO ENCODER");
+      DriverStation.reportError("LinearController is missing encoder", true);
+
       stopMotors();
       return;
     }
 
-    // if (leftMotor.getFaults() != null || rightMotor.getFaults() != null) {
-    //   System.out.println("MOTORS FAULTED");
-    //   stopMotors();
-    //   return;
-    // }
+    if (needsToStop()) {
+      stop();
+      return;
+    }
 
-    // remove?
-    // leftEncoder.setPosition(getAverageHeight().in(Meters));
-    // rightEncoder.setPosition(getAverageHeight().in(Meters));
-
-    // if (doneMoving()) {
-    //   System.out.println("DONE MOVING");
-
-    //   stopMotors();
-    //   return;
-    // }
-
-    // if (getLeftHeight().minus(getRightHeight()).abs(Inches) > 0.2) {
-    //   System.out.println("ELEVATOR TORQUED ===========");
-    //   stopMotors();
-    // }
-
-    // if (getLeftHeight().gt(maxHeight)) {
-    //   System.out.println("LEFT MAXED");
-    //   stopMotors();
-    // }
-
-    // if (getLeftHeight().lt(minHeight)) {
-    //   System.out.println("LEFT MINED");
-    //   stopMotors();
-    // }
-
-    // if (getRightHeight().gt(maxHeight)) {
-    //   System.out.println("RIGHT MAXED");
-    //   stopMotors();
-    // }
-
-    // if (getRightHeight().lt(minHeight)) {
-    //   System.out.println("RIGHT MINED");
-    //   stopMotors();
-    // }
-
-    System.out.println("TRYING TO MOVE ===========");
     // Set onboard PID controller to follow
     leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     rightPID.setReference(
         targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-
-    // leftMotor.set(-0.1);
-    // rightMotor.set(-0.1);
   }
+
+  public LinearVelocity getMeasuredVelocity() {
+    return MetersPerSecond.of(
+      ratios.rotorRotationsToCarriageMeters() *
+      (leftEncoder.getVelocity() + rightEncoder.getVelocity() / 2)
+    );
+  }
+
+  private void stop() {
+    if (getMeasuredVelocity().gt(MetersPerSecond.of(0))) {
+      leftMotor.set(-1.0);
+    } else {
+      leftMotor.set(1.0);
+    }
+  }
+
+  private boolean needsToStop() {
+    LinearVelocity velocity = getMeasuredVelocity();
+
+    LinearAcceleration gravityAcceleration;
+    Distance currentDistance;
+
+    if (velocity.lt(MetersPerSecond.of(0))) {
+      gravityAcceleration = MetersPerSecondPerSecond.of(-9.81);
+      currentDistance = getMeasuredHeight().minus(minHeight);
+    } else {
+      gravityAcceleration = MetersPerSecondPerSecond.of(9.81);
+      currentDistance = maxHeight.minus(getMeasuredHeight());
+    }
+
+    return getSafeStopDistance(velocity, gravityAcceleration).lt(currentDistance);
+  }
+
+  private Distance getSafeStopDistance(LinearVelocity velocity, LinearAcceleration gravityAcceleration) {
+    Force maxForce = ratios.motorToCarriage(NewtonMeters.of(motors.getTorque(40)));
+    LinearAcceleration maxAcceleration = maxForce.div(carriageMass).plus(gravityAcceleration);
+
+    Time stopTime = Seconds.of(velocity.in(MetersPerSecond) / maxAcceleration.in(MetersPerSecondPerSecond));
+    Distance stopDistance = maxAcceleration.times(stopTime).times(stopTime).div(2);
+
+    return stopDistance;
+  } 
 
   @Override
   public void periodic() {}

@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.hardware.SparkMaxUtil;
-import frc.robot.util.software.MathUtils;
 
 /*
  * Uses oboard 1kHz PID, Feedforward, and Trapazoidal Profiles to
@@ -78,7 +77,7 @@ public class PivotController {
     // );
     this.kS = kS;
     encoder = motor.getEncoder();
-    this.encoderOffset = absolutePositionOffset;          
+    this.encoderOffset = absolutePositionOffset;
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     pid = motor.getClosedLoopController();
@@ -89,7 +88,7 @@ public class PivotController {
     this.tolerance = tolerance;
 
     this.reversed = reversed;
-    
+
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -98,11 +97,9 @@ public class PivotController {
     Logger.logMeasure(subsystem.getName() + "/targetPosition", () -> getTargetAngle());
     Logger.logMeasure(subsystem.getName() + "/position", () -> getPosition());
     Logger.logMeasure(
-        subsystem.getName() + "/relativePosition",
-        () -> Rotations.of(encoder.getPosition()));
+        subsystem.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()));
     Logger.logMeasure(
-        subsystem.getName() + "/rawAbsolutePosition",
-        () -> Rotations.of(absoluteEncoder.get()));
+        subsystem.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()));
     Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(subsystem);
@@ -121,8 +118,6 @@ public class PivotController {
             0.0);
     simPID = new PIDController(kP, 0, 0);
 
-
-
     Logger.logNumber(subsystem.getName() + "/targetPosition", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(subsystem.getName() + "/position", () -> getPosition().in(Rotations));
     Logger.logNumber(
@@ -131,12 +126,13 @@ public class PivotController {
     Logger.logNumber(
         subsystem.getName() + "/rawAbsolutePosition",
         () -> Rotations.of(absoluteEncoder.get()).in(Rotations));
-    Logger.logBoolean(subsystem.getName() + "/encoderConnected",  () -> absoluteEncoder.isConnected());
+    Logger.logBoolean(
+        subsystem.getName() + "/encoderConnected", () -> absoluteEncoder.isConnected());
     Logger.logBoolean(subsystem.getName() + "/doneMoving", this::doneMoving);
     Logger.log(subsystem.getName() + "/minAngle", minAngle.in(Rotations));
     Logger.log(subsystem.getName() + "/maxAngle", maxAngle.in(Rotations));
-    Logger.logNumber(subsystem.getName()+"/appliedOutput", () -> motor.getAppliedOutput());
-    Logger.log(subsystem.getName()+"/achievableAngle", achievableAngle);
+    Logger.logNumber(subsystem.getName() + "/appliedOutput", () -> motor.getAppliedOutput());
+    Logger.log(subsystem.getName() + "/achievableAngle", achievableAngle);
   }
 
   public void run() {
@@ -191,7 +187,8 @@ public class PivotController {
       return;
     }
 
-    pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    pid.setReference(
+        achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);
 
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
@@ -205,6 +202,7 @@ public class PivotController {
   public Angle getTargetAngle() {
     return targetAngle;
   }
+
   public void setMaxAngle(Angle maxAngle) {
     this.maxAngle = maxAngle;
     setAchievableAngle();
@@ -228,7 +226,7 @@ public class PivotController {
     this.maxAngle = maxAngle;
     setAchievableAngle();
   }
-  
+
   private void setAchievableAngle() {
     achievableAngle = targetAngle;
     if (achievableAngle.lt(minAngle)) {
@@ -238,13 +236,14 @@ public class PivotController {
     }
   }
 
-  public void moveUp(){
+  public void moveUp() {
     motor.set(0.05);
   }
 
-  public void moveDown(){
+  public void moveDown() {
     motor.set(-0.05);
   }
+
   public boolean isInRange(Angle angle) {
     return angle.gt(minAngle) && angle.lt(maxAngle);
   }

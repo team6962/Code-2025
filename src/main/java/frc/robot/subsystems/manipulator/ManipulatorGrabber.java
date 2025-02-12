@@ -4,7 +4,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Time;
@@ -129,7 +128,8 @@ public class ManipulatorGrabber extends SubsystemBase {
     }
 
     private boolean isStalled() {
-      return stallDebouncer.calculate(motor.getEncoder().getVelocity() == 0.0 && motor.getOutputCurrent() > 0.0);
+      return stallDebouncer.calculate(
+          motor.getEncoder().getVelocity() == 0.0 && motor.getOutputCurrent() > 0.0);
     }
 
     @Override
@@ -141,6 +141,5 @@ public class ManipulatorGrabber extends SubsystemBase {
     public Command duringDrop() {
       return Commands.runOnce(() -> hasGamePiece = false);
     }
-    
   }
 }

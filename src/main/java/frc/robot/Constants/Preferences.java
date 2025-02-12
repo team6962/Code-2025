@@ -5,14 +5,9 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Meters;
-
-import java.util.Base64;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.Constants.Constants.ALGAE;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -62,17 +57,18 @@ public final class Preferences {
     public static final double CORAL_IN_SPEED = -1.0;
   }
 
-  // REFERENCE ANGLES FROM CAD AND https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
+  // REFERENCE ANGLES FROM CAD AND
+  // https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
   public static final class MANIPULATOR_PIVOT {
-    public static final Angle MAX_ANGLE   = Degrees.of(40.0);
-    public static final Angle MIN_LOW_ANGLE   = Degrees.of(-60.0);
+    public static final Angle MAX_ANGLE = Degrees.of(40.0);
+    public static final Angle MIN_LOW_ANGLE = Degrees.of(-60.0);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
-    public static final Angle STOW_ANGLE  = Degrees.of(38.5);
-    
+    public static final Angle STOW_ANGLE = Degrees.of(38.5);
+
     public static final class CORAL {
-      public static final Angle L1_ANGLE    = Degrees.of(22.5);
-      public static final Angle L23_ANGLE   = Degrees.of(-34.5);
-      public static final Angle L4_ANGLE    = Degrees.of(-57.0);
+      public static final Angle L1_ANGLE = Degrees.of(22.5);
+      public static final Angle L23_ANGLE = Degrees.of(-34.5);
+      public static final Angle L4_ANGLE = Degrees.of(-57.0);
       public static final Angle INTAKE_ANGLE = Degrees.of(-118.0);
     }
 
@@ -80,7 +76,7 @@ public final class Preferences {
       public static final Angle BARGE_ANGLE = Degrees.of(32.75);
       public static final Angle REEF_ANGLE = Degrees.of(0.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0); 
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
     }
   }
 

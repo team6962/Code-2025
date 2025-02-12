@@ -103,13 +103,14 @@ public class ManipulatorPivot extends SubsystemBase {
     return Commands.runEnd(this::moveDown, this::stop);
   }
 
-  public void moveUp(){
+  public void moveUp() {
     motor.set(0.05);
   }
 
-  public void moveDown(){
+  public void moveDown() {
     motor.set(-0.05);
   }
+
   public Angle getMinAngle() {
     return controller.getMinAngle();
   }
