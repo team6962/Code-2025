@@ -136,7 +136,8 @@ public class RobotContainer {
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+    Controls.configureBindings(
+        swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos, ledStrip);
 
     autoGen =
         new AutoGeneration(

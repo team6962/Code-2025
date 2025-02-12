@@ -1,9 +1,6 @@
 package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
-import com.team6962.lib.utils.MeasureMath;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,6 +9,8 @@ import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
+import frc.robot.subsystems.LEDs.LEDs;
+import frc.robot.subsystems.LEDs.LEDs.State;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -29,7 +28,8 @@ public class Controls {
       Manipulator manipulator,
       Hang hang,
       AutonomousCommands autonomous,
-      PieceCombos pieceCombos) {
+      PieceCombos pieceCombos,
+      LEDs ledStrip) {
 
     // Driver
     // Move swerve chassis
@@ -44,15 +44,22 @@ public class Controls {
 
     driver.a().whileTrue(autonomous.alignToClosestFace(false));
     driver
-        .b()
-        .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
-                AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
+    .b()
+    .whileTrue(
+        autonomous.alignToClosestPoleTeleop(
+            AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly())
+            .beforeStarting(() -> LEDs.setState(LEDs.State.AUTO_ALIGN)) 
+            .andThen(() -> LEDs.setState(LEDs.State.DEFAULT)) 
+    );
+
     driver
-        .x()
-        .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
-                AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
+    .x()
+    .whileTrue(
+        autonomous.alignToClosestPoleTeleop(
+            AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly())
+            .beforeStarting(() -> LEDs.setState(LEDs.State.AUTO_ALIGN)) 
+            .andThen(() -> LEDs.setState(LEDs.State.DEFAULT)) 
+    );
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
@@ -68,8 +75,7 @@ public class Controls {
     driver.povDown(); // USED
     driver.povLeft(); // USED
     driver.povRight(); // USED
-    driver.leftTrigger(); //USED
-    // driver.leftTrigger().whileTrue(swerveDrive.drive(MeasureMath.fromMeasure(swerveDrive.getConstants().maxSteerSpeed()))); // USED
+    driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
 
@@ -119,6 +125,21 @@ public class Controls {
     operator
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+        LEDs.setState(LEDs.State.HAS_CORAL);
+    operator
+      .rightStick()
+      .onTrue(
+        pieceCombos.intakeCoral()
+          .beforeStarting(() -> {
+            LEDs.setState(LEDs.State.HAS_CORAL); // ✅ Set LED state when starting
+                    rumbleBoth().schedule(); // ✅ Start rumbling
+          })
+                .andThen(() -> {
+                    LEDs.setState(LEDs.State.DEFAULT); // ✅ Reset LED when done
+                    rumbleBoth().cancel(); // ✅ Stop rumbling when action ends
+                })
+        );
+    
 
     operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
@@ -126,7 +147,11 @@ public class Controls {
         .whileTrue(
             pieceCombos.intakeAlgaeOrShootCoral().andThen(rumbleBoth())); // drop coral/intake algae
     operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // shoot barge
-    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
+    operator.leftTrigger().whileTrue(
+    manipulator.grabber.dropAlgae()
+        .beforeStarting(() -> LEDs.setState(LEDs.State.GOOD)) // ✅ Only runs when button is pressed
+        .andThen(() -> LEDs.setState(LEDs.State.DEFAULT)) // ✅ Resets when button is released
+);
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
@@ -167,7 +192,7 @@ public class Controls {
     return Commands.runEnd(
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-              // LEDs.setState(LEDs.State.GOOD);
+              LEDs.setState(LEDs.State.GOOD);
             },
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
@@ -180,7 +205,7 @@ public class Controls {
         () -> {
           if (booleanSupplier.getAsBoolean()) {
             controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-            // LEDs.setState(LEDs.State.GOOD);
+            LEDs.setState(LEDs.State.GOOD);
           } else {
             controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           }
