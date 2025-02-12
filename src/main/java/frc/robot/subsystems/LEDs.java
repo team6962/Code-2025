@@ -7,15 +7,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
+import frc.robot.Constants.Constants.DIO;
+import frc.robot.Constants.Constants.LED;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
+
+import javax.sound.sampled.Port;
+
+import com.team6962.lib.telemetry.Logger;
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static int length = 60;
-  private static State state = State.OFF;
+  private static int length = 5;
+  private static State state = State.CAN_SEE_ALGAE;
   private static double time = 0;
   private static double centerFillTimer = 0;
   private static boolean centerFillCalled = false;
@@ -34,7 +40,7 @@ public class LEDs extends SubsystemBase {
     BAD,
     GOOD,
   }
-
+  
   public static enum Direction {
     LEFT,
     RIGHT,
@@ -48,6 +54,8 @@ public class LEDs extends SubsystemBase {
   public static final int[] GREEN = {0, 255, 0};
   public static final int[] BLUE = {0, 20, 255};
   public static final int[] PURPLE = {100, 0, 255};
+ 
+  
 
   private DoubleSupplier animationSpeed;
 
@@ -61,10 +69,12 @@ public class LEDs extends SubsystemBase {
 
     strip.setData(buffer);
     strip.start();
-  }
 
+  }
+ 
   @Override
   public void periodic() {
+    Logger.log("State", state.name());
     switch (state) {
       case OFF:
         setColor(0, length, new int[] {0, 0, 0});
@@ -111,7 +121,7 @@ public class LEDs extends SubsystemBase {
     strip.setData(buffer);
     clear();
 
-    state = State.OFF;
+    state = State.CAN_SEE_ALGAE;
 
     time += Robot.getLoopTime() * animationSpeed.getAsDouble();
 
@@ -128,7 +138,7 @@ public class LEDs extends SubsystemBase {
     // setState(State.DISABLED);
   }
 
-  public static Command setStateCommand(State state) {
+  public static Command setStateCommand(State state) {    
     return Commands.run(() -> setState(state));
   }
 
@@ -192,7 +202,7 @@ public class LEDs extends SubsystemBase {
   }
 
   private static void setColorBounce(int start, int stop, int[] RGB, double speed) {
-    int length = stop - start;
+    int length = 5;
 
     // Calculate the current pixel position
     int pos = (int) ((((Timer.getFPGATimestamp() * speed)) * 2 * length) % (2.0 * length));
@@ -217,6 +227,9 @@ public class LEDs extends SubsystemBase {
       setColor(pixel, RGB);
     }
   }
+
+
+
 
   // private static void setGradientWave(int start, int stop, int[] firstRGB, int[] secondRGB,
   // double speed) {
@@ -289,4 +302,5 @@ public class LEDs extends SubsystemBase {
   //   return new int[] {ColorTools.redInt(OKLAB), ColorTools.greenInt(OKLAB),
   // ColorTools.blueInt(OKLAB)};
   // }
+  
 }
