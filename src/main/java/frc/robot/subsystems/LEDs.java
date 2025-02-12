@@ -24,15 +24,21 @@ public class LEDs extends SubsystemBase {
     OFF,
     DISABLED,
     ENABLED,
-    CAN_SEE_ALGAE,
+    DRIVING_AUTO,
+    DRIVING_TELEOP_RED,
+    DRIVING_TELEOP_BLUE,
     HAS_ALGAE,
-    HAS_VISION_TARGET_SPEAKER,
-    RUNNING_COMMAND,
-    AIMING,
-    AIMING_IN_RANGE,
-    AIMED,
-    BAD,
-    GOOD,
+    HAS_CORAL,
+    CAN_SEE_ALGAE,
+    AIMING_PROCESSOR,
+    SCORING_PROCESSOR,
+    AIMING_BARGE,
+    SCORING_BARGE,
+    AIMING_REEF,
+    SCORING_L2,
+    SCORING_L3,
+    SCORING_L4,
+    HANG
   }
 
   public static enum Direction {
@@ -41,13 +47,19 @@ public class LEDs extends SubsystemBase {
   }
 
   public static final int[] WHITE = {255, 255, 255};
-  public static final int[] ANTARES_BLUE = {0, 0, 255};
-  public static final int[] ANTARES_YELLOW = {255, 100, 0};
+  public static final int[] ANTARES_BLUE = {37, 46, 69};
+  public static final int[] ANTARES_YELLOW = {242, 222, 139};
   public static final int[] RED = {255, 0, 0};
-  public static final int[] RSL_ORANGE = {255, 100, 0};
   public static final int[] GREEN = {0, 255, 0};
   public static final int[] BLUE = {0, 20, 255};
-  public static final int[] PURPLE = {100, 0, 255};
+  public static final int[] RSL_ORANGE = {255, 100, 0};
+  public static final int[] LIGHT_BLUE = {173, 216, 230};
+  public static final int[] YELLOW = {255,255,0}
+  public static final int[] CYAN = {0, 255, 255};
+  public static final int[] DARK_GREEN = {0, 100, 0};
+  public static final int[] PURPLE = {108, 59, 170};
+  public static final int[] MAGENTA = {255, 0, 255};
+
 
   private DoubleSupplier animationSpeed;
 
@@ -70,37 +82,55 @@ public class LEDs extends SubsystemBase {
         setColor(0, length, new int[] {0, 0, 0});
         break;
       case DISABLED:
-        setColorWave(0, length, getBumperLEDColor(), new int[] {80, 80, 80}, 1.0, Direction.LEFT);
-        break;
-      case HAS_VISION_TARGET_SPEAKER:
-        setRainbow(0, length);
-        break;
-      case CAN_SEE_ALGAE:
-        setColorWave(0, length, new int[] {255, 25, 0}, 1.0, Direction.LEFT);
+        setColorWave(0, length, WHITE, LIGHT_BLUE, 1.0, Direction.LEFT);
         break;
       case ENABLED:
-        setBumperColorWave(0, length, 1.0);
+        setColorWave(0, length, getBumperLEDColor(), new int[] {80, 80, 80}, 1.0, Direction.LEFT);
+        break;
+      case DRIVING_AUTO:
+        setColorWave(0, length, ANTARES_YELLOW, ANTARES_BLUE, 1.0, Direction.LEFT);
+        break;
+      case DRIVING_TELEOP_BLUE:
+        setColorWave(0, length, ANTARES_BLUE, 1.0, Direction.LEFT);
+        break;
+      case DRIVING_TELEOP_RED:
+        setColorWave(0, length, WHITE, LIGHT_BLUE, 1.0, Direction.LEFT);
         break;
       case HAS_ALGAE:
-        setBumperColorWaveWithPurple(0, length, 1.0);
+        setColorWave(0, length, getBumperLEDColor(), CYAN, 1.0, Direction.LEFT);
         break;
-      case RUNNING_COMMAND:
-        setColorWave(0, length, ANTARES_YELLOW, 1.0, Direction.LEFT);
+      case HAS_CORAL:
+        setColorWave(0, length, getBumperLEDColor(), PURPLE, 1.0, Direction.LEFT);
         break;
-      case AIMING:
-        setColorBounce(0, length, ANTARES_YELLOW, 1.0);
+      case CAN_SEE_ALGAE:
+        setColorFromCenter(0, length,CYAN ,0.25);
         break;
-      case AIMING_IN_RANGE:
-        setColorBounce(0, length, GREEN, 1.0);
+      case AIMING_PROCESSOR:
+        setColorFlash(0, length, DARK_GREEN, 5);
+      break;
+      case SCORING_PROCESSOR:
+        setColor(length, DARK_GREEN);
         break;
-      case AIMED:
-        setColorFromCenter(0, length, GREEN, 0.25);
+      case AIMING_BARGE:
+        setColorFlash(0, length, YELLOW, 5);
         break;
-      case GOOD:
-        setColor(0, length, GREEN);
+      case SCORING_BARGE:
+        setColor(length, YELLOW);
         break;
-      case BAD:
-        setColorFlash(0, length, RED, 5);
+      case AIMING_REEF:
+        setColorFlash(0, length, MAGENTA, 5);
+        break;
+      case SCORING_L2:
+        setColor(length, MAGENTA);
+        break;
+      case SCORING_L3:
+        setColor(length, MAGENTA);
+        break;
+      case SCORING_L4:
+        setColor(length, MAGENTA);
+        break;
+      case HANG:
+        setColor(length, RSL_ORANGE);
         break;
     }
 
