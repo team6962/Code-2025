@@ -1,6 +1,7 @@
 package frc.robot.commands.autonomous;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Field;
+import frc.robot.Constants.Field.Pole;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -78,6 +80,12 @@ public class Autonomous extends SequentialCommandGroup {
             Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
             Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
             Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()));
+  }
+
+  
+  public Command pathfindToReefPole(int faceNumber, Pole pole) {
+    Pose2d polePose = Field.getPolePose(faceNumber, pole);
+    return swerveDrive.pathfindTo(polePose);
   }
 
   public Command scoreCoral() {

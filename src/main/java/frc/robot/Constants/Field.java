@@ -3,14 +3,29 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.subsystems.vision.AprilTags;
+
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -24,6 +39,15 @@ import java.util.function.Supplier;
 public final class Field {
   public static final double WIDTH = 8.05; // meters
   public static final double LENGTH = 17.55; // meters
+
+  public static enum Pole {
+    LEFT,
+    RIGHT
+  }
+
+  public static final Optional<Pose3d> getTagPose(int tagID) {
+    return AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape).getTagPose(tagID);
+  }
 
   public static final Map<String, Supplier<Pose2d>> AUTO_MOVE_POSITIONS =
       Map.of(
@@ -43,8 +67,68 @@ public final class Field {
           point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -1.0),
           point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -2.0));
 
-  public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
 
+  public static final Distance COMMON_FACE_POLE_DISTANCE = Inches.of(12.94);
+
+ 
+  public static final int LEFT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 1 : 13;
+  public static final int RIGHT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 2 : 12;
+  public static final int PROCESSOR_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 3 : 16;
+  public static final int BARGE_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 5 : 14;
+
+
+ /**
+   * reef tags keyed by their face
+   */
+  public static final List<Integer> REEF_APRILTAGS = new ArrayList<Integer>();
+  static {
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      REEF_APRILTAGS.add(10);
+      REEF_APRILTAGS.add(9);
+      REEF_APRILTAGS.add(8);
+      REEF_APRILTAGS.add(7);
+      REEF_APRILTAGS.add(6);
+      REEF_APRILTAGS.add(11);
+    } else {
+      // default blue
+      REEF_APRILTAGS.add(21);
+      REEF_APRILTAGS.add(22);
+      REEF_APRILTAGS.add(17);
+      REEF_APRILTAGS.add(18);
+      REEF_APRILTAGS.add(19);
+      REEF_APRILTAGS.add(20);
+    }
+  };
+
+  
+
+  public static final Pose2d getFacePose(int face) {
+    Pose2d tagPose = getTagPose(REEF_APRILTAGS.get(face)).get().toPose2d();
+    // return tagPose.rotateBy(Rotation2d.fromDegrees(180));
+    return tagPose;
+  }
+
+  public static final Pose2d getPolePose(int face, Pole pole) {
+    return getFacePose(face).transformBy(reefPoleOffset(pole));
+  }
+
+  public static final Pose2d getProcessorPose() {
+    return getTagPose(PROCESSOR_TAG).get().toPose2d();
+  }
+
+  public static final Pose2d getOurBargePose() {
+    return getTagPose(BARGE_TAG).get().toPose2d();
+  }
+
+  public static final Pose2d getLeftCoralStationPose() {
+    return getTagPose(LEFT_STATION_TAG).get().toPose2d();
+  }
+
+  public static final Pose2d getRightCoralStationPose() {
+    return getTagPose(RIGHT_STATION_TAG).get().toPose2d();
+  }
+
+  
   private static List<Pose2d> getCoralPlacementPoses() {
     List<Pose2d> positions = new ArrayList<Pose2d>();
 
@@ -80,8 +164,11 @@ public final class Field {
 
   public static final List<Pose2d> CORAL_PLACEMENT_POSES = getCoralPlacementPoses();
 
-  public static final Translation2d reefPoleOffset(double angle) {
-    return new Translation2d(12.94 / 2, Rotation2d.fromDegrees(angle));
+  public static final Transform2d reefPoleOffset(Pole pole) {
+    if (pole == Pole.LEFT) {
+      return new Transform2d(-COMMON_FACE_POLE_DISTANCE.in(Meters) / 2.0, 0, null);
+    }
+    return new Transform2d(COMMON_FACE_POLE_DISTANCE.in(Meters) / 2.0, 0, null);
   }
 
   public static Supplier<Pose2d> pose2d(double x, double y, double degrees) {
