@@ -191,6 +191,8 @@ public class PivotController extends SubsystemBase{
     // }
 
     pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);]
 
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
   }

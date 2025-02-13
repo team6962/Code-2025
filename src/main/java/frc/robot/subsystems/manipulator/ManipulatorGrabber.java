@@ -88,6 +88,12 @@ public class ManipulatorGrabber extends SubsystemBase {
     }, this);
   }
 
+  // public Command runMultiple(double speed) {
+  //   return Commands.run(() -> {
+  //     speed = isEnabled.getAsBoolean() ? speed : 0;
+  //   }, this);
+  // }
+
   public Command run(double speed) {
     return Commands.run(() -> {
       double limitedSpeed = isEnabled.getAsBoolean() ? speed : 0;
