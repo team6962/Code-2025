@@ -150,6 +150,8 @@ public final class Constants {
     public static final int HANG_ENCODER = 0;
     public static final int ELEVATOR_ENCODER = 1;
     public static final int MANIPULATOR_ENCODER = 2;
+    public static final int ELEVATOR_CEIL_LIMIT = 3;
+    public static final int ELEVATOR_FLOOR_LIMIT = 4;
     public static final int ALGAE_BEAM_BREAK = 5;
   }
 

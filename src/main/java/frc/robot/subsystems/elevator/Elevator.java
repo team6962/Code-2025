@@ -14,7 +14,7 @@ import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.ELEVATOR;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
-import frc.robot.util.hardware.MotionControl.DualLinearController;
+import frc.robot.util.hardware.MotionControl.DualLinearActuator;
 
 /**
  * The Elevator subsystem controls the elevator mechanism of the robot.
@@ -39,12 +39,14 @@ import frc.robot.util.hardware.MotionControl.DualLinearController;
  * The subsystem also includes methods to run and stop the elevator motors,
  * and to handle periodic updates and simulation-specific behavior.
  */
-public class Elevator extends DualLinearController {
+public class Elevator extends DualLinearActuator {
   public Elevator() {
     super(
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
         DIO.ELEVATOR_ENCODER,
+        DIO.ELEVATOR_CEIL_LIMIT,
+        DIO.ELEVATOR_FLOOR_LIMIT,
         Constants.ELEVATOR.ENCODER_OFFSET.in(Rotations), // CHANGE THIS
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
@@ -60,65 +62,72 @@ public class Elevator extends DualLinearController {
   }
 
 
+  @Override
+  public void periodic() {
+    if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
+    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.ELEVATOR) stopMotors();
+    super.periodic();
+  }
 
-  public Command setHeightCommand(Distance height) {
-    return this.run(() -> setTargetHeightAndRun(height)).until(this::doneMoving);
+  public Command setHeight(Distance height) {
+    if (!ENABLED_SYSTEMS.ELEVATOR) return stop();
+    return this.run(() -> moveTo(height)).until(this::doneMoving);
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stopMotors);
+    return this.runEnd(this::moveUp, this::stopMotors);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stopMotors);
-  }
-
-  public Command coralL1() {
-    return setHeightCommand(ELEVATOR.CORAL.L1_HEIGHT);
-  }
-
-  public Command coralL2() {
-    return setHeightCommand(ELEVATOR.CORAL.L2_HEIGHT);
-  }
-
-  public Command coralL3() {
-    return setHeightCommand(ELEVATOR.CORAL.L3_HEIGHT);
-  }
-
-  public Command coralL4() {
-    return setHeightCommand(ELEVATOR.CORAL.L4_HEIGHT);
-  }
-
-  public Command coralIntake() {
-    return setHeightCommand(ELEVATOR.CORAL.INTAKE_HEIGHT);
-  }
-
-  public Command algaeGround() {
-    return setHeightCommand(ELEVATOR.ALGAE.GROUND_HEIGHT);
-  }
-
-  public Command algaeL2() {
-    return setHeightCommand(ELEVATOR.ALGAE.L2_HEIGHT);
-  }
-
-  public Command algaeL3() {
-    return setHeightCommand(ELEVATOR.ALGAE.L3_HEIGHT);
-  }
-
-  public Command algaeBarge() {
-    return setHeightCommand(ELEVATOR.ALGAE.BARGE_HEIGHT);
-  }
-
-  public Command algaeProcessor() {
-    return setHeightCommand(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
-  }
-
-  public Command stow() {
-    return setHeightCommand(ELEVATOR.STOW_HEIGHT);
+    return this.runEnd(this::moveDown, this::stopMotors);
   }
 
   public Command stop() {
-    return Commands.run(this::stopMotors, this);
+    return this.run(this::stopMotors);
+  }
+
+  public Command stow() {
+    return setHeight(ELEVATOR.STOW_HEIGHT);
+  }
+
+  public Command coralL1() {
+    return setHeight(ELEVATOR.CORAL.L1_HEIGHT);
+  }
+
+  public Command coralL2() {
+    return setHeight(ELEVATOR.CORAL.L2_HEIGHT);
+  }
+
+  public Command coralL3() {
+    return setHeight(ELEVATOR.CORAL.L3_HEIGHT);
+  }
+
+  public Command coralL4() {
+    return setHeight(ELEVATOR.CORAL.L4_HEIGHT);
+  }
+
+  public Command coralIntake() {
+    return setHeight(ELEVATOR.CORAL.INTAKE_HEIGHT);
+  }
+
+  public Command algaeGround() {
+    return setHeight(ELEVATOR.ALGAE.GROUND_HEIGHT);
+  }
+
+  public Command algaeL2() {
+    return setHeight(ELEVATOR.ALGAE.L2_HEIGHT);
+  }
+
+  public Command algaeL3() {
+    return setHeight(ELEVATOR.ALGAE.L3_HEIGHT);
+  }
+
+  public Command algaeBarge() {
+    return setHeight(ELEVATOR.ALGAE.BARGE_HEIGHT);
+  }
+
+  public Command algaeProcessor() {
+    return setHeight(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
   }
 
   public Command test() {
@@ -129,30 +138,5 @@ public class Elevator extends DualLinearController {
       algaeBarge(),
       stow()
     );
-  }
-
-  private void setTargetHeightAndRun(Distance height) {
-    setTargetHeight(height);
-    run();
-  }
-
-  @Override
-  public void run() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) {
-      stopMotors();
-      return;
-    }
-    super.run();
-  }
-
-  @Override
-  public void periodic() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
-    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.ELEVATOR) stopMotors();
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
 }
