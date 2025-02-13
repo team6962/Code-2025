@@ -14,15 +14,19 @@ public class SimAlgaeGrabber extends AlgaeGrabber {
     public Time gripTime;
     public Time stopTime;
 
-    public SimAlgaeGrabber() {
-        this(Seconds.of(0.25), Seconds.of(0.25), MANIPULATOR.ALGAE_GRIP_CHECK_TIME, Seconds.of(0));
-    }
-
     public SimAlgaeGrabber(Time dropTime, Time intakeTime, Time gripTime, Time stopTime) {
         this.dropTime = dropTime;
         this.intakeTime = intakeTime;
         this.gripTime = gripTime;
         this.stopTime = stopTime;
+    }
+
+    public static SimAlgaeGrabber simulated() {
+        return new SimAlgaeGrabber(Seconds.of(0.25), Seconds.of(0.25), MANIPULATOR.ALGAE_GRIP_CHECK_TIME, Seconds.of(0));
+    }
+
+    public static SimAlgaeGrabber disabled() {
+        return new SimAlgaeGrabber(Seconds.of(0), Seconds.of(0), Seconds.of(0), Seconds.of(0));
     }
 
     @Override

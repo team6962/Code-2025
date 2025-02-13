@@ -10,29 +10,18 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.AngleRange;
-import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import frc.robot.Constants.Preferences.MANIPULATOR;
 import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
+import frc.robot.subsystems.manipulator.coral.CoralGrabber;
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
   public final AlgaeGrabber algae;
-  public final ManipulatorGrabber coral;
+  public final CoralGrabber coral;
 
   public Manipulator() {
     pivot = new ManipulatorPivot();
 
     algae = AlgaeGrabber.create();
-
-    coral =
-        new ManipulatorGrabber(
-            new ManipulatorGrabber.MotorConfig[] {
-              new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_CORAL, MANIPULATOR.INVERT_CORAL)
-            },
-            new ManipulatorGrabber.DigitalSensor("Coral Manipulator", Constants.DIO.CORAL_BEAM_BREAK),
-            MANIPULATOR.CORAL_IN_SPEED,
-            MANIPULATOR.CORAL_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.MANIPULATOR);
+    coral = CoralGrabber.create();
   }
 
   public void setPivotAnglesBasedOnHeight(Distance elevatorHeight) {

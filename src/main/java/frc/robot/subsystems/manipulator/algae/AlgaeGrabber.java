@@ -30,8 +30,8 @@ public abstract class AlgaeGrabber extends SubsystemBase {
     }
 
     public static AlgaeGrabber create() {
-        if (!ENABLED_SYSTEMS.MANIPULATOR) return new DisabledAlgaeGrabber();
+        if (!ENABLED_SYSTEMS.MANIPULATOR) return SimAlgaeGrabber.disabled();
         else if (RobotBase.isReal()) return new RealAlgaeGrabber();
-        else return new SimAlgaeGrabber();
+        else return SimAlgaeGrabber.simulated();
     }
 }

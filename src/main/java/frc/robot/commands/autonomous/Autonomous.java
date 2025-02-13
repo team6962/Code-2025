@@ -39,8 +39,12 @@ public class Autonomous extends SequentialCommandGroup {
 
     addCommands(manipulator.algae.intake());
     addCommands(manipulator.algae.drop());
+    addCommands(manipulator.coral.intake());
+    addCommands(manipulator.coral.drop());
     addCommands(manipulator.algae.intake());
     addCommands(manipulator.algae.drop());
+    addCommands(manipulator.coral.intake());
+    addCommands(manipulator.coral.drop());
 
     // addCommands(pathfindToProcessor());
     // addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));

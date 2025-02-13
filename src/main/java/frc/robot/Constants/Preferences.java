@@ -62,7 +62,6 @@ public final class Preferences {
   public static final class MANIPULATOR {
     public static final boolean INVERT_ALGAE_LEFT = true;
     public static final boolean INVERT_ALGAE_RIGHT = true;
-    public static final boolean INVERT_CORAL = false;
 
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(10);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
