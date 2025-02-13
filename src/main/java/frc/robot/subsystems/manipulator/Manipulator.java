@@ -1,5 +1,6 @@
 package frc.robot.subsystems.manipulator;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.util.Map;
@@ -27,7 +28,7 @@ public class Manipulator extends SubsystemBase {
               new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_ALGAE_LEFT, MANIPULATOR.INVERT_ALGAE_LEFT),
               new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_ALGAE_RIGHT, MANIPULATOR.INVERT_ALGAE_RIGHT)
             },
-            new ManipulatorGrabber.DigitalSensor(Constants.DIO.CORAL_BEAM_BREAK),
+            new ManipulatorGrabber.CurrentSensor(false, Amps.of(10)),
             MANIPULATOR.ALGAE_IN_SPEED,
             MANIPULATOR.ALGAE_OUT_SPEED,
             () -> ENABLED_SYSTEMS.MANIPULATOR);

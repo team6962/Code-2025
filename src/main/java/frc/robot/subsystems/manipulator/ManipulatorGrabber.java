@@ -7,6 +7,7 @@ import java.util.function.BooleanSupplier;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.team6962.lib.telemetry.Logger;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -61,8 +62,9 @@ public class ManipulatorGrabber extends SubsystemBase {
       motor = new SparkMax(motorId, MotorType.kBrushless);
 
       SparkMaxConfig config = new SparkMaxConfig();
-      SparkMaxUtil.configure(config, inverted, IdleMode.kBrake);
-      SparkMaxUtil.saveAndLog(getName(), motor, config);
+      SparkMaxUtil.configureAndLog550(motor, config, inverted, IdleMode.kBrake);
+      
+      Logger.log(getName() + "/Motor " + motorId + "/Current", Amps.of(motor.getOutputCurrent()));
     }
 
     public SparkMax getSparkMax() {
