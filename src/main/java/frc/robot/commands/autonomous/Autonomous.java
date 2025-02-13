@@ -3,7 +3,6 @@ package frc.robot.commands.autonomous;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.math.MathUtil;
@@ -18,7 +17,6 @@ import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
-import frc.robot.util.software.MathUtils;
 
 public class Autonomous extends SequentialCommandGroup {
   private RobotStateController controller;
@@ -38,6 +36,11 @@ public class Autonomous extends SequentialCommandGroup {
     this.manipulator = manipulator;
     this.intake = intake;
     this.elevator = elevator;
+
+    addCommands(manipulator.algae.intake());
+    addCommands(manipulator.algae.drop());
+    addCommands(manipulator.algae.intake());
+    addCommands(manipulator.algae.drop());
 
     // addCommands(pathfindToProcessor());
     // addCommands(pickupPreplacedAlgae(0, AlgaePickupMechanism.INTAKE));

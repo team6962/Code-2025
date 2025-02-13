@@ -3,15 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Base64;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants.Constants.ALGAE;
 
 /**
@@ -60,8 +64,14 @@ public final class Preferences {
     public static final boolean INVERT_ALGAE_RIGHT = true;
     public static final boolean INVERT_CORAL = false;
 
+    public static final Current ALGAE_DETECT_CURRENT = Amps.of(10);
+    public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
+    public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
+
     public static final double ALGAE_OUT_SPEED = 0.1;
-    public static final double ALGAE_IN_SPEED = -0.1;
+    public static final double ALGAE_IN_SPEED = 0.1;
+    public static final double ALGAE_HOLD_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.1;
     public static final double CORAL_IN_SPEED = 0.1;
   }

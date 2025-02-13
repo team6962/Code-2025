@@ -8,8 +8,8 @@ import java.util.function.BooleanSupplier;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.team6962.lib.telemetry.Logger;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -27,7 +27,6 @@ public class ManipulatorGrabber extends SubsystemBase {
   private double intakeSpeed;
   private double dropSpeed;
   private BooleanSupplier isEnabled;
-  private boolean holding;
 
   public final ManipulatorSensor sensor;
 
@@ -107,7 +106,7 @@ public class ManipulatorGrabber extends SubsystemBase {
     }, this);
   }
 
-  public Command smartButton() {
+  public Command action() {
     return Commands.defer(() -> {
       if (sensor.hasGamePiece()) return drop();
       else return intake();
@@ -115,11 +114,11 @@ public class ManipulatorGrabber extends SubsystemBase {
   }
 
   public Command intake() {
-    return run(intakeSpeed).until(sensor::hasGamePiece).alongWith(sensor.duringIntake()).andThen(() -> holding = true);
+    return run(intakeSpeed).until(sensor::hasGamePiece).alongWith(sensor.duringIntake());
   }
 
   public Command drop() {
-    return run(dropSpeed).until(() -> !sensor.hasGamePiece()).alongWith(sensor.duringDrop()).andThen(() -> holding = false);
+    return run(dropSpeed).until(() -> !sensor.hasGamePiece()).alongWith(sensor.duringDrop());
   }
 
   public Command stop() {

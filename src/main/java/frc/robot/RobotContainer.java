@@ -152,8 +152,8 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // return new MusicDrive(swerveDrive, "bohemian");
-    return swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.5));
-    // return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    // return swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.5));
+    return new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
     // return hang.stow();
     // return Commands.run(() -> {});
   }

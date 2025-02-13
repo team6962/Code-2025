@@ -1,6 +1,5 @@
 package frc.robot.subsystems.manipulator;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.util.Map;
@@ -14,24 +13,16 @@ import frc.robot.Constants.Constants.AngleRange;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.MANIPULATOR;
+import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
-  public final ManipulatorGrabber algae;
+  public final AlgaeGrabber algae;
   public final ManipulatorGrabber coral;
 
   public Manipulator() {
     pivot = new ManipulatorPivot();
 
-    algae =
-        new ManipulatorGrabber(
-            new ManipulatorGrabber.MotorConfig[] {
-              new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_ALGAE_LEFT, MANIPULATOR.INVERT_ALGAE_LEFT),
-              new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_ALGAE_RIGHT, MANIPULATOR.INVERT_ALGAE_RIGHT)
-            },
-            new ManipulatorGrabber.CurrentSensor(false, Amps.of(10)),
-            MANIPULATOR.ALGAE_IN_SPEED,
-            MANIPULATOR.ALGAE_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.MANIPULATOR);
+    algae = AlgaeGrabber.create();
 
     coral =
         new ManipulatorGrabber(

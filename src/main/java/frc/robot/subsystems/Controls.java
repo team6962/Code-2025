@@ -104,10 +104,12 @@ public class Controls {
     operator.povDown().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());,
-    operator.rightBumper().whileTrue(manipulator.coral.smartButton());
-    operator.rightTrigger().whileTrue(manipulator.coral.smartButton());
+    operator.rightBumper().whileTrue(manipulator.coral.action());
+    operator.rightTrigger().whileTrue(manipulator.coral.action());
     operator.leftBumper().whileTrue(manipulator.algae.intake());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
+    // operator.leftBumper().whileTrue(manipulator.algae.action());
+    // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 
