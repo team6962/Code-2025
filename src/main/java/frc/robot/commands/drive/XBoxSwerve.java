@@ -118,7 +118,7 @@ public class XBoxSwerve extends Command {
           new Translation2d(
               Math.cos(Units.degreesToRadians(controller.getPOV())) * FINE_TUNE_DRIVE_VELOCITY,
               -Math.sin(Units.degreesToRadians(controller.getPOV())) * FINE_TUNE_DRIVE_VELOCITY);
-      velocity = velocity.plus(povVelocity);
+    velocity = velocity.plus(povVelocity);
     }
 
     // Zero heading when Y is pressed

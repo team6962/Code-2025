@@ -139,10 +139,11 @@ public final class Constants {
     public static final int INTAKE_PIVOT = 29;
     public static final int HANG = 100;
     public static final int ELEVATOR_LEFT = 2; // UPDATE
-    public static final int ELEVATOR_RIGHT = 27; // UPDATE
-    public static final int MANIPULATOR_PIVOT = 24; // UPDATE
-    public static final int MANIPULATOR_ALGAE = 33; // UPDATE
-    public static final int MANIPULATOR_CORAL = 34; // UPDATE
+    public static final int ELEVATOR_RIGHT = 3; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 4; // UPDATE
+    public static final int MANIPULATOR_ALGAE_RIGHT = 5;
+    public static final int MANIPULATOR_ALGAE_LEFT = 6;
+    public static final int MANIPULATOR_CORAL = 7; // UPDATE
   }
 
   public static final class DIO {
@@ -236,8 +237,8 @@ public final class Constants {
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518); 
 
     public static final class PROFILE {
-      public static final double kP = 1.0;
-      public static final double kS = 0.1;
+      public static final double kP = 2.0;
+      public static final double kS = 0.5;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }

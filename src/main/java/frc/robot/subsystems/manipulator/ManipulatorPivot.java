@@ -20,17 +20,12 @@ import frc.robot.RobotContainer;
 import frc.robot.util.hardware.MotionControl.PivotController;
 import java.util.function.Supplier;
 
-public class ManipulatorPivot extends SubsystemBase {
-  private SparkMax motor;
-  private PivotController controller;
+public class ManipulatorPivot extends PivotController {
   private boolean isCalibrating = false;
 
   public ManipulatorPivot() {
-    motor = new SparkMax(CAN.MANIPULATOR_PIVOT, MotorType.kBrushless);
-    controller =
-        new PivotController(
-            this,
-            motor,
+    super(
+            CAN.MANIPULATOR_PIVOT,
             DIO.MANIPULATOR_ENCODER,
             MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
             MANIPULATOR_PIVOT.PROFILE.kP,
@@ -40,7 +35,6 @@ public class ManipulatorPivot extends SubsystemBase {
             Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
             Degrees.of(0.25),
             false);
-
     // setDefaultCommand(stow());
   }
 
@@ -49,14 +43,12 @@ public class ManipulatorPivot extends SubsystemBase {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return;
     if (isCalibrating) return;
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
-      motor.stopMotor();
+      stopMotor();
       return;
     }
     if (RobotState.isDisabled()) {
-      controller.setTargetAngle(controller.getPosition());
+      setTargetAngle(getPosition());
     }
-
-    controller.run();
   }
 
   public Command intakeCoral() {
@@ -92,68 +84,24 @@ public class ManipulatorPivot extends SubsystemBase {
   }
 
   public Command stop() {
-    return Commands.run(controller::stop, this);
+    return Commands.run(this::stopMotor);
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stop);
+    return Commands.runEnd(this::moveUp, this::stopMotor);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stop);
-  }
-
-  public void moveUp(){
-    // if (getPosition().gte(controller.getMaxAngle())) {
-    //   motor.stopMotor();
-    //   return;
-    // }
-    motor.set(0.05);
-  }
-
-  public void moveDown(){
-    // if (getPosition().lte(controller.getMinAngle())) {
-    //   motor.stopMotor();
-    //   return;
-    // }
-    motor.set(-0.05);
-  }
-  public Angle getMinAngle() {
-    return controller.getMinAngle();
-  }
-
-  public void setMinAngle(Angle angle) {
-    controller.setMinAngle(angle);
-  }
-
-  public Angle getMaxAngle() {
-    return controller.getMaxAngle();
-  }
-
-  public void setMaxAngle(Angle angle) {
-    controller.setMaxAngle(angle);
-  }
-
-  public void setMinMaxAngle(Angle minAngle, Angle maxAngle) {
-    controller.setMinAngle(minAngle);
-    controller.setMaxAngle(maxAngle);
+    return Commands.runEnd(this::moveDown, this::stopMotor);
   }
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
-    return Commands.run(() -> controller.setTargetAngle(angleSupplier.get()), this)
+    return Commands.run(() -> setTargetAngleAndRun(angleSupplier), this)
         .until(this::doneMoving);
   }
 
-  public boolean isInRange(Angle angle) {
-    if (angle == null) return false;
-    return controller.isInRange(angle);
-  }
-
-  public Angle getPosition() {
-    return controller.getPosition();
-  }
-
-  public boolean doneMoving() {
-    return controller.doneMoving();
+  public void setTargetAngleAndRun(Supplier<Angle> angleSupplier){
+    setTargetAngle(angleSupplier.get());
+    run();
   }
 }

@@ -98,6 +98,8 @@ public class Controls {
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
+    operator.povLeft().whileTrue(elevator.up());
+    operator.povRight().whileTrue(elevator.down());
     operator.povUp().whileTrue(manipulator.pivot.up());
     operator.povDown().whileTrue(manipulator.pivot.down());
     operator.povLeft().whileTrue(hang.deploy());

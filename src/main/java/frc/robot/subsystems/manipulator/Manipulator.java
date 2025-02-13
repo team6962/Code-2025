@@ -26,7 +26,7 @@ public class Manipulator extends SubsystemBase {
 
     algae =
         new ManipulatorGrabber(
-            CAN.MANIPULATOR_ALGAE,
+            CAN.MANIPULATOR_ALGAE_LEFT,
             new ManipulatorGrabber.DigitalSensor(Constants.DIO.ALGAE_BEAM_BREAK),
             MANIPULATOR.ALGAE_IN_SPEED,
             MANIPULATOR.ALGAE_OUT_SPEED,
