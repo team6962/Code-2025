@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -18,6 +14,8 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =

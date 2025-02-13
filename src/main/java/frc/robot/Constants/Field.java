@@ -56,19 +56,23 @@ public final class Field {
 
       positions.add(
           new Pose2d(
-              176.745 + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
-              158.5 + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
-              new Rotation2d(i * (Math.PI / 3) + Math.PI)
-          )
-      );
+              176.745
+                  + Math.cos(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius
+                  + Math.cos(i * (Math.PI / 3)) * 20,
+              158.5
+                  + Math.sin(i * (Math.PI / 3) + shiftAngle) * reefPoleRadius
+                  + Math.sin(i * (Math.PI / 3)) * 20,
+              new Rotation2d(i * (Math.PI / 3) + Math.PI)));
 
       positions.add(
           new Pose2d(
-              176.745 + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.cos(i * (Math.PI / 3)) * 20,
-              158.5 + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius + Math.sin(i * (Math.PI / 3)) * 20,
-              new Rotation2d(i * (Math.PI / 3) + Math.PI)
-          )
-      );
+              176.745
+                  + Math.cos(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius
+                  + Math.cos(i * (Math.PI / 3)) * 20,
+              158.5
+                  + Math.sin(i * (Math.PI / 3) - shiftAngle) * reefPoleRadius
+                  + Math.sin(i * (Math.PI / 3)) * 20,
+              new Rotation2d(i * (Math.PI / 3) + Math.PI)));
     }
 
     return positions;

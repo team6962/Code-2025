@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.elevator.Elevator;
@@ -23,12 +22,11 @@ public class PrematchChecks extends SequentialCommandGroup {
   private final Intake intake;
 
   public PrematchChecks(
-    SwerveDrive swerveDrive,
-    Elevator elevator,
-    Manipulator manipulator,
-    Hang hang,
-    Intake intake
-  ) {
+      SwerveDrive swerveDrive,
+      Elevator elevator,
+      Manipulator manipulator,
+      Hang hang,
+      Intake intake) {
     this.swerveDrive = swerveDrive;
     this.elevator = elevator;
     this.manipulator = manipulator;
@@ -36,10 +34,6 @@ public class PrematchChecks extends SequentialCommandGroup {
     this.intake = intake;
 
     addCommands(
-        elevator.test(),
-        manipulator.test(),
-        hang.test(),
-        Commands.runOnce(StatusChecks::refresh)
-    );
+        elevator.test(), manipulator.test(), hang.test(), Commands.runOnce(StatusChecks::refresh));
   }
 }

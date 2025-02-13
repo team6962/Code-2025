@@ -6,12 +6,12 @@ import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences;
+import frc.robot.RobotContainer;
 import frc.robot.util.hardware.MotionControl.PivotController;
 
 public class Hang extends PivotController {
@@ -49,10 +49,7 @@ public class Hang extends PivotController {
   }
 
   public Command test() {
-    return Commands.sequence(
-      deploy(),
-      stow()
-    );
+    return Commands.sequence(deploy(), stow());
   }
 
   public Command setTargetAngleCommand(Angle angle) {

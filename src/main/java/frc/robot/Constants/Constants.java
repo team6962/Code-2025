@@ -10,14 +10,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -28,6 +22,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -70,7 +68,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final Distance ALGAE_DIAMETER = Inches.of(16.25); //meters
+    public static final Distance ALGAE_DIAMETER = Inches.of(16.25); // meters
   }
 
   // LIMELIGHT
@@ -80,22 +78,27 @@ public final class Constants {
     // x is front-to-back
     // y is left-to-right
     // z it top-to-bottom
-    public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES = Map.of(
-      "limelight-ftag", new Pose3d(
-        Units.inchesToMeters(7.442142),
-        Units.inchesToMeters(1.0),
-        Units.inchesToMeters(25.283),
-        new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
-      "limelight-btag", new Pose3d(
-        Units.inchesToMeters(2.670592),
-        Units.inchesToMeters(-3.0), Units.inchesToMeters(25.283),
-        new Rotation3d(0.0, Units.degreesToRadians(24.0),
-        Units.degreesToRadians(180.0))),
-      "limelight-falgae", new Pose3d(
-        Units.inchesToMeters(0),
-        Units.inchesToMeters(0),
-        Units.inchesToMeters(0),
-        new Rotation3d(0.0, 0, 0.0)));
+    public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES =
+        Map.of(
+            "limelight-ftag",
+                new Pose3d(
+                    Units.inchesToMeters(7.442142),
+                    Units.inchesToMeters(1.0),
+                    Units.inchesToMeters(25.283),
+                    new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
+            "limelight-btag",
+                new Pose3d(
+                    Units.inchesToMeters(2.670592),
+                    Units.inchesToMeters(-3.0),
+                    Units.inchesToMeters(25.283),
+                    new Rotation3d(
+                        0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0))),
+            "limelight-falgae",
+                new Pose3d(
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(0),
+                    new Rotation3d(0.0, 0, 0.0)));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-falgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
@@ -113,7 +116,8 @@ public final class Constants {
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
     public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
 
-    public static final Distance MAX_DETECTION_RANGE = Meters.of(19.30); //Max distance an algae can be while being on the field
+    public static final Distance MAX_DETECTION_RANGE =
+        Meters.of(19.30); // Max distance an algae can be while being on the field
   }
 
   public static final class SWERVE {
@@ -211,10 +215,15 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0) * (3.0 / 2.0) / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
+    public static final double GEARING =
+        (3.0 / 1.0)
+            * (4.0 / 1.0)
+            * (5.0 / 1.0)
+            * (3.0 / 2.0)
+            / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
     public static final Angle ENCODER_OFFSET = Rotations.of(0.715);
-    public static final Distance Bhobe_HEIGHT = Inches.of(1); 
+    public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
 
@@ -224,7 +233,7 @@ public final class Constants {
       HEIGHT_TO_ANGLE_MAP.put(2.0, new AngleRange(Degrees.of(20.0), Degrees.of(35.0)));
       HEIGHT_TO_ANGLE_MAP.put(3.0, new AngleRange(Degrees.of(30.0), Degrees.of(30.0)));
       HEIGHT_TO_ANGLE_MAP.put(4.0, new AngleRange(Degrees.of(40.0), Degrees.of(25.0)));
-    }    
+    }
 
     public static final class PROFILE {
       public static final double kP = 0.5;
@@ -236,7 +245,7 @@ public final class Constants {
     public static final double GEARING = 5 * 5 * 5;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518); 
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
 
     public static final class PROFILE {
       public static final double kP = 2.0;

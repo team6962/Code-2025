@@ -1,6 +1,7 @@
 package frc.robot.util.hardware.MotionControl;
 
 import static edu.wpi.first.units.Units.Meters;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -24,7 +25,6 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-
 public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
@@ -35,7 +35,6 @@ public class DualLinearActuator extends SubsystemBase {
 
   private DutyCycleEncoder absoluteEncoder;
   private DigitalInput ceilingLimit, floorLimit;
-
   private Distance baseHeight, minHeight, maxHeight, tolerance;
 
   private double encoderOffset = 0.0;
@@ -46,7 +45,6 @@ public class DualLinearActuator extends SubsystemBase {
 
   private int cyclesCompleted;
   private Distance lastPosition = Meters.of(0.0);
-
 
   /**
    * Constructs a new DualLinearController.
@@ -95,12 +93,10 @@ public class DualLinearActuator extends SubsystemBase {
     rightEncoder = rightMotor.getEncoder();
     leftPID = leftMotor.getClosedLoopController();
     rightPID = rightMotor.getClosedLoopController();
-    
 
-    absoluteEncoder =
-        new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
+    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     lastPosition = getCycleDelta();
-    
+
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -119,15 +115,12 @@ public class DualLinearActuator extends SubsystemBase {
     leftEncoder.setPosition(baseHeight.in(Meters));
     rightEncoder.setPosition(baseHeight.in(Meters));
 
-
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
-    
-    
+
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
-    
 
     // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
     // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
@@ -135,7 +128,6 @@ public class DualLinearActuator extends SubsystemBase {
     // Logger.logNumber(
     //     this.getName() + "/rawAbsolutePosition",
     //     absoluteEncoder::get);
-
 
     Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
@@ -157,8 +149,7 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   private Distance clampHeight(Distance height) {
-    return Meters.of(
-        MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
+    return Meters.of(MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
   }
 
   public Distance getLeftHeight() {
@@ -222,7 +213,6 @@ public class DualLinearActuator extends SubsystemBase {
     //   return;
     // }
 
-
     // remove?
     // leftEncoder.setPosition(getAverageHeight().in(Meters));
     // rightEncoder.setPosition(getAverageHeight().in(Meters));
@@ -238,11 +228,9 @@ public class DualLinearActuator extends SubsystemBase {
       return;
     }
 
-    leftPID.setReference(
-        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     rightPID.setReference(
         targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-
   }
 
   public boolean triggeredCeilingLimit() {
@@ -299,7 +287,7 @@ public class DualLinearActuator extends SubsystemBase {
   public void periodic() {
     if (lastPosition.gt(cycleHeight.minus(tolerance)) && getCycleDelta().lt(tolerance)) {
       cyclesCompleted++;
-    } 
+    }
 
     if (lastPosition.lt(tolerance) && getCycleDelta().lt(cycleHeight.minus(tolerance))) {
       cyclesCompleted--;

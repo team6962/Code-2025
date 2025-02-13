@@ -1,15 +1,14 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.Constants;
+import frc.robot.Robot;
+import java.util.function.DoubleSupplier;
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
@@ -55,12 +54,11 @@ public class LEDs extends SubsystemBase {
   public static final int[] BLUE = {0, 20, 255};
   public static final int[] RSL_ORANGE = {255, 100, 0};
   public static final int[] LIGHT_BLUE = {173, 216, 230};
-  public static final int[] YELLOW = {255,255,0};
+  public static final int[] YELLOW = {255, 255, 0};
   public static final int[] CYAN = {0, 255, 255};
   public static final int[] DARK_GREEN = {0, 100, 0};
   public static final int[] PURPLE = {108, 59, 170};
   public static final int[] MAGENTA = {255, 0, 255};
-
 
   private DoubleSupplier animationSpeed;
 
@@ -104,11 +102,11 @@ public class LEDs extends SubsystemBase {
         setColorWave(0, length, getBumperLEDColor(), PURPLE, 1.0, Direction.LEFT);
         break;
       case CAN_SEE_ALGAE:
-        setColorFromCenter(0, length,CYAN ,0.25);
+        setColorFromCenter(0, length, CYAN, 0.25);
         break;
       case AIMING_PROCESSOR:
         setColorFlash(0, length, DARK_GREEN, 5);
-      break;
+        break;
       case SCORING_PROCESSOR:
         setColor(length, DARK_GREEN);
         break;

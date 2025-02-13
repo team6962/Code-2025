@@ -5,14 +5,10 @@
 package frc.robot.commands;
 
 import com.team6962.lib.swerve.SwerveDrive;
-
-import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.Constants.Preferences.ELEVATOR;
+import frc.robot.subsystems.elevator.Elevator;
 
 /** An example command that uses an example subsystem. */
 public class SlowDrivetrain extends Command {

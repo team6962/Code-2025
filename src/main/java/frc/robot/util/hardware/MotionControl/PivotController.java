@@ -7,14 +7,13 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -32,7 +31,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-public class PivotController extends SubsystemBase{
+public class PivotController extends SubsystemBase {
   private Angle targetAngle = Degrees.of(0);
   // State setpointState;
   private double kS = 0.0;
@@ -78,7 +77,7 @@ public class PivotController extends SubsystemBase{
     this.motor = new SparkMax(motorCAN, MotorType.kBrushless);
     this.kS = kS;
     encoder = motor.getEncoder();
-    this.encoderOffset = absolutePositionOffset;          
+    this.encoderOffset = absolutePositionOffset;
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     pid = motor.getClosedLoopController();
@@ -88,7 +87,7 @@ public class PivotController extends SubsystemBase{
     this.tolerance = tolerance;
 
     this.reversed = reversed;
-    
+
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -97,11 +96,9 @@ public class PivotController extends SubsystemBase{
     Logger.logMeasure(this.getName() + "/targetPosition", () -> getTargetAngle());
     Logger.logMeasure(this.getName() + "/position", () -> getPosition());
     Logger.logMeasure(
-        this.getName() + "/relativePosition",
-        () -> Rotations.of(encoder.getPosition()));
+        this.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()));
     Logger.logMeasure(
-        this.getName() + "/rawAbsolutePosition",
-        () -> Rotations.of(absoluteEncoder.get()));
+        this.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()));
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
@@ -120,18 +117,12 @@ public class PivotController extends SubsystemBase{
             0.0);
     simPID = new PIDController(kP, 0, 0);
 
-
-
     Logger.log(this.getName() + "/minAngle", minAngle.in(Rotations));
     Logger.log(this.getName() + "/maxAngle", maxAngle.in(Rotations));
     Logger.logNumber(this.getName() + "/targetAngle", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle", () -> getPosition().in(Rotations));
-    Logger.logNumber(
-        this.getName() + "/relativePosition",
-        () -> encoder.getPosition());
-    Logger.logNumber(
-        this.getName() + "/rawAbsolutePosition",
-        () -> absoluteEncoder.get());
+    Logger.logNumber(this.getName() + "/relativePosition", () -> encoder.getPosition());
+    Logger.logNumber(this.getName() + "/rawAbsolutePosition", () -> absoluteEncoder.get());
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
     Logger.logBoolean(this.getName() + "/forwardSafety", this::triggeredForwardSafety);
     Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
@@ -175,7 +166,7 @@ public class PivotController extends SubsystemBase{
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
   }
 
-  public Angle clampAngle(Angle angle){
+  public Angle clampAngle(Angle angle) {
     if (angle.gt(maxAngle)) return maxAngle;
     if (angle.lt(minAngle)) return minAngle;
     return angle;
@@ -209,11 +200,11 @@ public class PivotController extends SubsystemBase{
     targetAngle = clampAngle(targetAngle);
   }
 
-  public void moveUp(){
+  public void moveUp() {
     motor.set(0.05);
   }
 
-  public void moveDown(){
+  public void moveDown() {
     motor.set(-0.05);
   }
 
