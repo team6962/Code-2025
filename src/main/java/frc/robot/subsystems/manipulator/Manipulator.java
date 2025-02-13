@@ -51,11 +51,7 @@ public class Manipulator extends SubsystemBase {
     //   System.out.println("No angle range found for height " + elevatorHeight);
     }
   }
-
-  public void calculateDynamicLimit(Distance elevatorHeight){
-    
-  }
-
+  
   public Command placeCoralL23() {
     return pivot.coralL23().andThen(coral.drop());
   }

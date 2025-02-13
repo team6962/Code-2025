@@ -122,44 +122,38 @@ public class PivotController extends SubsystemBase{
 
 
 
+    Logger.log(this.getName() + "/minAngle", minAngle.in(Rotations));
+    Logger.log(this.getName() + "/maxAngle", maxAngle.in(Rotations));
     Logger.logNumber(this.getName() + "/targetAngle", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle", () -> getPosition().in(Rotations));
     Logger.logNumber(
         this.getName() + "/relativePosition",
-        () -> Rotations.of(encoder.getPosition()).in(Rotations));
+        () -> encoder.getPosition());
     Logger.logNumber(
         this.getName() + "/rawAbsolutePosition",
-        () -> Rotations.of(absoluteEncoder.get()).in(Rotations));
-    Logger.logBoolean(this.getName() + "/encoderConnected",  () -> absoluteEncoder.isConnected());
+        () -> absoluteEncoder.get());
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
-    Logger.log(this.getName() + "/minAngle", minAngle.in(Rotations));
-    Logger.log(this.getName() + "/maxAngle", maxAngle.in(Rotations));
-    Logger.logNumber(this.getName()+"/appliedOutput", () -> motor.getAppliedOutput());
+    Logger.logBoolean(this.getName() + "/forwardSafety", this::triggeredForwardSafety);
+    Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
+    // Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
   }
 
-  public void run() {
-    if (targetAngle == null) return; // If we havent set a target angle yet, do nothing
+  public void setAngle(Angle requestedAngle) {
+    if (requestedAngle == null) return; // If we havent set a target angle yet, do nothing
+    targetAngle = clampAngle(requestedAngle);
+
     if (!absoluteEncoder.isConnected()) {
       motor.stopMotor();
       return;
     }
 
-    // System.out.println(getPosition().getDegrees());
-
-    // Re-seed the relative encoder with the absolute encoder when not moving
-    // if (doneMoving()) {
     encoder.setPosition(getPosition().in(Rotations));
-    // }
 
-    // if (setpointState == null) {
-    //   setpointState = new State(getAbsolutePosition().getRadians(), getVelocity().getRadians());
-    // };
-
-    // Calculate the setpoint following a trapazoidal profile (smooth ramp up and down acceleration
-    // curves)
-    // State targetState = new State(targetAngle.getRadians(), 0.0);
-
-    // setpointState = profile.calculate(Robot.getLoopTime(), setpointState, targetState);
+    if (triggeredForwardSafety() || triggeredReverseSafety()) {
+      motor.stopMotor();
+      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
+      return;
+    }
 
     if (doneMoving()) {
       motor.stopMotor();
@@ -176,37 +170,21 @@ public class PivotController extends SubsystemBase{
     // System.out.println("kS: " + kS);
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
-
-    // if (getPosition().gt(maxAngle) && encoder.getVelocity() > 0.0) {
-    //   motor.stopMotor();
-    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-    //   return;
-    // }
-
-    // if (getPosition().lt(minAngle) && encoder.getVelocity() < -0.0) {
-    //   motor.stopMotor();
-    //   if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-    //   return;
-    // }
-
     pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
 
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
   }
 
-  public Angle clampAngle (Angle angle){
+  public Angle clampAngle(Angle angle){
     if (angle.gt(maxAngle)) return maxAngle;
     if (angle.lt(minAngle)) return minAngle;
     return angle;
   }
 
-  public void setTargetAngle(Angle angle) {
-    targetAngle = clampAngle(angle);
-  }
-
   public Angle getTargetAngle() {
     return targetAngle;
   }
+
   public void setMaxAngle(Angle maxAngle) {
     this.maxAngle = maxAngle;
     targetAngle = clampAngle(targetAngle);
@@ -239,16 +217,10 @@ public class PivotController extends SubsystemBase{
     motor.set(-0.05);
   }
 
-  public boolean isInRange(Angle angle) {
-    return angle.gt(minAngle) && angle.lt(maxAngle);
-  }
-
   public Angle getPosition() {
     if (Robot.isSimulation()) return Radians.of(sim.getAngleRads());
 
     double factor = reversed ? -1 : 1;
-
-    // ((0.26934 + x) * -1)
 
     // map from 0 - 1 rotations to -0.5 to 0.5 rotations, where 0 is straight
     // out
@@ -266,6 +238,14 @@ public class PivotController extends SubsystemBase{
     return Rotations.of(absoluteAngle);
   }
 
+  public boolean triggeredForwardSafety() {
+    return getPosition().gt(maxAngle) && encoder.getVelocity() > 0.0;
+  }
+
+  public boolean triggeredReverseSafety() {
+    return getPosition().lt(minAngle) && encoder.getVelocity() < -0.0;
+  }
+
   public boolean doneMoving() {
     if (getTargetAngle() == null) return true;
     return debouncer.calculate(
@@ -278,6 +258,8 @@ public class PivotController extends SubsystemBase{
 
   @Override
   public void periodic() {
-      
+    if (triggeredForwardSafety() || triggeredReverseSafety()) {
+      stopMotor();
+    }
   }
 }

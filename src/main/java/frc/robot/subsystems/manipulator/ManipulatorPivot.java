@@ -46,9 +46,11 @@ public class ManipulatorPivot extends PivotController {
       stopMotor();
       return;
     }
-    if (RobotState.isDisabled()) {
-      setTargetAngle(getPosition());
-    }
+  }
+
+  public Command pivotTo(Supplier<Angle> angleSupplier) {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    return this.run(() -> setAngle(angleSupplier.get())).until(this::doneMoving);
   }
 
   public Command intakeCoral() {
@@ -93,15 +95,5 @@ public class ManipulatorPivot extends PivotController {
 
   public Command down() {
     return Commands.runEnd(this::moveDown, this::stopMotor);
-  }
-
-  public Command pivotTo(Supplier<Angle> angleSupplier) {
-    return Commands.run(() -> setTargetAngleAndRun(angleSupplier), this)
-        .until(this::doneMoving);
-  }
-
-  public void setTargetAngleAndRun(Supplier<Angle> angleSupplier){
-    setTargetAngle(angleSupplier.get());
-    run();
   }
 }
