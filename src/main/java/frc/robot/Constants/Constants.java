@@ -46,12 +46,12 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = false;
+    public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -115,17 +115,17 @@ public final class Constants {
 
     public static final Distance MAX_DETECTION_RANGE = Meters.of(19.30); //Max distance an algae can be while being on the field
   }
-
+  // Competition: 5476
   public static final class SWERVE {
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module(14, 24, 34, Degrees.of(0)),
-      new SwerveConfig.Module(15, 25, 35, Degrees.of(0)),
-      new SwerveConfig.Module(16, 26, 36, Degrees.of(0)),
-      new SwerveConfig.Module(17, 27, 37, Degrees.of(0)),
+      new SwerveConfig.Module(14, 24, 34, Radians.of(-2.439 - Math.PI / 4)), // -2.439
+      new SwerveConfig.Module(15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4)), // -0.440
+      new SwerveConfig.Module(16, 26, 36, Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI)), // -1.842
+      new SwerveConfig.Module(17, 27, 37, Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -225,8 +225,8 @@ public final class Constants {
     }    
 
     public static final class PROFILE {
-      public static final double kP = 0.5;
-      public static final double kS = 0.0;
+      public static final double kP = 8.0;
+      public static final double kS = 0.35;
     }
   }
 
@@ -238,7 +238,7 @@ public final class Constants {
 
     public static final class PROFILE {
       public static final double kP = 2.0;
-      public static final double kI = 1.0;
+      public static final double kI = 0.1;
       public static final double kS = 0.5;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }

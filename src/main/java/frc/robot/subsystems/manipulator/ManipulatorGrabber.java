@@ -45,6 +45,7 @@ public class ManipulatorGrabber extends SubsystemBase {
     this.sensor = sensor;
     this.intakeSpeed = intakeSpeed;
     this.dropSpeed = dropSpeed;
+    this.isEnabled = isEnabled;
 
     sensor.addManipulatorProperties(this.motors);
 
@@ -90,6 +91,12 @@ public class ManipulatorGrabber extends SubsystemBase {
       }
     }, this);
   }
+
+  // public Command runMultiple(double speed) {
+  //   return Commands.run(() -> {
+  //     speed = isEnabled.getAsBoolean() ? speed : 0;
+  //   }, this);
+  // }
 
   public Command run(double speed) {
     return Commands.run(() -> {
