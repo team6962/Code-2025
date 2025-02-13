@@ -26,6 +26,7 @@ public class ManipulatorGrabber extends SubsystemBase {
   private double intakeSpeed;
   private double dropSpeed;
   private BooleanSupplier isEnabled;
+  private boolean holding;
 
   public final ManipulatorSensor sensor;
 
@@ -80,6 +81,8 @@ public class ManipulatorGrabber extends SubsystemBase {
 
   public Command hold() {
     return Commands.run(() -> {
+      if (!holding) return;
+
       double limitedSpeed = isEnabled.getAsBoolean() ? (sensor.needsHold() ? intakeSpeed : 0) : 0;
 
       for (Motor motor : motors) {
@@ -99,11 +102,11 @@ public class ManipulatorGrabber extends SubsystemBase {
   }
 
   public Command intake() {
-    return run(intakeSpeed).until(sensor::hasGamePiece).alongWith(sensor.duringIntake());
+    return run(intakeSpeed).until(sensor::hasGamePiece).alongWith(sensor.duringIntake()).andThen(() -> holding = true);
   }
 
   public Command drop() {
-    return run(dropSpeed).until(() -> !sensor.hasGamePiece()).alongWith(sensor.duringDrop());
+    return run(dropSpeed).until(() -> !sensor.hasGamePiece()).alongWith(sensor.duringDrop()).andThen(() -> holding = false);
   }
 
   public Command stop() {
