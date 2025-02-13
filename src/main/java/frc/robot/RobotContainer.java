@@ -59,11 +59,11 @@ public class RobotContainer {
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
   public final LEDs ledStrip;
-  public final Intake intake;
-  public final Manipulator manipulator;
+  // public final Intake intake;
+  // public final Manipulator manipulator;
   public final Elevator elevator;
-  public final Hang hang;
-  public final Algae algaeDetector;
+  // public final Hang hang;
+  // public final Algae algaeDetector;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -112,17 +112,17 @@ public class RobotContainer {
         new LEDs(
             stateController,
             () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
-    intake = new Intake();
-    manipulator = new Manipulator();
+    // intake = new Intake();
+    // manipulator = new Manipulator();
     elevator = new Elevator();
-    hang = new Hang();
-    algaeDetector = new Algae();
+    // hang = new Hang();
+    // algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang);
+    Controls.configureBindings(stateController, swerveDrive, elevator, null, null, null);
 
     // module = new SwerveModule();
 
@@ -150,7 +150,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    return swerveDrive.drive(new ChassisSpeeds(1.0, 0.0, 0.0));
+    // return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
     // return hang.stow();
     // return Commands.run(() -> {});
   }
@@ -181,7 +182,7 @@ public class RobotContainer {
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
-    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, hang, intake);
+    Command checks = new PrematchChecks(swerveDrive, elevator, null, null, null);
     checks.schedule();
   }
 }
