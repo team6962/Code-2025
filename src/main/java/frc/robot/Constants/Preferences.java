@@ -91,7 +91,7 @@ public final class Preferences {
   public static final class ELEVATOR {
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(35.5);
-    public static final Distance MAX_HEIGHT = Inches.of(82);
+    public static final Distance MAX_HEIGHT = Inches.of(80);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); //AVERAGE
