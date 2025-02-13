@@ -65,6 +65,10 @@ public class Elevator extends DualLinearController {
     return this.run(() -> setTargetHeightAndRun(height)).until(this::doneMoving);
   }
 
+  public Command speed(double speed) {
+    return Commands.runEnd(() -> this.moveSpeed(speed * 0.2), this::stopMotors);
+  }
+
   public Command up() {
     return Commands.runEnd(this::moveUp, this::stopMotors);
   }

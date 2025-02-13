@@ -186,6 +186,11 @@ public class DualLinearController extends SubsystemBase {
     return cycleHeight.times(absoluteEncoder.get());
   }
 
+  public void moveSpeed(double speed) {
+    leftMotor.set(speed);
+    rightMotor.set(speed);
+  }
+
   public void moveUp() {
     leftMotor.set(0.10);
     rightMotor.set(0.10);

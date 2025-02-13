@@ -38,7 +38,7 @@ public class Manipulator extends SubsystemBase {
             new ManipulatorGrabber.MotorConfig[] {
               new ManipulatorGrabber.MotorConfig(CAN.MANIPULATOR_CORAL, MANIPULATOR.INVERT_CORAL)
             },
-            new ManipulatorGrabber.DigitalSensor(Constants.DIO.CORAL_BEAM_BREAK),
+            new ManipulatorGrabber.DigitalSensor("Coral Manipulator", Constants.DIO.CORAL_BEAM_BREAK),
             MANIPULATOR.CORAL_IN_SPEED,
             MANIPULATOR.CORAL_OUT_SPEED,
             () -> ENABLED_SYSTEMS.MANIPULATOR);

@@ -63,7 +63,7 @@ public final class Preferences {
     public static final double ALGAE_OUT_SPEED = 0.1;
     public static final double ALGAE_IN_SPEED = -0.1;
     public static final double CORAL_OUT_SPEED = 0.1;
-    public static final double CORAL_IN_SPEED = -0.1;
+    public static final double CORAL_IN_SPEED = 0.1;
   }
 
   // REFERENCE ANGLES FROM CAD AND https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0

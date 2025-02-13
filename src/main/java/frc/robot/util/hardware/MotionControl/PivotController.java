@@ -65,6 +65,7 @@ public class PivotController extends SubsystemBase{
       double absolutePositionOffset,
       double kP,
       double kI,
+      double kD,
       double kS,
       double gearing,
       Angle minAngle,
@@ -92,7 +93,7 @@ public class PivotController extends SubsystemBase{
     
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, kI, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, kI, kD, 0.0, false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     Logger.logMeasure(this.getName() + "/targetPosition", () -> getTargetAngle());

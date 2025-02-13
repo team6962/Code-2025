@@ -86,28 +86,28 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    // operator.a().onTrue(elevator.coralL2());
-    // operator.b().onTrue(elevator.coralL3());
-    // operator.x().onTrue(elevator.coralL4());
-    // operator.y().onTrue(elevator.algaeBarge());
-    operator.a().onTrue(manipulator.pivot.coralL23());
-    operator.b().onTrue(manipulator.pivot.algaeReef());
-    operator.x().onTrue(manipulator.pivot.intakeCoral());
-    operator.y().onTrue(manipulator.pivot.stow());
+    operator.a().onTrue(elevator.coralL2());
+    operator.b().onTrue(elevator.coralL3());
+    operator.x().onTrue(elevator.coralL4());
+    operator.y().onTrue(elevator.algaeBarge());
+    // operator.a().onTrue(manipulator.pivot.coralL23());
+    // operator.b().onTrue(manipulator.pivot.algaeReef());
+    // operator.x().onTrue(manipulator.pivot.intakeCoral());
+    // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(elevator.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
-    operator.povLeft().whileTrue(elevator.up());
-    operator.povRight().whileTrue(elevator.down());
+    operator.povRight().whileTrue(elevator.up());
+    operator.povLeft().whileTrue(elevator.down());
     operator.povUp().whileTrue(manipulator.pivot.up());
     operator.povDown().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
-    // operator.povRight().whileTrue(hang.stow());
-    operator.leftBumper().onTrue(manipulator.coral.intake());
-    operator.rightBumper().onTrue(manipulator.coral.drop());
-    operator.leftTrigger().onTrue(manipulator.algae.intake());
-    operator.rightTrigger().onTrue(manipulator.algae.drop());
+    // operator.povRight().whileTrue(hang.stow());,
+    operator.rightBumper().whileTrue(manipulator.coral.smartButton());
+    operator.rightTrigger().whileTrue(manipulator.coral.smartButton());
+    operator.leftBumper().whileTrue(manipulator.algae.intake());
+    operator.leftTrigger().whileTrue(manipulator.algae.drop());
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 

@@ -2,6 +2,7 @@ package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Amps;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -82,9 +83,7 @@ public class ManipulatorGrabber extends SubsystemBase {
 
   public Command hold() {
     return Commands.run(() -> {
-      if (!holding) return;
-
-      double limitedSpeed = isEnabled.getAsBoolean() ? (sensor.needsHold() ? intakeSpeed : 0) : 0;
+      double limitedSpeed = isEnabled.getAsBoolean() && sensor.needsHold() ? intakeSpeed : 0;
 
       for (Motor motor : motors) {
         motor.set(limitedSpeed);
@@ -106,6 +105,13 @@ public class ManipulatorGrabber extends SubsystemBase {
         motor.set(limitedSpeed);
       }
     }, this);
+  }
+
+  public Command smartButton() {
+    return Commands.defer(() -> {
+      if (sensor.hasGamePiece()) return drop();
+      else return intake();
+    }, Set.of(this));
   }
 
   public Command intake() {
@@ -146,12 +152,14 @@ public class ManipulatorGrabber extends SubsystemBase {
   public static class DigitalSensor implements ManipulatorSensor {
     private DigitalInput sensor;
 
-    public DigitalSensor(DigitalInput sensor) {
+    public DigitalSensor(String name, DigitalInput sensor) {
       this.sensor = sensor;
+
+      Logger.logBoolean("/" + name + "/hasGamePiece", () -> !sensor.get());
     }
 
-    public DigitalSensor(int channel) {
-      this(new DigitalInput(channel));
+    public DigitalSensor(String name, int channel) {
+      this(name, new DigitalInput(channel));
     }
 
     @Override

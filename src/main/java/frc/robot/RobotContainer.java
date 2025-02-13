@@ -5,6 +5,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import com.team6962.lib.swerve.MusicDrive;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
@@ -150,7 +151,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return swerveDrive.drive(new ChassisSpeeds(1.0, 0.0, 0.0));
+    // return new MusicDrive(swerveDrive, "bohemian");
+    return swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.5));
     // return new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
     // return hang.stow();
     // return Commands.run(() -> {});
