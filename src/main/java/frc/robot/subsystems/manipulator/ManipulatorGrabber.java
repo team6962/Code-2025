@@ -44,6 +44,7 @@ public class ManipulatorGrabber extends SubsystemBase {
     this.sensor = sensor;
     this.intakeSpeed = intakeSpeed;
     this.dropSpeed = dropSpeed;
+    this.isEnabled = isEnabled;
 
     sensor.addManipulatorProperties(this.motors);
 

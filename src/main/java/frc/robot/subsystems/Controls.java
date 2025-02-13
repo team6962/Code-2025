@@ -102,8 +102,8 @@ public class Controls {
     operator.povRight().whileTrue(elevator.down());
     operator.povUp().whileTrue(manipulator.pivot.up());
     operator.povDown().whileTrue(manipulator.pivot.down());
-    operator.povLeft().whileTrue(hang.deploy());
-    operator.povRight().whileTrue(hang.stow());
+    // operator.povLeft().whileTrue(hang.deploy());
+    // operator.povRight().whileTrue(hang.stow());
     operator.leftBumper().onTrue(manipulator.coral.intake());
     operator.rightBumper().onTrue(manipulator.coral.drop());
     operator.leftTrigger().onTrue(manipulator.algae.intake());
