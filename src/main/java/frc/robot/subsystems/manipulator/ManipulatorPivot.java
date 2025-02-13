@@ -29,6 +29,7 @@ public class ManipulatorPivot extends PivotController {
             DIO.MANIPULATOR_ENCODER,
             MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
             MANIPULATOR_PIVOT.PROFILE.kP,
+            MANIPULATOR_PIVOT.PROFILE.kI,
             MANIPULATOR_PIVOT.PROFILE.kS,
             MANIPULATOR_PIVOT.GEARING,
             Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,

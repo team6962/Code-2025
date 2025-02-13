@@ -23,6 +23,7 @@ public class Hang extends PivotController {
         Constants.HANG_PIVOT.ENCODER_OFFSET.in(Rotations),
         Constants.HANG_PIVOT.PROFILE.kP,
         Constants.HANG_PIVOT.PROFILE.kS,
+        Constants.HANG_PIVOT.PROFILE.kI,
         Constants.HANG_PIVOT.GEARING,
         Preferences.HANG_PIVOT.MIN_ANGLE,
         Preferences.HANG_PIVOT.MAX_ANGLE,
