@@ -222,40 +222,40 @@ public class SwerveDrive extends SwerveCore {
     return driveHeading(() -> heading);
   }
 
-    public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
-        return Commands.run(
-            () -> facePoint(point.get(), rotationOffset)
-        );
-    }
+//   public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
+//     return Commands.run(
+//       () -> facePoint(point.get(), rotationOffset)
+//     );
+//   }
 
-    public void facePoint(Translation2d point, Rotation2d rotationOffset) {
-        double time = 0.02;
+//   public void facePoint(Translation2d point, Rotation2d rotationOffset) {
+//     double time = 0.02;
 
-        if (point == null) {
-            // TODO: add and velocity
-            driveHeading(getEstimatedPose().getRotation());
-            return;
-        }
+//     if (point == null) {
+//         // TODO: add and velocity
+//         driveHeading(getEstimatedPose().getRotation());
+//         return;
+//     }
 
-        if (point.getDistance(getEstimatedPose().getTranslation()) < 1.0 && RobotState.isAutonomous()) {
-            return;
-        }
-
-
-        Translation2d currentPosition = getEstimatedPose().getTranslation();
-        Translation2d futurePosition = getEstimatedPose().getTranslation().plus(KinematicsUtils.getTranslation(getEstimatedSpeeds()).times(time));
-        
-        Rotation2d currentTargetHeading = point.minus(currentPosition).getAngle().plus(rotationOffset);
-        Rotation2d futureTargetHeading = point.minus(futurePosition).getAngle().plus(rotationOffset);
-        
-        double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
-        if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
-            addedVelocity = 0.0;
-        }
+//     if (point.getDistance(getEstimatedPose().getTranslation()) < 1.0 && RobotState.isAutonomous()) {
+//         return;
+//     }
 
 
-        driveHeading(currentTargetHeading);
-    }
+//     Translation2d currentPosition = getEstimatedPose().getTranslation();
+//     Translation2d futurePosition = getEstimatedPose().getTranslation().plus(KinematicsUtils.getTranslation(getEstimatedSpeeds()).times(time));
+    
+//     Rotation2d currentTargetHeading = point.minus(currentPosition).getAngle().plus(rotationOffset);
+//     Rotation2d futureTargetHeading = point.minus(futurePosition).getAngle().plus(rotationOffset);
+    
+//     double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
+//     if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
+//         addedVelocity = 0.0;
+//     }
+
+
+//     driveHeading(currentTargetHeading);
+//   }
 
   public Command stop() {
     return driveModules(() -> KinematicsUtils.getStoppedStates(getModuleStates()));
