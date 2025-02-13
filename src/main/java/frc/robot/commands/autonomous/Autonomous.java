@@ -98,11 +98,11 @@ public class Autonomous {
 
   /**
    * Aligns to either reef pole on the closest reef face
-   * @param side 0 means left, 1 means right
+   * @param side 0 means left, 1 means right (from the robot's perspective)
    * @return
    */
   public Command reefPoleAlign(int side) {
-    return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[0]);
+    return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
   }
 
   public Command pathfindToTopLeftReefPoles() {
@@ -211,7 +211,7 @@ public class Autonomous {
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      reefPoleAlign(0)
+      reefPoleAlign(1)
     );
   }
 }
