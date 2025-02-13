@@ -86,6 +86,7 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
+    
     operator.a().onTrue(elevator.coralL2());
     operator.b().onTrue(elevator.coralL3());
     operator.x().onTrue(elevator.coralL4());
@@ -100,6 +101,9 @@ public class Controls {
     operator.rightStick().onTrue(elevator.algaeL3());
     operator.povUp().whileTrue(elevator.up());
     operator.povDown().whileTrue(elevator.down());
+    operator.povLeft().whileTrue(manipulator.pivot.up());
+    operator.povRight().whileTrue(manipulator.pivot.down());
+
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());
     // operator.leftBumper().onTrue(manipulator.coral.intake());

@@ -51,7 +51,7 @@ public final class Constants {
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -224,8 +224,8 @@ public final class Constants {
     }    
 
     public static final class PROFILE {
-      public static final double kP = 0.2;
-      public static final double kS = 0.0;
+      public static final double kP = 8.0;
+      public static final double kS = 0.35;
     }
   }
 

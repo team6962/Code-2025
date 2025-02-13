@@ -17,6 +17,7 @@ import java.util.function.BooleanSupplier;
 
 public class ManipulatorGrabber extends SubsystemBase {
   private SparkMax motor;
+  private Motor[] motors;
   private double intakeSpeed;
   private double dropSpeed;
   private BooleanSupplier isEnabled;
@@ -39,6 +40,28 @@ public class ManipulatorGrabber extends SubsystemBase {
     this.intakeSpeed = intakeSpeed;
     this.dropSpeed = dropSpeed;
   }
+
+  private class Motor {
+    private SparkMax sparkMax;
+
+    public Motor(int motorId) {
+      sparkMax = new SparkMax(motorId, MotorType.kBrushless);
+
+      SparkMaxConfig config = new SparkMaxConfig();
+      SparkMaxUtil.configure(config, false, IdleMode.kCoast);
+      SparkMaxUtil.saveAndLog(getName(), motor, config);
+    }
+
+    public void set(double speed) {
+      sparkMax.set(speed);
+    }
+  }
+
+  // public Command runMultiple(double speed) {
+  //   return Commands.run(() -> {
+  //     speed = isEnabled.getAsBoolean() ? speed : 0;
+  //   }, this);
+  // }
 
   public Command run(double speed) {
     return Commands.run(() -> motor.set(isEnabled.getAsBoolean() ? speed : 0), this);

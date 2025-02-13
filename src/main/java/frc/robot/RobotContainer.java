@@ -60,7 +60,7 @@ public class RobotContainer {
   public final RobotStateController stateController;
   public final LEDs ledStrip;
   // public final Intake intake;
-  // public final Manipulator manipulator;
+  public final Manipulator manipulator;
   public final Elevator elevator;
   // public final Hang hang;
   // public final Algae algaeDetector;
@@ -113,7 +113,7 @@ public class RobotContainer {
             stateController,
             () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
-    // manipulator = new Manipulator();
+    manipulator = new Manipulator();
     elevator = new Elevator();
     // hang = new Hang();
     // algaeDetector = new Algae();
@@ -122,7 +122,7 @@ public class RobotContainer {
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, null, null, null);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, null);
 
     // module = new SwerveModule();
 
@@ -182,7 +182,7 @@ public class RobotContainer {
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
-    Command checks = new PrematchChecks(swerveDrive, elevator, null, null, null);
+    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null, null);
     checks.schedule();
   }
 }

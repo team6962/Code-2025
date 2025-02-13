@@ -56,7 +56,7 @@ public class ManipulatorPivot extends SubsystemBase {
       controller.setTargetAngle(controller.getPosition());
     }
 
-    controller.run();
+    // controller.run();
   }
 
   public Command intakeCoral() {
