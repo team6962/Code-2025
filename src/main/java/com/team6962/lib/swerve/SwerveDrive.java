@@ -1,27 +1,11 @@
 package com.team6962.lib.swerve;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindThenFollowPath;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -40,187 +23,204 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
  * {@link Command}-based API for controlling the drivetrain.
  */
 public class SwerveDrive extends SwerveCore {
-    /** Subsystem for translation commands to require. */
-    private SubsystemBase translationSubsystem = new SubsystemBase() {};
+  /** Subsystem for translation commands to require. */
+  private SubsystemBase translationSubsystem = new SubsystemBase() {};
 
-    /** Subsystem for rotation commands to require. */
-    private SubsystemBase rotationSubsysem = new SubsystemBase() {};
+  /** Subsystem for rotation commands to require. */
+  private SubsystemBase rotationSubsysem = new SubsystemBase() {};
 
-    private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
+  /** Subsystem for max speed commands to require. */
+  private SubsystemBase maxSpeedSubsystem = new SubsystemBase() {};
 
-    /**
-     * Create a new SwerveDrive object with the given configuration.
-     *
-     * @param constants The SwerveConfig object that contains the configuration for the swerve drive.
-     */
-    public SwerveDrive(SwerveConfig constants) {
-        super(constants);
+  private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
 
-        autoBuilder.configure(
-            this::getEstimatedPose,
-            this.getPoseEstimator()::resetPosition,
-            this.getPoseEstimator()::getEstimatedSpeeds,
-            getConstants().driveGains().pathController(),
-            getConstants().pathRobotConfig(),
-            () -> false
-        );
-    }
+  /**
+   * Create a new SwerveDrive object with the given configuration.
+   *
+   * @param constants The SwerveConfig object that contains the configuration for the swerve drive.
+   */
+  public SwerveDrive(SwerveConfig constants) {
+    super(constants);
 
-    @Override
-    public void periodic() {
-        Field2d field = Logger.getField();
+    autoBuilder.configure(
+        this::getEstimatedPose,
+        this.getPoseEstimator()::resetPosition,
+        this.getPoseEstimator()::getEstimatedSpeeds,
+        getConstants().driveGains().pathController(),
+        getConstants().pathRobotConfig(),
+        () -> false);
 
-        field.setRobotPose(getEstimatedPose());
+    maxSpeedSubsystem.setDefaultCommand(limitSpeed(getConstants().maxDriveSpeed()));
+  }
 
-        FieldObject2d modules = field.getObject("Swerve Modules");
+  @Override
+  public void periodic() {
+    Field2d field = Logger.getField();
+    // Logger.log("Swerve Drive/AlgaePosition", );
+    field.setRobotPose(getEstimatedPose());
 
-        modules.setPoses(getModulePoses());
-    }
+    FieldObject2d modules = field.getObject("Swerve Modules");
 
-    public Pose2d getFuturePose(Time time) {
-        return getPoseEstimator().getFuturePose(time);
-    }
+    modules.setPoses(getModulePoses());
+  }
 
-    /**
-     * Returns the estimated chassis speeds of the robot in the given coordinate system.
-     *
-     * @return The estimated speeds as a ChassisSpeeds object
-     */
-    public ChassisSpeeds getEstimatedSpeeds(Coordinates.MovementSystem system) {
-        return convertSpeeds(
-            getPoseEstimator().getEstimatedSpeeds(), Coordinates.MovementSystem.ROBOT, system);
-    }
+  public Pose2d getFuturePose(Time time) {
+    return getPoseEstimator().getFuturePose(time);
+  }
 
-    /**
-     * Returns the estimated alliance-relative chassis speeds of the robot.
-     *
-     * @return The estimated speeds as a ChassisSpeeds object
-     */
-    public ChassisSpeeds getEstimatedSpeeds() {
-        return getEstimatedSpeeds(Coordinates.MovementSystem.ALLIANCE);
-    }
+  /**
+   * Returns the estimated chassis speeds of the robot in the given coordinate system.
+   *
+   * @return The estimated speeds as a ChassisSpeeds object
+   */
+  public ChassisSpeeds getEstimatedSpeeds(Coordinates.MovementSystem system) {
+    return convertSpeeds(
+        getPoseEstimator().getEstimatedSpeeds(), Coordinates.MovementSystem.ROBOT, system);
+  }
 
-    public SubsystemBase useTranslation() {
-        return translationSubsystem;
-    }
+  /**
+   * Returns the estimated alliance-relative chassis speeds of the robot.
+   *
+   * @return The estimated speeds as a ChassisSpeeds object
+   */
+  public ChassisSpeeds getEstimatedSpeeds() {
+    return getEstimatedSpeeds(Coordinates.MovementSystem.ALLIANCE);
+  }
 
-    public SubsystemBase useRotation() {
-        return rotationSubsysem;
-    }
+  public SubsystemBase useTranslation() {
+    return translationSubsystem;
+  }
 
-    public SubsystemBase[] useMotion() {
-        return new SubsystemBase[] {translationSubsystem, rotationSubsysem};
-    }
+  public SubsystemBase useRotation() {
+    return rotationSubsysem;
+  }
 
-    public LinearVelocity getLinearDriveVelocity(double powerFraction) {
-        return getConstants().maxDriveSpeed().times(powerFraction);
-    }
+  public SubsystemBase[] useMotion() {
+    return new SubsystemBase[] {translationSubsystem, rotationSubsysem};
+  }
 
-    public AngularVelocity getAngularDriveVelocity(double powerFraction) {
-        return getConstants().maxRotationSpeed().times(powerFraction);
-    }
+  public SubsystemBase useMaxSpeed() {
+    return maxSpeedSubsystem;
+  }
 
-    public Command driveModules(Supplier<SwerveModuleState[]> states) {
-        return Commands.run(() -> setMovement(states.get()), useMotion());
-    }
+  public Command limitSpeed(Supplier<LinearVelocity> maxSpeed) {
+    return Commands.run(() -> setMaxDriveSpeed(maxSpeed.get()), useMaxSpeed());
+  }
 
-    public Command drive(SwerveModuleState[] states) {
-        return driveModules(() -> states);
-    }
+  public Command limitSpeed(LinearVelocity maxSpeed) {
+    return limitSpeed(() -> maxSpeed);
+  }
 
-    public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
-        Logger.log("Swerve Drive/driveSpeeds", speeds.get());
+  public LinearVelocity getLinearDriveVelocity(double powerFraction) {
+    return getConstants().maxDriveSpeed().times(powerFraction);
+  }
 
-        return Commands.run(
-            () -> setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
-            useMotion());
-    }
+  public AngularVelocity getAngularDriveVelocity(double powerFraction) {
+    return getConstants().maxRotationSpeed().times(powerFraction);
+  }
 
-    public Command driveSpeeds(Supplier<ChassisSpeeds> speeds) {
-        return driveSpeeds(speeds, Coordinates.MovementSystem.ALLIANCE);
-    }
+  public Command driveModules(Supplier<SwerveModuleState[]> states) {
+    return Commands.run(() -> setMovement(states.get()), useMotion());
+  }
 
-    public Command drive(ChassisSpeeds speeds) {
-        return driveSpeeds(() -> speeds);
-    }
+  public Command drive(SwerveModuleState[] states) {
+    return driveModules(() -> states);
+  }
 
-    public Command driveTranslation(
-        Supplier<Translation2d> translation, Coordinates.MovementSystem system) {
-        return Commands.run(
-            () -> {
-                setMovement(convertVelocity(translation.get(), system, Coordinates.MovementSystem.ROBOT));
-            },
-            useTranslation());
-    }
+  public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
+    Logger.log("Swerve Drive/driveSpeeds", speeds.get());
 
-    public Command driveTranslation(Supplier<Translation2d> translation) {
-        return driveTranslation(translation, Coordinates.MovementSystem.ALLIANCE);
-    }
+    return Commands.run(
+        () -> setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
+        useMotion());
+  }
 
-    public Command drive(Translation2d translation) {
-        return driveTranslation(() -> translation);
-    }
+  public Command driveSpeeds(Supplier<ChassisSpeeds> speeds) {
+    return driveSpeeds(speeds, Coordinates.MovementSystem.ALLIANCE);
+  }
 
-    public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
-        return Commands.run(
-            () -> setMovement(convertAngle(rotation.get(), system, Coordinates.MovementSystem.ROBOT)),
-            useRotation());
-    }
+  public Command drive(ChassisSpeeds speeds) {
+    return driveSpeeds(() -> speeds);
+  }
 
-    public Command driveRotation(Supplier<Rotation2d> rotation) {
-        return driveRotation(rotation, Coordinates.MovementSystem.ALLIANCE);
-    }
+  public Command driveTranslation(
+      Supplier<Translation2d> translation, Coordinates.MovementSystem system) {
+    return Commands.run(
+        () -> {
+          setMovement(convertVelocity(translation.get(), system, Coordinates.MovementSystem.ROBOT));
+        },
+        useTranslation());
+  }
 
-    public Command drive(Rotation2d rotation) {
-        return driveRotation(() -> rotation);
-    }
+  public Command driveTranslation(Supplier<Translation2d> translation) {
+    return driveTranslation(translation, Coordinates.MovementSystem.ALLIANCE);
+  }
 
-    public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
-        Command command =
-            new Command() {
-            private PIDController pid;
+  public Command drive(Translation2d translation) {
+    return driveTranslation(() -> translation);
+  }
 
-            @Override
-            public void initialize() {
-                PIDConstants constants = getConstants().driveGains().rotation();
-                pid = new PIDController(constants.kP, constants.kI, constants.kD);
+  public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
+    return Commands.run(
+        () -> setMovement(convertAngle(rotation.get(), system, Coordinates.MovementSystem.ROBOT)),
+        useRotation());
+  }
 
-                pid.enableContinuousInput(-Math.PI, Math.PI);
-            }
+  public Command driveRotation(Supplier<Rotation2d> rotation) {
+    return driveRotation(rotation, Coordinates.MovementSystem.ALLIANCE);
+  }
 
-            @Override
-            public void execute() {
-                Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
-                double output = pid.calculate(error.getRadians());
+  public Command drive(Rotation2d rotation) {
+    return driveRotation(() -> rotation);
+  }
 
-                setMovement(
-                    convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
-            }
+  public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
+    Command command =
+        new Command() {
+          private PIDController pid;
 
-            @Override
-            public void end(boolean interrupted) {
-                pid.close();
-            }
-            };
+          @Override
+          public void initialize() {
+            PIDConstants constants = getConstants().driveGains().rotation();
+            pid = new PIDController(constants.kP, constants.kI, constants.kD);
 
-        command.addRequirements(useRotation());
+            pid.enableContinuousInput(-Math.PI, Math.PI);
+          }
 
-        return command;
-    }
+          @Override
+          public void execute() {
+            Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
+            double output = pid.calculate(error.getRadians());
 
-    public Command driveHeading(Supplier<Rotation2d> heading) {
-        return driveHeading(heading, Coordinates.MovementSystem.ALLIANCE);
-    }
+            setMovement(
+                convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
+          }
 
-    public Command driveHeading(Rotation2d heading) {
-        return driveHeading(() -> heading);
-    }
+          @Override
+          public void end(boolean interrupted) {
+            pid.close();
+          }
+        };
+
+    command.addRequirements(useRotation());
+
+    return command;
+  }
+
+  public Command driveHeading(Supplier<Rotation2d> heading) {
+    return driveHeading(heading, Coordinates.MovementSystem.ALLIANCE);
+  }
+
+  public Command driveHeading(Rotation2d heading) {
+    return driveHeading(() -> heading);
+  }
 
     public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
         return Commands.run(
@@ -257,37 +257,41 @@ public class SwerveDrive extends SwerveCore {
         driveHeading(currentTargetHeading);
     }
 
-    public Command stop() {
-        return driveModules(() -> KinematicsUtils.getStoppedStates(getModuleStates()));
-    }
+  public Command stop() {
+    return driveModules(() -> KinematicsUtils.getStoppedStates(getModuleStates()));
+  }
 
-    public Command park() {
-        return driveModules(() -> KinematicsUtils.getParkedStates());
-    }
+  public Command park() {
+    return driveModules(() -> KinematicsUtils.getParkedStates());
+  }
 
-    public Command pathfindTo(Pose2d target) {
-        autoBuilder.setOutput(speeds -> setMovement(speeds));
+  public Command pathfindTo(Pose2d target) {
+    autoBuilder.setOutput(speeds -> setMovement(speeds));
 
-        return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints());
-    }
+    return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints());
+  }
 
-    public Command pathfindTo(Pose2d target, LinearVelocity goalEndVelocity) {
-        autoBuilder.setOutput(speeds -> setMovement(speeds));
+  public Command pathfindTo(Pose2d target, LinearVelocity goalEndVelocity) {
+    autoBuilder.setOutput(speeds -> setMovement(speeds));
 
-        return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity);
-    }
+    return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity);
+  }
 
-    public Command pathfindTo(Translation2d target) {
-        autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
+  public Command pathfindTo(Translation2d target) {
+    autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-        return AutoBuilder.pathfindToPose(new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints());
-    }
+    return AutoBuilder.pathfindToPose(
+        new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints());
+  }
 
-    public Command pathfindTo(Translation2d target, LinearVelocity goalEndVelocity) {
-        autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
+  public Command pathfindTo(Translation2d target, LinearVelocity goalEndVelocity) {
+    autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-        return AutoBuilder.pathfindToPose(new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints(), goalEndVelocity);
-    }
+    return AutoBuilder.pathfindToPose(
+        new Pose2d(target, Rotation2d.fromRotations(0)),
+        getConstants().pathConstraints(),
+        goalEndVelocity);
+  }
 
   // public Command pathfindTo(
   //     Pose2d target,
@@ -308,7 +312,8 @@ public class SwerveDrive extends SwerveCore {
   //                 ignoreRotation
   //                     ? new Pose2d(getEstimatedPose().getTranslation(), new Rotation2d())
   //                     : startPose,
-  //                 ignoreRotation ? new Pose2d(target.getTranslation(), new Rotation2d()) : target);
+  //                 ignoreRotation ? new Pose2d(target.getTranslation(), new Rotation2d()) :
+  // target);
 
   //         return pathfindThrough(
   //             bezierPoints, ignoreRotation, endState, rotationDelayDistance.in(Meters));
@@ -359,7 +364,8 @@ public class SwerveDrive extends SwerveCore {
   //   return Commands.defer(() -> {
   //       autoBuilder.setOutput((speeds) -> {
   //           if (ignoreRotation)
-  //               setMovement(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+  //               setMovement(new Translation2d(speeds.vxMetersPerSecond,
+  // speeds.vyMetersPerSecond));
   //           else setMovement(speeds);
   //       });
 
@@ -378,7 +384,8 @@ public class SwerveDrive extends SwerveCore {
   //   //         getPoseEstimator()::getEstimatedSpeeds,
   //   //         (speeds, feedforwards) -> {
   //   //             if (ignoreRotation)
-  //   //                 setMovement(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+  //   //                 setMovement(new Translation2d(speeds.vxMetersPerSecond,
+  // speeds.vyMetersPerSecond));
   //   //             else setMovement(speeds);
   //   //         },
   //   //         getConstants().driveGains().pathController(),
@@ -389,21 +396,22 @@ public class SwerveDrive extends SwerveCore {
 
   // private IdealStartingState getPathplannerStartingState() {
   //   return new IdealStartingState(
-  //       Math.hypot(getEstimatedSpeeds().vxMetersPerSecond, getEstimatedSpeeds().vyMetersPerSecond),
+  //       Math.hypot(getEstimatedSpeeds().vxMetersPerSecond,
+  // getEstimatedSpeeds().vyMetersPerSecond),
   //       Rotation2d.fromRadians(getEstimatedSpeeds().omegaRadiansPerSecond));
   // }
 
-    public Command cancelDrive() {
-        return Commands.run(
-            () -> {
-                if (translationSubsystem.getCurrentCommand() != null) {
-                    translationSubsystem.getCurrentCommand().cancel();
-                }
+  public Command cancelDrive() {
+    return Commands.run(
+        () -> {
+          if (translationSubsystem.getCurrentCommand() != null) {
+            translationSubsystem.getCurrentCommand().cancel();
+          }
 
-                if (rotationSubsysem.getCurrentCommand() != null) {
-                    rotationSubsysem.getCurrentCommand().cancel();
-                }
-            },
-            useMotion());
-    }
+          if (rotationSubsysem.getCurrentCommand() != null) {
+            rotationSubsysem.getCurrentCommand().cancel();
+          }
+        },
+        useMotion());
+  }
 }

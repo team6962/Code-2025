@@ -6,15 +6,12 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.util.Map;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -25,6 +22,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -43,11 +44,11 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = true;
+    public static final boolean DRIVE = false;
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
-    public static final boolean HANG = true;
-    public static final boolean MANIPULATOR = false;
+    public static final boolean HANG = false;
+    public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = false;
   }
 
@@ -67,7 +68,7 @@ public final class Constants {
   }
 
   public static final class ALGAE {
-    public static final double ALGAE_DIAMETER = 16.25; // inches
+    public static final Distance ALGAE_DIAMETER = Inches.of(16.25); // meters
   }
 
   // LIMELIGHT
@@ -91,9 +92,15 @@ public final class Constants {
                     Units.inchesToMeters(-3.0),
                     Units.inchesToMeters(25.283),
                     new Rotation3d(
-                        0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0))));
+                        0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0))),
+            "limelight-falgae",
+                new Pose3d(
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(0),
+                    new Rotation3d(0.0, 0, 0.0)));
 
-    public static final String ALGAE_CAMERA_NAME = "limelight-balgae";
+    public static final String ALGAE_CAMERA_NAME = "limelight-falgae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
     public static final double SPHERE_TOLERANCE = 0.5;
@@ -109,7 +116,8 @@ public final class Constants {
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees
     public static final double ALGAE_CAMERA_HEIGHT_PIXELS = 960;
 
-    public static final double MAX_DETECTION_RANGE = 19.30;
+    public static final Distance MAX_DETECTION_RANGE =
+        Meters.of(19.30); // Max distance an algae can be while being on the field
   }
 
   public static final class SWERVE {
@@ -133,19 +141,21 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
-    public static final int HANG = 2;
-    public static final int ELEVATOR_LEFT = 36; // UPDATE
-    public static final int ELEVATOR_RIGHT = 35; // UPDATE
-    public static final int MANIPULATOR_PIVOT = 32; // UPDATE
-    public static final int MANIPULATOR_ALGAE = 33; // UPDATE
-    public static final int MANIPULATOR_CORAL = 34; // UPDATE
+    public static final int HANG = 100;
+    public static final int ELEVATOR_LEFT = 2; // UPDATE
+    public static final int ELEVATOR_RIGHT = 3; // UPDATE
+    public static final int MANIPULATOR_PIVOT = 4; // UPDATE
+    public static final int MANIPULATOR_ALGAE_RIGHT = 5;
+    public static final int MANIPULATOR_ALGAE_LEFT = 6;
+    public static final int MANIPULATOR_CORAL = 7; // UPDATE
   }
 
   public static final class DIO {
-    public static final int AMP_PIVOT = 1;
-    public static final int MANIPULATOR_PIVOT = 2;
     public static final int HANG_ENCODER = 0;
-    public static final int ELEVATOR_ENCODER = 4;
+    public static final int ELEVATOR_ENCODER = 1;
+    public static final int MANIPULATOR_ENCODER = 2;
+    public static final int ELEVATOR_CEIL_LIMIT = 3;
+    public static final int ELEVATOR_FLOOR_LIMIT = 4;
     public static final int ALGAE_BEAM_BREAK = 5;
   }
 
@@ -205,67 +215,41 @@ public final class Constants {
   // }
 
   public static final class ELEVATOR {
-    public static final double GEARING = (3.0 / 1.0) * (4.0 / 1.0) * (5.0 / 1.0); // CALCULATE
-    public static final Distance CYCLE_HEIGHT = Inches.of(6.13); // CALCULATE
-    public static final double ENCODER_OFFSET = 0.0; // CALCULATE
+    public static final double GEARING =
+        (3.0 / 1.0)
+            * (4.0 / 1.0)
+            * (5.0 / 1.0)
+            * (3.0 / 2.0)
+            / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
+    public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
+    public static final Angle ENCODER_OFFSET = Rotations.of(0.715);
+    public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
-    public static final class PROFILE {
-      public static final double kP = 0.0;
-      public static final double kS = 0.0;
+    public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
+
+    static {
+      HEIGHT_TO_ANGLE_MAP.put(0.0, new AngleRange(Degrees.of(0.0), Degrees.of(45.0)));
+      HEIGHT_TO_ANGLE_MAP.put(1.0, new AngleRange(Degrees.of(10.0), Degrees.of(40.0)));
+      HEIGHT_TO_ANGLE_MAP.put(2.0, new AngleRange(Degrees.of(20.0), Degrees.of(35.0)));
+      HEIGHT_TO_ANGLE_MAP.put(3.0, new AngleRange(Degrees.of(30.0), Degrees.of(30.0)));
+      HEIGHT_TO_ANGLE_MAP.put(4.0, new AngleRange(Degrees.of(40.0), Degrees.of(25.0)));
     }
-  }
-
-  public static final class SHOOTER_WHEELS {
-    public static final double GEARBOX_STEP_UP = 2.0;
-    public static final double ENCODER_CONVERSION_FACTOR = 2.0 * Math.PI * GEARBOX_STEP_UP;
-    public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
-    public static final double WHEEL_MOI = 0.00018540712;
-    public static final double TOTAL_MOI = WHEEL_MOI * 12.0;
-    public static final double PROJECTILE_MASS = Units.lbsToKilograms(0.5);
-    public static final double COMPRESSION = Units.inchesToMeters(0.5);
-    public static final double SPEED_PRECISION = Units.rotationsPerMinuteToRadiansPerSecond(10);
-    public static final double TOP_EXIT_VELOCITY = 12.5;
-    public static final double MAX_EXIT_VELOCITY = 13.0;
-    public static final double NOTE_LOG_BASE = 1.0082;
-    public static final double NOTE_LOG_OFFSET = 504.213;
-    public static final double MAX_WHEEL_SPEED =
-        NEO.STATS.freeSpeedRadPerSec * SHOOTER_WHEELS.GEARBOX_STEP_UP;
-
-    // x is front-to-back
-    // y is left-to-right
-    // z is top-to-bottom
-
-    public static final class PROFILE {
-      public static final double kP = 0.0;
-      public static final double kI = 0.0;
-      public static final double kD = 0.0;
-      public static final double kS = 0.0; // volts per rad/s
-      public static final double kV =
-          (12.0 / (NEO.STATS.freeSpeedRadPerSec * GEARBOX_STEP_UP)) / 0.8; // volts per rad/s
-      public static final double kA = 0.0; // volts per rad/s^2
-    }
-  }
-
-  public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = 15.0 * (78.0 / 20.0) * (200.0 / 19.0);
-    public static final double ROTATION_DELAY = 0.3; // seconds
-    public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Rotation2d ANGLE_PRECISION = Rotation2d.fromDegrees(0.25);
-    public static final Rotation2d HEADING_PRECISION = Rotation2d.fromDegrees(0.25);
-    public static final Translation3d POSITION =
-        new Translation3d(Units.inchesToMeters(3.33), 0.0, Units.inchesToMeters(12.1));
-    public static final double ABSOLUTE_POSITION_OFFSET =
-        Units.degreesToRotations(
-            -140.375 - 93.15
-                + 27); //  - [ rawAbsolutePosition from logs ] - 93.15 + [ the angle measured from
-    // the front plate of shooter ]
-    public static final Rotation2d NOTE_ROTATION_OFFSET =
-        Rotation2d.fromDegrees(-1.25); // Theoretically 3.1480961
-    public static final double SHOOTER_LENGTH = Units.inchesToMeters(15.023);
 
     public static final class PROFILE {
       public static final double kP = 0.5;
       public static final double kS = 0.0;
+    }
+  }
+
+  public static final class MANIPULATOR_PIVOT {
+    public static final double GEARING = 5 * 5 * 5;
+    public static final double ROTATION_DELAY = 0.3; // seconds
+    public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
+
+    public static final class PROFILE {
+      public static final double kP = 2.0;
+      public static final double kS = 0.5;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }
@@ -290,5 +274,23 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+  }
+
+  public static class AngleRange {
+    private final Angle minAngle;
+    private final Angle maxAngle;
+
+    public AngleRange(Angle minAngle, Angle maxAngle) {
+      this.minAngle = minAngle;
+      this.maxAngle = maxAngle;
+    }
+
+    public Angle getMinAngle() {
+      return minAngle;
+    }
+
+    public Angle getMaxAngle() {
+      return maxAngle;
+    }
   }
 }

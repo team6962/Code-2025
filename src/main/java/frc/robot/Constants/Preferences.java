@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.Constants.Constants.ALGAE;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -26,10 +25,6 @@ public final class Preferences {
     public static final double TELEOPERATED_BOOST_POWER =
         1.0; // Percent power when using the triggers
     public static final double TELEOPERATED_ROTATE_POWER = 0.5; // Percent rotating power
-  }
-
-  public static final class AMP_WHEELS {
-    public static final double POWER = 1.0;
   }
 
   public static final class HANG_PIVOT {
@@ -62,50 +57,59 @@ public final class Preferences {
     public static final double CORAL_IN_SPEED = -1.0;
   }
 
+  // REFERENCE ANGLES FROM CAD AND
+  // https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
   public static final class MANIPULATOR_PIVOT {
-    public static final Angle MAX_ANGLE   = Degrees.of(0.0);
-    public static final Angle MIN_ANGLE   = Degrees.of(0.0);
-    public static final Angle STOW_ANGLE  = Degrees.of(0.0);
-    
+    public static final Angle MAX_ANGLE = Degrees.of(20.0); // RESET TO 40.0
+    public static final Angle MIN_LOW_ANGLE = Degrees.of(-80.0);
+    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
+    public static final Angle STOW_ANGLE = Degrees.of(38.5);
+
     public static final class CORAL {
-      public static final Angle L23_ANGLE   = Degrees.of(0.0);
-      public static final Angle L4_ANGLE    = Degrees.of(0.0);
-      public static final Angle INTAKE_ANGLE = Degrees.of(0.0);      
+      public static final Angle L1_ANGLE = Degrees.of(22.5);
+      public static final Angle L23_ANGLE = Degrees.of(-34.5);
+      public static final Angle L4_ANGLE = Degrees.of(-57.0);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-118.0);
     }
 
     public static final class ALGAE {
-      public static final Angle BARGE_ANGLE = Degrees.of(0.0);
+      public static final Angle BARGE_ANGLE = Degrees.of(32.75);
       public static final Angle REEF_ANGLE = Degrees.of(0.0);
-      public static final Angle GROUND_ANGLE = Degrees.of(0.0);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0); 
+      public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
     }
   }
 
   public static final class ELEVATOR {
-    public static final Distance MAX_HEIGHT = Inches.of(80);
-    public static final Distance MIN_HEIGHT = Inches.of(0);
-    public static final Distance STOW_HEIGHT = Inches.of(0);
+    // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
+    public static final Distance BASE_HEIGHT = Inches.of(35.5);
+    public static final Distance MAX_HEIGHT = Inches.of(82);
+    public static final Distance MIN_HEIGHT = BASE_HEIGHT;
+    public static final Distance STOW_HEIGHT = BASE_HEIGHT;
+    public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(0);
-      public static final Distance L2_HEIGHT = Inches.of(0);
-      public static final Distance L3_HEIGHT = Inches.of(0);
-      public static final Distance L4_HEIGHT = Inches.of(0);
-      public static final Distance INTAKE_HEIGHT = STOW_HEIGHT;
+      public static final Distance L1_HEIGHT = Inches.of(38.0);
+      public static final Distance L2_HEIGHT = Inches.of(47.6);
+      public static final Distance L3_HEIGHT = Inches.of(58.0);
+      public static final Distance L4_HEIGHT = Inches.of(77.2);
+      public static final Distance INTAKE_HEIGHT = Inches.of(58.8);
     }
 
     public static final class ALGAE {
       public static final Distance L2_HEIGHT = Inches.of(0);
       public static final Distance L3_HEIGHT = Inches.of(0);
-      public static final Distance BARGE_HEIGHT = Inches.of(0);
-      public static final Distance GROUND_HEIGHT = STOW_HEIGHT;
+      public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
+      public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
+      public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
     }
   }
 
   public static final class VOLTAGE_LADDER {
     public static final double SWERVE_DRIVE = 7.0;
-    public static final double SHOOTER = 8.0;
+    public static final double ELEVATOR = 7.5;
+    public static final double MANIPULATOR = 8.0;
     public static final double INTAKE = 8.5;
-    public static final double MANIPULATOR = 8; // placeholder value
+    public static final double HANG = 9.0;
   }
 }

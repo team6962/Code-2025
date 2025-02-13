@@ -1,7 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -20,6 +19,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
@@ -28,6 +28,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
 /**
@@ -57,6 +58,7 @@ public class RobotContainer {
   public final Elevator elevator;
   public final Hang hang;
   public final Autonomous autonomous;
+  public final Algae algaeDetector;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -110,12 +112,13 @@ public class RobotContainer {
     elevator = new Elevator();
     hang = new Hang();
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, manipulator, intake, hang, autonomous);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang, autonomous);
 
     // module = new SwerveModule();
 
@@ -164,12 +167,18 @@ public class RobotContainer {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
   }
 
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // System.out.println(new Translation2d(0.0,0.0));
+    // System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive,
+    // LIMELIGHT.ALGAE_CAMERA_POSITION)));
+  }
 
   public void disabledInit() {}
 
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
+    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, hang, intake);
+    checks.schedule();
   }
 }

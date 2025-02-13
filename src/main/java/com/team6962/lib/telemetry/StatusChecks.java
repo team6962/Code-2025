@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.team6962.lib.utils.CTREUtils;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -57,7 +58,7 @@ public final class StatusChecks {
 
   private static List<Runnable> updates = new ArrayList<>();
 
-  private static void refresh() {
+  public static void refresh() {
     updates.forEach(Runnable::run);
   }
 
@@ -83,6 +84,11 @@ public final class StatusChecks {
               .getEntry();
 
       updates.add(() -> entry.setBoolean(checkSupplier.getAsBoolean()));
+      updates.add(
+          () -> {
+            if (!checkSupplier.getAsBoolean())
+              DriverStation.reportError("===== STATUS CHECKS FAILED ====", false);
+          });
     }
 
     public void add(String name, TalonFX motor) {
@@ -113,9 +119,7 @@ public final class StatusChecks {
     }
 
     public void add(String name, DutyCycleEncoder encoder) {
-      add(
-          name + " Connected",
-          () -> encoder.isConnected());
+      add(name + " Connected", () -> encoder.isConnected());
     }
   }
 }

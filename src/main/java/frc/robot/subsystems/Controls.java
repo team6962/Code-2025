@@ -27,7 +27,7 @@ public class Controls {
   public static void configureBindings(
       RobotStateController stateController,
       SwerveDrive swerveDrive,
-      // Elevator elevator,
+      Elevator elevator,
       Manipulator manipulator,
       Intake intake,
       Hang hang, Autonomous autonomous) {
@@ -95,13 +95,18 @@ public class Controls {
     // operator.b().onTrue(elevator.coralL3());
     // operator.x().onTrue(elevator.coralL4());
     // operator.y().onTrue(elevator.algaeBarge());
+    operator.a().onTrue(manipulator.pivot.coralL23());
+    operator.b().onTrue(manipulator.pivot.algaeReef());
+    operator.x().onTrue(manipulator.pivot.intakeCoral());
+    operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(elevator.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
-    // operator.povCenter();
-    // operator.povUp().whileTrue(elevator.up());
-    // operator.povDown().whileTrue(elevator.down());
+    operator.povLeft().whileTrue(elevator.up());
+    operator.povRight().whileTrue(elevator.down());
+    operator.povUp().whileTrue(manipulator.pivot.up());
+    operator.povDown().whileTrue(manipulator.pivot.down());
     operator.povLeft().whileTrue(hang.deploy());
     operator.povRight().whileTrue(hang.stow());
     operator.leftBumper().onTrue(manipulator.coral.intake());
@@ -132,7 +137,7 @@ public class Controls {
     return Commands.runEnd(
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-              LEDs.setState(LEDs.State.GOOD);
+              // LEDs.setState(LEDs.State.GOOD);
             },
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
@@ -145,7 +150,7 @@ public class Controls {
         () -> {
           if (booleanSupplier.getAsBoolean()) {
             controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-            LEDs.setState(LEDs.State.GOOD);
+            // LEDs.setState(LEDs.State.GOOD);
           } else {
             controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           }

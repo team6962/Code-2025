@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Field;
-import frc.robot.subsystems.LEDs;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ public class AprilTags extends SubsystemBase {
                       .getTranslation()
                       .getDistance(pose2d.getTranslation())
                   < 1.0;
-      if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
+      // if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
 
       double rotationError = Units.degreesToRadians(15);
       if (!canChangeHeading) {
@@ -154,5 +153,15 @@ public class AprilTags extends SubsystemBase {
               Units.radiansToDegrees(limelight.getValue().getRotation().getY()),
               Units.radiansToDegrees(limelight.getValue().getRotation().getZ())));
     }
+  }
+
+  
+  public static int findClosestReefTagID() {
+    int ftagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
+    int btagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
+
+    if (Field.REEF_APRILTAGS.contains(ftagID)) return ftagID;
+    if (Field.REEF_APRILTAGS.contains(btagID)) return btagID;
+    return -1;
   }
 }

@@ -4,17 +4,9 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.studica.frc.AHRS;
-
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,6 +29,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
@@ -45,10 +43,7 @@ public class Logger extends SubsystemBase {
   private static Field2d field2d = new Field2d();
   private static double threadLastPing = Timer.getFPGATimestamp();
 
-  private static record Updatable(
-    String key,
-    Runnable runnable
-  ) {
+  private static record Updatable(String key, Runnable runnable) {
     public void run() {
       try {
         runnable.run();
@@ -58,7 +53,7 @@ public class Logger extends SubsystemBase {
       }
     }
   }
-  
+
   @Override
   public void periodic() {
     Logger.log("Logger/bhobeKilledMe", Timer.getFPGATimestamp() - threadLastPing > 1.0);
@@ -185,8 +180,8 @@ public class Logger extends SubsystemBase {
   }
 
   public static void log(String key, Translation2d value) {
-    addUpdate(key,
-      () -> table.getEntry(key).setDoubleArray(new double[] {value.getX(), value.getY()}));
+    addUpdate(
+        key, () -> table.getEntry(key).setDoubleArray(new double[] {value.getX(), value.getY()}));
   }
 
   public static void logRotation(String key, Supplier<Rotation2d> supplier) {

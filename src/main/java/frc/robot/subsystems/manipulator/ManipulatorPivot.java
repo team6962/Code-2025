@@ -1,14 +1,11 @@
 package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
@@ -19,41 +16,37 @@ import frc.robot.RobotContainer;
 import frc.robot.util.hardware.MotionControl.PivotController;
 import java.util.function.Supplier;
 
-public class ManipulatorPivot extends SubsystemBase {
-  private SparkMax motor;
-  private PivotController controller;
+public class ManipulatorPivot extends PivotController {
   private boolean isCalibrating = false;
 
   public ManipulatorPivot() {
-    motor = new SparkMax(CAN.MANIPULATOR_PIVOT, MotorType.kBrushless);
-    controller =
-        new PivotController(
-            this,
-            motor,
-            DIO.MANIPULATOR_PIVOT,
-            MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET,
-            MANIPULATOR_PIVOT.PROFILE.kP,
-            MANIPULATOR_PIVOT.PROFILE.kS,
-            MANIPULATOR_PIVOT.GEARING,
-            Preferences.MANIPULATOR_PIVOT.MIN_ANGLE,
-            Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-            Degrees.of(0.25),
-            true);
-
-    setDefaultCommand(stow());
+    super(
+        CAN.MANIPULATOR_PIVOT,
+        DIO.MANIPULATOR_ENCODER,
+        MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
+        MANIPULATOR_PIVOT.PROFILE.kP,
+        MANIPULATOR_PIVOT.PROFILE.kS,
+        MANIPULATOR_PIVOT.GEARING,
+        Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+        Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
+        Degrees.of(0.25),
+        false);
+    // setDefaultCommand(stow());
   }
 
   @Override
   public void periodic() {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return;
     if (isCalibrating) return;
-    if (RobotState.isDisabled()) {
-      controller.setTargetAngle(controller.getPosition());
+    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
+      stopMotor();
+      return;
     }
+  }
 
-    controller.run();
-
-    if (RobotContainer.getVoltage() < VOLTAGE_LADDER.SHOOTER) motor.stopMotor();
+  public Command pivotTo(Supplier<Angle> angleSupplier) {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    return this.run(() -> setAngle(angleSupplier.get())).until(this::doneMoving);
   }
 
   public Command intakeCoral() {
@@ -66,10 +59,6 @@ public class ManipulatorPivot extends SubsystemBase {
 
   public Command coralL4() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
-  }
-
-  public Command stow() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
   public Command algaeReef() {
@@ -88,22 +77,19 @@ public class ManipulatorPivot extends SubsystemBase {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
   }
 
-
-  public Command pivotTo(Supplier<Angle> angleSupplier) {
-    return Commands.run(() -> controller.setTargetAngle(angleSupplier.get()), this)
-        .until(this::doneMoving);
+  public Command stow() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
-  public boolean isInRange(Angle angle) {
-    if (angle == null) return false;
-    return controller.isInRange(angle);
+  public Command stop() {
+    return Commands.run(this::stopMotor);
   }
 
-  public Angle getPosition() {
-    return controller.getPosition();
+  public Command up() {
+    return Commands.runEnd(this::moveUp, this::stopMotor);
   }
 
-  public boolean doneMoving() {
-    return controller.doneMoving();
+  public Command down() {
+    return Commands.runEnd(this::moveDown, this::stopMotor);
   }
 }
