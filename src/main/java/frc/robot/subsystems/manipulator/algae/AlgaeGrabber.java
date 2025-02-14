@@ -11,14 +11,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 public abstract class AlgaeGrabber extends SubsystemBase {
+    private boolean hasGamePiece = false;
+
     public AlgaeGrabber() {
         setName("Algae Grabber");
 
         Logger.logBoolean(getName() + "/hasGamePiece", this::hasGamePiece);
     }
 
-    public abstract void expectGamePiece(boolean hasGamePiece);
-    public abstract boolean hasGamePiece();
+    public void expectGamePiece(boolean hasGamePiece) {
+        this.hasGamePiece = hasGamePiece;
+    }
+
+    public boolean hasGamePiece() {
+        return hasGamePiece;
+    }
 
     public abstract Command checkGrip();
     public abstract Command intake();

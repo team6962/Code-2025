@@ -2,6 +2,8 @@ package frc.robot.subsystems.manipulator.coral;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -23,7 +25,11 @@ public class RealCoralGrabber extends CoralGrabber {
     public RealCoralGrabber() {
         motor = new SparkMax(CAN.MANIPULATOR_CORAL, MotorType.kBrushless);
 
-        SparkMaxUtil.configureAndLog550(motor, new SparkMaxConfig(), false, IdleMode.kBrake);
+        SparkMaxConfig config = new SparkMaxConfig();
+
+        SparkMaxUtil.configureAndLog550(motor, config, false, IdleMode.kBrake);
+
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         sensor = new DigitalInput(DIO.CORAL_BEAM_BREAK);
 
@@ -50,6 +56,13 @@ public class RealCoralGrabber extends CoralGrabber {
                 Commands.waitUntil(() -> !detectsGamePiece())
             ))
             .andThen(() -> setHasGamePiece(false));
+    }
+
+    public Command hold() {
+        return run(() -> {
+            if (hasGamePiece() && detectsGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
+            else motor.set(0);
+        });
     }
 
     public Command stop() {

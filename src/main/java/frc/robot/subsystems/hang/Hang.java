@@ -56,7 +56,7 @@ public class Hang extends PivotController {
 
   public Command setTargetAngleCommand(Angle angle) {
     if (!ENABLED_SYSTEMS.HANG) return stop();
-    return this.run(() -> setAngle(angle)).until(this::doneMoving);
+    return this.run(() -> moveTowards(angle)).until(this::doneMoving);
   }
 
   @Override

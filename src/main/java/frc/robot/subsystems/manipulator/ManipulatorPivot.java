@@ -53,7 +53,7 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return this.runEnd(() -> setAngle(angleSupplier.get()), () -> stopAngle = getPosition()).until(this::doneMoving);
+    return this.runEnd(() -> moveTowards(angleSupplier.get()), () -> stopAngle = getPosition()).until(this::doneMoving);
   }
 
   public Command intakeCoral() {

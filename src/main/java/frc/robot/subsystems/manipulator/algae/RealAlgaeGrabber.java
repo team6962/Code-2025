@@ -24,7 +24,6 @@ import frc.robot.util.hardware.SparkMaxUtil;
 public class RealAlgaeGrabber extends AlgaeGrabber {
     private SparkMax leftMotor;
     private SparkMax rightMotor;
-    private boolean hasGamePiece = false;
     private Debouncer stallDebouncer = new Debouncer(0.1, DebounceType.kFalling);
     private boolean stalled = false;
     private Timer gripCheckTimer = new Timer();
@@ -44,22 +43,12 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         setDefaultCommand(hold());
     }
 
-    @Override
-    public void expectGamePiece(boolean hasGamePiece) {
-        this.hasGamePiece = hasGamePiece;
-    }
-
-    @Override
-    public boolean hasGamePiece() {
-        return hasGamePiece;
-    }
-
     public Command checkGrip() {
         return Commands.parallel(
             run(MANIPULATOR.ALGAE_IN_SPEED),
             Commands.race(
-                Commands.waitUntil(() -> stalled).andThen(() -> hasGamePiece = true),
-                Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds)).andThen(() -> hasGamePiece = false)
+                Commands.waitUntil(() -> stalled).andThen(() -> expectGamePiece(true)),
+                Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds)).andThen(() -> expectGamePiece(false))
             )
         );
     }
@@ -69,7 +58,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
             if (!ENABLED_SYSTEMS.MANIPULATOR) {
                 leftMotor.set(0);
                 rightMotor.set(0);
-            } else if (!hasGamePiece) {
+            } else if (!hasGamePiece()) {
                 leftMotor.set(0);
                 rightMotor.set(0);
 
@@ -104,15 +93,15 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     }
 
     public Command intake() {
-        return run(MANIPULATOR.ALGAE_IN_SPEED).until(() -> stalled).andThen(() -> hasGamePiece = true);
+        return run(MANIPULATOR.ALGAE_IN_SPEED).until(() -> stalled).andThen(() -> expectGamePiece(true));
     }
 
     public Command drop() {
-        return run(MANIPULATOR.ALGAE_OUT_SPEED).alongWith(Commands.waitUntil(() -> !stalled).andThen(() -> hasGamePiece = false));
+        return run(MANIPULATOR.ALGAE_OUT_SPEED).alongWith(Commands.waitUntil(() -> !stalled).andThen(() -> expectGamePiece(false)));
     }
 
     public Command action() {
-        return Commands.defer(() -> hasGamePiece ? drop() : intake(), Set.of(this));
+        return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
     }
 
     public Command stop() {

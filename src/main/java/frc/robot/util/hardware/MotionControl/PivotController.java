@@ -131,7 +131,7 @@ public class PivotController extends SubsystemBase {
     // Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
   }
 
-  public void setAngle(Angle requestedAngle) {
+  public void moveTowards(Angle requestedAngle) {
     if (requestedAngle == null) return; // If we havent set a target angle yet, do nothing
     targetAngle = clampAngle(requestedAngle);
 
@@ -141,12 +141,6 @@ public class PivotController extends SubsystemBase {
     }
 
     encoder.setPosition(getPosition().in(Rotations));
-
-    if (triggeredForwardSafety() || triggeredReverseSafety()) {
-      motor.stopMotor();
-      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-      return;
-    }
 
     if (doneMoving()) {
       motor.stopMotor();
@@ -163,7 +157,12 @@ public class PivotController extends SubsystemBase {
     // System.out.println("kS: " + kS);
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
-    pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    if (canMoveInDirection(targetAngle.minus(getPosition()).in(Rotations))) {
+      pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    } else {
+      motor.stopMotor();
+    }
+    
     // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);]
 
@@ -204,12 +203,17 @@ public class PivotController extends SubsystemBase {
     targetAngle = clampAngle(targetAngle);
   }
 
+  public void moveSpeed(double speed) {
+    if (canMoveInDirection(speed)) motor.set(speed);
+    else motor.set(0);
+  }
+
   public void moveUp() {
-    motor.set(0.05);
+    moveSpeed(0.05);
   }
 
   public void moveDown() {
-    motor.set(-0.05);
+    moveSpeed(-0.05);
   }
 
   public Angle getPosition() {
@@ -231,6 +235,12 @@ public class PivotController extends SubsystemBase {
     }
 
     return Rotations.of(absoluteAngle);
+  }
+
+  public boolean canMoveInDirection(double velocity) {
+    if (velocity > 0.0) return getPosition().lt(maxAngle);
+    if (velocity < 0.0) return getPosition().gt(minAngle);
+    return true;
   }
 
   public boolean triggeredForwardSafety() {
