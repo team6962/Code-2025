@@ -46,11 +46,11 @@ public final class AutonChooser {
 
     List<Integer> reefFaces = new ArrayList<>();
 
-    for (int i = 0; i < Field.REEF_FACES.size(); i++) {
-      if (reefOptions.get(i).getEntry().getBoolean(false)) {
-        reefFaces.add(i);
-      }
-    }
+    // for (int i = 0; i < Field.REEF_FACES.size(); i++) {
+    //   if (reefOptions.get(i).getEntry().getBoolean(false)) {
+    //     reefFaces.add(i);
+    //   }
+    // }
     return reefFaces;
   }
 
