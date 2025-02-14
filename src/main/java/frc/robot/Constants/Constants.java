@@ -44,7 +44,7 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = false;
+    public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
