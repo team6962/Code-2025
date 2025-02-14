@@ -1,6 +1,7 @@
 package frc.robot.util.hardware.MotionControl;
 
 import static edu.wpi.first.units.Units.Meters;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -14,6 +15,7 @@ import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -23,8 +25,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
  * control a pivot mechanism precisely, smoothly, and accurately
  */
 
-
-public class DualLinearController extends SubsystemBase {
+public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
@@ -33,7 +34,7 @@ public class DualLinearController extends SubsystemBase {
   private SparkClosedLoopController leftPID, rightPID;
 
   private DutyCycleEncoder absoluteEncoder;
-
+  private DigitalInput ceilingLimit, floorLimit;
   private Distance baseHeight, minHeight, maxHeight, tolerance;
 
   private double encoderOffset = 0.0;
@@ -44,7 +45,6 @@ public class DualLinearController extends SubsystemBase {
 
   private int cyclesCompleted;
   private Distance lastPosition = Meters.of(0.0);
-
 
   /**
    * Constructs a new DualLinearController.
@@ -62,10 +62,12 @@ public class DualLinearController extends SubsystemBase {
    * @param maxHeight The maximum height the mechanism can achieve.
    * @param tolerance The tolerance for the height control.
    */
-  public DualLinearController(
+  public DualLinearActuator(
       int leftCAN,
       int rightCAN,
       int absoluteEncoderDIO,
+      int ceilingLimitDIO,
+      int floorLimitDIO,
       double absolutePositionOffset,
       double kP,
       double kS,
@@ -91,12 +93,10 @@ public class DualLinearController extends SubsystemBase {
     rightEncoder = rightMotor.getEncoder();
     leftPID = leftMotor.getClosedLoopController();
     rightPID = rightMotor.getClosedLoopController();
-    
 
-    absoluteEncoder =
-        new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
+    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     lastPosition = getCycleDelta();
-    
+
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -108,24 +108,30 @@ public class DualLinearController extends SubsystemBase {
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
+    this.ceilingLimit = new DigitalInput(ceilingLimitDIO);
+    this.floorLimit = new DigitalInput(floorLimitDIO);
     // leftEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
     // rightEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
     leftEncoder.setPosition(baseHeight.in(Meters));
     rightEncoder.setPosition(baseHeight.in(Meters));
 
-
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
-    
-    Logger.logNumber(
-        this.getName() + "/rawAbsolutePosition",
-        absoluteEncoder::get);
+    // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
+    // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
+
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
-    Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
-    Logger.logNumber(this.getName() + "/cyclesComplted", () -> cyclesCompleted);
-    Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
+
+    // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
+    // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
+    // Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
+    // Logger.logNumber(
+    //     this.getName() + "/rawAbsolutePosition",
+    //     absoluteEncoder::get);
+
+    Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
+    Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
+
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
@@ -133,30 +139,18 @@ public class DualLinearController extends SubsystemBase {
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
   }
 
-  public void setTargetHeight(Distance height) {
-    targetHeight = clampHeight(height);
+  private void seedEncoders(Distance height) {
+    leftEncoder.setPosition(height.in(Meters));
+    rightEncoder.setPosition(height.in(Meters));
   }
 
   public Distance getTargetHeight() {
     return targetHeight;
   }
 
-  public boolean isPastLimit() {
-    return leftEncoder.getPosition() > maxHeight.in(Meters)
-        || leftEncoder.getPosition() < minHeight.in(Meters)
-        || rightEncoder.getPosition() > maxHeight.in(Meters)
-        || rightEncoder.getPosition() < minHeight.in(Meters);
-  }
-
   private Distance clampHeight(Distance height) {
-    return Meters.of(
-        MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
+    return Meters.of(MathUtil.clamp(height.in(Meters), minHeight.in(Meters), maxHeight.in(Meters)));
   }
-
-  public boolean isHeightAchievable(Distance height) {
-    return height.gt(minHeight) && height.lt(maxHeight);
-  }
-
 
   public Distance getLeftHeight() {
     return Meters.of(leftEncoder.getPosition());
@@ -168,10 +162,6 @@ public class DualLinearController extends SubsystemBase {
 
   public Distance getAverageHeight() {
     return getLeftHeight().plus(getRightHeight()).div(2);
-  }
-  
-  public int getMovingDirection() {
-    return (int) Math.signum(leftEncoder.getVelocity());
   }
 
   public Distance getMaxHeight() {
@@ -212,14 +202,15 @@ public class DualLinearController extends SubsystemBase {
     rightMotor.stopMotor();
   }
 
-  public void run() {
+  public void moveTo(Distance requestedHeight) {
+    targetHeight = clampHeight(requestedHeight);
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
-    if (!absoluteEncoder.isConnected()) {
-      System.out.println("NO ENCODER");
-      stopMotors();
-      return;
-    }
+    // if (!absoluteEncoder.isConnected()) {
+    //   System.out.println("NO ENCODER");
+    //   stopMotors();
+    //   return;
+    // }
 
     // if (leftMotor.getFaults() != null || rightMotor.getFaults() != null) {
     //   System.out.println("MOTORS FAULTED");
@@ -227,55 +218,70 @@ public class DualLinearController extends SubsystemBase {
     //   return;
     // }
 
-
     // remove?
     // leftEncoder.setPosition(getAverageHeight().in(Meters));
     // rightEncoder.setPosition(getAverageHeight().in(Meters));
-
-    // if (doneMoving()) {
-    //   System.out.println("DONE MOVING");
-
-    //   stopMotors();
-    //   return;
-    // }
-    
 
     // if (getLeftHeight().minus(getRightHeight()).abs(Inches) > 0.2) {
     //   System.out.println("ELEVATOR TORQUED ===========");
     //   stopMotors();
     // }
 
-    // if (getLeftHeight().gt(maxHeight)) {
-    //   System.out.println("LEFT MAXED");
-    //   stopMotors();
-    // }
+    if (triggeredSafeties()) {
+      System.out.println("SAFETIES TRIGGERED ===========");
+      stopMotors();
+      return;
+    }
 
-    // if (getLeftHeight().lt(minHeight)) {
-    //   System.out.println("LEFT MINED");
-    //   stopMotors();
-    // }
-
-    // if (getRightHeight().gt(maxHeight)) {
-    //   System.out.println("RIGHT MAXED");
-    //   stopMotors();
-    // }
-
-    // if (getRightHeight().lt(minHeight)) {
-    //   System.out.println("RIGHT MINED");
-    //   stopMotors();
-    // }
-
-
-
-    System.out.println("TRYING TO MOVE ===========");
-    // Set onboard PID controller to follow
-    leftPID.setReference(
-        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
     rightPID.setReference(
         targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+  }
 
-    // leftMotor.set(-0.1);
-    // rightMotor.set(-0.1);
+  public boolean triggeredCeilingLimit() {
+    return !ceilingLimit.get();
+  }
+
+  public boolean triggeredFloorLimit() {
+    return !floorLimit.get();
+  }
+
+  public boolean triggeredCeilingSafeties() {
+    // if moving down then don't worry about it
+    if (leftEncoder.getVelocity() < 0 && rightEncoder.getVelocity() < 0) {
+      return false;
+    }
+
+    if (getLeftHeight().gt(maxHeight) && leftEncoder.getVelocity() > 0) {
+      return true;
+    }
+
+    if (getRightHeight().gt(maxHeight) && rightEncoder.getVelocity() > 0) {
+      return true;
+    }
+
+    return triggeredCeilingLimit();
+  }
+
+  public boolean triggeredFloorSafeties() {
+    // if moving up then don't worry about it
+    if (leftEncoder.getVelocity() > 0 && rightEncoder.getVelocity() > 0) {
+      return false;
+    }
+
+    if (getLeftHeight().lt(minHeight) && leftEncoder.getVelocity() < 0) {
+      return true;
+    }
+
+    if (getRightHeight().lt(minHeight) && rightEncoder.getVelocity() < 0) {
+      return true;
+    }
+
+    return triggeredFloorLimit();
+  }
+
+  public boolean triggeredSafeties() {
+    return triggeredCeilingSafeties() || triggeredFloorSafeties();
   }
 
   public Distance calculateHeight() {
@@ -286,12 +292,22 @@ public class DualLinearController extends SubsystemBase {
   public void periodic() {
     if (lastPosition.gt(cycleHeight.minus(tolerance)) && getCycleDelta().lt(tolerance)) {
       cyclesCompleted++;
-    } 
+    }
 
     if (lastPosition.lt(tolerance) && getCycleDelta().lt(cycleHeight.minus(tolerance))) {
       cyclesCompleted--;
-    } 
+    }
 
+    if (triggeredCeilingSafeties()) {
+      stopMotors();
+    }
+
+    if (triggeredFloorSafeties()) {
+      if (triggeredFloorLimit()) {
+        seedEncoders(baseHeight);
+      }
+      stopMotors();
+    }
     lastPosition = getCycleDelta();
   }
 }

@@ -84,7 +84,11 @@ public final class StatusChecks {
               .getEntry();
 
       updates.add(() -> entry.setBoolean(checkSupplier.getAsBoolean()));
-      updates.add(() -> {if (!checkSupplier.getAsBoolean()) DriverStation.reportError("===== STATUS CHECKS FAILED ====", false);});
+      updates.add(
+          () -> {
+            if (!checkSupplier.getAsBoolean())
+              DriverStation.reportError("===== STATUS CHECKS FAILED ====", false);
+          });
     }
 
     public void add(String name, TalonFX motor) {
@@ -115,9 +119,7 @@ public final class StatusChecks {
     }
 
     public void add(String name, DutyCycleEncoder encoder) {
-      add(
-          name + " Connected",
-          () -> encoder.isConnected());
+      add(name + " Connected", () -> encoder.isConnected());
     }
   }
 }

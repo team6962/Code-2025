@@ -6,10 +6,10 @@ import static edu.wpi.first.units.Units.Rotations;
 import java.util.function.Supplier;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
@@ -23,18 +23,18 @@ public class ManipulatorPivot extends PivotController {
 
   public ManipulatorPivot() {
     super(
-            CAN.MANIPULATOR_PIVOT,
-            DIO.MANIPULATOR_ENCODER,
-            MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
-            MANIPULATOR_PIVOT.PROFILE.kP,
-            MANIPULATOR_PIVOT.PROFILE.kI,
-            MANIPULATOR_PIVOT.PROFILE.kD,
-            MANIPULATOR_PIVOT.PROFILE.kS,
-            MANIPULATOR_PIVOT.GEARING,
-            Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
-            Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-            Degrees.of(0.25),
-            false);
+      CAN.MANIPULATOR_PIVOT,
+      DIO.MANIPULATOR_ENCODER,
+      MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
+      MANIPULATOR_PIVOT.PROFILE.kP,
+      MANIPULATOR_PIVOT.PROFILE.kI,
+      MANIPULATOR_PIVOT.PROFILE.kD,
+      MANIPULATOR_PIVOT.PROFILE.kS,
+      MANIPULATOR_PIVOT.GEARING,
+      Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+      Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
+      Degrees.of(0.25),
+      false);
     // setDefaultCommand(stow());
   }
 
@@ -46,9 +46,11 @@ public class ManipulatorPivot extends PivotController {
       stopMotor();
       return;
     }
-    if (RobotState.isDisabled()) {
-      setTargetAngle(getPosition());
-    }
+  }
+
+  public Command pivotTo(Supplier<Angle> angleSupplier) {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    return this.run(() -> setAngle(angleSupplier.get())).until(this::doneMoving);
   }
 
   public Command intakeCoral() {
@@ -93,15 +95,5 @@ public class ManipulatorPivot extends PivotController {
 
   public Command down() {
     return Commands.runEnd(this::moveDown, this::stopMotor);
-  }
-
-  public Command pivotTo(Supplier<Angle> angleSupplier) {
-    return Commands.run(() -> setTargetAngleAndRun(angleSupplier), this)
-        .until(this::doneMoving);
-  }
-
-  public void setTargetAngleAndRun(Supplier<Angle> angleSupplier){
-    setTargetAngle(angleSupplier.get());
-    run();
   }
 }

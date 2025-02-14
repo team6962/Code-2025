@@ -25,7 +25,7 @@
 //   public CommandQueue(
 //     SwerveDrive swerveDrive,
 //     Elevator elevator,
-//     Manipulator manipulator  
+//     Manipulator manipulator
 //   ) {
 //     this.swerveDrive = swerveDrive;
 //     this.elevator = elevator;
@@ -67,8 +67,8 @@
 // }
 
 // //     3  4
-// //   2      5     
-// // 1          6  
-// // 12         7   
+// //   2      5
+// // 1          6
+// // 12         7
 // //   11     8
-// //     10 9     
+// //     10 9

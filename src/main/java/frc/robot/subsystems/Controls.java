@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -18,6 +14,8 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -61,19 +59,6 @@ public class Controls {
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
-
-    if (RobotBase.isSimulation()) {
-      driver
-          .button(1)
-          .whileTrue(
-              Commands.defer(
-                  () ->
-                      swerveDrive.pathfindTo(
-                          frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
-                  Set.of()));
-
-      // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
-    }
 
     // Operator
     // Button to L2-L4, and Barge Height

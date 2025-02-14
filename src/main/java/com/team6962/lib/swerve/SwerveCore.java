@@ -1,7 +1,5 @@
 package com.team6962.lib.swerve;
 
-import java.util.Arrays;
-
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.SwerveGyroscope;
@@ -10,7 +8,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -24,6 +21,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Arrays;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing the swerve modules,
@@ -64,10 +62,11 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
   }
 
   /**
-   * Sets the maximum speed of the drive motors. This should only be called
-   * inside commands that require the max speed subsystem.
-   * @param maxSpeed the maximum speed to set, values higher than
-   * {@code getConstants().maxDriveSpeed()} are ignored.
+   * Sets the maximum speed of the drive motors. This should only be called inside commands that
+   * require the max speed subsystem.
+   *
+   * @param maxSpeed the maximum speed to set, values higher than {@code
+   *     getConstants().maxDriveSpeed()} are ignored.
    */
   public void setMaxDriveSpeed(LinearVelocity maxSpeed) {
     this.maxSpeed = maxSpeed;
@@ -132,7 +131,9 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
       states = KinematicsUtils.getStoppedStates(getModuleStates());
     }
 
-    states = KinematicsUtils.desaturateWheelSpeeds(states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
+    states =
+        KinematicsUtils.desaturateWheelSpeeds(
+            states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
 
     Logger.log(getName() + "/targetModuleSpeeds", robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
     Logger.log(getName() + "/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
