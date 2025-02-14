@@ -35,7 +35,7 @@ public class ManipulatorPivot extends PivotController {
       MANIPULATOR_PIVOT.GEARING,
       Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
       Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-      Degrees.of(2),
+      Degrees.of(4),
       false);
     // setDefaultCommand(stow());
 
