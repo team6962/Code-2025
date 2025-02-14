@@ -160,8 +160,8 @@ public class AprilTags extends SubsystemBase {
     int ftagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
     int btagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
 
-    if (Field.REEF_APRILTAGS.contains(ftagID)) return ftagID;
-    if (Field.REEF_APRILTAGS.contains(btagID)) return btagID;
+    if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
+    if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
     return -1;
   }
 }

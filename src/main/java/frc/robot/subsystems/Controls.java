@@ -60,19 +60,6 @@ public class Controls {
     driver.rightTrigger(); // USED
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
-    if (RobotBase.isSimulation()) {
-      driver
-          .button(1)
-          .whileTrue(
-              Commands.defer(
-                  () ->
-                      swerveDrive.pathfindTo(
-                          frc.robot.Constants.Field.AUTO_MOVE_POSITIONS.get("AMP").get()),
-                  Set.of()));
-
-      // driver.button(1).whileTrue(stateController.setState(RobotStateController.State.AIM_SPEAKER).alongWith(stateController.setState(RobotStateController.State.SPIN_UP)));
-    }
-
     // Operator
     // Button to L2-L4, and Barge Height
     // Intake Algae with The Box

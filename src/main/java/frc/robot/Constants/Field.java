@@ -37,8 +37,10 @@ import java.util.function.Supplier;
  * constants are needed, to reduce verbosity.
  */
 public final class Field {
-  public static final double WIDTH = 8.05; // meters
-  public static final double LENGTH = 17.55; // meters
+  public static final AprilTagFieldLayout FIELD_LAYOUT =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // meters
+  public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // meters
 
   public static enum Pole {
     LEFT,
@@ -46,64 +48,44 @@ public final class Field {
   }
 
   public static final Optional<Pose3d> getTagPose(int tagID) {
-    return AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape).getTagPose(tagID);
+    return FIELD_LAYOUT.getTagPose(tagID);
   }
-
-  public static final Map<String, Supplier<Pose2d>> AUTO_MOVE_POSITIONS =
-      Map.of(
-          "AMP", pose2d(1.85, 7.5, 90.0),
-          "SOURCE", pose2d(15.4, 1.0, -60.0),
-          "SPEAKER", pose2d(1.5, 5.5, 180.0),
-          "TRAP", pose2d(6, WIDTH / 2, 180.0));
-
-  public static final List<Supplier<Translation2d>> NOTE_POSITIONS =
-      List.of(
-          point2d(Units.inchesToMeters(114), WIDTH / 2.0 + Units.inchesToMeters(57) * 2.0),
-          point2d(Units.inchesToMeters(114), WIDTH / 2.0 + Units.inchesToMeters(57) * 1.0),
-          point2d(Units.inchesToMeters(114), WIDTH / 2.0 + Units.inchesToMeters(57) * 0.0),
-          point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * 2.0),
-          point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * 1.0),
-          point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * 0.0),
-          point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -1.0),
-          point2d(LENGTH / 2.0, WIDTH / 2.0 + Units.inchesToMeters(66) * -2.0));
-
 
   public static final Distance COMMON_FACE_POLE_DISTANCE = Inches.of(12.94);
 
- 
   public static final int LEFT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 1 : 13;
   public static final int RIGHT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 2 : 12;
   public static final int PROCESSOR_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 3 : 16;
   public static final int BARGE_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 5 : 14;
 
+  private static List<Integer> reefAprilTags;
 
- /**
-   * reef tags keyed by their face
-   */
-  public static final List<Integer> REEF_APRILTAGS = new ArrayList<Integer>();
-  static {
-    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-      REEF_APRILTAGS.add(10);
-      REEF_APRILTAGS.add(9);
-      REEF_APRILTAGS.add(8);
-      REEF_APRILTAGS.add(7);
-      REEF_APRILTAGS.add(6);
-      REEF_APRILTAGS.add(11);
-    } else {
-      // default blue
-      REEF_APRILTAGS.add(21);
-      REEF_APRILTAGS.add(22);
-      REEF_APRILTAGS.add(17);
-      REEF_APRILTAGS.add(18);
-      REEF_APRILTAGS.add(19);
-      REEF_APRILTAGS.add(20);
+  public static List<Integer> getReefAprilTagsByFace() {
+    if (reefAprilTags == null) {
+      reefAprilTags = new ArrayList<Integer>();
+
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        reefAprilTags.add(10);
+        reefAprilTags.add(9);
+        reefAprilTags.add(8);
+        reefAprilTags.add(7);
+        reefAprilTags.add(6);
+        reefAprilTags.add(11);
+      } else {
+        reefAprilTags.add(21);
+        reefAprilTags.add(22);
+        reefAprilTags.add(17);
+        reefAprilTags.add(18);
+        reefAprilTags.add(19);
+        reefAprilTags.add(20);
+      }
     }
-  };
 
-  
+    return reefAprilTags;
+  }
 
   public static final Pose2d getFacePose(int face) {
-    Pose2d tagPose = getTagPose(REEF_APRILTAGS.get(face)).get().toPose2d();
+    Pose2d tagPose = getTagPose(getReefAprilTagsByFace().get(face)).get().toPose2d();
     // return tagPose.rotateBy(Rotation2d.fromDegrees(180));
     return tagPose;
   }
