@@ -250,10 +250,6 @@ public class DualLinearActuator extends SubsystemBase {
       cyclesCompleted--;
     }
 
-    if (!canMoveInDirection((leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2)) {
-      stopMotors();
-    }
-
     if (triggeredFloorLimit()) {
       seedEncoders(baseHeight);
     }
