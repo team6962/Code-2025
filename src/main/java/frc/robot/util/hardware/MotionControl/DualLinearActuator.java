@@ -177,18 +177,20 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public void moveSpeed(double speed) {
-    leftMotor.set(speed);
-    rightMotor.set(speed);
+    if (canMoveInDirection(speed)) {
+      leftMotor.set(speed);
+      rightMotor.set(speed);
+    } else {
+      stopMotors();
+    }
   }
 
   public void moveUp() {
-    leftMotor.set(0.10);
-    rightMotor.set(0.10);
+    moveSpeed(0.10);
   }
 
   public void moveDown() {
-    leftMotor.set(-0.10);
-    rightMotor.set(-0.10);
+    moveSpeed(-0.10);
   }
 
   public boolean doneMoving() {
@@ -206,29 +208,7 @@ public class DualLinearActuator extends SubsystemBase {
     targetHeight = clampHeight(requestedHeight);
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
-    // if (!absoluteEncoder.isConnected()) {
-    //   System.out.println("NO ENCODER");
-    //   stopMotors();
-    //   return;
-    // }
-
-    // if (leftMotor.getFaults() != null || rightMotor.getFaults() != null) {
-    //   System.out.println("MOTORS FAULTED");
-    //   stopMotors();
-    //   return;
-    // }
-
-    // remove?
-    // leftEncoder.setPosition(getAverageHeight().in(Meters));
-    // rightEncoder.setPosition(getAverageHeight().in(Meters));
-
-    // if (getLeftHeight().minus(getRightHeight()).abs(Inches) > 0.2) {
-    //   System.out.println("ELEVATOR TORQUED ===========");
-    //   stopMotors();
-    // }
-
-    if (triggeredSafeties()) {
-      System.out.println("SAFETIES TRIGGERED ===========");
+    if (!canMoveInDirection(requestedHeight.minus(getAverageHeight()).in(Meters))) {
       stopMotors();
       return;
     }
@@ -246,42 +226,14 @@ public class DualLinearActuator extends SubsystemBase {
     return !floorLimit.get();
   }
 
-  public boolean triggeredCeilingSafeties() {
-    // if moving down then don't worry about it
-    if (leftEncoder.getVelocity() < 0 && rightEncoder.getVelocity() < 0) {
-      return false;
+  public boolean canMoveInDirection(double velocity) {
+    if (velocity > 0) {
+      return getLeftHeight().lt(maxHeight) && getRightHeight().lt(maxHeight) &&
+        !triggeredCeilingLimit();
+    } else {
+      return getLeftHeight().gt(minHeight) && getRightHeight().gt(minHeight) &&
+        !triggeredFloorLimit();
     }
-
-    if (getLeftHeight().gt(maxHeight) && leftEncoder.getVelocity() > 0) {
-      return true;
-    }
-
-    if (getRightHeight().gt(maxHeight) && rightEncoder.getVelocity() > 0) {
-      return true;
-    }
-
-    return triggeredCeilingLimit();
-  }
-
-  public boolean triggeredFloorSafeties() {
-    // if moving up then don't worry about it
-    if (leftEncoder.getVelocity() > 0 && rightEncoder.getVelocity() > 0) {
-      return false;
-    }
-
-    if (getLeftHeight().lt(minHeight) && leftEncoder.getVelocity() < 0) {
-      return true;
-    }
-
-    if (getRightHeight().lt(minHeight) && rightEncoder.getVelocity() < 0) {
-      return true;
-    }
-
-    return triggeredFloorLimit();
-  }
-
-  public boolean triggeredSafeties() {
-    return triggeredCeilingSafeties() || triggeredFloorSafeties();
   }
 
   public Distance calculateHeight() {
@@ -298,16 +250,14 @@ public class DualLinearActuator extends SubsystemBase {
       cyclesCompleted--;
     }
 
-    if (triggeredCeilingSafeties()) {
+    if (!canMoveInDirection((leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2)) {
       stopMotors();
     }
 
-    if (triggeredFloorSafeties()) {
-      if (triggeredFloorLimit()) {
-        seedEncoders(baseHeight);
-      }
-      stopMotors();
+    if (triggeredFloorLimit()) {
+      seedEncoders(baseHeight);
     }
+
     lastPosition = getCycleDelta();
   }
 }
