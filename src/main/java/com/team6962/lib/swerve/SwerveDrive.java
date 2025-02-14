@@ -221,10 +221,10 @@ public class SwerveDrive extends SwerveCore {
   public Command driveHeading(Rotation2d heading) {
     return driveHeading(() -> heading);
   }
-
   public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
-    return Commands.run(
-      () -> facePoint(point.get(), rotationOffset)
+    return Commands.runEnd(
+      () -> facePoint(point.get(), rotationOffset),
+      () -> System.out.println("idiot")
     );
   }
 
@@ -232,7 +232,7 @@ public class SwerveDrive extends SwerveCore {
     double time = 0.02;
 
     if (point == null) {
-        // TODO: include velocity (maybe?)
+        // TODO: add and velocity
         driveHeading(getEstimatedPose().getRotation());
         return;
     }
@@ -248,10 +248,10 @@ public class SwerveDrive extends SwerveCore {
     Rotation2d currentTargetHeading = point.minus(currentPosition).getAngle().plus(rotationOffset);
     Rotation2d futureTargetHeading = point.minus(futurePosition).getAngle().plus(rotationOffset);
     
-    //double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
-    // if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
-    //     addedVelocity = 0.0;
-    // }
+    double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
+    if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
+        addedVelocity = 0.0;
+    }
 
 
     driveHeading(currentTargetHeading);

@@ -210,7 +210,10 @@ public class Autonomous {
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      reefPoleAlign(1)
+      cycleTopCoral()
     );
+    // return Commands.sequence(
+    //   reefPoleAlign(1)
+    // );
   }
 }

@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -95,6 +97,10 @@ public class Controls {
     operator.leftTrigger().onTrue(manipulator.algae.intake());
     operator.rightTrigger().onTrue(manipulator.algae.drop());
     operator.y().onTrue(autonomous.reefPoleAlign(0));
+
+    if (RobotBase.isSimulation()) {
+      driver.button(15).onTrue(swerveDrive.facePointCommand(() -> new Translation2d(3, 6), new Rotation2d()));
+    }
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 
