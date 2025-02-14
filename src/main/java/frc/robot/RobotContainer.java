@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.commands.PrematchChecks;
@@ -179,6 +180,12 @@ public class RobotContainer {
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
+
+    Commands.sequence(
+      manipulator.pivot.safe(),
+      elevator.rezeroAtBottom()).schedule();
+
+    
     Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null, null);
     checks.schedule();
   }

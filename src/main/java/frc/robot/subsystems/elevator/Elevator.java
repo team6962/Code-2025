@@ -121,6 +121,10 @@ public class Elevator extends DualLinearActuator {
     return setHeight(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
   }
 
+  public Command rezeroAtBottom() {
+    return Commands.none().until(this::moveDownUntilTriggered);
+  }
+
   public Command test() {
     return Commands.sequence(stow(), coralL1(), coralL3(), algaeBarge(), stow());
   }

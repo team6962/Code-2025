@@ -44,6 +44,10 @@ public class Manipulator extends SubsystemBase {
     }
   }
 
+  public Command placeCoralL1() {
+    return pivot.coralL1().andThen(coral.drop());
+  }
+
   public Command placeCoralL23() {
     return pivot.coralL23().andThen(coral.drop());
   }
@@ -53,7 +57,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.intakeCoral().alongWith(coral.intake());
+    return pivot.coralIntake().alongWith(coral.intake());
   }
 
   public Command pickupGroundAlgae() {
@@ -82,6 +86,6 @@ public class Manipulator extends SubsystemBase {
 
   public Command test() {
     return Commands.sequence(
-        intakeCoral(), placeCoralL23(), pickupGroundAlgae(), placeProcessorAlgae(), stow());
+        pivot.safe(), /* intakeCoral(), placeCoralL23(),*/ pickupGroundAlgae(), placeProcessorAlgae(), pivot.safe());
   }
 }

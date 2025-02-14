@@ -68,15 +68,15 @@ public final class Preferences {
     public static final double ALGAE_HOLD_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.2;
     public static final double CORAL_IN_SPEED = 0.2;
-    public static final double CORAL_HOLD_SPEED = -0.1;
+    public static final double CORAL_HOLD_SPEED = -0.0; // -0.1
   }
 
   // REFERENCE ANGLES FROM CAD AND
   // https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
   public static final class MANIPULATOR_PIVOT {
     public static final Angle MAX_ANGLE = Degrees.of(20.0); // RESET TO 40.0
-    public static final Angle MIN_LOW_ANGLE = Degrees.of(-80.0);
-    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
+    public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
+    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
     public static final Angle STOW_ANGLE = Degrees.of(38.5);
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
@@ -84,7 +84,7 @@ public final class Preferences {
       public static final Angle L1_ANGLE = Degrees.of(22.5);
       public static final Angle L23_ANGLE = Degrees.of(-34.5);
       public static final Angle L4_ANGLE = Degrees.of(-57.0);
-      public static final Angle INTAKE_ANGLE = Degrees.of(-118.0);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-138.0);
     }
 
     public static final class ALGAE {
@@ -104,11 +104,11 @@ public final class Preferences {
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(38.0);
-      public static final Distance L2_HEIGHT = Inches.of(47.6);
-      public static final Distance L3_HEIGHT = Inches.of(58.0);
+      public static final Distance L1_HEIGHT = Inches.of(39.0);
+      public static final Distance L2_HEIGHT = Inches.of(49.8);
+      public static final Distance L3_HEIGHT = Inches.of(58.6);
       public static final Distance L4_HEIGHT = Inches.of(77.2);
-      public static final Distance INTAKE_HEIGHT = Inches.of(58.8);
+      public static final Distance INTAKE_HEIGHT = Inches.of(59.1);
     }
 
     public static final class ALGAE {

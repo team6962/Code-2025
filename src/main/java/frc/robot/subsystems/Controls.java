@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
+import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -42,6 +43,8 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
+    PieceCombos pieceCombos = new PieceCombos(elevator, manipulator, intake);
+
     driver.a();
     driver.b();
     driver.x();
@@ -71,10 +74,11 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(manipulator.pivot.safe().andThen(elevator.coralL1()).andThen(manipulator.pivot.coralL1()));
-    operator.b().onTrue(manipulator.pivot.safe().andThen(elevator.coralL2()).andThen(manipulator.pivot.coralL23()));
-    operator.x().onTrue(manipulator.pivot.safe().andThen(elevator.coralL3()).andThen(manipulator.pivot.coralL23()));
-    operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4()).andThen(manipulator.pivot.coralL4()));
+    operator.a().onTrue(pieceCombos.coralL1());
+    operator.b().onTrue(pieceCombos.coralL2());
+    operator.x().onTrue(pieceCombos.coralL3());
+    operator.y().onTrue(pieceCombos.coralL4());
+    // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
 
     // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
     // operator.a().onTrue(manipulator.pivot.coralL23());
@@ -85,15 +89,15 @@ public class Controls {
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
-    operator.povRight().whileTrue(elevator.up());
-    operator.povLeft().whileTrue(elevator.down());
-    operator.povUp().whileTrue(manipulator.pivot.up());
-    operator.povDown().whileTrue(manipulator.pivot.down());
+    operator.povUp().whileTrue(elevator.up());
+    operator.povDown().whileTrue(elevator.down());
+    operator.povRight().whileTrue(manipulator.pivot.up());
+    operator.povLeft().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());,
-    operator.rightBumper().whileTrue(manipulator.coral.action());
-    operator.rightTrigger().whileTrue(manipulator.coral.action());
-    operator.leftBumper().whileTrue(manipulator.algae.intake());
+    operator.rightBumper().whileTrue(pieceCombos.intakeCoral());
+    operator.rightTrigger();
+    operator.leftBumper().whileTrue(pieceCombos.pickupGroundAlgae());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());

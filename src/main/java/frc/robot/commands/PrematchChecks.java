@@ -34,6 +34,6 @@ public class PrematchChecks extends SequentialCommandGroup {
     this.intake = intake;
 
     addCommands(
-        elevator.test(), manipulator.test(), hang.test(), Commands.runOnce(StatusChecks::refresh));
+        manipulator.pivot.safe(), elevator.test(), manipulator.test(), /*hang.test(),*/ Commands.runOnce(StatusChecks::refresh));
   }
 }

@@ -185,6 +185,17 @@ public class DualLinearActuator extends SubsystemBase {
     }
   }
 
+  public boolean moveDownUntilTriggered() {
+    if (!triggeredFloorLimit()) {
+      leftMotor.set(-0.1);
+      rightMotor.set(-0.1);
+      return false;
+    }
+    
+    stopMotors();
+    return true;
+  }
+
   public void moveUp() {
     moveSpeed(0.10);
   }

@@ -35,7 +35,7 @@ public class ManipulatorPivot extends PivotController {
       MANIPULATOR_PIVOT.GEARING,
       Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
       Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-      Degrees.of(4),
+      Degrees.of(2),
       false);
     // setDefaultCommand(stow());
 
@@ -67,7 +67,7 @@ public class ManipulatorPivot extends PivotController {
     }, Set.of(this));
   } 
 
-  public Command intakeCoral() {
+  public Command coralIntake() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
   }
 
