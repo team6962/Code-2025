@@ -33,7 +33,7 @@ public class RealCoralGrabber extends CoralGrabber {
 
         sensor = new DigitalInput(DIO.CORAL_BEAM_BREAK);
 
-        setDefaultCommand(stop());
+        setDefaultCommand(hold());
     }
 
     @Override

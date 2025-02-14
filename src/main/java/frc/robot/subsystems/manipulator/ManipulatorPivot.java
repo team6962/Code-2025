@@ -3,6 +3,7 @@ package frc.robot.subsystems.manipulator;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import edu.wpi.first.units.measure.Angle;
@@ -39,6 +40,8 @@ public class ManipulatorPivot extends PivotController {
     // setDefaultCommand(stow());
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
+
+    setDefaultCommand(hold());
   }
 
   @Override
@@ -55,6 +58,14 @@ public class ManipulatorPivot extends PivotController {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
     return this.runEnd(() -> moveTowards(angleSupplier.get()), () -> stopAngle = getPosition()).until(this::doneMoving);
   }
+
+  public Command hold() {
+    return Commands.defer(() -> {
+      Angle position = getPosition();
+
+      return this.runEnd(() -> moveTowards(position), () -> stopAngle = getPosition());
+    }, Set.of(this));
+  } 
 
   public Command intakeCoral() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 /*
@@ -142,12 +143,6 @@ public class PivotController extends SubsystemBase {
 
     encoder.setPosition(getPosition().in(Rotations));
 
-    if (doneMoving()) {
-      motor.stopMotor();
-      if (RobotBase.isSimulation()) sim.setInputVoltage(0.0);
-      return;
-    }
-
     // Set onboard PID controller to follow
 
     if (RobotBase.isSimulation())
@@ -158,7 +153,7 @@ public class PivotController extends SubsystemBase {
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
     if (canMoveInDirection(targetAngle.minus(getPosition()).in(Rotations))) {
-      pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+      pid.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0, Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + getPosition().in(Radians)) * kS);
     } else {
       motor.stopMotor();
     }

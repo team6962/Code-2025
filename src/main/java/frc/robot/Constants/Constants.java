@@ -250,6 +250,7 @@ public final class Constants {
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
+    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(60);
 
     public static final class PROFILE {
       public static final double kP = 1.5;
