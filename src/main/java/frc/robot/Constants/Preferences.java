@@ -66,8 +66,8 @@ public final class Preferences {
     public static final double ALGAE_OUT_SPEED = 0.1;
     public static final double ALGAE_IN_SPEED = 0.1;
     public static final double ALGAE_HOLD_SPEED = 0.1;
-    public static final double CORAL_OUT_SPEED = 0.1;
-    public static final double CORAL_IN_SPEED = 0.1;
+    public static final double CORAL_OUT_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.2;
   }
 
   // REFERENCE ANGLES FROM CAD AND
@@ -77,6 +77,7 @@ public final class Preferences {
     public static final Angle MIN_LOW_ANGLE = Degrees.of(-80.0);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
     public static final Angle STOW_ANGLE = Degrees.of(38.5);
+    public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(22.5);

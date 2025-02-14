@@ -71,10 +71,12 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(elevator.coralL2().andThen(manipulator.pivot.coralL23()));
-    operator.b().onTrue(elevator.coralL3().andThen(manipulator.pivot.coralL23()));
-    operator.x().onTrue(elevator.coralL4().andThen(manipulator.pivot.coralL4()));
-    operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
+    operator.a().onTrue(manipulator.pivot.safe().andThen(elevator.coralL1()).andThen(manipulator.pivot.coralL1()));
+    operator.b().onTrue(manipulator.pivot.safe().andThen(elevator.coralL2()).andThen(manipulator.pivot.coralL23()));
+    operator.x().onTrue(manipulator.pivot.safe().andThen(elevator.coralL3()).andThen(manipulator.pivot.coralL23()));
+    operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4()).andThen(manipulator.pivot.coralL4()));
+
+    // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
     // operator.a().onTrue(manipulator.pivot.coralL23());
     // operator.b().onTrue(manipulator.pivot.algaeReef());
     // operator.x().onTrue(manipulator.pivot.intakeCoral());

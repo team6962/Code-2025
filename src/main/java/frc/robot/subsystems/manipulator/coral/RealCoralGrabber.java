@@ -36,7 +36,7 @@ public class RealCoralGrabber extends CoralGrabber {
     }
 
     public Command runSpeed(double speed) {
-        return run(() -> motor.set(speed));
+        return this.run(() -> motor.set(speed));
     }
 
     public Command intake() {

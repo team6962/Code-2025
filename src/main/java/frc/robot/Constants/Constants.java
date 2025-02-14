@@ -48,7 +48,7 @@ public final class Constants {
     public static final boolean DASHBOARD = true;
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
-    public static final boolean MANIPULATOR = false;
+    public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;
   }
 
@@ -157,8 +157,8 @@ public final class Constants {
     public static final int ELEVATOR_ENCODER = 1;
     public static final int MANIPULATOR_ENCODER = 2;
     public static final int CORAL_BEAM_BREAK = 3;
-    public static final int ELEVATOR_CEIL_LIMIT = 3;
     public static final int ELEVATOR_FLOOR_LIMIT = 4;
+    public static final int ELEVATOR_CEIL_LIMIT = 5;
   }
 
   public static final class NEO {
@@ -238,7 +238,7 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 8.0;
+      public static final double kP = 4.0;
       public static final double kS = 0.4;
     }
   }
@@ -250,9 +250,9 @@ public final class Constants {
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
 
     public static final class PROFILE {
-      public static final double kP = 3.0;
+      public static final double kP = 1.5;
       public static final double kI = 0.0;
-      public static final double kD = 0.1;
+      public static final double kD = 0.0;//0.1;
       public static final double kS = 0.2;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }

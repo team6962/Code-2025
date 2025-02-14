@@ -228,10 +228,10 @@ public class DualLinearActuator extends SubsystemBase {
 
   public boolean canMoveInDirection(double velocity) {
     if (velocity > 0) {
-      return getLeftHeight().lt(maxHeight) && getRightHeight().lt(maxHeight) &&
+      return /* getLeftHeight().lt(maxHeight) && getRightHeight().lt(maxHeight) && */
         !triggeredCeilingLimit();
     } else {
-      return getLeftHeight().gt(minHeight) && getRightHeight().gt(minHeight) &&
+      return /* getLeftHeight().gt(minHeight) && getRightHeight().gt(minHeight) && */
         !triggeredFloorLimit();
     }
   }

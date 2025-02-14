@@ -20,6 +20,7 @@ import frc.robot.util.hardware.MotionControl.PivotController;
 
 public class ManipulatorPivot extends PivotController {
   private boolean isCalibrating = false;
+  private Angle stopAngle = Preferences.MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE;
 
   public ManipulatorPivot() {
     super(
@@ -33,9 +34,11 @@ public class ManipulatorPivot extends PivotController {
       MANIPULATOR_PIVOT.GEARING,
       Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
       Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-      Degrees.of(0.25),
+      Degrees.of(2),
       false);
     // setDefaultCommand(stow());
+
+    // setDefaultCommand(pivotTo(() -> stopAngle));
   }
 
   @Override
@@ -50,11 +53,15 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return this.run(() -> setAngle(angleSupplier.get())).until(this::doneMoving);
+    return this.runEnd(() -> setAngle(angleSupplier.get()), () -> stopAngle = getPosition()).until(this::doneMoving);
   }
 
   public Command intakeCoral() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
+  }
+
+  public Command coralL1() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L1_ANGLE);
   }
 
   public Command coralL23() {
@@ -85,15 +92,27 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
+  public Command safe() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.SAFE_ANGLE);
+  }
+
+
+
+
   public Command stop() {
-    return Commands.run(this::stopMotor);
+    return Commands.run(this::stopMotor, this);
+  }
+
+  private void stopAndStay() {
+    stopMotor();
+    stopAngle = getPosition();
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stopMotor);
+    return Commands.runEnd(this::moveUp, this::stopAndStay, this);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stopMotor);
+    return Commands.runEnd(this::moveDown, this::stopAndStay, this);
   }
 }

@@ -1,9 +1,12 @@
 package frc.robot.subsystems.manipulator.coral;
 
+import java.util.Set;
+
 import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
@@ -28,7 +31,7 @@ public abstract class CoralGrabber extends SubsystemBase {
     }
 
     public Command action() {
-        return hasGamePiece() ? drop() : intake();
+        return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
     }
 
     public abstract Command intake();
