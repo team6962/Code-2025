@@ -97,7 +97,7 @@ public class Controls {
     // operator.povRight().whileTrue(hang.stow());,
     operator.rightBumper().whileTrue(pieceCombos.intakeCoral());
     operator.rightTrigger();
-    operator.leftBumper().whileTrue(pieceCombos.pickupGroundAlgae());
+    operator.leftBumper().whileTrue(manipulator.algae.intake());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());

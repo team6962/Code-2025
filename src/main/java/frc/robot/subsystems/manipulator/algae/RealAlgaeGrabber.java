@@ -33,7 +33,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     public RealAlgaeGrabber() {
         motors = new CombinedMotor(
             new RealMotor("Algae Grabber/Left Motor", CAN.MANIPULATOR_ALGAE_LEFT, true),
-            new RealMotor("Algae Grabber/Right Motor", CAN.MANIPULATOR_ALGAE_RIGHT, true)
+            new RealMotor("Algae Grabber/Right Motor", CAN.MANIPULATOR_ALGAE_RIGHT, false)
         );
 
         Logger.logBoolean(getName() + "/motorsStalled", () -> stalled);

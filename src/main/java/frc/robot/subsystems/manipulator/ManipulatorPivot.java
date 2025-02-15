@@ -21,7 +21,6 @@ import frc.robot.util.hardware.MotionControl.PivotController;
 
 public class ManipulatorPivot extends PivotController {
   private boolean isCalibrating = false;
-  private Angle stopAngle = Preferences.MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE;
 
   public ManipulatorPivot() {
     super(
@@ -56,14 +55,14 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return this.runEnd(() -> moveTowards(angleSupplier.get()), () -> stopAngle = getPosition()).until(this::doneMoving);
+    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving);
   }
 
   public Command hold() {
     return Commands.defer(() -> {
       Angle position = getPosition();
 
-      return this.runEnd(() -> moveTowards(position), () -> stopAngle = getPosition());
+      return run(() -> moveTowards(position));
     }, Set.of(this));
   } 
 
@@ -107,23 +106,15 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.SAFE_ANGLE);
   }
 
-
-
-
   public Command stop() {
-    return Commands.run(this::stopMotor, this);
-  }
-
-  private void stopAndStay() {
-    stopMotor();
-    stopAngle = getPosition();
+    return run(this::stopMotor);
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stopAndStay, this);
+    return run(this::moveUp);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stopAndStay, this);
+    return run(this::moveDown);
   }
 }

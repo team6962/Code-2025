@@ -49,11 +49,11 @@ public class PieceCombos {
     }
 
     public Command algaeBarge() {
-        return manipulator.pivot.safe().andThen(elevator.algaeBarge()).andThen(manipulator.pickupReefAlgae());
+        return manipulator.pivot.safe().andThen(elevator.algaeBarge()).andThen(manipulator.placeBargeAlgae());
     }
 
     public Command algaeProcessor() {
-        return manipulator.pivot.safe().andThen(elevator.algaeProcessor()).andThen(manipulator.pickupReefAlgae());
+        return manipulator.pivot.safe().andThen(elevator.algaeProcessor()).andThen(manipulator.placeProcessorAlgae());
     }
 
     public Command stow() {
