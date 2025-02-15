@@ -63,8 +63,8 @@ public final class Preferences {
     public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
 
-    public static final double ALGAE_OUT_SPEED = 0.2;
-    public static final double ALGAE_IN_SPEED = -0.2;
+    public static final double ALGAE_OUT_SPEED = -0.2;
+    public static final double ALGAE_IN_SPEED = 0.2;
     public static final double ALGAE_HOLD_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.2;
     public static final double CORAL_IN_SPEED = 0.2;
