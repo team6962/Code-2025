@@ -28,34 +28,34 @@ public class LEDs extends SubsystemBase {
     OFF,
     DISABLED,
     ENABLED,
-    DRIVING_AUTO
-    // DRIVING_TELEOP_RED,
-    // DRIVING_TELEOP_BLUE,
-    // HAS_ALGAE,
-    // HAS_CORAL,
-    // CAN_SEE_ALGAE,
-    // AIMING_PROCESSOR,
-    // SCORING_PROCESSOR,
-    // AIMING_BARGE,
-    // SCORING_BARGE,
-    // AIMING_REEF,
-    // SCORING_REEF,
-    // HANG
+    DRIVING_AUTO,
+     DRIVING_TELEOP_RED,
+     DRIVING_TELEOP_BLUE,
+     HAS_ALGAE,
+     HAS_CORAL,
+     CAN_SEE_ALGAE,
+     AIMING_PROCESSOR,
+     SCORING_PROCESSOR,
+     AIMING_BARGE,
+     SCORING_BARGE,
+     AIMING_REEF,
+     SCORING_REEF,
+     HANG
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
-  // public static final Color ANTARES_BLUE = {37, 46, 69};
-  // public static final Color ANTARES_YELLOW = {242, 222, 139};
-  // public static final Color RED = {255, 0, 0};
-  // public static final Color GREEN = {0, 255, 0};
-  // public static final Color BLUE = {0, 20, 255};
-  // public static final Color RSL_ORANGE = {255, 100, 0};
-  // public static final Color LIGHT_BLUE = {173, 216, 230};
-  // public static final Color YELLOW = {255, 255, 0};
-  // public static final Color CYAN = {0, 255, 255};
-  // public static final Color DARK_GREEN = {0, 100, 0};
-  // public static final Color PURPLE = {108, 59, 170};
-  // public static final Color MAGENTA = {255, 0, 255};
+  public static final Color ANTARES_BLUE = new Color(37, 46, 69);
+  public static final Color ANTARES_YELLOW = new Color(242, 222, 139);
+  public static final Color RED = new Color(255, 0, 0);
+  public static final Color GREEN = new Color(0, 255, 0);
+  public static final Color BLUE = new Color(0, 20, 255);
+  public static final Color RSL_ORANGE = new Color(255, 100, 0);
+  public static final Color LIGHT_BLUE = new Color(173, 216, 230);
+  public static final Color YELLOW = new Color(255, 255, 0);
+  public static final Color CYAN = new Color(0, 255, 255);
+  public static final Color DARK_GREEN = new Color(0, 100, 0);
+  public static final Color PURPLE = new Color(108, 59, 170);
+  public static final Color MAGENTA = new Color(255, 0, 255);
   
   public LEDs(RobotStateController stateController) {
     this.stateController = stateController;
@@ -108,41 +108,41 @@ public class LEDs extends SubsystemBase {
       case DRIVING_AUTO:
         apply(createColor(WHITE, WHITE, 0.0, 50.0));
         break;
-      // case DRIVING_TELEOP_RED:
-      //   apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
-      //   break;
-      // case DRIVING_TELEOP_BLUE:
-      //   apply(createColor(BLUE, ANTARES_BLUE, 0.0, 50.0));
-      //   break;
-      // case HAS_ALGAE:
-      //   apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
-      //   break;
-      // case HAS_CORAL:
-      //   break;
-      // case CAN_SEE_ALGAE:
-      //   apply(createColor(CYAN, CYAN, 0.0, 0.0));
-      //   break;
-      // case AIMING_PROCESSOR:
-      //   apply(createColor(DARK_GREEN, DARK_GREEN, 0.5, 0.0));
-      //   break;
-      // case SCORING_PROCESSOR:
-      //   apply(createColor(DARK_GREEN, DARK_GREEN, 0.0, 0.0));
-      //   break;
-      // case AIMING_BARGE:
-      //   apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
-      //   break;
-      // case SCORING_BARGE:
-      //   apply(createColor(YELLOW, YELLOW, 0.0, 0.0));
-      //   break;
-      // case AIMING_REEF:
-      //   apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
-      //   break;
-      // case SCORING_REEF:
-      //   apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
-      //   break;
-      // case HANG:
-      //   apply(createColor(RSL_ORANGE, RSL_ORANGE, 0.0, 0.0));
-      //   break;
+      case DRIVING_TELEOP_RED:
+        apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
+        break;
+      case DRIVING_TELEOP_BLUE:
+        apply(createColor(BLUE, ANTARES_BLUE, 0.0, 50.0));
+        break;
+      case HAS_ALGAE:
+        apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
+        break;
+      case HAS_CORAL:
+        break;
+      case CAN_SEE_ALGAE:
+        apply(createColor(CYAN, CYAN, 0.0, 0.0));
+        break;
+      case AIMING_PROCESSOR:
+        apply(createColor(DARK_GREEN, DARK_GREEN, 0.5, 0.0));
+        break;
+      case SCORING_PROCESSOR:
+        apply(createColor(DARK_GREEN, DARK_GREEN, 0.0, 0.0));
+        break;
+      case AIMING_BARGE:
+        apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
+        break;
+      case SCORING_BARGE:
+        apply(createColor(YELLOW, YELLOW, 0.0, 0.0));
+        break;
+      case AIMING_REEF:
+        apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
+        break;
+      case SCORING_REEF:
+        apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
+        break;
+      case HANG:
+        apply(createColor(RSL_ORANGE, RSL_ORANGE, 0.0, 0.0));
+        break;
 
 
     }
