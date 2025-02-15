@@ -33,7 +33,22 @@ public class PrematchChecks extends SequentialCommandGroup {
     this.hang = hang;
     this.intake = intake;
 
+    PieceCombos combos = new PieceCombos(elevator, manipulator, intake);
+
     addCommands(
-        manipulator.pivot.safe(), elevator.test(), manipulator.test(), /*hang.test(),*/ Commands.runOnce(StatusChecks::refresh));
+        manipulator.pivot.safe(),
+      elevator.rezeroAtBottom(),
+      Commands.waitSeconds(1.0),
+      // combos.coralL1(),
+      Commands.waitSeconds(1.0),
+      combos.coralL2(),
+      Commands.waitSeconds(1.0),
+      combos.coralL4().withTimeout(4.0),
+      Commands.waitSeconds(1.0),
+      combos.algaeL3(),
+      Commands.waitSeconds(1.0),
+      combos.algaeProcessor(),
+        combos.coralL1(),
+        Commands.runOnce(StatusChecks::refresh));
   }
 }

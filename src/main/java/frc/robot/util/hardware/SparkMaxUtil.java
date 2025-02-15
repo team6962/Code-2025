@@ -62,8 +62,7 @@ public final class SparkMaxUtil {
         false);
   }
 
-  public static void configureAndLog550(
-      SparkMax motor, SparkMaxConfig config, boolean inverted, IdleMode idleMode) {
+  public static void configure550(SparkMaxConfig config, boolean inverted, IdleMode idleMode) {
     configure(config, inverted, idleMode, 10, 40);
   }
 

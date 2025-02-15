@@ -28,7 +28,8 @@ public class RealCoralGrabber extends CoralGrabber {
 
         SparkMaxConfig config = new SparkMaxConfig();
 
-        SparkMaxUtil.configureAndLog550(motor, config, false, IdleMode.kBrake);
+        SparkMaxUtil.configure(config, false, IdleMode.kBrake);
+        SparkMaxUtil.saveAndLog(this, motor, config);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -56,7 +57,7 @@ public class RealCoralGrabber extends CoralGrabber {
     public Command drop() {
         return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
             .withDeadline(Commands.sequence(
-                Commands.waitUntil(this::detectsGamePiece),
+                // Commands.waitUntil(this::detectsGamePiece),
                 Commands.waitUntil(() -> !detectsGamePiece())
             ))
             .andThen(() -> setHasGamePiece(false));
