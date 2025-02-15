@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.LEDs;
+//import frc.robot.subsystems.LEDs;
 
 public class Algae {
     public static Translation2d getAlgaePosition(String name, SwerveDrive swerveDrive, Translation3d cameraToRobot){
@@ -61,7 +61,7 @@ public class Algae {
         robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
 
     if (!RobotState.isDisabled()) {
-      LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
+      //LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
     }
 
     return algaePosition;

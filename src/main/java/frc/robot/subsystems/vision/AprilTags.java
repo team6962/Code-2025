@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Field;
-import frc.robot.subsystems.LEDs;
+//import frc.robot.subsystems.LEDs;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public class AprilTags extends SubsystemBase {
                       .getTranslation()
                       .getDistance(pose2d.getTranslation())
                   < 1.0;
-      if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
+//      if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
 
       double rotationError = Units.degreesToRadians(15);
       if (!canChangeHeading) {

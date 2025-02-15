@@ -256,6 +256,8 @@ public final class Constants {
 
   // LED
   public static final class LED {
-    public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+    public static final Distance Spacing = Meters.of(1 / 60.0);
+    public static final int length = 300;
+    public static final int port = 9;
   }
 }
