@@ -57,7 +57,7 @@ public class RealCoralGrabber extends CoralGrabber {
     public Command drop() {
         return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
             .withDeadline(Commands.sequence(
-                // Commands.waitUntil(this::detectsGamePiece),
+                Commands.waitUntil(this::detectsGamePiece),
                 Commands.waitUntil(() -> !detectsGamePiece())
             ))
             .andThen(() -> setHasGamePiece(false));
