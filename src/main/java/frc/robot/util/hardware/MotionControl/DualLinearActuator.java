@@ -86,7 +86,6 @@ public class DualLinearActuator extends SubsystemBase {
     this.cycleHeight = mechanismToSensor;
     encoderOffset = absolutePositionOffset;
 
-    SparkMaxConfig motorConfig = new SparkMaxConfig();
     leftMotor = new SparkMax(leftCAN, MotorType.kBrushless);
     rightMotor = new SparkMax(rightCAN, MotorType.kBrushless);
     leftEncoder = leftMotor.getEncoder();
@@ -97,6 +96,7 @@ public class DualLinearActuator extends SubsystemBase {
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     lastPosition = getCycleDelta();
 
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
@@ -185,7 +185,16 @@ public class DualLinearActuator extends SubsystemBase {
     }
   }
 
-  public boolean moveDownUntilTriggered() {
+
+  public void moveUp() {
+    moveSpeed(0.10);
+  }
+
+  public void moveDown() {
+    moveSpeed(-0.10);
+  }
+
+  public boolean unsafeMoveDown() {
     if (!triggeredFloorLimit()) {
       leftMotor.set(-0.1);
       rightMotor.set(-0.1);
@@ -194,14 +203,6 @@ public class DualLinearActuator extends SubsystemBase {
     
     stopMotors();
     return true;
-  }
-
-  public void moveUp() {
-    moveSpeed(0.10);
-  }
-
-  public void moveDown() {
-    moveSpeed(-0.10);
   }
 
   public boolean doneMoving() {

@@ -122,7 +122,7 @@ public class Elevator extends DualLinearActuator {
   }
 
   public Command rezeroAtBottom() {
-    return Commands.none().until(this::moveDownUntilTriggered);
+    return this.run(this::unsafeMoveDown).until(this::triggeredFloorLimit);
   }
 
   public Command test() {
