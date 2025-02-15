@@ -3,11 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -51,25 +55,36 @@ public final class Preferences {
   }
 
   public static final class MANIPULATOR {
-    public static final double ALGAE_OUT_SPEED = 1.0;
-    public static final double ALGAE_IN_SPEED = -1.0;
-    public static final double CORAL_OUT_SPEED = 1.0;
-    public static final double CORAL_IN_SPEED = -1.0;
+    public static final boolean INVERT_ALGAE_LEFT = true;
+    public static final boolean INVERT_ALGAE_RIGHT = true;
+
+    public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
+    public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
+    public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
+
+    public static final double ALGAE_OUT_SPEED = -0.2;
+    public static final double ALGAE_IN_SPEED = 0.2;
+    public static final double ALGAE_HOLD_SPEED = 0.1;
+    public static final double CORAL_OUT_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_HOLD_SPEED = -0.0; // -0.1
   }
 
   // REFERENCE ANGLES FROM CAD AND
   // https://docs.google.com/spreadsheets/d/1nObnDdU-mXogmLKZjKTFBk0GvdE3hzZU7_AcbApUQno/edit?gid=0#gid=0
   public static final class MANIPULATOR_PIVOT {
     public static final Angle MAX_ANGLE = Degrees.of(20.0); // RESET TO 40.0
-    public static final Angle MIN_LOW_ANGLE = Degrees.of(-80.0);
-    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-120.0);
+    public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
+    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
     public static final Angle STOW_ANGLE = Degrees.of(38.5);
+    public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(22.5);
       public static final Angle L23_ANGLE = Degrees.of(-34.5);
       public static final Angle L4_ANGLE = Degrees.of(-57.0);
-      public static final Angle INTAKE_ANGLE = Degrees.of(-118.0);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-138.0);
     }
 
     public static final class ALGAE {
@@ -83,17 +98,17 @@ public final class Preferences {
   public static final class ELEVATOR {
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(35.5);
-    public static final Distance MAX_HEIGHT = Inches.of(82);
+    public static final Distance MAX_HEIGHT = Inches.of(80);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(38.0);
-      public static final Distance L2_HEIGHT = Inches.of(47.6);
-      public static final Distance L3_HEIGHT = Inches.of(58.0);
+      public static final Distance L1_HEIGHT = Inches.of(39.0);
+      public static final Distance L2_HEIGHT = Inches.of(49.8);
+      public static final Distance L3_HEIGHT = Inches.of(58.6);
       public static final Distance L4_HEIGHT = Inches.of(77.2);
-      public static final Distance INTAKE_HEIGHT = Inches.of(58.8);
+      public static final Distance INTAKE_HEIGHT = Inches.of(59.1);
     }
 
     public static final class ALGAE {

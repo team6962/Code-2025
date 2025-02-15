@@ -31,7 +31,7 @@ import java.util.function.BooleanSupplier;
  * calling the {@code under} method on a {@code StatusChecks} instance:
  *
  * <pre>
- * statusChecks.under("Drivetrain").add("Is Working", () -> drivetrain.isWorking());
+ * statusChecks.under("Swerve Drive").add("Is Working", () -> swerveDrive.isWorking());
  * </pre>
  *
  * <p>You can also add checks for TalonFX controllers, CANcoders, and Spark MAX controllers:

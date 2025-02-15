@@ -49,6 +49,8 @@ public class SwerveDrive extends SwerveCore {
   public SwerveDrive(SwerveConfig constants) {
     super(constants);
 
+    setName("Swerve Drive");
+
     autoBuilder.configure(
         this::getEstimatedPose,
         this.getPoseEstimator()::resetPosition,

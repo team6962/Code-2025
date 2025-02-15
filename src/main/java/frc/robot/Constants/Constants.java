@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -49,7 +51,7 @@ public final class Constants {
     public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = false;
+    public static final boolean ELEVATOR = true;
   }
 
   public static final class LOGGING {
@@ -119,17 +121,19 @@ public final class Constants {
     public static final Distance MAX_DETECTION_RANGE =
         Meters.of(19.30); // Max distance an algae can be while being on the field
   }
-
+  // Competition: 5476
   public static final class SWERVE {
+    public static final Angle ALL_OFFSET = Degrees.of(135);
+
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module(14, 24, 34, Degrees.of(0)),
-      new SwerveConfig.Module(15, 25, 35, Degrees.of(0)),
-      new SwerveConfig.Module(16, 26, 36, Degrees.of(0)),
-      new SwerveConfig.Module(17, 27, 37, Degrees.of(0)),
+      new SwerveConfig.Module(14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+      new SwerveConfig.Module(15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
+      new SwerveConfig.Module(16, 26, 36, Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
+      new SwerveConfig.Module(17, 27, 37, Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -142,21 +146,21 @@ public final class Constants {
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
     public static final int HANG = 100;
-    public static final int ELEVATOR_LEFT = 2; // UPDATE
-    public static final int ELEVATOR_RIGHT = 3; // UPDATE
-    public static final int MANIPULATOR_PIVOT = 4; // UPDATE
+    public static final int ELEVATOR_LEFT = 2;
+    public static final int ELEVATOR_RIGHT = 3; 
+    public static final int MANIPULATOR_PIVOT = 4; 
     public static final int MANIPULATOR_ALGAE_RIGHT = 5;
     public static final int MANIPULATOR_ALGAE_LEFT = 6;
-    public static final int MANIPULATOR_CORAL = 7; // UPDATE
+    public static final int MANIPULATOR_CORAL = 7; 
   }
 
   public static final class DIO {
     public static final int HANG_ENCODER = 0;
     public static final int ELEVATOR_ENCODER = 1;
     public static final int MANIPULATOR_ENCODER = 2;
-    public static final int ELEVATOR_CEIL_LIMIT = 3;
+    public static final int CORAL_BEAM_BREAK = 3;
     public static final int ELEVATOR_FLOOR_LIMIT = 4;
-    public static final int ALGAE_BEAM_BREAK = 5;
+    public static final int ELEVATOR_CEIL_LIMIT = 5;
   }
 
   public static final class NEO {
@@ -236,8 +240,8 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 0.5;
-      public static final double kS = 0.0;
+      public static final double kP = 6.0;
+      public static final double kS = 0.4;
     }
   }
 
@@ -246,10 +250,13 @@ public final class Constants {
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
+    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(60);
 
     public static final class PROFILE {
-      public static final double kP = 2.0;
-      public static final double kS = 0.5;
+      public static final double kP = 4.0;
+      public static final double kI = 0.0;
+      public static final double kD = 0.0;//0.1;
+      public static final double kS = 0.3;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
   }
@@ -268,6 +275,8 @@ public final class Constants {
     public static final class PROFILE {
       public static final double kP = 0.5;
       public static final double kS = 0.5; // volts per rad/s
+      public static final double kD = 0.0;
+      public static final double kI = 0.0;
     }
   }
 

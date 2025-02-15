@@ -60,6 +60,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private SwerveConfig constants;
   private SwerveModule.Corner corner;
 
+  private boolean isNeutralCoast = false;
   protected boolean isCalibrating = false;
 
   public void configureModule(SwerveConfig config, SwerveModule.Corner corner) {
@@ -132,7 +133,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withFusedCANcoder(steerEncoder)
                 .withRotorToSensorRatio(config.gearing().steer())));
 
-    setName("Swerve Drive/Swerve Modules/" + getModuleName(corner.index));
+    setName("Swerve Drive/Modules/" + getModuleName(corner.index));
 
     Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
   }
@@ -204,11 +205,23 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   public void driveState(SwerveModuleState targetState) {
     if (isCalibrating) return;
     if (!ENABLED_SYSTEMS.DRIVE) {
-      driveMotor.setNeutralMode(NeutralModeValue.Coast);
+      if (!isNeutralCoast) {
+        driveMotor.setNeutralMode(NeutralModeValue.Coast);
+        steerMotor.setNeutralMode(NeutralModeValue.Coast);
+
+        isNeutralCoast = true;
+      }
+
       driveMotor.stopMotor();
-      steerMotor.setNeutralMode(NeutralModeValue.Coast);
       steerMotor.stopMotor();
       return;
+    }
+
+    if (isNeutralCoast) {
+      driveMotor.setNeutralMode(NeutralModeValue.Brake);
+      steerMotor.setNeutralMode(NeutralModeValue.Brake);
+
+      isNeutralCoast = false;
     }
 
     targetState = optimizeStateForTalon(targetState, getSteerAngle());

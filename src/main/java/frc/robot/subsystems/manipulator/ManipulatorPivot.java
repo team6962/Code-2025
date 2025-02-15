@@ -3,35 +3,44 @@ package frc.robot.subsystems.manipulator;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
+
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Constants.Preferences;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
-import frc.robot.RobotContainer;
 import frc.robot.util.hardware.MotionControl.PivotController;
-import java.util.function.Supplier;
 
 public class ManipulatorPivot extends PivotController {
   private boolean isCalibrating = false;
 
   public ManipulatorPivot() {
     super(
-        CAN.MANIPULATOR_PIVOT,
-        DIO.MANIPULATOR_ENCODER,
-        MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
-        MANIPULATOR_PIVOT.PROFILE.kP,
-        MANIPULATOR_PIVOT.PROFILE.kS,
-        MANIPULATOR_PIVOT.GEARING,
-        Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
-        Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
-        Degrees.of(0.25),
-        false);
+      CAN.MANIPULATOR_PIVOT,
+      DIO.MANIPULATOR_ENCODER,
+      MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
+      MANIPULATOR_PIVOT.PROFILE.kP,
+      MANIPULATOR_PIVOT.PROFILE.kI,
+      MANIPULATOR_PIVOT.PROFILE.kD,
+      MANIPULATOR_PIVOT.PROFILE.kS,
+      MANIPULATOR_PIVOT.GEARING,
+      Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+      Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
+      Degrees.of(2),
+      false);
     // setDefaultCommand(stow());
+
+    // setDefaultCommand(pivotTo(() -> stopAngle));
+
+    setDefaultCommand(hold());
   }
 
   @Override
@@ -46,11 +55,23 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return this.run(() -> setAngle(angleSupplier.get())).until(this::doneMoving);
+    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving);
   }
 
-  public Command intakeCoral() {
+  public Command hold() {
+    return Commands.defer(() -> {
+      Angle position = getPosition();
+
+      return run(() -> moveTowards(position));
+    }, Set.of(this));
+  } 
+
+  public Command coralIntake() {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
+  }
+
+  public Command coralL1() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L1_ANGLE);
   }
 
   public Command coralL23() {
@@ -81,15 +102,19 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
+  public Command safe() {
+    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.SAFE_ANGLE);
+  }
+
   public Command stop() {
-    return Commands.run(this::stopMotor);
+    return run(this::stopMotor);
   }
 
   public Command up() {
-    return Commands.runEnd(this::moveUp, this::stopMotor);
+    return run(this::moveUp);
   }
 
   public Command down() {
-    return Commands.runEnd(this::moveDown, this::stopMotor);
+    return run(this::moveDown);
   }
 }

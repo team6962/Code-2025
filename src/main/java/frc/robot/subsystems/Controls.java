@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -45,6 +46,8 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
+    PieceCombos pieceCombos = new PieceCombos(elevator, manipulator, intake);
+
     driver.a();
     driver.b();
     driver.x();
@@ -74,14 +77,17 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    // operator.a().onTrue(elevator.coralL2());
-    // operator.b().onTrue(elevator.coralL3());
-    // operator.x().onTrue(elevator.coralL4());
-    // operator.y().onTrue(elevator.algaeBarge());
-    operator.a().onTrue(manipulator.pivot.coralL23());
-    operator.b().onTrue(manipulator.pivot.algaeReef());
-    operator.x().onTrue(manipulator.pivot.intakeCoral());
-    operator.y().onTrue(manipulator.pivot.stow());
+    operator.a().onTrue(pieceCombos.coralL1());
+    operator.b().onTrue(pieceCombos.coralL2());
+    operator.x().onTrue(pieceCombos.coralL3());
+    operator.y().onTrue(pieceCombos.coralL4());
+    // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
+
+    // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
+    // operator.a().onTrue(manipulator.pivot.coralL23());
+    // operator.b().onTrue(manipulator.pivot.algaeReef());
+    // operator.x().onTrue(manipulator.pivot.intakeCoral());
+    // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(elevator.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());

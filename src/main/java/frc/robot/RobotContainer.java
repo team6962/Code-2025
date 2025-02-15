@@ -5,6 +5,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import com.team6962.lib.swerve.MusicDrive;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.commands.PrematchChecks;
@@ -53,7 +55,7 @@ public class RobotContainer {
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
   public final LEDs ledStrip;
-  public final Intake intake;
+  // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
@@ -107,18 +109,18 @@ public class RobotContainer {
         new LEDs(
             stateController,
             () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
-    intake = new Intake();
+    // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
     hang = new Hang();
-    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, intake);
+    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
     algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, intake, hang, autonomous);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, hang, autonomous);
 
     // module = new SwerveModule();
 
@@ -178,7 +180,13 @@ public class RobotContainer {
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
-    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, hang, intake);
+
+    Commands.sequence(
+      manipulator.pivot.safe(),
+      elevator.rezeroAtBottom()).schedule();
+
+    
+    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null, null);
     checks.schedule();
   }
 }

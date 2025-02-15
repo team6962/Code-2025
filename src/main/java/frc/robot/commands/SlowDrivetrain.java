@@ -33,6 +33,8 @@ public class SlowDrivetrain extends Command {
     Double scaleFactor = (elevator.getAverageHeight().div(elevator.getMaxHeight())).magnitude();
     if (elevator.getAverageHeight().lt(ELEVATOR.MAX_UNLIMITED_HEIGHT)) {
       scaleFactor = 1.0;
+    }else{
+      scaleFactor = 1.0 - scaleFactor;
     }
     swerveDrive.limitSpeed(maxSpeed.times(scaleFactor));
   }

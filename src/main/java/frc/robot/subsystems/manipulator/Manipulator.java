@@ -1,6 +1,9 @@
 package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Meters;
+
+import java.util.Map;
+
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
@@ -9,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.AngleRange;
+import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
+import frc.robot.subsystems.manipulator.coral.CoralGrabber;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.MANIPULATOR;
@@ -16,27 +21,14 @@ import java.util.Map;
 
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
-  public final ManipulatorGrabber algae;
-  public final ManipulatorGrabber coral;
+  public final AlgaeGrabber algae;
+  public final CoralGrabber coral;
 
   public Manipulator() {
     pivot = new ManipulatorPivot();
 
-    algae =
-        new ManipulatorGrabber(
-            CAN.MANIPULATOR_ALGAE_LEFT,
-            new ManipulatorGrabber.DigitalSensor(Constants.DIO.ALGAE_BEAM_BREAK),
-            MANIPULATOR.ALGAE_IN_SPEED,
-            MANIPULATOR.ALGAE_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.MANIPULATOR);
-
-    coral =
-        new ManipulatorGrabber(
-            CAN.MANIPULATOR_CORAL,
-            new ManipulatorGrabber.TimeSensor(false, Seconds.of(0.3), Seconds.of(0.3)),
-            MANIPULATOR.CORAL_IN_SPEED,
-            MANIPULATOR.CORAL_OUT_SPEED,
-            () -> ENABLED_SYSTEMS.MANIPULATOR);
+    algae = AlgaeGrabber.create();
+    coral = CoralGrabber.create();
   }
 
   public void setPivotAnglesBasedOnHeight(Distance elevatorHeight) {
@@ -52,6 +44,10 @@ public class Manipulator extends SubsystemBase {
     }
   }
 
+  public Command placeCoralL1() {
+    return pivot.coralL1().andThen(coral.drop());
+  }
+
   public Command placeCoralL23() {
     return pivot.coralL23().andThen(coral.drop());
   }
@@ -61,7 +57,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.intakeCoral().alongWith(coral.intake());
+    return pivot.coralIntake().alongWith(coral.intake());
   }
 
   public Command pickupGroundAlgae() {
@@ -90,6 +86,6 @@ public class Manipulator extends SubsystemBase {
 
   public Command test() {
     return Commands.sequence(
-        intakeCoral(), placeCoralL23(), pickupGroundAlgae(), placeProcessorAlgae(), stow());
+        pivot.safe(), /* intakeCoral(), placeCoralL23(),*/ pickupGroundAlgae(), placeProcessorAlgae(), pivot.safe());
   }
 }

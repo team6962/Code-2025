@@ -22,6 +22,8 @@ public class Hang extends PivotController {
         DIO.HANG_ENCODER,
         Constants.HANG_PIVOT.ENCODER_OFFSET.in(Rotations),
         Constants.HANG_PIVOT.PROFILE.kP,
+        Constants.HANG_PIVOT.PROFILE.kI,
+        Constants.HANG_PIVOT.PROFILE.kD,
         Constants.HANG_PIVOT.PROFILE.kS,
         Constants.HANG_PIVOT.GEARING,
         Preferences.HANG_PIVOT.MIN_ANGLE,
@@ -54,7 +56,7 @@ public class Hang extends PivotController {
 
   public Command setTargetAngleCommand(Angle angle) {
     if (!ENABLED_SYSTEMS.HANG) return stop();
-    return this.run(() -> setAngle(angle)).until(this::doneMoving);
+    return this.run(() -> moveTowards(angle)).until(this::doneMoving);
   }
 
   @Override
