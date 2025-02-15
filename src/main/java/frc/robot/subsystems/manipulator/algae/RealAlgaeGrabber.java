@@ -140,8 +140,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
                     gripCheckTimer.advanceIfElapsed(MANIPULATOR.ALGAE_GRIP_CHECK_RATE.in(Seconds))) {
                     
                     checkGrip().schedule();
-
-                    gripCheckTimer.reset();
                 }
             } else if (stalled) {
                 motors.setDutyCycle(0);
