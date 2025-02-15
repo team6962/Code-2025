@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Set;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -13,6 +15,7 @@ import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,25 +25,98 @@ import frc.robot.Constants.Preferences.MANIPULATOR;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealAlgaeGrabber extends AlgaeGrabber {
-    private SparkMax leftMotor;
-    private SparkMax rightMotor;
+    private Motor motors;
     private Debouncer stallDebouncer = new Debouncer(0.1, DebounceType.kFalling);
     private boolean stalled = false;
     private Timer gripCheckTimer = new Timer();
 
     public RealAlgaeGrabber() {
-        leftMotor = new SparkMax(CAN.MANIPULATOR_ALGAE_LEFT, MotorType.kBrushless);
-        SparkMaxUtil.configureAndLog550(leftMotor, new SparkMaxConfig(), true, IdleMode.kBrake);
+        motors = new CombinedMotor(
+            new RealMotor("Algae Grabber/Left Motor", CAN.MANIPULATOR_ALGAE_LEFT, true),
+            new RealMotor("Algae Grabber/Right Motor", CAN.MANIPULATOR_ALGAE_RIGHT, true)
+        );
 
         Logger.logBoolean(getName() + "/motorsStalled", () -> stalled);
         Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
-        Logger.logMeasure(getName() + "/LeftMotor/current", () -> Amps.of(leftMotor.getOutputCurrent()));
-
-        rightMotor = new SparkMax(CAN.MANIPULATOR_ALGAE_RIGHT, MotorType.kBrushless);
-        SparkMaxUtil.configureAndLog550(rightMotor, new SparkMaxConfig(), true, IdleMode.kBrake);
-        Logger.logMeasure(getName() + "/RightMotor/current", () -> Amps.of(rightMotor.getOutputCurrent()));
 
         setDefaultCommand(hold());
+    }
+
+    private static interface Motor {
+        /**
+         * Sets the duty cycle of the motor.
+         * @param dutyCycle the duty cycle to set
+         */
+        public void setDutyCycle(double dutyCycle);
+
+        /**
+         * Returns the output current of the motor. If there are multiple motors,
+         * returns the average current.
+         * @return the output current
+         */
+        public Current getOutputCurrent();
+    }
+
+    private static class CombinedMotor implements Motor {
+        private Motor[] motors;
+
+        public CombinedMotor(Motor... motors) {
+            this.motors = motors;
+        }
+
+        /**
+         * Sets the duty cycle of all motors.
+         */
+        @Override
+        public void setDutyCycle(double dutyCycle) {
+            for (Motor motor : motors) {
+                motor.setDutyCycle(dutyCycle);
+            }
+        }
+
+        /**
+         * Returns the average output current of all motors.
+         */
+        @Override
+        public Current getOutputCurrent() {
+            double current = 0;
+
+            for (Motor motor : motors) {
+                current += motor.getOutputCurrent().in(Amps);
+            }
+
+            return Amps.of(current).div(motors.length);
+        }
+    }
+
+    private static class RealMotor implements Motor {
+        private SparkMax motor;
+
+        public RealMotor(String name, int canId, boolean inverted) {
+            motor = new SparkMax(canId, MotorType.kBrushless);
+
+            SparkMaxConfig config = new SparkMaxConfig();
+            SparkMaxUtil.configureAndLog550(motor, config, inverted, IdleMode.kBrake);
+            motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+            Logger.logMeasure(name + "/outputCurrent", () -> Amps.of(motor.getOutputCurrent()));
+        }
+
+        /**
+         * Sets the duty cycle of the motor.
+         */
+        @Override
+        public void setDutyCycle(double dutyCycle) {
+            motor.set(dutyCycle);
+        }
+
+        /**
+         * Returns the output current of the motor.
+         */
+        @Override
+        public Current getOutputCurrent() {
+            return Amps.of(motor.getOutputCurrent());
+        }
     }
 
     public Command checkGrip() {
@@ -56,11 +132,9 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     private Command hold() {
         return Commands.run(() -> {
             if (!ENABLED_SYSTEMS.MANIPULATOR) {
-                leftMotor.set(0);
-                rightMotor.set(0);
+                motors.setDutyCycle(0);
             } else if (!hasGamePiece()) {
-                leftMotor.set(0);
-                rightMotor.set(0);
+                motors.setDutyCycle(0);
 
                 if (MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED &&
                     gripCheckTimer.advanceIfElapsed(MANIPULATOR.ALGAE_GRIP_CHECK_RATE.in(Seconds))) {
@@ -70,11 +144,9 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
                     gripCheckTimer.reset();
                 }
             } else if (stalled) {
-                leftMotor.set(0);
-                rightMotor.set(0);
+                motors.setDutyCycle(0);
             } else {
-                leftMotor.set(MANIPULATOR.ALGAE_HOLD_SPEED);
-                rightMotor.set(MANIPULATOR.ALGAE_HOLD_SPEED);
+                motors.setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED);
             }
         }, this);
     }
@@ -82,13 +154,11 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     public Command run(double speed) {
         return Commands.run(() -> {
             if (!ENABLED_SYSTEMS.MANIPULATOR) {
-                leftMotor.set(0);
-                rightMotor.set(0);
+                motors.setDutyCycle(0);
                 return;
             }
             
-            leftMotor.set(speed);
-            rightMotor.set(speed);
+            motors.setDutyCycle(speed);
         }, this);
     }
 
@@ -105,16 +175,11 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     }
 
     public Command stop() {
-        return Commands.run(() -> {
-            leftMotor.set(0);
-            rightMotor.set(0);
-        }, this);
+        return Commands.run(() -> motors.setDutyCycle(0), this);
     }
 
     @Override
     public void periodic() {
-        stalled = stallDebouncer.calculate(
-            leftMotor.getOutputCurrent() + rightMotor.getOutputCurrent() > MANIPULATOR.ALGAE_DETECT_CURRENT.in(Amps)
-        );
+        stalled = stallDebouncer.calculate(motors.getOutputCurrent().gt(MANIPULATOR.ALGAE_DETECT_CURRENT));
     }
 }
