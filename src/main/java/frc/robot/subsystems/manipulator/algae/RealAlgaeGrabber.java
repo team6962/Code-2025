@@ -234,7 +234,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         // stalled = stallDebouncer.calculate(
         //     (leftMotor.getOutputCurrent() + rightMotor.getOutputCurrent())/2.0 > MANIPULATOR.ALGAE_DETECT_CURRENT.in(Amps)
         // );
-
         stalled = stallDebouncer.calculate(motors.getEncoderVelocity().abs(RPM) < 1.0 && Math.abs(motors.getOutputDutyCycle()) > 0.0);
     }
 }
