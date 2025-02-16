@@ -105,7 +105,7 @@ public class Controls {
     operator.y().onTrue(autonomous.reefPoleAlign(0));
 
     if (RobotBase.isSimulation()) {
-      driver.button(15).onTrue(swerveDrive.facePointCommand(() -> new Translation2d(3, 6), new Rotation2d()));
+      driver.button(15).whileTrue(swerveDrive.facePointCommand(() -> new Translation2d(1.234, 5.905), new Rotation2d()));
     }
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");

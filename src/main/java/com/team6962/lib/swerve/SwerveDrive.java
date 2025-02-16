@@ -180,10 +180,12 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command drive(Rotation2d rotation) {
+    System.out.println("run");
     return driveRotation(() -> rotation);
   }
 
   public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
+    System.out.println("running");
     Command command =
         new Command() {
           private PIDController pid;
@@ -226,7 +228,7 @@ public class SwerveDrive extends SwerveCore {
   public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
     return Commands.runEnd(
       () -> facePoint(point.get(), rotationOffset),
-      () -> System.out.println("idiot")
+      () -> System.out.println("")
     );
   }
 
@@ -255,8 +257,8 @@ public class SwerveDrive extends SwerveCore {
         addedVelocity = 0.0;
     }
 
-
-    driveHeading(currentTargetHeading);
+    System.out.println(currentTargetHeading);
+    //change -> drive(currentTargetHeading);
   }
 
   public Command stop() {
