@@ -240,7 +240,7 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 6.0;
+      public static final double kP = 8.0;
       public static final double kS = 0.4;
     }
   }

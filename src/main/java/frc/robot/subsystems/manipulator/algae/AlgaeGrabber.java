@@ -32,7 +32,7 @@ public abstract class AlgaeGrabber extends SubsystemBase {
     public abstract Command drop();
     public abstract Command stop();
 
-    public Command action() {
+    public Command magicButton() {
         return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
     }
 

@@ -125,9 +125,9 @@ public class DualLinearActuator extends SubsystemBase {
     // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
     // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
     // Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
-    // Logger.logNumber(
-    //     this.getName() + "/rawAbsolutePosition",
-    //     absoluteEncoder::get);
+    Logger.logNumber(
+        this.getName() + "/rawAbsolutePosition",
+        absoluteEncoder::get);
 
     Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);

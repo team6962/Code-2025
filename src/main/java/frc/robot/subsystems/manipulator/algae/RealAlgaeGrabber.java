@@ -217,7 +217,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         return this.runSpeed(-MANIPULATOR.ALGAE_OUT_SPEED).until(() -> !stalled).finallyDo(() -> {expectGamePiece(false); stopMotors();});
     }
 
-    public Command action() {
+    public Command magicButton() {
         return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
     }
 
