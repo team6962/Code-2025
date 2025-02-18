@@ -45,19 +45,19 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command placeCoralL1() {
-    return pivot.coralL1().andThen(coral.drop());
+    return pivot.coralL1();
   }
 
   public Command placeCoralL23() {
-    return pivot.coralL23().andThen(coral.drop());
+    return pivot.coralL23();
   }
 
   public Command placeCoralL4() {
-    return pivot.coralL4().andThen(coral.drop());
+    return pivot.coralL4();
   }
 
   public Command intakeCoral() {
-    return pivot.coralIntake().alongWith(coral.intake());
+    return pivot.coralIntake();
   }
 
   public Command pickupGroundAlgae() {

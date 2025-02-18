@@ -85,7 +85,7 @@ public class Controls {
     // operator.b().onTrue(manipulator.pivot.algaeReef());
     // operator.x().onTrue(manipulator.pivot.intakeCoral());
     // operator.y().onTrue(manipulator.pivot.stow());
-    // operator.start().onTrue(elevator.stow()); // assume this is processor height
+    operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
@@ -95,8 +95,9 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());,
-    operator.rightBumper().whileTrue(pieceCombos.intakeCoral());
-    operator.rightTrigger();
+    operator.rightStick().onTrue(pieceCombos.intakeCoral()); //big right paddle
+    operator.rightBumper().whileTrue(manipulator.coral.backwards());
+    operator.rightTrigger().whileTrue(manipulator.coral.magicButton());
     operator.leftBumper().whileTrue(manipulator.algae.intake());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
     // operator.leftBumper().whileTrue(manipulator.algae.action());

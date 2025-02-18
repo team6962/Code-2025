@@ -63,6 +63,14 @@ public class RealCoralGrabber extends CoralGrabber {
             .andThen(() -> setHasGamePiece(false));
     }
 
+    public Command forwards() {
+        return runSpeed(MANIPULATOR.CORAL_IN_SPEED);
+    }
+
+    public Command backwards() {
+        return runSpeed(-MANIPULATOR.CORAL_IN_SPEED);
+    }
+
     public Command hold() {
         return run(() -> {
             if (hasGamePiece() && detectsGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);

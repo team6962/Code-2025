@@ -30,13 +30,21 @@ public abstract class CoralGrabber extends SubsystemBase {
         this.hasGamePiece = hasGamePiece;
     }
 
-    public Command action() {
+    public Command magicButton() {
         return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
     }
 
     public abstract Command intake();
     public abstract Command drop();
     public abstract Command stop();
+
+    public Command forwards() {
+        return Commands.none();
+    }
+
+    public Command backwards() {
+        return Commands.none();
+    }
 
     public static CoralGrabber create() {
         if (!ENABLED_SYSTEMS.MANIPULATOR) return SimCoralGrabber.disabled();

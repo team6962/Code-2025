@@ -130,6 +130,8 @@ public class PivotController extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/forwardSafety", this::triggeredForwardSafety);
     Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
     // Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
+
+    encoder.setPosition(getPosition().in(Rotations));
   }
 
   public void moveTowards(Angle requestedAngle) {
@@ -258,6 +260,8 @@ public class PivotController extends SubsystemBase {
 
   @Override
   public void periodic() {
+    encoder.setPosition(getPosition().in(Rotations));
+    
     if (triggeredForwardSafety() || triggeredReverseSafety()) {
       stopMotor();
     }
