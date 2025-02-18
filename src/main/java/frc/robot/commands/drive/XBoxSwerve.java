@@ -151,10 +151,11 @@ public class XBoxSwerve extends Command {
 
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
-    if ((
-        swerveDrive.useRotation().getCurrentCommand() == rotateCommand &&
-        swerveDrive.useTranslation().getCurrentCommand() == translateCommand
-      ) || Math.abs(velocity.getNorm()) > 0.05 && Math.abs(angularVelocity) > Units.degreesToRadians(3)) {
+    if ((swerveDrive.useRotation().getCurrentCommand() == rotateCommand &&
+        swerveDrive.useTranslation().getCurrentCommand() == translateCommand) || (
+          swerveDrive.useRotation().getCurrentCommand() == swerveDrive.useRotation().getDefaultCommand() &&
+          swerveDrive.useTranslation().getCurrentCommand() == swerveDrive.useTranslation().getDefaultCommand()
+        ) || Math.abs(velocity.getNorm()) > 0.05 && Math.abs(angularVelocity) > Units.degreesToRadians(3)) {
       rotateCommand = swerveDrive.drive(velocity);
       rotateCommand.schedule();
 
