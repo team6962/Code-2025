@@ -19,13 +19,13 @@ public class OperatorFineControls extends Command {
     public void execute() {
         double elevatorSpeed = controller.getLeftY() * 0.2;
 
-        if (elevator.getCurrentCommand() == elevator.getDefaultCommand() && controller.getLeftY() > 0.1) {
+        if (elevator.getCurrentCommand() == elevator.getDefaultCommand() && Math.abs(controller.getLeftY()) > 0.1) {
             elevator.moveSpeed(elevatorSpeed);
         }
 
         double manipulatorSpeed = controller.getRightY() * 0.2;
 
-        if (manipulator.getCurrentCommand() == manipulator.getDefaultCommand() && controller.getRightY() > 0.1) {
+        if (manipulator.getCurrentCommand() == manipulator.getDefaultCommand() && Math.abs(controller.getRightY()) > 0.1) {
             manipulator.pivot.moveSpeed(manipulatorSpeed);
         }
     }
