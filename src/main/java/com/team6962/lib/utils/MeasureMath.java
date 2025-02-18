@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Measure;
@@ -13,6 +14,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.util.software.MathUtils;
 
 public final class MeasureMath {
@@ -101,5 +103,9 @@ public final class MeasureMath {
   /** Returns the difference between two angles, in the range [-0.5, 0.5] */
   public static Angle differenceUnderHalf(Angle a, Angle b) {
     return Rotations.of(MathUtils.floorMod(a.in(Rotations) - b.in(Rotations) - 0.5, 1) - 0.5);
+  }
+
+  public static Time time(double minutes, double seconds) {
+    return Seconds.of(minutes * 60 + seconds);
   }
 }

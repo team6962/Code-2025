@@ -12,8 +12,15 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -26,10 +33,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -395,6 +398,13 @@ public final class Constants {
     public static final double MANIPULATOR = 8.0;
     public static final double INTAKE = 8.5;
     public static final double HANG = 9.0;
+  }
+  
+  public static final class TIMING {
+    public static final Time MATCH_LENGTH = MeasureMath.time(2, 30);
+    public static final Time AUTO_LENGTH = MeasureMath.time(0, 15);
+    public static final Time ENDGAME_LENGTH = MeasureMath.time(0, 20);
+    public static final Time ENDGAME_START = MATCH_LENGTH.minus(ENDGAME_LENGTH);
   }
 
   public static class AngleRange {

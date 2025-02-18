@@ -115,9 +115,9 @@ public class RobotContainer {
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
-    hang = new Hang();
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
     algaeDetector = new Algae();
+    hang = Hang.create();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);

@@ -50,7 +50,7 @@ public class Elevator extends DualLinearActuator {
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
 
-    // setDefaultCommand(Commands.run(this::stopMotors, this));
+    setDefaultCommand(Commands.run(this::stopMotors, this));
   }
 
   @Override

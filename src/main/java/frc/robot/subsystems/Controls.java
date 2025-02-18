@@ -4,7 +4,9 @@ import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,12 +14,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.Constants.Constants.TIMING;
 import frc.robot.commands.PieceCombos;
+import frc.robot.commands.drive.OperatorFineControls;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+
+import static edu.wpi.first.units.Units.Minutes;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class Controls {
@@ -92,8 +101,8 @@ public class Controls {
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
 
-    operator.povUp().whileTrue(elevator.up());
-    operator.povDown().whileTrue(elevator.down());
+    // operator.povUp().whileTrue(elevator.up());
+    // operator.povDown().whileTrue(elevator.down());
     operator.povRight().whileTrue(manipulator.pivot.up());
     operator.povLeft().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
@@ -103,6 +112,10 @@ public class Controls {
     operator.rightTrigger().whileTrue(manipulator.coral.magicButton());
     operator.leftBumper().whileTrue(manipulator.algae.intake());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
+
+    operator.povUp().onTrue(hang.deploy());
+    operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() > TIMING.ENDGAME_START.in(Seconds)));
+    operator.rightStick().onTrue(hang.stow());
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
@@ -122,6 +135,8 @@ public class Controls {
     //   .withPosition(3, 2)
     //   .withSize(2, 2)
     //   .withProperties(Map.of("min", 0, "max", 100));
+
+    new OperatorFineControls(elevator, manipulator, operator.getHID()).schedule();
   }
 
   private static Command rumble(CommandXboxController controller) {
