@@ -58,7 +58,7 @@ public class RobotContainer {
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
-  // public final Hang hang;
+  public final Hang hang;
   // public final Algae algaeDetector;
   // private final CollisionDetector collisionDetector;
 
@@ -111,14 +111,14 @@ public class RobotContainer {
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
-    // hang = new Hang();
+    hang = Hang.create();
     // algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, null);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, hang);
 
     // module = new SwerveModule();
 

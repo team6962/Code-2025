@@ -6,7 +6,10 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
+
+import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
@@ -39,8 +42,15 @@ public final class Preferences {
   }
 
   public static final class HANG { // Adjust these as needed
-    public static final double CLIMB_POWER = 0.5;
-    public static final double REVERSE_POWER = 0.5;
+    public static final Current MAX_CURRENT = Amps.of(80);
+    public static final PIDConstants DEPLOY_PROFILE = new PIDConstants(1.0, 0.0, 0.0);
+
+    public static final Angle ENCODER_OFFSET = Radians.of(0.0);
+
+    public static final Angle HANG_ANGLE = Degrees.of(180.0);
+    public static final Angle SWAP_ANGLE = Degrees.of(80.0);
+    public static final Angle DEPLOY_ANGLE = Degrees.of(0.0);
+    public static final Angle STOW_ANGLE = Degrees.of(110.0);
   }
 
   public static final class INTAKE {
