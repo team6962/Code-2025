@@ -37,7 +37,8 @@ public class XBoxSwerve extends Command {
   private Translation2d velocity = new Translation2d();
   private double angularVelocity = 0.0;
 
-  private Command driveCommand;
+  private Command translateCommand;
+  private Command rotateCommand;
 
   public XBoxSwerve(
       SwerveDrive swerveDrive,
@@ -82,7 +83,8 @@ public class XBoxSwerve extends Command {
 
     // Disable drive if the controller disconnects
     if (!controller.isConnected()) {
-      if (driveCommand != null) driveCommand.cancel();
+      if (translateCommand != null) translateCommand.cancel();
+      if (rotateCommand != null) rotateCommand.cancel();
 
       return;
     }
@@ -149,8 +151,16 @@ public class XBoxSwerve extends Command {
 
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
-    driveCommand = swerveDrive.drive(drivenSpeeds);
-    driveCommand.schedule();
+    if ((
+        swerveDrive.useRotation().getCurrentCommand() == rotateCommand &&
+        swerveDrive.useTranslation().getCurrentCommand() == translateCommand
+      ) || Math.abs(velocity.getNorm()) > 0.05 && Math.abs(angularVelocity) > Units.degreesToRadians(3)) {
+      rotateCommand = swerveDrive.drive(velocity);
+      rotateCommand.schedule();
+
+      translateCommand = swerveDrive.drive(Rotation2d.fromRadians(angularVelocity));
+      translateCommand.schedule();
+    }
 
     // if (leftStick.getNorm() > 0.05 && (controller.getLeftBumper() ||
     // controller.getRightBumper())) {
@@ -164,7 +174,8 @@ public class XBoxSwerve extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (driveCommand != null) driveCommand.cancel();
+    if (rotateCommand != null) rotateCommand.cancel();
+    if (translateCommand != null) translateCommand.cancel();
   }
 
   // Returns true when the command should end.

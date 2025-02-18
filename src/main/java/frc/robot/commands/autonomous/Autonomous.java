@@ -11,16 +11,19 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Field;
 import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Field.Pole;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.subsystems.vision.Algae;
 
 public class Autonomous {
   private RobotStateController controller;
@@ -208,6 +211,10 @@ public class Autonomous {
 
   public boolean hasCoral() {
     return false;
+  }
+
+  public Command autoOrientToAlgae() {
+    return swerveDrive.facePoint(() -> Algae.getAlgaePosition("algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
   }
 
   public Command createAutonomousCommand() {

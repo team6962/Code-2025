@@ -243,6 +243,14 @@ public class SwerveDrive extends SwerveCore {
     });
   }
 
+  public Command facePoint(Supplier<Translation2d> point) {
+    return facePoint(point, () -> Rotation2d.fromDegrees(0));
+  }
+
+  public Command facePoint(Translation2d point) {
+    return facePoint(() -> point);
+  }
+  
   public Command stop() {
     return driveModules(() -> KinematicsUtils.getStoppedStates(getModuleStates()));
   }

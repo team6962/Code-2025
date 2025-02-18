@@ -64,7 +64,8 @@ public class Controls {
     driver.leftBumper();
     driver.rightBumper();
     driver.leftStick();
-    driver.rightStick().whileTrue(pieceCombos.pickupGroundAlgae());
+    driver.rightStick().whileTrue(autonomous.autoOrientToAlgae()
+      .alongWith(pieceCombos.pickupGroundAlgae()));
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
