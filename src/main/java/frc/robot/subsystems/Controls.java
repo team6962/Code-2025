@@ -64,7 +64,7 @@ public class Controls {
     driver.leftBumper();
     driver.rightBumper();
     driver.leftStick();
-    driver.rightStick();
+    driver.rightStick().whileTrue(pieceCombos.pickupGroundAlgae());
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -101,8 +101,8 @@ public class Controls {
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
 
-    // operator.povUp().whileTrue(elevator.up());
-    // operator.povDown().whileTrue(elevator.down());
+    operator.povUp().whileTrue(elevator.up());
+    operator.povDown().whileTrue(elevator.down());
     operator.povRight().whileTrue(manipulator.pivot.up());
     operator.povLeft().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
@@ -113,9 +113,12 @@ public class Controls {
     operator.leftBumper().whileTrue(manipulator.algae.intake());
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
 
-    operator.povUp().onTrue(hang.deploy());
-    operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() > TIMING.ENDGAME_START.in(Seconds)));
-    operator.rightStick().onTrue(hang.stow());
+    // operator.povRight().whileTrue(manipulator.pivot.up());
+    // operator.povLeft().whileTrue(manipulator.pivot.down());
+
+    // operator.povUp().onTrue(hang.deploy());
+    // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() > TIMING.ENDGAME_START.in(Seconds)));
+    // operator.rightStick().onTrue(hang.stow());
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
@@ -136,7 +139,7 @@ public class Controls {
     //   .withSize(2, 2)
     //   .withProperties(Map.of("min", 0, "max", 100));
 
-    new OperatorFineControls(elevator, manipulator, operator.getHID()).schedule();
+    // new OperatorFineControls(elevator, manipulator, operator.getHID()).schedule();
   }
 
   private static Command rumble(CommandXboxController controller) {

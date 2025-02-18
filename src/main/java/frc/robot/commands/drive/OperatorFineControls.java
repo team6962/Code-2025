@@ -16,17 +16,18 @@ public class OperatorFineControls extends Command {
         this.manipulator = manipulator;
     }
 
+    @Override
     public void execute() {
         double elevatorSpeed = controller.getLeftY() * 0.2;
 
         if (elevator.getCurrentCommand() == elevator.getDefaultCommand() && Math.abs(controller.getLeftY()) > 0.1) {
-            elevator.moveSpeed(elevatorSpeed);
+            elevator.move(elevatorSpeed).schedule();
         }
 
         double manipulatorSpeed = controller.getRightY() * 0.2;
 
-        if (manipulator.getCurrentCommand() == manipulator.getDefaultCommand() && Math.abs(controller.getRightY()) > 0.1) {
-            manipulator.pivot.moveSpeed(manipulatorSpeed);
+        if (manipulator.pivot.getCurrentCommand() == manipulator.pivot.getDefaultCommand() && Math.abs(controller.getRightY()) > 0.1) {
+            manipulator.pivot.move(manipulatorSpeed).schedule();
         }
     }
 }

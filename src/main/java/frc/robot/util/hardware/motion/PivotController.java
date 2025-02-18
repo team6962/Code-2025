@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Robot;
@@ -204,6 +205,10 @@ public class PivotController extends SubsystemBase {
     this.minAngle = minAngle;
     this.maxAngle = maxAngle;
     targetAngle = clampAngle(targetAngle);
+  }
+
+  public Command move(double speed) {
+    return runOnce(() -> moveSpeed(speed));
   }
 
   public void moveSpeed(double speed) {
