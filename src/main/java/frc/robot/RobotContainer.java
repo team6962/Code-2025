@@ -26,7 +26,9 @@ import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
 /**
