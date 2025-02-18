@@ -36,12 +36,18 @@ public class Algae {
                 .getDouble(0)); // the horizontal offset angle of target from center of camera
     double[] t2d = table.getEntry("t2d").getDoubleArray(new double[17]);
     double pixelHeight = t2d[15];
-    double pixelRatio = pixelHeight / t2d[14];
+    double pixelWidth = t2d[14];
+    double pixelRatio = pixelHeight / pixelWidth;
 
     // Validate the object is approximately spherical
-    if (!(pixelRatio < 1.0 + LIMELIGHT.SPHERE_TOLERANCE)
-        && !(pixelRatio > 1.0 - LIMELIGHT.SPHERE_TOLERANCE)
-        && !(pixelHeight > 0)) return null; // Not spherical
+    // if (!(pixelRatio < 1.0 + LIMELIGHT.SPHERE_TOLERANCE &&
+    //         pixelRatio > 1.0 - LIMELIGHT.SPHERE_TOLERANCE &&
+    //         pixelHeight > 0)) return null; // Not spherical
+
+    if (pixelHeight <= 0) return null;
+    if (pixelWidth <= 0) return null;
+    if (Math.abs(pixelRatio - 1.0) > LIMELIGHT.SPHERE_TOLERANCE) return null;
+
     double targetFOVRatio =
         LIMELIGHT.FOV_HEIGHT.getRadians()
             * (pixelHeight
