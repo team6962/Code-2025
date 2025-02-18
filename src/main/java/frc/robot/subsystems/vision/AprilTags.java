@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,7 +40,8 @@ public class AprilTags extends SubsystemBase {
     }
   }
 
-  public static void injectVisionData(Map<String, Pose3d> cameraPoses, SwerveDrive swerveDrive) {
+  public static void injectVisionData(
+      Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
     List<LimelightHelpers.PoseEstimate> poseEstimates =
         cameraPoses.keySet().stream()
             .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
@@ -71,7 +72,7 @@ public class AprilTags extends SubsystemBase {
 
       canChangeHeading =
           canChangeHeading
-              && swerveDrive
+              && poseEstimator
                       .getEstimatedPose()
                       .getTranslation()
                       .getDistance(pose2d.getTranslation())
@@ -84,7 +85,7 @@ public class AprilTags extends SubsystemBase {
         pose2d =
             new Pose2d(
                 pose2d.getTranslation(),
-                swerveDrive
+                poseEstimator
                     .getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds))
                     .getRotation());
       }
@@ -110,15 +111,13 @@ public class AprilTags extends SubsystemBase {
     }
 
     if ((int) bestPoseEstimate.tagCount > 0) {
-      swerveDrive
-          .getPoseEstimator()
-          .addVisionMeasurement(
-              bestPoseEstimate.pose,
-              bestPoseEstimate.timestamp,
-              VecBuilder.fill(
-                  bestPoseEstimate.translationError.in(Meters),
-                  bestPoseEstimate.translationError.in(Meters),
-                  bestPoseEstimate.rotationError.in(Radians)));
+      poseEstimator.addVisionMeasurement(
+          bestPoseEstimate.pose,
+          bestPoseEstimate.timestamp,
+          VecBuilder.fill(
+              bestPoseEstimate.translationError.in(Meters),
+              bestPoseEstimate.translationError.in(Meters),
+              bestPoseEstimate.rotationError.in(Radians)));
     }
 
     Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);

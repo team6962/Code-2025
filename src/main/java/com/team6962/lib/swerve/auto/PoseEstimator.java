@@ -20,6 +20,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.subsystems.vision.AprilTags;
 import java.util.function.Supplier;
 
 /**
@@ -74,7 +76,7 @@ public class PoseEstimator extends SubsystemBase {
 
     poseEstimator.updateWithTime(
         timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
-
+    AprilTags.injectVisionData(LIMELIGHT.APRILTAG_CAMERA_POSES, this);
     chassisVelocity =
         kinematics.toTwist2d(
             KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1)));
