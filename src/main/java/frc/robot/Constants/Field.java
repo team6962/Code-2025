@@ -6,6 +6,9 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.hal.PortsJNI;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -45,16 +48,32 @@ public final class Field {
     return FIELD_LAYOUT.getTagPose(tagID);
   }
 
+
+  public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
+  
+  public static List<Translation2d> getReefFacePositions() {
+    List<Translation2d> positions = new ArrayList<Translation2d>();
+
+    for (int i = 0; i < 6; i++) {
+      final double reefRadius = 32.75;
+
+      positions.add(
+          new Translation2d(
+              Meters.convertFrom(176.745 + Math.cos(i * (Math.PI / 3)) * reefRadius, Inches),
+              Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius, Inches)
+          )
+      );
+    }
+
+    return positions;
+  }
+
   public static final Distance COMMON_FACE_POLE_DISTANCE = Inches.of(12.94);
 
-  public static final int LEFT_STATION_TAG =
-      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 1 : 13;
-  public static final int RIGHT_STATION_TAG =
-      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 2 : 12;
-  public static final int PROCESSOR_TAG =
-      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 3 : 16;
-  public static final int BARGE_TAG =
-      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 5 : 14;
+  public static final int LEFT_STATION_TAG = !TEAM_COLOR.IS_BLUE_TEAM.get() ? 1 : 13;
+  public static final int RIGHT_STATION_TAG = !TEAM_COLOR.IS_BLUE_TEAM.get() ? 2 : 12;
+  public static final int PROCESSOR_TAG = !TEAM_COLOR.IS_BLUE_TEAM.get() ? 3 : 16;
+  public static final int BARGE_TAG = !TEAM_COLOR.IS_BLUE_TEAM.get() ? 5 : 14;
 
   private static List<Integer> reefAprilTags;
 
@@ -112,6 +131,7 @@ public final class Field {
     List<Pose2d> positions = new ArrayList<Pose2d>();
 
     for (int i = 0; i < 6; i++) {
+      // All the numbers are in inches because that's what the field map uses
       final double shiftAngle =
           Math.atan2(6.46, 32.75); // The angle from the middle of one side and a reef pole
       final double reefPoleRadius =
@@ -140,6 +160,8 @@ public final class Field {
 
     return positions;
   }
+
+  public static final List<Translation2d> REEF_FACE_POSITIONS = getReefFacePositions();
 
   public static final List<Pose2d> CORAL_PLACEMENT_POSES = getCoralPlacementPoses();
 

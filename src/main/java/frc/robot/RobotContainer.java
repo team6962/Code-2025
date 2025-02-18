@@ -54,8 +54,9 @@ public class RobotContainer {
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
-  // public final Hang hang;
-  // public final Algae algaeDetector;
+  public final Hang hang;
+  public final Autonomous autonomous;
+  public final Algae algaeDetector;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -107,14 +108,15 @@ public class RobotContainer {
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
-    // hang = new Hang();
-    // algaeDetector = new Algae();
+    hang = new Hang();
+    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
+    algaeDetector = new Algae();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, null);
+    Controls.configureBindings(stateController, swerveDrive, elevator, manipulator, null, hang, autonomous);
 
     // module = new SwerveModule();
 
@@ -142,9 +144,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return new MusicDrive(swerveDrive, "bohemian");
-    // return swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.5));
-    return new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
+    return autonomous.createAutonomousCommand();
     // return hang.stow();
     // return Commands.run(() -> {});
   }

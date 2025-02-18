@@ -2,12 +2,16 @@ package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
+import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
@@ -28,7 +32,7 @@ public class Controls {
       Elevator elevator,
       Manipulator manipulator,
       Intake intake,
-      Hang hang) {
+      Hang hang, Autonomous autonomous) {
 
     // Driver
     // Move swerve chassis
@@ -87,6 +91,7 @@ public class Controls {
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
+
     operator.povUp().whileTrue(elevator.up());
     operator.povDown().whileTrue(elevator.down());
     operator.povRight().whileTrue(manipulator.pivot.up());
