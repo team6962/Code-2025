@@ -2,9 +2,8 @@ package frc.robot.subsystems.manipulator.algae;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-
-import java.util.Set;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,15 +11,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.MutLinearVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,24 +26,34 @@ import frc.robot.Constants.Preferences.MANIPULATOR;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealAlgaeGrabber extends AlgaeGrabber {
-    private Motor motors;
-    private Debouncer stallDebouncer = new Debouncer(1.0, DebounceType.kFalling);
-    private boolean stalled = false;
+    /**
+     * Represents the motors that control the grabber.
+     */
+    private Motors motors;
+
+    /**
+     * Represents the debouncer that detects if the motors are stalled.
+     */
+    private Debouncer detectedDebouncer = new Debouncer(1.0, DebounceType.kFalling);
+    private boolean detected = false;
     private Timer gripCheckTimer = new Timer();
 
     public RealAlgaeGrabber() {
-        motors = new CombinedMotor(
-            new RealMotor("Algae Grabber/Left Motor", CAN.MANIPULATOR_ALGAE_LEFT, true),
-            new RealMotor("Algae Grabber/Right Motor", CAN.MANIPULATOR_ALGAE_RIGHT, false)
+        motors = new MotorGroup(
+            new NEO550Motor("Algae Grabber/Left Motor", CAN.MANIPULATOR_ALGAE_LEFT, true),
+            new NEO550Motor("Algae Grabber/Right Motor", CAN.MANIPULATOR_ALGAE_RIGHT, false)
         );
 
-        Logger.logBoolean(getName() + "/motorsStalled", () -> stalled);
+        Logger.logBoolean(getName() + "/motorsStalled", () -> detected);
         Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
 
-        // setDefaultCommand(hold());
+        setDefaultCommand(hold());
     }
 
-    private static interface Motor {
+    /**
+     * Represents a motor or group of motors that can be controlled together.
+     */
+    private static interface Motors {
         /**
          * Sets the duty cycle of the motor.
          * @param dutyCycle the duty cycle to set
@@ -71,10 +77,13 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         public double getOutputDutyCycle();
     }
 
-    private static class CombinedMotor implements Motor {
-        private Motor[] motors;
+    /**
+     * Represents a group of motors that can be controlled together.
+     */
+    private static class MotorGroup implements Motors {
+        private Motors[] motors;
 
-        public CombinedMotor(Motor... motors) {
+        public MotorGroup(Motors... motors) {
             this.motors = motors;
         }
 
@@ -83,7 +92,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
          */
         @Override
         public void setDutyCycle(double dutyCycle) {
-            for (Motor motor : motors) {
+            for (Motors motor : motors) {
                 motor.setDutyCycle(dutyCycle);
             }
         }
@@ -95,7 +104,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         public Current getOutputCurrent() {
             double current = 0;
 
-            for (Motor motor : motors) {
+            for (Motors motor : motors) {
                 current += motor.getOutputCurrent().in(Amps);
             }
 
@@ -106,7 +115,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         public AngularVelocity getEncoderVelocity() {
             AngularVelocity w = RPM.of(0);
 
-            for (Motor motor : motors) {
+            for (Motors motor : motors) {
                 w = w.plus(motor.getEncoderVelocity());
             }
 
@@ -117,20 +126,21 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
         public double getOutputDutyCycle() {
             double output = 0;
 
-            for (Motor motor : motors) {
+            for (Motors motor : motors) {
                 output += motor.getOutputDutyCycle();
             }
 
-            return output/motors.length;
+            return output / motors.length;
         }
-
-
     }
 
-    private static class RealMotor implements Motor {
+    /**
+     * Represents a Spark MAX controlled NEO 550 motor.
+     */
+    private static class NEO550Motor implements Motors {
         private SparkMax motor;
 
-        public RealMotor(String name, int canId, boolean inverted) {
+        public NEO550Motor(String name, int canId, boolean inverted) {
             motor = new SparkMax(canId, MotorType.kBrushless);
 
             SparkMaxConfig config = new SparkMaxConfig();
@@ -170,28 +180,22 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
     public Command checkGrip() {
         return Commands.parallel(
-            runSpeed(MANIPULATOR.ALGAE_IN_SPEED),
+            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
             Commands.race(
-                Commands.waitUntil(() -> stalled).andThen(() -> expectGamePiece(true)),
+                Commands.waitUntil(() -> detected).andThen(() -> expectGamePiece(true)),
                 Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds)).andThen(() -> expectGamePiece(false))
             )
         );
     }
 
     private Command hold() {
-        return this.run(() -> {
-            if (!ENABLED_SYSTEMS.MANIPULATOR) {
-                motors.setDutyCycle(0);
-            } else if (!hasGamePiece()) {
-                motors.setDutyCycle(0);
-
-                if (MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED &&
-                    gripCheckTimer.advanceIfElapsed(MANIPULATOR.ALGAE_GRIP_CHECK_RATE.in(Seconds))) {
-                    
-                    checkGrip().schedule();
-                }
-            } else if (stalled) {
-                motors.setDutyCycle(0);
+        return run(() -> {
+            if (!ENABLED_SYSTEMS.MANIPULATOR || !hasGamePiece()) {
+                stopMotors();
+            } else if ((hasGamePiece() || detected) && MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED &&
+                gripCheckTimer.advanceIfElapsed(MANIPULATOR.ALGAE_GRIP_CHECK_RATE.in(Seconds))) {
+                
+                checkGrip().schedule();
             } else {
                 motors.setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED);
             }
@@ -199,9 +203,9 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     }
 
     public Command runSpeed(double speed) {
-        return this.run(() -> {
+        return run(() -> {
             if (!ENABLED_SYSTEMS.MANIPULATOR) {
-                motors.setDutyCycle(0);
+                stopMotors();
                 return;
             }
             
@@ -210,19 +214,19 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     }
 
     public Command intake() {
-        return this.runSpeed(MANIPULATOR.ALGAE_IN_SPEED).until(() -> stalled).andThen(() -> expectGamePiece(true)); // do finallydo?
+        return runSpeed(MANIPULATOR.ALGAE_IN_SPEED).until(() -> detected).andThen(() -> expectGamePiece(true));
     }
 
     public Command drop() {
-        return this.runSpeed(-MANIPULATOR.ALGAE_OUT_SPEED).until(() -> !stalled).finallyDo(() -> {expectGamePiece(false); stopMotors();});
+        return runSpeed(-MANIPULATOR.ALGAE_OUT_SPEED).until(() -> !detected).andThen(() -> { expectGamePiece(false); stopMotors(); });
     }
 
     public Command magicButton() {
-        return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));
+        return defer(() -> hasGamePiece() ? drop() : intake());
     }
 
     public Command stop() {
-        return Commands.run(() -> motors.setDutyCycle(0), this);
+        return run(this::stopMotors);
     }
 
     public void stopMotors() {
@@ -231,9 +235,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
     @Override
     public void periodic() {
-        // stalled = stallDebouncer.calculate(
-        //     (leftMotor.getOutputCurrent() + rightMotor.getOutputCurrent())/2.0 > MANIPULATOR.ALGAE_DETECT_CURRENT.in(Amps)
-        // );
-        stalled = stallDebouncer.calculate(motors.getEncoderVelocity().abs(RPM) < 1.0 && Math.abs(motors.getOutputDutyCycle()) > 0.0);
+        detected = detectedDebouncer.calculate(motors.getEncoderVelocity().abs(RotationsPerSecond) < 1.0 && Math.abs(motors.getOutputDutyCycle()) > 0.025);
     }
 }
