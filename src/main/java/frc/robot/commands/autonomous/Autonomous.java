@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Field;
+import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Field.Pole;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
@@ -39,8 +40,6 @@ public class Autonomous {
     this.manipulator = manipulator;
     this.intake = intake;
     this.elevator = elevator;
-    
-    
     
     // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " + swerveDrive.getEstimatedPose().getY());
     // addCommands(cycleTopCoral());
@@ -127,6 +126,11 @@ public class Autonomous {
     return swerveDrive.pathfindTo(polePose);
   }
 
+  public Command pathfindToPole(int poleNumber) {
+    return swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(poleNumber))
+      .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(poleNumber)));
+  }
+
   public Command scoreCoral() {
     return null;
   }
@@ -208,7 +212,18 @@ public class Autonomous {
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      cycleTopCoral()
+      pathfindToPole(0),
+      pathfindToPole(1),
+      pathfindToPole(2),
+      pathfindToPole(3),
+      pathfindToPole(4),
+      pathfindToPole(5),
+      pathfindToPole(6),
+      pathfindToPole(7),
+      pathfindToPole(8),
+      pathfindToPole(9),
+      pathfindToPole(10),
+      pathfindToPole(11)
     );
     // return Commands.sequence(
     //   reefPoleAlign(1)

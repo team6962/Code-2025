@@ -1,11 +1,19 @@
 package com.team6962.lib.swerve;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,16 +22,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -297,113 +304,66 @@ public class SwerveDrive extends SwerveCore {
         goalEndVelocity);
   }
 
-  // public Command pathfindTo(
-  //     Pose2d target,
-  //     boolean ignoreRotation,
-  //     GoalEndState endState,
-  //     Distance rotationDelayDistance) {
-  //   return Commands.defer(
-  //       () -> {
-  //         Pose2d startPose =
-  //             new Pose2d(
-  //                 getEstimatedPose().getTranslation(),
-  //                 KinematicsUtils.getAngle(
-  //                     getEstimatedSpeeds().vxMetersPerSecond,
-  //                     getEstimatedSpeeds().vyMetersPerSecond));
+  public Command alignTo(Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle) {
+    return new AlignCommand(target, toleranceDistance, toleranceAngle);
+  }
 
-  //         List<Waypoint> bezierPoints =
-  //             PathPlannerPath.waypointsFromPoses(
-  //                 ignoreRotation
-  //                     ? new Pose2d(getEstimatedPose().getTranslation(), new Rotation2d())
-  //                     : startPose,
-  //                 ignoreRotation ? new Pose2d(target.getTranslation(), new Rotation2d()) :
-  // target);
+  public Command alignTo(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
+    return alignTo(() -> target, toleranceDistance, toleranceAngle);
+  }
 
-  //         return pathfindThrough(
-  //             bezierPoints, ignoreRotation, endState, rotationDelayDistance.in(Meters));
-  //       },
-  //       Set.of());
-  // }
+  public Command alignTo(Supplier<Pose2d> target) {
+    return alignTo(target, Inches.of(1), Degrees.of(4));
+  }
 
-  // public Command pathfindThroughPoints(List<Translation2d> points) {
-  //   return pathfindThroughPoints(points, new GoalEndState(0, new Rotation2d()));
-  // }
+  public Command alignTo(Pose2d target) {
+    return alignTo(() -> target);
+  }
 
-  // public Command pathfindThroughPoints(List<Translation2d> points, GoalEndState endState) {
-  //   return Commands.defer(
-  //       () -> {
-  //         List<Waypoint> bezierPoints =
-  //             PathPlannerPath.waypointsFromPoses(
-  //                 points.stream().map(p -> new Pose2d(p, new Rotation2d())).toList());
+  private class AlignCommand extends Command {
+    private PIDController translationXPID;
+    private PIDController translationYPID;
+    private PIDController rotationPID;
 
-  //         return pathfindThrough(bezierPoints, false, endState, 0);
-  //       },
-  //       Set.of());
-  // }
+    private Supplier<Pose2d> targetSupplier;
+    private Distance toleranceDistance;
+    private Angle toleranceAngle;
 
-  // public Command pathfindThroughPoses(List<Pose2d> poses) {
-  //   return pathfindThroughPoses(poses, new GoalEndState(0, new Rotation2d()));
-  // }
+    public AlignCommand(Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
+      this.targetSupplier = targetSupplier;
+      this.toleranceDistance = toleranceDistance;
+      this.toleranceAngle = toleranceAngle;
 
-  // public Command pathfindThroughPoses(List<Pose2d> poses, GoalEndState endState) {
-  //   return pathfindThroughPoses(poses, endState, 0);
-  // }
+      translationXPID = new PIDController(getConstants().driveGains().translation().kP, getConstants().driveGains().translation().kI, getConstants().driveGains().translation().kD);
+      translationYPID = new PIDController(getConstants().driveGains().translation().kP, getConstants().driveGains().translation().kI, getConstants().driveGains().translation().kD);
+      rotationPID = new PIDController(getConstants().driveGains().rotation().kP, getConstants().driveGains().rotation().kI, getConstants().driveGains().rotation().kD);
+      rotationPID.enableContinuousInput(-Math.PI, Math.PI);
+    }
 
-  // public Command pathfindThroughPoses(
-  //     List<Pose2d> poses, GoalEndState endState, double rotationDelayDistance) {
-  //   return Commands.defer(
-  //       () -> {
-  //         List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(poses);
+    @Override
+    public void execute() {
+      Pose2d target = targetSupplier.get();
 
-  //         return pathfindThrough(bezierPoints, false, endState, rotationDelayDistance);
-  //       },
-  //       Set.of());
-  // }
+      double translationXError = target.getTranslation().getX() - getEstimatedPose().getTranslation().getX();
+      double translationYError = target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
+      double rotationError = target.getRotation().getRadians() - getEstimatedPose().getRotation().getRadians();
 
-  // public Command pathfindThrough(
-  //     List<Waypoint> bezierPoints,
-  //     boolean ignoreRotation,
-  //     GoalEndState endState,
-  //     double rotationDelayDistance) {
-  //   return Commands.defer(() -> {
-  //       autoBuilder.setOutput((speeds) -> {
-  //           if (ignoreRotation)
-  //               setMovement(new Translation2d(speeds.vxMetersPerSecond,
-  // speeds.vyMetersPerSecond));
-  //           else setMovement(speeds);
-  //       });
+      double translationXOutput = translationXPID.calculate(translationXError);
+      double translationYOutput = translationYPID.calculate(translationYError);
+      double rotationOutput = rotationPID.calculate(rotationError);
 
-  //       PathPlannerPath goalPath = new PathPlannerPath(
-  //           bezierPoints,
-  //           getConstants().pathConstraints(),
-  //           getPathplannerStartingState(),
-  //           endState
-  //       );
+      setMovement(allianceToRobotSpeeds(new ChassisSpeeds(translationXOutput * 0.5, translationYOutput * 0.5, rotationOutput * 0.5)));
+    }
 
-  //       return AutoBuilder.pathfindThenFollowPath(goalPath, getConstants().pathConstraints());
+    @Override
+    public boolean isFinished() {
+      Pose2d target = targetSupplier.get();
+      Pose2d current = getEstimatedPose();
 
-  //   //     return new FollowPathCommand(
-  //   //         path,
-  //   //         this::getEstimatedPose,
-  //   //         getPoseEstimator()::getEstimatedSpeeds,
-  //   //         (speeds, feedforwards) -> {
-  //   //             if (ignoreRotation)
-  //   //                 setMovement(new Translation2d(speeds.vxMetersPerSecond,
-  // speeds.vyMetersPerSecond));
-  //   //             else setMovement(speeds);
-  //   //         },
-  //   //         getConstants().driveGains().pathController(),
-  //   //         getConstants().pathRobotConfig(),
-  //   //         () -> false);
-  //   }, ignoreRotation ? Set.of(useTranslation()) : Set.of(useMotion()));
-  // }
-
-  // private IdealStartingState getPathplannerStartingState() {
-  //   return new IdealStartingState(
-  //       Math.hypot(getEstimatedSpeeds().vxMetersPerSecond,
-  // getEstimatedSpeeds().vyMetersPerSecond),
-  //       Rotation2d.fromRadians(getEstimatedSpeeds().omegaRadiansPerSecond));
-  // }
+      return current.getTranslation().getDistance(target.getTranslation()) < toleranceDistance.in(Meters)
+          && MeasureMath.differenceUnderHalf(current.getRotation().getMeasure(), target.getRotation().getMeasure()).lt(toleranceAngle);
+    }
+  }
 
   public Command cancelDrive() {
     return Commands.run(
