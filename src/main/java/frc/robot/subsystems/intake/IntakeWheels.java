@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import frc.robot.Constants.Preferences;
+import frc.robot.Constants.Constants.INTAKE;
 import frc.robot.util.hardware.SparkMaxUtil;
 import java.util.function.DoubleSupplier;
 
@@ -36,11 +36,11 @@ public class IntakeWheels extends SubsystemBase {
   }
 
   public Command intake() {
-    return setSpeed(() -> Preferences.INTAKE.IN_POWER);
+    return setSpeed(() -> INTAKE.IN_POWER);
   }
 
   public Command drop() {
-    return setSpeed(() -> Preferences.INTAKE.OUT_POWER);
+    return setSpeed(() -> INTAKE.OUT_POWER);
   }
 
   public Command stop() {

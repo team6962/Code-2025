@@ -10,9 +10,9 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
-import frc.robot.Constants.Preferences;
-import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
 import frc.robot.util.hardware.motion.PivotController;
+
+import frc.robot.Constants.Constants.VOLTAGE_LADDER;
 import frc.robot.RobotContainer;
 
 import java.util.Set;
@@ -31,8 +31,8 @@ public class ManipulatorPivot extends PivotController {
         MANIPULATOR_PIVOT.PROFILE.kD,
         MANIPULATOR_PIVOT.PROFILE.kS,
         MANIPULATOR_PIVOT.GEARING,
-        Preferences.MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
-        Preferences.MANIPULATOR_PIVOT.MAX_ANGLE,
+        MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+        MANIPULATOR_PIVOT.MAX_ANGLE,
         Degrees.of(2),
         false);
     // setDefaultCommand(stow());
@@ -68,43 +68,43 @@ public class ManipulatorPivot extends PivotController {
   }
 
   public Command coralIntake() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
   }
 
   public Command coralL1() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L1_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L1_ANGLE);
   }
 
   public Command coralL23() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L23_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L23_ANGLE);
   }
 
   public Command coralL4() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
   }
 
   public Command algaeReef() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE);
   }
 
   public Command algaeBarge() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE);
   }
 
   public Command algaeProcessor() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.PROCESSOR_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.PROCESSOR_ANGLE);
   }
 
   public Command algaeGround() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
   }
 
   public Command stow() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.STOW_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
   public Command safe() {
-    return pivotTo(() -> Preferences.MANIPULATOR_PIVOT.SAFE_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE);
   }
 
   public Command stop() {

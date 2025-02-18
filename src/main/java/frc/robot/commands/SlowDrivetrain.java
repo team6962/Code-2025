@@ -7,7 +7,7 @@ package frc.robot.commands;
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Preferences.ELEVATOR;
+import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.subsystems.elevator.Elevator;
 
 /** An example command that uses an example subsystem. */

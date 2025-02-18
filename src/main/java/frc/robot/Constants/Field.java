@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants.Constants.TEAM_COLOR;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -174,12 +175,12 @@ public final class Field {
     return () ->
         new Pose2d(
             flipIfRed(pose.getTranslation()).get(),
-            Constants.IS_BLUE_TEAM.get()
+            TEAM_COLOR.IS_BLUE_TEAM.get()
                 ? pose.getRotation()
                 : Rotation2d.fromDegrees(-(pose.getRotation().getDegrees() + 90) - 90));
   }
 
   public static Supplier<Double> flipIfRed(double x) {
-    return () -> Constants.IS_BLUE_TEAM.get() ? x : LENGTH - x;
+    return () -> TEAM_COLOR.IS_BLUE_TEAM.get() ? x : LENGTH - x;
   }
 }

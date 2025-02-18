@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import frc.robot.Constants.Preferences;
+import frc.robot.Constants.Constants.INTAKE;
 import java.util.function.Supplier;
 
 public abstract class IntakePivot extends SubsystemBase {
@@ -20,11 +20,11 @@ public abstract class IntakePivot extends SubsystemBase {
   }
 
   public Command lower() {
-    return setAngle(() -> Preferences.INTAKE.PIVOT_DOWN);
+    return setAngle(() -> INTAKE.PIVOT_DOWN);
   }
 
   public Command raise() {
-    return setAngle(() -> Preferences.INTAKE.PIVOT_UP);
+    return setAngle(() -> INTAKE.PIVOT_UP);
   }
 
   public static IntakePivot create() {

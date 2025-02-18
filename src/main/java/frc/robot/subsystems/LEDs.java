@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants;
+import frc.robot.Constants.Constants.LED;
+import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 
@@ -176,7 +177,7 @@ public class LEDs extends SubsystemBase {
   }
 
   private static void setTopStripColor(int[] RGB) {
-    setColor(Constants.LED.SIDE_STRIP_HEIGHT, length - Constants.LED.SIDE_STRIP_HEIGHT, RGB);
+    setColor(LED.SIDE_STRIP_HEIGHT, length - LED.SIDE_STRIP_HEIGHT, RGB);
   }
 
   private static void setRainbow(int start, int stop) {
@@ -274,7 +275,7 @@ public class LEDs extends SubsystemBase {
   // }
 
   private static int[] getBumperLEDColor() {
-    if (Constants.IS_BLUE_TEAM.get()) {
+    if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
       return BLUE;
     } else {
       return RED;
@@ -282,7 +283,7 @@ public class LEDs extends SubsystemBase {
   }
 
   private static void setBumperColorWaveWithPurple(int start, int stop, double speed) {
-    if (Constants.IS_BLUE_TEAM.get()) {
+    if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
       setColorWave(start, stop, getBumperLEDColor(), PURPLE, speed, Direction.LEFT);
     } else {
       setColorWave(start, stop, getBumperLEDColor(), PURPLE, speed, Direction.LEFT);
@@ -290,7 +291,7 @@ public class LEDs extends SubsystemBase {
   }
 
   private static void setBumperColorWave(int start, int stop, double speed) {
-    if (Constants.IS_BLUE_TEAM.get()) {
+    if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
       setColorWave(start, stop, getBumperLEDColor(), speed, Direction.LEFT);
     } else {
       setColorWave(start, stop, getBumperLEDColor(), speed, Direction.LEFT);

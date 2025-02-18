@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Constants;
-import frc.robot.Constants.Preferences;
+import frc.robot.Constants.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
@@ -51,23 +51,23 @@ public class XBoxSwerve extends Command {
 
     MAX_DRIVE_VELOCITY =
         swerveDrive
-            .getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
+            .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
             .in(MetersPerSecond);
     NOMINAL_DRIVE_VELOCITY =
         swerveDrive
-            .getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER)
+            .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_DRIVE_POWER)
             .in(MetersPerSecond);
     FINE_TUNE_DRIVE_VELOCITY =
         swerveDrive
-            .getLinearDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER)
+            .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER)
             .in(MetersPerSecond);
     NOMINAL_ANGULAR_VELOCITY =
         swerveDrive
-            .getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER)
+            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER)
             .in(RadiansPerSecond);
     MAX_ANGULAR_VELOCITY =
         swerveDrive
-            .getAngularDriveVelocity(Preferences.SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
+            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
             .in(RadiansPerSecond);
   }
 
@@ -123,9 +123,9 @@ public class XBoxSwerve extends Command {
     // Zero heading when Y is pressed
     if (controller.getYButton()) {
       Rotation2d newHeading = new Rotation2d();
-      if (!Constants.IS_BLUE_TEAM.get()) {
+      if (!TEAM_COLOR.IS_BLUE_TEAM.get()) {
         newHeading = Rotation2d.fromDegrees(180.0);
-      } else if (Constants.IS_BLUE_TEAM.get()) {
+      } else if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
         newHeading = Rotation2d.fromDegrees(0);
       }
       swerveDrive.getGyroscope().setHeading(newHeading.getMeasure());
@@ -137,7 +137,7 @@ public class XBoxSwerve extends Command {
     }
 
     if (RobotBase.isSimulation()) {
-      if (Constants.IS_BLUE_TEAM.get()) {
+      if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
         velocity = velocity.rotateBy(Rotation2d.fromDegrees(90.0));
       } else {
         velocity = velocity.rotateBy(Rotation2d.fromDegrees(-90.0));

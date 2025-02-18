@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.Preferences.MANIPULATOR;
+import frc.robot.Constants.Constants.MANIPULATOR;
 
 public class SimAlgaeGrabber extends AlgaeGrabber {
   private boolean hasGamePiece = false;
