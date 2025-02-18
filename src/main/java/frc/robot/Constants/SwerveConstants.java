@@ -14,8 +14,6 @@ import com.team6962.lib.swerve.SwerveConfig.Gearing;
 import com.team6962.lib.swerve.SwerveConfig.Module;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
-import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Preferences;
 

@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +14,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class Controls {
@@ -95,7 +93,7 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());,
-    operator.rightStick().onTrue(pieceCombos.intakeCoral()); //big right paddle
+    operator.rightStick().onTrue(pieceCombos.intakeCoral()); // big right paddle
     operator.rightBumper().whileTrue(manipulator.coral.backwards());
     operator.rightTrigger().whileTrue(manipulator.coral.magicButton());
     operator.leftBumper().whileTrue(manipulator.algae.intake());

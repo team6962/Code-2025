@@ -2,10 +2,6 @@ package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.Map;
-
-import static edu.wpi.first.units.Units.Seconds;
-
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,9 +10,6 @@ import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.AngleRange;
 import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
 import frc.robot.subsystems.manipulator.coral.CoralGrabber;
-import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import frc.robot.Constants.Preferences.MANIPULATOR;
 import java.util.Map;
 
 public class Manipulator extends SubsystemBase {
@@ -86,6 +79,9 @@ public class Manipulator extends SubsystemBase {
 
   public Command test() {
     return Commands.sequence(
-        pivot.safe(), /* intakeCoral(), placeCoralL23(),*/ pickupGroundAlgae(), placeProcessorAlgae(), pivot.safe());
+        pivot.safe(), /* intakeCoral(), placeCoralL23(),*/
+        pickupGroundAlgae(),
+        placeProcessorAlgae(),
+        pivot.safe());
   }
 }

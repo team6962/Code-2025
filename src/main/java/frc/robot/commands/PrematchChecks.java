@@ -37,17 +37,17 @@ public class PrematchChecks extends SequentialCommandGroup {
 
     addCommands(
         manipulator.pivot.safe(),
-      elevator.rezeroAtBottom(),
-      Commands.waitSeconds(1.0),
-      // combos.coralL1(),
-      Commands.waitSeconds(1.0),
-      combos.coralL2(),
-      Commands.waitSeconds(1.0),
-      combos.coralL4().withTimeout(4.0),
-      Commands.waitSeconds(1.0),
-      combos.algaeL3(),
-      Commands.waitSeconds(1.0),
-      combos.algaeProcessor(),
+        elevator.rezeroAtBottom(),
+        Commands.waitSeconds(1.0),
+        // combos.coralL1(),
+        Commands.waitSeconds(1.0),
+        combos.coralL2(),
+        Commands.waitSeconds(1.0),
+        combos.coralL4().withTimeout(4.0),
+        Commands.waitSeconds(1.0),
+        combos.algaeL3(),
+        Commands.waitSeconds(1.0),
+        combos.algaeProcessor(),
         combos.coralL1(),
         Commands.runOnce(StatusChecks::refresh));
   }

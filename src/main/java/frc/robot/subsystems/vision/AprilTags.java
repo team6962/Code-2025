@@ -155,10 +155,15 @@ public class AprilTags extends SubsystemBase {
     }
   }
 
-  
   public static int findClosestReefTagID() {
-    int ftagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
-    int btagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
+    int ftagID =
+        (int)
+            LimelightHelpers.getFiducialID(
+                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
+    int btagID =
+        (int)
+            LimelightHelpers.getFiducialID(
+                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
 
     if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
     if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;

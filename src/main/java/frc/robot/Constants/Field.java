@@ -3,8 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.Constants;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetection;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,18 +14,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.subsystems.vision.AprilTags;
-
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -53,10 +46,14 @@ public final class Field {
 
   public static final Distance COMMON_FACE_POLE_DISTANCE = Inches.of(12.94);
 
-  public static final int LEFT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 1 : 13;
-  public static final int RIGHT_STATION_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 2 : 12;
-  public static final int PROCESSOR_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 3 : 16;
-  public static final int BARGE_TAG = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 5 : 14;
+  public static final int LEFT_STATION_TAG =
+      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 1 : 13;
+  public static final int RIGHT_STATION_TAG =
+      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 2 : 12;
+  public static final int PROCESSOR_TAG =
+      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 3 : 16;
+  public static final int BARGE_TAG =
+      DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 5 : 14;
 
   private static List<Integer> reefAprilTags;
 
@@ -110,7 +107,6 @@ public final class Field {
     return getTagPose(RIGHT_STATION_TAG).get().toPose2d();
   }
 
-  
   private static List<Pose2d> getCoralPlacementPoses() {
     List<Pose2d> positions = new ArrayList<Pose2d>();
 

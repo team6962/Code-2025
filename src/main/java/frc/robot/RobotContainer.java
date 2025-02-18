@@ -5,7 +5,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
-import com.team6962.lib.swerve.MusicDrive;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
@@ -27,10 +26,7 @@ import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.hang.Hang;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
-import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
 /**
@@ -181,11 +177,8 @@ public class RobotContainer {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
 
-    Commands.sequence(
-      manipulator.pivot.safe(),
-      elevator.rezeroAtBottom()).schedule();
+    Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
-    
     Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null, null);
     checks.schedule();
   }

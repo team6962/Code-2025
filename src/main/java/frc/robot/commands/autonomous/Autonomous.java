@@ -1,7 +1,6 @@
 package frc.robot.commands.autonomous;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -91,7 +90,6 @@ public class Autonomous extends SequentialCommandGroup {
             Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()));
   }
 
-  
   public Command pathfindToReefPole(int faceNumber, Pole pole) {
     Pose2d polePose = Field.getPolePose(faceNumber, pole);
     return swerveDrive.pathfindTo(polePose);

@@ -125,9 +125,7 @@ public class DualLinearActuator extends SubsystemBase {
     // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
     // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
     // Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
-    Logger.logNumber(
-        this.getName() + "/rawAbsolutePosition",
-        absoluteEncoder::get);
+    Logger.logNumber(this.getName() + "/rawAbsolutePosition", absoluteEncoder::get);
 
     Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
@@ -185,7 +183,6 @@ public class DualLinearActuator extends SubsystemBase {
     }
   }
 
-
   public void moveUp() {
     moveSpeed(0.10);
   }
@@ -200,7 +197,7 @@ public class DualLinearActuator extends SubsystemBase {
       rightMotor.set(-0.1);
       return false;
     }
-    
+
     stopMotors();
     return true;
   }
@@ -240,11 +237,9 @@ public class DualLinearActuator extends SubsystemBase {
 
   public boolean canMoveInDirection(double velocity) {
     if (velocity > 0) {
-      return /* getLeftHeight().lt(maxHeight) && getRightHeight().lt(maxHeight) && */
-        !triggeredCeilingLimit();
+      return /* getLeftHeight().lt(maxHeight) && getRightHeight().lt(maxHeight) && */ !triggeredCeilingLimit();
     } else {
-      return /* getLeftHeight().gt(minHeight) && getRightHeight().gt(minHeight) && */
-        !triggeredFloorLimit();
+      return /* getLeftHeight().gt(minHeight) && getRightHeight().gt(minHeight) && */ !triggeredFloorLimit();
     }
   }
 
