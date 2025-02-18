@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.Constants.Constants.TIMING;
 import frc.robot.commands.PieceCombos;
+import frc.robot.commands.drive.OperatorFineControls;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -96,10 +97,6 @@ public class Controls {
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
     // operator.rightStick().onTrue(elevator.algaeL3());
-    // operator.povUp().whileTrue(elevator.up());
-    // operator.povDown().whileTrue(elevator.down());
-    // operator.povRight().whileTrue(manipulator.pivot.up()); TODO: Add this back in, use joystick
-    // operator.povLeft().whileTrue(manipulator.pivot.down()); TODO: Add this back in, use joystick
     // operator.povLeft().whileTrue(hang.deploy());
     // operator.povRight().whileTrue(hang.stow());,
     // operator.rightStick().onTrue(pieceCombos.intakeCoral()); //big right paddle
@@ -130,6 +127,8 @@ public class Controls {
     //   .withPosition(3, 2)
     //   .withSize(2, 2)
     //   .withProperties(Map.of("min", 0, "max", 100));
+
+    new OperatorFineControls(elevator, manipulator, operator.getHID()).schedule();
   }
 
   private static Command rumble(CommandXboxController controller) {
