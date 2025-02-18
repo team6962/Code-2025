@@ -232,40 +232,15 @@ public class SwerveDrive extends SwerveCore {
   public Command driveHeading(Rotation2d heading) {
     return driveHeading(() -> heading);
   }
-  public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
-    return Commands.runEnd(
-      () -> facePoint(point.get(), rotationOffset),
-      () -> System.out.println("")
-    );
-  }
+  
+  public Command facePoint(Supplier<Translation2d> point, Supplier<Rotation2d> offset) {
+    return driveHeading(() -> {
+      Translation2d currentPoseTranslation = getEstimatedPose().getTranslation();
+      Translation2d translationDistance = point.get().minus(currentPoseTranslation);
+      Rotation2d targetHeading = translationDistance.getAngle().plus(offset.get());
 
-  public void facePoint(Translation2d point, Rotation2d rotationOffset) {
-    double time = 0.02;
-
-    if (point == null) {
-        // TODO: add and velocity
-        driveHeading(getEstimatedPose().getRotation());
-        return;
-    }
-
-    if (point.getDistance(getEstimatedPose().getTranslation()) < 1.0 && RobotState.isAutonomous()) {
-        return;
-    }
-
-
-    Translation2d currentPosition = getEstimatedPose().getTranslation();
-    Translation2d futurePosition = getEstimatedPose().getTranslation().plus(KinematicsUtils.getTranslation(getEstimatedSpeeds()).times(time));
-    
-    Rotation2d currentTargetHeading = point.minus(currentPosition).getAngle().plus(rotationOffset);
-    Rotation2d futureTargetHeading = point.minus(futurePosition).getAngle().plus(rotationOffset);
-    
-    double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
-    if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
-        addedVelocity = 0.0;
-    }
-
-    System.out.println(currentTargetHeading);
-    //change -> drive(currentTargetHeading);
+      return targetHeading;
+    });
   }
 
   public Command stop() {
