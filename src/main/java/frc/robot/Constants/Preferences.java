@@ -66,6 +66,7 @@ public final class Preferences {
     public static final double ALGAE_OUT_SPEED = -0.2;
     public static final double ALGAE_IN_SPEED = 0.2;
     public static final double ALGAE_HOLD_SPEED = 0.1;
+    public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.2;
     public static final double CORAL_IN_SPEED = 0.2;
     public static final double CORAL_HOLD_SPEED = -0.0; // -0.1
