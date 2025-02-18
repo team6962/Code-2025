@@ -1,4 +1,4 @@
-package frc.robot.util.hardware.MotionControl;
+package frc.robot.util.hardware.motion;
 
 import static edu.wpi.first.units.Units.Meters;
 

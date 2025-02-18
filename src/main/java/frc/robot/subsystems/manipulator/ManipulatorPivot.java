@@ -12,8 +12,9 @@ import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Constants.Preferences;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
+import frc.robot.util.hardware.motion.PivotController;
 import frc.robot.RobotContainer;
-import frc.robot.util.hardware.MotionControl.PivotController;
+
 import java.util.Set;
 import java.util.function.Supplier;
 

@@ -12,8 +12,8 @@ import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Preferences.ELEVATOR;
 import frc.robot.Constants.Preferences.VOLTAGE_LADDER;
+import frc.robot.util.hardware.motion.DualLinearActuator;
 import frc.robot.RobotContainer;
-import frc.robot.util.hardware.MotionControl.DualLinearActuator;
 
 /**
  * The Elevator subsystem controls the elevator mechanism of the robot. It extends the

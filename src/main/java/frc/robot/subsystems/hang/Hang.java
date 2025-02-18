@@ -10,9 +10,9 @@ import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import frc.robot.util.hardware.motion.PivotController;
 import frc.robot.Constants.Preferences;
 import frc.robot.RobotContainer;
-import frc.robot.util.hardware.MotionControl.PivotController;
 
 public class Hang extends PivotController {
 
