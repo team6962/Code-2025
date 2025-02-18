@@ -12,9 +12,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -177,10 +180,12 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command drive(Rotation2d rotation) {
+    System.out.println("run");
     return driveRotation(() -> rotation);
   }
 
   public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
+    System.out.println("running");
     Command command =
         new Command() {
           private PIDController pid;
@@ -219,6 +224,41 @@ public class SwerveDrive extends SwerveCore {
 
   public Command driveHeading(Rotation2d heading) {
     return driveHeading(() -> heading);
+  }
+  public Command facePointCommand(Supplier<Translation2d> point, Rotation2d rotationOffset) {
+    return Commands.runEnd(
+      () -> facePoint(point.get(), rotationOffset),
+      () -> System.out.println("")
+    );
+  }
+
+  public void facePoint(Translation2d point, Rotation2d rotationOffset) {
+    double time = 0.02;
+
+    if (point == null) {
+        // TODO: add and velocity
+        driveHeading(getEstimatedPose().getRotation());
+        return;
+    }
+
+    if (point.getDistance(getEstimatedPose().getTranslation()) < 1.0 && RobotState.isAutonomous()) {
+        return;
+    }
+
+
+    Translation2d currentPosition = getEstimatedPose().getTranslation();
+    Translation2d futurePosition = getEstimatedPose().getTranslation().plus(KinematicsUtils.getTranslation(getEstimatedSpeeds()).times(time));
+    
+    Rotation2d currentTargetHeading = point.minus(currentPosition).getAngle().plus(rotationOffset);
+    Rotation2d futureTargetHeading = point.minus(futurePosition).getAngle().plus(rotationOffset);
+    
+    double addedVelocity = futureTargetHeading.minus(currentTargetHeading).getRadians() / time;
+    if (getEstimatedPose().getTranslation().getDistance(point) < 1.0) {
+        addedVelocity = 0.0;
+    }
+
+    System.out.println(currentTargetHeading);
+    //change -> drive(currentTargetHeading);
   }
 
   public Command stop() {
