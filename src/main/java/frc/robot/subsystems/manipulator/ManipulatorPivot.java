@@ -10,11 +10,9 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
-import frc.robot.util.hardware.motion.PivotController;
-
 import frc.robot.Constants.Constants.VOLTAGE_LADDER;
 import frc.robot.RobotContainer;
-
+import frc.robot.util.hardware.motion.PivotController;
 import java.util.Set;
 import java.util.function.Supplier;
 

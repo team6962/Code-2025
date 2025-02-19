@@ -32,7 +32,8 @@ public class RealHang extends SubsystemBase implements Hang {
 
     encoder = new DutyCycleEncoder(DIO.HANG_ENCODER, 1.0, HANG.ENCODER_OFFSET.in(Rotations));
 
-    pidController = new PIDController(HANG.DEPLOY_PROFILE.kP, HANG.DEPLOY_PROFILE.kI, HANG.DEPLOY_PROFILE.kD);
+    pidController =
+        new PIDController(HANG.DEPLOY_PROFILE.kP, HANG.DEPLOY_PROFILE.kI, HANG.DEPLOY_PROFILE.kD);
     pidController.setTolerance(Degrees.of(2).in(Rotations));
   }
 

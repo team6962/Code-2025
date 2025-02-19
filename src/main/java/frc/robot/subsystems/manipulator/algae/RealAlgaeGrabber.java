@@ -11,7 +11,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -170,12 +169,14 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   }
 
   public Command checkGrip() {
-    return Commands.runOnce(this::resetDebouncer).andThen(Commands.parallel(
-        runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
-        Commands.race(
-            Commands.waitUntil(() -> detected).andThen(() -> expectGamePiece(true)),
-            Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds))
-                .andThen(() -> expectGamePiece(false)))));
+    return Commands.runOnce(this::resetDebouncer)
+        .andThen(
+            Commands.parallel(
+                runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
+                Commands.race(
+                    Commands.waitUntil(() -> detected).andThen(() -> expectGamePiece(true)),
+                    Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds))
+                        .andThen(() -> expectGamePiece(false)))));
   }
 
   private Command hold() {
@@ -236,7 +237,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
   @Override
   public void periodic() {
-    detected =
-        detectedDebouncer.calculate(motors.getOutputCurrent().gt(Amps.of(40)));
+    detected = detectedDebouncer.calculate(motors.getOutputCurrent().gt(Amps.of(40)));
   }
 }

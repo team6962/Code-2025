@@ -3,27 +3,23 @@ package frc.robot.commands.autonomous;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.List;
-
-import com.pathplanner.lib.path.GoalEndState;
 import com.team6962.lib.swerve.SwerveDrive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.Field;
-import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.Pole;
+import frc.robot.Constants.ReefPositioning;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import java.util.List;
 
 public class Autonomous {
   private RobotStateController controller;
@@ -43,12 +39,14 @@ public class Autonomous {
     this.manipulator = manipulator;
     this.intake = intake;
     this.elevator = elevator;
-    
-    // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " + swerveDrive.getEstimatedPose().getY());
+
+    // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " +
+    // swerveDrive.getEstimatedPose().getY());
     // addCommands(cycleTopCoral());
 
     // for (int i = 0; i < Field.REEF_FACE_POSITIONS.size(); i ++) {
-    //   System.out.println(Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getX(), Inches) + ", " + Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getY(), Inches));
+    //   System.out.println(Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getX(), Inches) + ",
+    // " + Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getY(), Inches));
     // }
   }
 
@@ -58,13 +56,13 @@ public class Autonomous {
     double closestDist = Integer.MAX_VALUE;
     int closestFace = -1;
 
-    for (int i = 0; i < reefFaces.size(); i ++) {
+    for (int i = 0; i < reefFaces.size(); i++) {
       Translation2d curFace = reefFaces.get(i);
-      
-      double distance = Math.hypot(
-        swerveDrive.getEstimatedPose().getX() - curFace.getX(),
-        swerveDrive.getEstimatedPose().getY() - curFace.getY()
-      );
+
+      double distance =
+          Math.hypot(
+              swerveDrive.getEstimatedPose().getX() - curFace.getX(),
+              swerveDrive.getEstimatedPose().getY() - curFace.getY());
 
       System.out.println(distance);
 
@@ -79,14 +77,12 @@ public class Autonomous {
 
   /**
    * Outputs the numbers of the reef pole on a certain reef face
+   *
    * @param face
    * @return Index 0 is the left pole (from the robot's perspective), index 1 is on the right
    */
   public int[] reefPolesFromReefFace(int face) {
-    return new int[] {
-      face * 2,
-      face * 2 + 1
-    };
+    return new int[] {face * 2, face * 2 + 1};
   }
 
   public Command pathfindToProcessor() {
@@ -99,6 +95,7 @@ public class Autonomous {
 
   /**
    * Aligns to either reef pole on the closest reef face
+   *
    * @param side 0 means left, 1 means right (from the robot's perspective)
    * @return
    */
@@ -130,8 +127,9 @@ public class Autonomous {
   }
 
   public Command pathfindToPole(int poleNumber) {
-    return swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(poleNumber))
-      .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(poleNumber)));
+    return swerveDrive
+        .pathfindTo(ReefPositioning.getCoralAlignPose(poleNumber))
+        .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(poleNumber)));
   }
 
   public Command scoreCoral() {
@@ -140,17 +138,16 @@ public class Autonomous {
 
   public Command cycleTopCoral() {
     return Commands.sequence(
-      pathfindToReefPole(4),
-      pathfindToTopCoralStation(),
-      pathfindToReefPole(3),
-      pathfindToTopCoralStation(),
-      pathfindToReefPole(2),
-      pathfindToTopCoralStation(),
-      pathfindToReefPole(1),
-      pathfindToTopCoralStation(),
-      pathfindToReefPole(0),
-      pathfindToTopCoralStation()
-    );
+        pathfindToReefPole(4),
+        pathfindToTopCoralStation(),
+        pathfindToReefPole(3),
+        pathfindToTopCoralStation(),
+        pathfindToReefPole(2),
+        pathfindToTopCoralStation(),
+        pathfindToReefPole(1),
+        pathfindToTopCoralStation(),
+        pathfindToReefPole(0),
+        pathfindToTopCoralStation());
   }
 
   public Command coralStation() {
@@ -214,24 +211,26 @@ public class Autonomous {
   }
 
   public Command autoOrientToAlgae() {
-    return swerveDrive.facePoint(() -> Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
+    return swerveDrive.facePoint(
+        () ->
+            Algae.getAlgaePosition(
+                LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
   }
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      pathfindToPole(0),
-      pathfindToPole(1),
-      pathfindToPole(2),
-      pathfindToPole(3),
-      pathfindToPole(4),
-      pathfindToPole(5),
-      pathfindToPole(6),
-      pathfindToPole(7),
-      pathfindToPole(8),
-      pathfindToPole(9),
-      pathfindToPole(10),
-      pathfindToPole(11)
-    );
+        pathfindToPole(0),
+        pathfindToPole(1),
+        pathfindToPole(2),
+        pathfindToPole(3),
+        pathfindToPole(4),
+        pathfindToPole(5),
+        pathfindToPole(6),
+        pathfindToPole(7),
+        pathfindToPole(8),
+        pathfindToPole(9),
+        pathfindToPole(10),
+        pathfindToPole(11));
     // return Commands.sequence(
     //   reefPoleAlign(1)
     // );

@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
@@ -13,7 +11,6 @@ import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -176,9 +174,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
-    return Commands.run(
-        () -> setMovement(rotation.get()),
-        useRotation());
+    return Commands.run(() -> setMovement(rotation.get()), useRotation());
   }
 
   public Command driveRotation(Supplier<Rotation2d> rotation) {
@@ -222,8 +218,7 @@ public class SwerveDrive extends SwerveCore {
       Rotation2d error = headingValue.minus(getEstimatedPose().getRotation());
       double output = pid.calculate(error.getRadians());
 
-      setMovement(
-          convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
+      setMovement(convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
     }
 
     @Override
@@ -239,19 +234,20 @@ public class SwerveDrive extends SwerveCore {
   public Command driveHeading(Rotation2d heading) {
     return driveHeading(() -> heading);
   }
-  
+
   public Command facePoint(Supplier<Translation2d> point, Supplier<Rotation2d> offset) {
-    return driveHeading(() -> {
-      Translation2d currentPoint = point.get();
+    return driveHeading(
+        () -> {
+          Translation2d currentPoint = point.get();
 
-      if (currentPoint == null) return null;
+          if (currentPoint == null) return null;
 
-      Translation2d currentPoseTranslation = getEstimatedPose().getTranslation();
-      Translation2d translationDistance = currentPoint.minus(currentPoseTranslation);
-      Rotation2d targetHeading = translationDistance.getAngle().plus(offset.get());
+          Translation2d currentPoseTranslation = getEstimatedPose().getTranslation();
+          Translation2d translationDistance = currentPoint.minus(currentPoseTranslation);
+          Rotation2d targetHeading = translationDistance.getAngle().plus(offset.get());
 
-      return targetHeading;
-    });
+          return targetHeading;
+        });
   }
 
   public Command facePoint(Supplier<Translation2d> point) {
@@ -261,7 +257,7 @@ public class SwerveDrive extends SwerveCore {
   public Command facePoint(Translation2d point) {
     return facePoint(() -> point);
   }
-  
+
   public Command stop() {
     return driveModules(() -> KinematicsUtils.getStoppedStates(getModuleStates()));
   }
@@ -298,7 +294,8 @@ public class SwerveDrive extends SwerveCore {
         goalEndVelocity);
   }
 
-  public Command alignTo(Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle) {
+  public Command alignTo(
+      Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle) {
     return new AlignCommand(target, toleranceDistance, toleranceAngle);
   }
 
@@ -323,14 +320,27 @@ public class SwerveDrive extends SwerveCore {
     private Distance toleranceDistance;
     private Angle toleranceAngle;
 
-    public AlignCommand(Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
+    public AlignCommand(
+        Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
       this.targetSupplier = targetSupplier;
       this.toleranceDistance = toleranceDistance;
       this.toleranceAngle = toleranceAngle;
 
-      translationXPID = new PIDController(getConstants().driveGains().translation().kP, getConstants().driveGains().translation().kI, getConstants().driveGains().translation().kD);
-      translationYPID = new PIDController(getConstants().driveGains().translation().kP, getConstants().driveGains().translation().kI, getConstants().driveGains().translation().kD);
-      rotationPID = new PIDController(getConstants().driveGains().rotation().kP, getConstants().driveGains().rotation().kI, getConstants().driveGains().rotation().kD);
+      translationXPID =
+          new PIDController(
+              getConstants().driveGains().translation().kP,
+              getConstants().driveGains().translation().kI,
+              getConstants().driveGains().translation().kD);
+      translationYPID =
+          new PIDController(
+              getConstants().driveGains().translation().kP,
+              getConstants().driveGains().translation().kI,
+              getConstants().driveGains().translation().kD);
+      rotationPID =
+          new PIDController(
+              getConstants().driveGains().rotation().kP,
+              getConstants().driveGains().rotation().kI,
+              getConstants().driveGains().rotation().kD);
       rotationPID.enableContinuousInput(-Math.PI, Math.PI);
     }
 
@@ -338,15 +348,21 @@ public class SwerveDrive extends SwerveCore {
     public void execute() {
       Pose2d target = targetSupplier.get();
 
-      double translationXError = target.getTranslation().getX() - getEstimatedPose().getTranslation().getX();
-      double translationYError = target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
-      double rotationError = target.getRotation().getRadians() - getEstimatedPose().getRotation().getRadians();
+      double translationXError =
+          target.getTranslation().getX() - getEstimatedPose().getTranslation().getX();
+      double translationYError =
+          target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
+      double rotationError =
+          target.getRotation().getRadians() - getEstimatedPose().getRotation().getRadians();
 
       double translationXOutput = translationXPID.calculate(translationXError);
       double translationYOutput = translationYPID.calculate(translationYError);
       double rotationOutput = rotationPID.calculate(rotationError);
 
-      setMovement(allianceToRobotSpeeds(new ChassisSpeeds(translationXOutput * 0.5, translationYOutput * 0.5, rotationOutput * 0.5)));
+      setMovement(
+          allianceToRobotSpeeds(
+              new ChassisSpeeds(
+                  translationXOutput * 0.5, translationYOutput * 0.5, rotationOutput * 0.5)));
     }
 
     @Override
@@ -354,8 +370,11 @@ public class SwerveDrive extends SwerveCore {
       Pose2d target = targetSupplier.get();
       Pose2d current = getEstimatedPose();
 
-      return current.getTranslation().getDistance(target.getTranslation()) < toleranceDistance.in(Meters)
-          && MeasureMath.differenceUnderHalf(current.getRotation().getMeasure(), target.getRotation().getMeasure()).lt(toleranceAngle);
+      return current.getTranslation().getDistance(target.getTranslation())
+              < toleranceDistance.in(Meters)
+          && MeasureMath.differenceUnderHalf(
+                  current.getRotation().getMeasure(), target.getRotation().getMeasure())
+              .lt(toleranceAngle);
     }
   }
 

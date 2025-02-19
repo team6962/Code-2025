@@ -69,12 +69,13 @@ public class AprilTags extends SubsystemBase {
       translationError += ADDITIONAL_TRANSLATION_ERROR;
 
       if (isBetterEstimate(bestPoseEstimate, translationError, rotationError)) {
-        bestPoseEstimate = new BestEstimate(
-            pose2d,
-            Seconds.of(poseEstimate.timestampSeconds),
-            Meters.of(translationError),
-            Rotations.of(rotationError),
-            poseEstimate.tagCount);
+        bestPoseEstimate =
+            new BestEstimate(
+                pose2d,
+                Seconds.of(poseEstimate.timestampSeconds),
+                Meters.of(translationError),
+                Rotations.of(rotationError),
+                poseEstimate.tagCount);
       }
     }
 
@@ -91,7 +92,8 @@ public class AprilTags extends SubsystemBase {
     Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);
   }
 
-  private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(Map<String, Pose3d> cameraPoses) {
+  private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
+      Map<String, Pose3d> cameraPoses) {
     return cameraPoses.keySet().stream()
         .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
         .filter((estimate) -> estimate != null)
@@ -99,7 +101,8 @@ public class AprilTags extends SubsystemBase {
   }
 
   private static boolean isInvalidPoseEstimate(PoseEstimate poseEstimate, Pose2d pose2d) {
-    return IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.rawFiducials[0].id)
+    return IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS)
+            .anyMatch(x -> x == poseEstimate.rawFiducials[0].id)
         || poseEstimate.tagCount == 0
         || pose2d.getTranslation().getNorm() == 0.0
         || pose2d.getRotation().getRadians() == 0.0
@@ -110,12 +113,16 @@ public class AprilTags extends SubsystemBase {
         || pose2d.getY() > Field.WIDTH;
   }
 
-  private static boolean canChangeHeading(PoseEstimate poseEstimate, PoseEstimator poseEstimator, Pose2d pose2d) {
+  private static boolean canChangeHeading(
+      PoseEstimate poseEstimate, PoseEstimator poseEstimator, Pose2d pose2d) {
     boolean canChangeHeading = poseEstimate.tagCount >= 2 || RobotState.isDisabled();
-    return canChangeHeading && poseEstimator.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation()) < 1.0;
+    return canChangeHeading
+        && poseEstimator.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation())
+            < 1.0;
   }
 
-  private static Pose2d adjustPoseRotation(PoseEstimator poseEstimator, PoseEstimate poseEstimate, Pose2d pose2d) {
+  private static Pose2d adjustPoseRotation(
+      PoseEstimator poseEstimator, PoseEstimate poseEstimate, Pose2d pose2d) {
     return new Pose2d(
         pose2d.getTranslation(),
         poseEstimator.getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds)).getRotation());
@@ -127,7 +134,8 @@ public class AprilTags extends SubsystemBase {
         / TRANSLATION_ERROR_FACTOR;
   }
 
-  private static boolean isBetterEstimate(BestEstimate bestPoseEstimate, double translationError, double rotationError) {
+  private static boolean isBetterEstimate(
+      BestEstimate bestPoseEstimate, double translationError, double rotationError) {
     return translationError < bestPoseEstimate.translationError.in(Meters)
         || rotationError < Units.degreesToRadians(360.0);
   }
@@ -164,8 +172,14 @@ public class AprilTags extends SubsystemBase {
   }
 
   public static int findClosestReefTagID() {
-    int ftagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
-    int btagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
+    int ftagID =
+        (int)
+            LimelightHelpers.getFiducialID(
+                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
+    int btagID =
+        (int)
+            LimelightHelpers.getFiducialID(
+                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
 
     if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
     if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;

@@ -6,9 +6,6 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.hal.PortsJNI;
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -48,9 +45,8 @@ public final class Field {
     return FIELD_LAYOUT.getTagPose(tagID);
   }
 
-
   public static final List<Supplier<Translation2d>> REEF_FACES = List.of();
-  
+
   public static List<Translation2d> getReefFacePositions() {
     List<Translation2d> positions = new ArrayList<Translation2d>();
 
@@ -60,9 +56,7 @@ public final class Field {
       positions.add(
           new Translation2d(
               Meters.convertFrom(176.745 + Math.cos(i * (Math.PI / 3)) * reefRadius, Inches),
-              Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius, Inches)
-          )
-      );
+              Meters.convertFrom(158.5 + Math.sin(i * (Math.PI / 3)) * reefRadius, Inches)));
     }
 
     return positions;

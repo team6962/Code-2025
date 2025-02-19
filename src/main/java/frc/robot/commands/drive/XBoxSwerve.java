@@ -151,7 +151,9 @@ public class XBoxSwerve extends Command {
 
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
-    boolean moving = Math.abs(velocity.getNorm()) > 0.05 || Math.abs(angularVelocity) > Units.degreesToRadians(3);
+    boolean moving =
+        Math.abs(velocity.getNorm()) > 0.05
+            || Math.abs(angularVelocity) > Units.degreesToRadians(3);
 
     Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
 
