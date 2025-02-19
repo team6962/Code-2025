@@ -1,25 +1,21 @@
 package frc.robot.commands.autonomous;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.Constants.Field;
-import frc.robot.Constants.Field.Pole;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
-import java.util.List;
 
 public class Autonomous {
   private RobotStateController controller;
@@ -50,30 +46,30 @@ public class Autonomous {
     // }
   }
 
-  public int getClosestReefFace() {
-    List<Translation2d> reefFaces = Field.REEF_FACE_POSITIONS;
+  // public int getClosestReefFace() {
+  //   List<Translation2d> reefFaces = Field.REEF_FACE_POSITIONS;
 
-    double closestDist = Integer.MAX_VALUE;
-    int closestFace = -1;
+  //   double closestDist = Integer.MAX_VALUE;
+  //   int closestFace = -1;
 
-    for (int i = 0; i < reefFaces.size(); i++) {
-      Translation2d curFace = reefFaces.get(i);
+  //   for (int i = 0; i < reefFaces.size(); i ++) {
+  //     Translation2d curFace = reefFaces.get(i);
+      
+  //     double distance = Math.hypot(
+  //       swerveDrive.getEstimatedPose().getX() - curFace.getX(),
+  //       swerveDrive.getEstimatedPose().getY() - curFace.getY()
+  //     );
 
-      double distance =
-          Math.hypot(
-              swerveDrive.getEstimatedPose().getX() - curFace.getX(),
-              swerveDrive.getEstimatedPose().getY() - curFace.getY());
+  //     System.out.println(distance);
 
-      System.out.println(distance);
+  //     if (distance < closestDist) {
+  //       closestDist = distance;
+  //       closestFace = i;
+  //     }
+  //   }
 
-      if (distance < closestDist) {
-        closestDist = distance;
-        closestFace = i;
-      }
-    }
-
-    return closestFace;
-  }
+  //   return closestFace;
+  // }
 
   /**
    * Outputs the numbers of the reef pole on a certain reef face
@@ -85,46 +81,88 @@ public class Autonomous {
     return new int[] {face * 2, face * 2 + 1};
   }
 
-  public Command pathfindToProcessor() {
+  public Command driveToProcessor() {
     return swerveDrive.pathfindTo(new Pose2d(6.172, 0.508, Rotation2d.fromDegrees(-90)));
   }
 
-  public Command pathfindToTopCoralStation() {
-    return swerveDrive.pathfindTo(new Pose2d(1.1, 7.0, Rotation2d.fromDegrees(135)));
+  // public Command pathfindToTopCoralStation() {
+  //   return swerveDrive.pathfindTo(new Pose2d(1.1, 7.0, Rotation2d.fromDegrees(135)));
+  // }
+
+  // /**
+  //  * Aligns to either reef pole on the closest reef face
+  //  * @param side 0 means left, 1 means right (from the robot's perspective)
+  //  * @return
+  //  */
+  // public Command reefPoleAlign(int side) {
+  //   return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
+  // }
+
+  // public Command pathfindToTopLeftReefPoles() {
+  //   return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(300)));
+  // }
+
+  // /**
+  //  * Pathfinds to reef pole based on pole number
+  //  *
+  //  * @param poleNum Number from 1-12 starting on the right side top pole, moving counterclockwise
+  //  * @return
+  //  */
+  // public Command pathfindToReefPole(int poleNum) {
+  //   return swerveDrive.pathfindTo(
+  //       new Pose2d(
+  //           Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
+  //           Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
+  //           Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()));
+  // }
+
+  // public Command pathfindToReefPole(int faceNumber, Pole pole) {
+  //   Pose2d polePose = Field.getPolePose(faceNumber, pole);
+  //   return swerveDrive.pathfindTo(polePose);
+  // }
+
+  public Command driveToPole(int pole) {
+    return swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole))
+      .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
   }
 
-  /**
-   * Aligns to either reef pole on the closest reef face
-   *
-   * @param side 0 means left, 1 means right (from the robot's perspective)
-   * @return
-   */
-  public Command reefPoleAlign(int side) {
-    return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
+  // /**
+  //  * Aligns to either reef pole on the closest reef face
+  //  *
+  //  * @param side 0 means left, 1 means right (from the robot's perspective)
+  //  * @return
+  //  */
+  // public Command reefPoleAlign(int side) {
+  //   return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
+  // }
+
+  public Command driveToAlgae(int face) {
+    return swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
+      .andThen(swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)));
   }
 
-  public Command pathfindToTopLeftReefPoles() {
-    return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(300)));
-  }
+  // public Command scoreCoral() {
+  //   return null;
+  // }
 
-  /**
-   * Pathfinds to reef pole based on pole number
-   *
-   * @param poleNum Number from 1-12 starting on the right side top pole, moving counterclockwise
-   * @return
-   */
-  public Command pathfindToReefPole(int poleNum) {
-    return swerveDrive.pathfindTo(
-        new Pose2d(
-            Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
-            Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
-            Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()));
-  }
+  // public Command cycleTopCoral() {
+  //   return Commands.sequence(
+  //     pathfindToReefPole(4),
+  //     pathfindToTopCoralStation(),
+  //     pathfindToReefPole(3),
+  //     pathfindToTopCoralStation(),
+  //     pathfindToReefPole(2),
+  //     pathfindToTopCoralStation(),
+  //     pathfindToReefPole(1),
+  //     pathfindToTopCoralStation(),
+  //     pathfindToReefPole(0),
+  //     pathfindToTopCoralStation()
+  //   );
+  // }
 
-  public Command pathfindToReefPole(int faceNumber, Pole pole) {
-    Pose2d polePose = Field.getPolePose(faceNumber, pole);
-    return swerveDrive.pathfindTo(polePose);
-  }
+  // public Command coralStation() {
+  //   return null;
+  // }
 
   public Command pathfindToPole(int poleNumber) {
     return swerveDrive
@@ -132,78 +170,23 @@ public class Autonomous {
         .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(poleNumber)));
   }
 
-  public Command scoreCoral() {
-    return null;
-  }
-
-  public Command cycleTopCoral() {
-    return Commands.sequence(
-        pathfindToReefPole(4),
-        pathfindToTopCoralStation(),
-        pathfindToReefPole(3),
-        pathfindToTopCoralStation(),
-        pathfindToReefPole(2),
-        pathfindToTopCoralStation(),
-        pathfindToReefPole(1),
-        pathfindToTopCoralStation(),
-        pathfindToReefPole(0),
-        pathfindToTopCoralStation());
-  }
-
-  public Command coralStation() {
-    return null;
-  }
-
-  private static Translation2d ALGAE_SETUP = new Translation2d(1.98, 2.18);
-  private static Translation2d ALGAE_DRIVE_OVER = new Translation2d(1.21, 2.18);
-
-  public static enum AlgaePickupMechanism {
-    INTAKE,
-    MANIPULATOR
-  }
-
-  /**
-   * Pickup a pre-placed algae on the ground
-   *
-   * @param algaePosition The position of the algae to pickup (0 is nearest the processor, and 2 is
-   *     farthest)
-   * @return
-   */
-  public Command pickupPreplacedAlgae(int algaePosition, AlgaePickupMechanism mechanism) {
-    Translation2d offset = new Translation2d(0, 1.83 * algaePosition);
-    Rotation2d angle =
-        Rotation2d.fromDegrees(mechanism == AlgaePickupMechanism.MANIPULATOR ? -180 : 0);
-
-    Command setupCommand = swerveDrive.pathfindTo(new Pose2d(ALGAE_SETUP.plus(offset), angle));
-    Command driveOverCommand =
-        swerveDrive.pathfindTo(new Pose2d(ALGAE_DRIVE_OVER.plus(offset), angle));
-
-    return Commands.sequence(
-        setupCommand,
-        Commands.deadline(
-            Commands.sequence(driveOverCommand, intake.pivot.lower()), intake.wheels.intake()),
-        intake.pivot.raise());
-
-    // if (mechanism == AlgaePickupMechanism.INTAKE) {
-    //   return Commands.sequence(
-    //       setupCommand,
-    //       Commands.deadline(driveOverCommand, intake.wheels.intake(), intake.pivot.lower()),
-    //       intake.pivot.raise());
-    // } else {
-    //
-    // }
-  }
+  // private static Translation2d ALGAE_SETUP = new Translation2d(1.98, 2.18);
+  // private static Translation2d ALGAE_DRIVE_OVER = new Translation2d(1.21, 2.18);
 
   final double BARGE_X = 7.75;
   final double BARGE_MIN = 4.63;
   final double BARGE_MAX = 7.41;
 
   public Command driveToBarge() {
-    double y = swerveDrive.getEstimatedPose().getY();
+    return Commands.defer(() -> {
+      double y = swerveDrive.getEstimatedPose().getY();
 
-    y = MathUtil.clamp(y, BARGE_MIN, BARGE_MAX);
+      y = MathUtil.clamp(y, BARGE_MIN, BARGE_MAX);
 
-    return swerveDrive.pathfindTo(new Pose2d(BARGE_X, y, Rotation2d.fromDegrees(180)));
+      Pose2d pose = new Pose2d(BARGE_X, y, Rotation2d.fromDegrees(180));
+
+      return swerveDrive.pathfindTo(pose).andThen(swerveDrive.alignTo(pose));
+    }, Set.of(swerveDrive.useMotion()));
   }
 
   public boolean hasCoral() {
@@ -219,18 +202,13 @@ public class Autonomous {
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-        pathfindToPole(0),
-        pathfindToPole(1),
-        pathfindToPole(2),
-        pathfindToPole(3),
-        pathfindToPole(4),
-        pathfindToPole(5),
-        pathfindToPole(6),
-        pathfindToPole(7),
-        pathfindToPole(8),
-        pathfindToPole(9),
-        pathfindToPole(10),
-        pathfindToPole(11));
+      driveToPole(0),
+      driveToAlgae(3),
+      driveToBarge(),
+      driveToPole(11),
+      driveToAlgae(5),
+      driveToBarge()
+    );
     // return Commands.sequence(
     //   reefPoleAlign(1)
     // );

@@ -16,23 +16,38 @@ public final class ReefPositioning {
   public static final Translation2d REEF_CENTER =
       new Translation2d(Units.inchesToMeters(176.745545), Units.inchesToMeters(158.499093));
 
-  public static final Distance REEF_TO_EDGE = Inches.of(32.745545);
-  // public static final Distance REEF_TO_POLE = Inches.of(30.738196);
-  public static final Distance BETWEEN_POLES = Inches.of(12.937756);
-  public static final Distance ROBOT_TO_EDGE_PLACE = SWERVE.CONFIG.chassis().outerLength().div(2);
-  public static final Distance ROBOT_TO_EDGE_ALIGN = ROBOT_TO_EDGE_PLACE.plus(Inches.of(8));
+    public static final Distance REEF_TO_EDGE = Inches.of(32.745545);
+    // public static final Distance REEF_TO_POLE = Inches.of(30.738196);
+    public static final Distance BETWEEN_POLES = Inches.of(12.937756);
+    public static final Distance ROBOT_TO_EDGE_PLACE_CORAL = SWERVE.CONFIG.chassis().outerLength().div(2);
+    public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
 
-  public static final Translation2d PLACE_RELATIVE =
-      new Translation2d(
-          REEF_TO_EDGE.plus(ROBOT_TO_EDGE_PLACE).in(Meters), BETWEEN_POLES.div(2).in(Meters));
+    public static final Distance ROBOT_TO_EDGE_PLACE_ALGAE = SWERVE.CONFIG.chassis().outerLength().div(2);
+    public static final Distance ROBOT_TO_EDGE_ALIGN_ALGAE = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
 
-  public static final Translation2d ALIGN_RELATIVE =
-      new Translation2d(
-          REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN).in(Meters), BETWEEN_POLES.div(2).in(Meters));
+    public static final Translation2d PLACE_CORAL_RELATIVE = new Translation2d(
+        REEF_TO_EDGE.plus(ROBOT_TO_EDGE_PLACE_CORAL).in(Meters),
+        BETWEEN_POLES.div(2).in(Meters)
+    );
 
-  private static Pose2d relativeToFieldPose(Pose2d relativePose, Rotation2d rotation) {
-    Translation2d reefTranslation = relativePose.getTranslation().rotateBy(rotation);
-    Translation2d fieldTranslation = REEF_CENTER.plus(reefTranslation);
+    public static final Translation2d ALIGN_CORAL_RELATIVE = new Translation2d(
+        REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN_CORAL).in(Meters),
+        BETWEEN_POLES.div(2).in(Meters)
+    );
+
+    public static final Translation2d PLACE_ALGAE_RELATIVE = new Translation2d(
+        REEF_TO_EDGE.plus(ROBOT_TO_EDGE_PLACE_ALGAE).in(Meters),
+        0
+    );
+
+    public static final Translation2d ALIGN_ALGAE_RELATIVE = new Translation2d(
+        REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN_ALGAE).in(Meters),
+        0
+    );
+
+    private static Pose2d relativeToFieldPose(Pose2d relativePose, Rotation2d rotation) {
+        Translation2d reefTranslation = relativePose.getTranslation().rotateBy(rotation);
+        Translation2d fieldTranslation = REEF_CENTER.plus(reefTranslation);
 
     return new Pose2d(fieldTranslation, rotation);
   }
@@ -51,26 +66,40 @@ public final class ReefPositioning {
 
     return relativeToFieldPose(relativePose, rotation);
   }
+    private static Rotation2d getRotationOfFace(int face) {
+        return Rotation2d.fromDegrees(60. * face);
+    }
 
-  // Poles are CCW starting at right (WPILib convention)
-  private static Rotation2d getRotationOfPole(int face) {
-    return Rotation2d.fromDegrees(60. * Math.round(face / 2.));
-  }
+    // Poles are CCW starting at right of simulation view (WPILib convention)
+    private static Rotation2d getRotationOfPole(int pole) {
+        return getRotationOfFace((int) Math.round(pole / 2.));
+    }
 
-  private static boolean getMirroringOfPole(int pole) {
-    return pole % 2 == 1;
-  }
+    private static boolean getMirroringOfPole(int pole) {
+        return pole % 2 == 1;
+    }
 
-  public static Pose2d getPolePose(Translation2d relativeTranslation, int pole) {
-    return relativeToFieldAndReflect(
-        relativeTranslation, getRotationOfPole(pole), getMirroringOfPole(pole));
-  }
+    public static Pose2d getPolePose(Translation2d relativeTranslation, int pole) {
+        return relativeToFieldAndReflect(relativeTranslation, getRotationOfPole(pole), getMirroringOfPole(pole));
+    }
 
-  public static Pose2d getCoralPlacePose(int pole) {
-    return getPolePose(PLACE_RELATIVE, pole);
-  }
+    public static Pose2d getFacePose(Translation2d relativeTranslation, int face) {
+        return relativeToFieldPose(new Pose2d(relativeTranslation, new Rotation2d()), getRotationOfFace(face));
+    }
 
-  public static Pose2d getCoralAlignPose(int pole) {
-    return getPolePose(ALIGN_RELATIVE, pole);
-  }
+    public static Pose2d getCoralPlacePose(int pole) {
+        return getPolePose(PLACE_CORAL_RELATIVE, pole);
+    }
+
+    public static Pose2d getCoralAlignPose(int pole) {
+        return getPolePose(ALIGN_CORAL_RELATIVE, pole);
+    }
+
+    public static Pose2d getAlgaePlacePose(int face) {
+        return getFacePose(PLACE_ALGAE_RELATIVE, face);
+    }
+
+    public static Pose2d getAlgaeAlignPose(int face) {
+        return getFacePose(ALIGN_ALGAE_RELATIVE, face);
+    }
 }
