@@ -29,7 +29,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   private Motors motors;
 
   /** Represents the debouncer that detects if the motors are stalled. */
-  private Debouncer detectedDebouncer = new Debouncer(1.0, DebounceType.kFalling);
+  private Debouncer detectedDebouncer;
 
   private boolean detected = false;
   private Timer gripCheckTimer = new Timer();
@@ -42,6 +42,8 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
     Logger.logBoolean(getName() + "/motorsStalled", () -> detected);
     Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
+
+    resetDebouncer();
 
     setDefaultCommand(hold());
   }
@@ -163,13 +165,17 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     }
   }
 
+  private void resetDebouncer() {
+    detectedDebouncer = new Debouncer(1.0, DebounceType.kFalling);
+  }
+
   public Command checkGrip() {
-    return Commands.parallel(
+    return Commands.runOnce(this::resetDebouncer).andThen(Commands.parallel(
         runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
         Commands.race(
             Commands.waitUntil(() -> detected).andThen(() -> expectGamePiece(true)),
             Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds))
-                .andThen(() -> expectGamePiece(false))));
+                .andThen(() -> expectGamePiece(false)))));
   }
 
   private Command hold() {
