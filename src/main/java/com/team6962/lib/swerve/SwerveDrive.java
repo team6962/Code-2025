@@ -25,7 +25,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -216,6 +215,8 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
+      if (heading.get() == null) return;
+
       Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
       double output = pid.calculate(error.getRadians());
 
@@ -239,8 +240,12 @@ public class SwerveDrive extends SwerveCore {
   
   public Command facePoint(Supplier<Translation2d> point, Supplier<Rotation2d> offset) {
     return driveHeading(() -> {
+      Translation2d currentPoint = point.get();
+
+      if (currentPoint == null) return null;
+
       Translation2d currentPoseTranslation = getEstimatedPose().getTranslation();
-      Translation2d translationDistance = point.get().minus(currentPoseTranslation);
+      Translation2d translationDistance = currentPoint.minus(currentPoseTranslation);
       Rotation2d targetHeading = translationDistance.getAngle().plus(offset.get());
 
       return targetHeading;
