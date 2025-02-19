@@ -65,6 +65,14 @@ public class PieceCombos {
         .andThen(manipulator.pickupGroundAlgae());
   }
 
+  public Command algae(int level) {
+    return switch (level) {
+      case 2 -> algaeL2();
+      case 3 -> algaeL3();
+      default -> CommandUtils.noneWithRequirements(elevator, manipulator);
+    };
+  }
+
   public Command algaeL2() {
     return manipulator
         .pivot

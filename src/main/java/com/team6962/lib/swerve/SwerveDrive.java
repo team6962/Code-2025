@@ -1,8 +1,12 @@
 package com.team6962.lib.swerve;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -13,12 +17,16 @@ import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -318,7 +326,9 @@ public class SwerveDrive extends SwerveCore {
   private class AlignCommand extends Command {
     private PIDController translationXPID;
     private PIDController translationYPID;
-    private PIDController rotationPID;
+    private ProfiledPIDController rotationPID;
+    private SimpleMotorFeedforward translateFeedforward;
+    private SimpleMotorFeedforward rotateFeedforward;
 
     private Supplier<Pose2d> targetSupplier;
     private Distance toleranceDistance;
@@ -341,11 +351,18 @@ public class SwerveDrive extends SwerveCore {
               getConstants().driveGains().translation().kI,
               getConstants().driveGains().translation().kD);
       rotationPID =
-          new PIDController(
+          new ProfiledPIDController(
               getConstants().driveGains().rotation().kP,
               getConstants().driveGains().rotation().kI,
-              getConstants().driveGains().rotation().kD);
+              getConstants().driveGains().rotation().kD,
+              new TrapezoidProfile.Constraints(
+                getConstants().maxRotationSpeed().in(RadiansPerSecond),
+                getConstants().maxAngularAcceleration(Amps.of(60)).in(RadiansPerSecondPerSecond)
+              ));
       rotationPID.enableContinuousInput(-Math.PI, Math.PI);
+
+      translateFeedforward = new SimpleMotorFeedforward(0.025, 0);
+      rotateFeedforward = new SimpleMotorFeedforward(0.025, 0);
     }
 
     @Override
@@ -357,16 +374,28 @@ public class SwerveDrive extends SwerveCore {
       double translationYError =
           target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
       double rotationError =
-          target.getRotation().getRadians() - getEstimatedPose().getRotation().getRadians();
+          -target.getRotation().minus(getEstimatedPose().getRotation()).getRadians();
+
+      Logger.log("Swerve Drive/AlignCommand/translationXError", translationXError);
+      Logger.log("Swerve Drive/AlignCommand/translationYError", translationYError);
+      Logger.log("Swerve Drive/AlignCommand/rotationError", rotationError);
 
       double translationXOutput = translationXPID.calculate(translationXError);
       double translationYOutput = translationYPID.calculate(translationYError);
       double rotationOutput = rotationPID.calculate(rotationError);
 
+      Logger.log("Swerve Drive/AlignCommand/translationXOutput", translationXOutput);
+      Logger.log("Swerve Drive/AlignCommand/translationYOutput", translationYOutput);
+      Logger.log("Swerve Drive/AlignCommand/rotationOutput", rotationOutput);
+
+      translationXOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vxMetersPerSecond, translationXOutput);
+      translationYOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vyMetersPerSecond, translationYOutput);
+      rotationOutput += rotateFeedforward.calculateWithVelocities(getEstimatedSpeeds().omegaRadiansPerSecond, rotationOutput);
+
       setMovement(
           allianceToRobotSpeeds(
               new ChassisSpeeds(
-                  translationXOutput * 0.5, translationYOutput * 0.5, rotationOutput * 0.5)));
+                  translationXOutput, translationYOutput, rotationOutput)));
     }
 
     @Override

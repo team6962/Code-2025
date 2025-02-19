@@ -27,4 +27,8 @@ public final class CommandUtils {
         Commands.print(message),
         Commands.waitSeconds(seconds));
   }
+
+  public static Command printInSimulation(String message) {
+    return RobotBase.isSimulation() ? Commands.print(message) : Commands.none();
+  }
 }
