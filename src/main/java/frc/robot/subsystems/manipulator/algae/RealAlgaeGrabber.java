@@ -166,7 +166,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   }
 
   private void resetDebouncer() {
-    detectedDebouncer = new Debouncer(1.0, DebounceType.kFalling);
+    detectedDebouncer = new Debouncer(0.5, DebounceType.kFalling);
   }
 
   public Command checkGrip() {
@@ -237,6 +237,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   @Override
   public void periodic() {
     detected =
-        detectedDebouncer.calculate(motors.getOutputCurrent().gt(Amps.of(20)));
+        detectedDebouncer.calculate(motors.getOutputCurrent().gt(Amps.of(40)));
   }
 }

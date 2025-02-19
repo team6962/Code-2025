@@ -215,9 +215,11 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
-      if (heading.get() == null) return;
+      Rotation2d headingValue = heading.get();
 
-      Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
+      if (headingValue == null) return;
+
+      Rotation2d error = headingValue.minus(getEstimatedPose().getRotation());
       double output = pid.calculate(error.getRadians());
 
       setMovement(
