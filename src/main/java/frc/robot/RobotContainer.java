@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
@@ -171,6 +172,21 @@ public class RobotContainer {
 
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
+
+    Pose2d[] poses;
+
+    Translation2d algae = Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
+
+    if (algae != null) {
+      poses = new Pose2d[] { new Pose2d(
+        algae,
+        new Rotation2d()
+      ) };
+    } else {
+      poses = new Pose2d[0];
+    }
+
+    Logger.getField().getObject("Algae").setPoses(poses);
   }
 
   public void disabledPeriodic() {

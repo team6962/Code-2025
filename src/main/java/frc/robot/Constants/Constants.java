@@ -113,7 +113,7 @@ public final class Constants {
     // x is forward, y is left, z is up
     public static final Translation3d ALGAE_CAMERA_POSITION =
         new Translation3d(
-            Units.inchesToMeters(13.0), Units.inchesToMeters(0.0), Units.inchesToMeters(22.5));
+            Units.inchesToMeters(3.0), Units.inchesToMeters(0.0), Units.inchesToMeters(32.5));
 
     public static final Rotation2d FOV_HEIGHT = Rotation2d.fromDegrees(48.9); // Degrees
     public static final Rotation2d FOV_WIDTH = Rotation2d.fromDegrees(62.5); // Degrees

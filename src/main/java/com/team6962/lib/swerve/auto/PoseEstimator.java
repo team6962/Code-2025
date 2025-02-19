@@ -60,7 +60,7 @@ public class PoseEstimator extends SubsystemBase {
             kinematics,
             RotationUtils.fromAngle(gyroscope.getHeading()),
             modulePositions.get(),
-            new Pose2d());
+            new Pose2d(5, 5, Rotation2d.fromDegrees(0)));
 
     if (RobotBase.isSimulation()) {
       poseEstimator.resetPose(new Pose2d(7.57, 5.75, Rotation2d.fromDegrees(0)));

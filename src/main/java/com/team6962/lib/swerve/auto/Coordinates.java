@@ -112,12 +112,12 @@ public interface Coordinates {
 
   /** Converts a {@link Translation2d} from robot coordinates to absolute coordinates. */
   public default Translation2d robotToAbsoluteVelocity(Translation2d velocity) {
-    return velocity.rotateBy(getEstimatedPose().getRotation().unaryMinus());
+    return velocity.rotateBy(getEstimatedPose().getRotation());
   }
 
   /** Converts a {@link Translation2d} from absolute coordinates to robot coordinates. */
   public default Translation2d absoluteToRobotVelocity(Translation2d velocity) {
-    return velocity.rotateBy(getEstimatedPose().getRotation());
+    return velocity.rotateBy(getEstimatedPose().getRotation().unaryMinus());
   }
 
   /** Converts a {@link Translation2d} from alliance coordinates to absolute coordinates. */

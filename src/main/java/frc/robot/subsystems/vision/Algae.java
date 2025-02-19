@@ -34,7 +34,7 @@ public class Algae {
         Degrees.of(
             table
                 .getEntry("tx")
-                .getDouble(0)); // the horizontal offset angle of target from center of camera
+                .getDouble(0)).unaryMinus(); // the horizontal offset angle of target from center of camera
     double[] t2d = table.getEntry("t2d").getDoubleArray(new double[17]);
     double pixelHeight = t2d[15];
     double pixelWidth = t2d[14];
