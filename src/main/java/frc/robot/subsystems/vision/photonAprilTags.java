@@ -10,6 +10,8 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -17,7 +19,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants.PHOTONVISION;;
+import frc.robot.Constants.Constants.PHOTONVISION;
 import frc.robot.Constants.Field;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
@@ -111,22 +113,26 @@ public class photonAprilTags extends SubsystemBase {
         .map(entry -> {
           String cameraName = entry.getKey();
           Pose3d robotToCamPose3d = entry.getValue();
-          PhotonCamera camera = new PhotonCamera(cameraName);
-          PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
-              Field.aprilTagFieldLayout, 
-              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
-              camera, 
-              robotToCamPose3d
-          );
-          Optional<EstimatedRobotPose> estimatedRobotPose = photonPoseEstimator.update(camera.getLatestResult());
-          return estimatedRobotPose;
+          Transform3d robotToCamTransform3d = new Transform3d(new Pose3d(0,0,0,new Rotation3d(0,0,0)),robotToCamPose3d);
+          try (PhotonCamera camera = new PhotonCamera(cameraName)) {
+            PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
+                Field.FIELD_LAYOUT, 
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+                robotToCamTransform3d
+            );
+            Optional<EstimatedRobotPose> estimatedRobotPose = photonPoseEstimator.update(camera.getLatestResult());
+            return estimatedRobotPose;
+          }
         })
         .collect(Collectors.toList());
   }
 
   private static boolean isInvalidPoseEstimate(EstimatedRobotPose poseEstimate, Pose2d pose2d) {
-    return IntStream.of(PHOTONVISION.BLACKLISTED_APRILTAGS)
-            .anyMatch(x -> x == poseEstimate.rawFiducials[0].id)
+    boolean hasBlacklistedTag = poseEstimate.targetsUsed.stream()
+        .anyMatch(target -> IntStream.of(PHOTONVISION.BLACKLISTED_APRILTAGS)
+            .anyMatch(x -> x == target.getFiducialId()));
+
+    return hasBlacklistedTag
         || poseEstimate.targetsUsed.size() == 0
         || pose2d.getTranslation().getNorm() == 0.0
         || pose2d.getRotation().getRadians() == 0.0
@@ -196,17 +202,16 @@ public class photonAprilTags extends SubsystemBase {
   }
 
   public static int findClosestReefTagID() {
-    int ftagID =
-        (int)
-            LimelightHelpers.getFiducialID(
-                PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
-    int btagID =
-        (int)
-            LimelightHelpers.getFiducialID(
-                PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
+    try (PhotonCamera ftagCamera = new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString())) {
+        int ftagID = (int) ftagCamera.getLatestResult().getBestTarget().getFiducialId();
 
-    if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
-    if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
+        try (PhotonCamera btagCamera = new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString())) {
+            int btagID = (int) btagCamera.getLatestResult().getBestTarget().getFiducialId();
+
+            if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
+            if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
+        }
+    }
     return -1;
   }
 }

@@ -33,16 +33,14 @@ public class photonAlgae {
     PhotonCamera camera = new PhotonCamera(name);
     PhotonPipelineResult result = camera.getLatestResult();
 
-    if (!result.hasTargets()) return null; // Check if detection is valid
+    if (result == null || !result.hasTargets()) return null; // Check if detection is valid
 
     PhotonTrackedTarget target = result.getBestTarget();
-
-    if (!(target.getDetectedObjectClassID()==1)) return null; //need to change
+    if (target == null || target.getDetectedObjectClassID() != 1) return null; // Check if target is valid
 
     Translation2d algaePosition = new Translation2d(0, 0);
 
     Angle horizontalOffset = Degrees.of(target.getYaw());
-    
     
     double pixelHeight = target.getBoundingBox().getHeight();
     double pixelWidth = target.getBoundingBox().getWidth();
@@ -59,7 +57,6 @@ public class photonAlgae {
 
     Translation2d relativePosition =
         calculateRelativePosition(distance, horizontalOffset, cameraToRobot);
-    
     
     Time timestamp = Microseconds.of(result.getTimestampSeconds());
     Pose2d robotPosition = swerveDrive.getEstimatedPose(timestamp);
