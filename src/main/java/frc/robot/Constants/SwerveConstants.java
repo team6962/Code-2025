@@ -55,7 +55,7 @@ public final class SwerveConstants {
             Amps.of(60)),
         Wheel.COLSON,
         new DriveGains( // TODO: Tune drive gains
-            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.1, 0)));
+            new PIDConstants(5.0, 1.0, 0), new PIDConstants(3.0, 0.1, 0.01)));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {

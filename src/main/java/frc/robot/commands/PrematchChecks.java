@@ -19,21 +19,18 @@ public class PrematchChecks extends SequentialCommandGroup {
   private final Elevator elevator;
   private final Manipulator manipulator;
   private final Hang hang;
-  private final Intake intake;
 
   public PrematchChecks(
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
-      Hang hang,
-      Intake intake) {
+      Hang hang) {
     this.swerveDrive = swerveDrive;
     this.elevator = elevator;
     this.manipulator = manipulator;
     this.hang = hang;
-    this.intake = intake;
 
-    PieceCombos combos = new PieceCombos(elevator, manipulator, intake);
+    PieceCombos combos = new PieceCombos(elevator, manipulator);
 
     addCommands(
         manipulator.pivot.safe(),

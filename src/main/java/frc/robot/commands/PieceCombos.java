@@ -1,19 +1,18 @@
 package frc.robot.commands;
 
+import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 
 public class PieceCombos {
   Elevator elevator;
   Manipulator manipulator;
-  Intake intake;
 
-  public PieceCombos(Elevator elevator, Manipulator manipulator, Intake intake) {
+  public PieceCombos(Elevator elevator, Manipulator manipulator) {
     this.elevator = elevator;
     this.manipulator = manipulator;
-    this.intake = intake;
   }
 
   public Command intakeCoral() {
@@ -22,6 +21,16 @@ public class PieceCombos {
         .safe()
         .andThen(elevator.coralIntake())
         .andThen(manipulator.intakeCoral());
+  }
+
+  public Command coral(int level) {
+    return switch (level) {
+      case 1 -> coralL1();
+      case 2 -> coralL2();
+      case 3 -> coralL3();
+      case 4 -> coralL4();
+      default -> CommandUtils.noneWithRequirements(elevator, manipulator);
+    };
   }
 
   public Command coralL1() {

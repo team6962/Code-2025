@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.commands.PieceCombos;
 import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
@@ -63,6 +64,7 @@ public class RobotContainer {
   public final Hang hang;
   public final Autonomous autonomous;
   public final Algae algaeDetector;
+  public final PieceCombos pieceCombos;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -114,7 +116,8 @@ public class RobotContainer {
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
-    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, null);
+    pieceCombos = new PieceCombos(elevator, manipulator);
+    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();x
@@ -123,7 +126,7 @@ public class RobotContainer {
 
     // // Configure the trigger bindings
     Controls.configureBindings(
-        stateController, swerveDrive, elevator, manipulator, null, hang, autonomous);
+        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
     // module = new SwerveModule();
 
@@ -199,7 +202,7 @@ public class RobotContainer {
 
     Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
-    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null, null);
+    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
     checks.schedule();
   }
 }

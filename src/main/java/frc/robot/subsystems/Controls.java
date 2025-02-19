@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.team6962.lib.swerve.SwerveDrive;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -13,9 +16,7 @@ import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
-import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -28,9 +29,9 @@ public class Controls {
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
-      Intake intake,
       Hang hang,
-      Autonomous autonomous) {
+      Autonomous autonomous,
+      PieceCombos pieceCombos) {
 
     // Driver
     // Move swerve chassis
@@ -42,8 +43,6 @@ public class Controls {
     // Auto orient towards algae
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
-
-    PieceCombos pieceCombos = new PieceCombos(elevator, manipulator, intake);
 
     driver.a();
     driver.b();

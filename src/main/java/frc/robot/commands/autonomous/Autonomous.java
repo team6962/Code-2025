@@ -3,6 +3,7 @@ package frc.robot.commands.autonomous;
 import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.utils.CommandUtils;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.commands.PieceCombos;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
@@ -21,20 +23,21 @@ public class Autonomous {
   private RobotStateController controller;
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
-  private Intake intake;
   private Elevator elevator;
+  private PieceCombos pieceCombos;
 
   public Autonomous(
       RobotStateController controller,
       SwerveDrive swerveDrive,
       Manipulator manipulator,
       Elevator elevator,
-      Intake intake) {
+      PieceCombos pieceCombos
+    ) {
     this.controller = controller;
     this.swerveDrive = swerveDrive;
     this.manipulator = manipulator;
-    this.intake = intake;
     this.elevator = elevator;
+    this.pieceCombos = pieceCombos;
 
     // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " +
     // swerveDrive.getEstimatedPose().getY());
@@ -126,6 +129,16 @@ public class Autonomous {
       .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
   }
 
+  public Command placeCoral(int pole, int level) {
+    return Commands.sequence(
+      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole)),
+      CommandUtils.selectByMode(pieceCombos.coral(level), CommandUtils.logAndWait("Moving to level " + level, level * 0.5)),
+      swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)),
+      CommandUtils.selectByMode(manipulator.coral.drop(), CommandUtils.logAndWait("Dropping coral", 0.25)),
+      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.logAndWait("Stowing elevator", level * 0.5))
+    );
+  }
+
   // /**
   //  * Aligns to either reef pole on the closest reef face
   //  *
@@ -198,14 +211,14 @@ public class Autonomous {
         () ->
             Algae.getAlgaePosition(
                 LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
-  }
+}
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      driveToPole(0),
+      placeCoral(0, 1),
       driveToAlgae(3),
       driveToBarge(),
-      driveToPole(11),
+      placeCoral(11, 4),
       driveToAlgae(5),
       driveToBarge()
     );
