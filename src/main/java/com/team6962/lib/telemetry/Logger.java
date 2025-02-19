@@ -1,7 +1,11 @@
 package com.team6962.lib.telemetry;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.StatusSignal;
@@ -20,7 +24,11 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -92,7 +100,8 @@ public class Logger extends SubsystemBase {
   }
 
   public static void log(String key, Boolean value) {
-    table.getEntry(key).setBoolean(value);
+    if (value == null) table.getEntry(key).setString("null");
+    else table.getEntry(key).setBoolean(value);
   }
 
   public static void logString(String key, Supplier<String> supplier) {
@@ -100,7 +109,7 @@ public class Logger extends SubsystemBase {
   }
 
   public static void log(String key, String value) {
-    table.getEntry(key).setString(value);
+    table.getEntry(key).setString(value == null ? "null" : value);
   }
 
   public static void logNumber(String key, Supplier<Number> supplier) {
@@ -108,7 +117,8 @@ public class Logger extends SubsystemBase {
   }
 
   public static void log(String key, Number value) {
-    table.getEntry(key).setNumber(value);
+    if (value == null) table.getEntry(key).setValue("null");
+    else table.getEntry(key).setNumber(value);
   }
 
   public static <T extends Unit> void logMeasure(String key, Supplier<Measure<T>> supplier) {
@@ -130,6 +140,14 @@ public class Logger extends SubsystemBase {
       unit = (T) Meters;
     } else if (value instanceof Time) {
       unit = (T) Seconds;
+    } else if (value instanceof AngularVelocity) {
+      unit = (T) RotationsPerSecond;
+    } else if (value instanceof AngularAcceleration) {
+      unit = (T) RotationsPerSecondPerSecond;
+    } else if (value instanceof LinearVelocity) {
+      unit = (T) MetersPerSecond;
+    } else if (value instanceof LinearAcceleration) {
+      unit = (T) MetersPerSecondPerSecond;
     }
 
     key += reformatMeasureName(unit.name());
@@ -181,7 +199,10 @@ public class Logger extends SubsystemBase {
 
   public static void log(String key, Translation2d value) {
     addUpdate(
-        key, () -> table.getEntry(key).setDoubleArray(new double[] {value.getX(), value.getY()}));
+        key, () -> {
+          if (value == null) table.getEntry(key).setString("null");
+          else table.getEntry(key).setDoubleArray(new double[] {value.getX(), value.getY()});
+        });
   }
 
   public static void logRotation(String key, Supplier<Rotation2d> supplier) {

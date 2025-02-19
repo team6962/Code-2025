@@ -108,4 +108,12 @@ public final class MeasureMath {
   public static Time time(double minutes, double seconds) {
     return Seconds.of(minutes * 60 + seconds);
   }
+
+  public static Rotation2d fromMeasure(Angle angle) {
+    return Rotation2d.fromRadians(angle.in(Radians));
+  }
+
+  public static Rotation2d fromMeasure(AngularVelocity velocity) {
+    return Rotation2d.fromRadians(velocity.in(RadiansPerSecond));
+  }
 }

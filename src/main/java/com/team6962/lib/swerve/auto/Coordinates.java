@@ -159,16 +159,6 @@ public interface Coordinates {
     };
   }
 
-  /** Converts a {@link Rotation2d} from robot coordinates to absolute coordinates. */
-  public default Rotation2d robotToAbsoluteAngle(Rotation2d angle) {
-    return angle.rotateBy(getEstimatedPose().getRotation().unaryMinus());
-  }
-
-  /** Converts a {@link Rotation2d} from absolute coordinates to robot coordinates. */
-  public default Rotation2d absoluteToRobotAngle(Rotation2d angle) {
-    return angle.rotateBy(getEstimatedPose().getRotation());
-  }
-
   /** Converts a {@link Rotation2d} from alliance coordinates to absolute coordinates. */
   public default Rotation2d allianceToAbsoluteAngle(Rotation2d angle) {
     return isAllianceInverted().orElse(false)
@@ -181,30 +171,13 @@ public interface Coordinates {
     return allianceToAbsoluteAngle(angle);
   }
 
-  /** Converts a {@link Rotation2d} from robot coordinates to alliance coordinates. */
-  public default Rotation2d robotToAllianceAngle(Rotation2d angle) {
-    return absoluteToAllianceAngle(robotToAbsoluteAngle(angle));
-  }
-
-  /** Converts a {@link Rotation2d} from alliance coordinates to robot coordinates. */
-  public default Rotation2d allianceToRobotAngle(Rotation2d angle) {
-    return absoluteToRobotAngle(allianceToAbsoluteAngle(angle));
-  }
-
   /** Converts a {@link Rotation2d} from one coordinate system to another. */
-  public default Rotation2d convertAngle(Rotation2d angle, MovementSystem from, MovementSystem to) {
-    Rotation2d absolute =
-        switch (from) {
-          case ROBOT -> robotToAbsoluteAngle(angle);
-          case ABSOLUTE -> angle;
-          case ALLIANCE -> allianceToAbsoluteAngle(angle);
-        };
-
-    return switch (to) {
-      case ROBOT -> absoluteToRobotAngle(absolute);
-      case ABSOLUTE -> absolute;
-      case ALLIANCE -> absoluteToAllianceAngle(absolute);
-    };
+  public default Rotation2d convertAngle(Rotation2d angle, PoseSystem from, PoseSystem to) {
+    if (from == to) {
+      return angle;
+    } else {
+      return allianceToAbsoluteAngle(angle);
+    }
   }
 
   /** Converts a {@link Pose2d} from alliance coordinates to absolute coordinates. */

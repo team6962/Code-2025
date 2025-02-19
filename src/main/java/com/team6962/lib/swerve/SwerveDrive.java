@@ -11,6 +11,8 @@ import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -185,16 +187,12 @@ public class SwerveDrive extends SwerveCore {
     return driveRotation(() -> rotation);
   }
 
-  public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
-    return new HeadingCommand(heading, system);
-  }
-
   private class HeadingCommand extends Command {
     private PIDController pid;
     private Supplier<Rotation2d> heading;
-    private Coordinates.MovementSystem system;
+    private Coordinates.PoseSystem system;
 
-    public HeadingCommand(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
+    public HeadingCommand(Supplier<Rotation2d> heading, Coordinates.PoseSystem system) {
       this.heading = heading;
       this.system = system;
 
@@ -211,14 +209,16 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
-      Rotation2d headingValue = heading.get();
+      Rotation2d targetHeading = convertAngle(heading.get(), system, Coordinates.PoseSystem.ALLIANCE);
+      Rotation2d currentHeading = getEstimatedPose().getRotation();
 
-      if (headingValue == null) return;
+      if (targetHeading == null) return;
 
-      Rotation2d error = headingValue.minus(getEstimatedPose().getRotation());
-      double output = pid.calculate(error.getRadians());
+      double output = pid.calculate(currentHeading.getRadians(), targetHeading.getRadians());
 
-      setMovement(convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
+      output = MathUtil.clamp(output, -1, 1);
+
+      setMovement(MeasureMath.fromMeasure(getAngularDriveVelocity(output)));
     }
 
     @Override
@@ -227,8 +227,12 @@ public class SwerveDrive extends SwerveCore {
     }
   }
 
+  public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.PoseSystem system) {
+    return new HeadingCommand(heading, system);
+  }
+
   public Command driveHeading(Supplier<Rotation2d> heading) {
-    return driveHeading(heading, Coordinates.MovementSystem.ALLIANCE);
+    return driveHeading(heading, Coordinates.PoseSystem.ALLIANCE);
   }
 
   public Command driveHeading(Rotation2d heading) {
@@ -251,7 +255,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command facePoint(Supplier<Translation2d> point) {
-    return facePoint(point, () -> Rotation2d.fromDegrees(0));
+    return facePoint(point, () -> Rotation2d.fromRotations(0));
   }
 
   public Command facePoint(Translation2d point) {

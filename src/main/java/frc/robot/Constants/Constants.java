@@ -76,6 +76,7 @@ public final class Constants {
 
   public static final class ALGAE {
     public static final Distance ALGAE_DIAMETER = Inches.of(16.25); // meters
+    public static final boolean SIMULATE_STATIC_ALGAE = false;
   }
 
   // LIMELIGHT

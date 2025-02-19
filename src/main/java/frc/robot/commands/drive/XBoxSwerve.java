@@ -151,31 +151,21 @@ public class XBoxSwerve extends Command {
 
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
-    boolean moving =
-        Math.abs(velocity.getNorm()) > 0.05
-            || Math.abs(angularVelocity) > Units.degreesToRadians(3);
-
+    boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
     Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
 
-    // swerveDrive.drive(velocity).schedule();
-    // swerveDrive.drive(Rotation2d.fromRadians(angularVelocity)).schedule();
-
-    if (currentTranslateCommand == translateCommand || currentTranslateCommand == null || moving) {
+    if (currentTranslateCommand == translateCommand || currentTranslateCommand == null || movingTranslation) {
       translateCommand = swerveDrive.drive(velocity);
       translateCommand.schedule();
     }
 
+    boolean movingRotation = Math.abs(angularVelocity) > Units.degreesToRadians(3);
     Command currentRotateCommand = swerveDrive.useRotation().getCurrentCommand();
 
-    if (currentRotateCommand == rotateCommand || currentRotateCommand == null || moving) {
+    if (currentRotateCommand == rotateCommand || currentRotateCommand == null || movingRotation) {
       rotateCommand = swerveDrive.drive(Rotation2d.fromRadians(angularVelocity));
       rotateCommand.schedule();
     }
-
-    // if (leftStick.getNorm() > 0.05 && (controller.getLeftBumper() ||
-    // controller.getRightBumper())) {
-    //   swerveDrive.setTargetHeading(leftStick.getAngle());
-    // }
 
     angularVelocity = 0.0;
     velocity = new Translation2d();

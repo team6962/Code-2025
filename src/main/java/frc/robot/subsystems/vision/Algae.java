@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
@@ -23,6 +24,10 @@ public class Algae {
 
   public static Translation2d getAlgaePosition(
       String name, SwerveDrive swerveDrive, Translation3d cameraToRobot) {
+    if (RobotBase.isSimulation() && ALGAE.SIMULATE_STATIC_ALGAE) {
+        return new Translation2d(2.281, 4.03);
+    }
+
     NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
 
     if (table.getEntry("tv").getDouble(0) == 0) return null; // check if detection is valid
