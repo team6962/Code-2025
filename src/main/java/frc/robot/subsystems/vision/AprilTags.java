@@ -28,6 +28,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
+  private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
+  private static final double LARGE_ROTATION_ERROR = 9999999;
+  private static final double TRANSLATION_ERROR_FACTOR = 10;
+  private static final double ADDITIONAL_TRANSLATION_ERROR = 0.5;
+
   private static record BestEstimate(
       Pose2d pose, Time timestamp, Distance translationError, Angle rotationError, int tagCount) {
     public BestEstimate() {
@@ -42,75 +47,38 @@ public class AprilTags extends SubsystemBase {
 
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates =
-        cameraPoses.keySet().stream()
-            .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
-            .filter((estimate) -> estimate != null)
-            .collect(Collectors.toList());
+    List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses);
 
     BestEstimate bestPoseEstimate = new BestEstimate();
-
     List<Pose2d> loggedVisionPoses = new ArrayList<>();
 
     for (PoseEstimate poseEstimate : poseEstimates) {
       Pose2d pose2d = poseEstimate.pose;
-      if (IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS)
-          .anyMatch(x -> x == poseEstimate.rawFiducials[0].id)) continue;
-      if (poseEstimate.tagCount == 0) continue;
-      if (pose2d.getTranslation().getNorm() == 0.0) continue;
-      if (pose2d.getRotation().getRadians() == 0.0) continue;
-      if (Double.isNaN(poseEstimate.avgTagDist)) continue;
+      if (isInvalidPoseEstimate(poseEstimate, pose2d)) continue;
 
-      if (pose2d.getX() < 0.0
-          || pose2d.getY() < 0.0
-          || pose2d.getX() > Field.LENGTH
-          || pose2d.getY() > Field.WIDTH) continue;
-      boolean canChangeHeading = false;
-      if (poseEstimate.tagCount >= 2 || RobotState.isDisabled()) {
-        canChangeHeading = true;
-      }
+      boolean canChangeHeading = canChangeHeading(poseEstimate, poseEstimator, pose2d);
 
-      canChangeHeading =
-          canChangeHeading
-              && poseEstimator
-                      .getEstimatedPose()
-                      .getTranslation()
-                      .getDistance(pose2d.getTranslation())
-                  < 1.0;
-      // if (canChangeHeading) LEDs.setState(LEDs.State.HAS_VISION_TARGET_SPEAKER);
-
-      double rotationError = Units.degreesToRadians(15);
+      double rotationError = canChangeHeading ? MAX_ROTATION_ERROR : LARGE_ROTATION_ERROR;
       if (!canChangeHeading) {
-        rotationError = 9999999;
-        pose2d =
-            new Pose2d(
-                pose2d.getTranslation(),
-                poseEstimator
-                    .getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds))
-                    .getRotation());
+        pose2d = adjustPoseRotation(poseEstimator, poseEstimate, pose2d);
       }
 
-      double translationError =
-          Math.pow(Math.abs(poseEstimate.avgTagDist), 2.0)
-              / Math.pow(poseEstimate.tagCount, 2)
-              / 10;
+      double translationError = calculateTranslationError(poseEstimate);
 
       loggedVisionPoses.add(pose2d);
-      translationError += 0.5;
+      translationError += ADDITIONAL_TRANSLATION_ERROR;
 
-      if (translationError < bestPoseEstimate.translationError.in(Meters)
-          || rotationError < Units.degreesToRadians(360.0)) {
-        bestPoseEstimate =
-            new BestEstimate(
-                pose2d,
-                Seconds.of(poseEstimate.timestampSeconds),
-                Meters.of(translationError),
-                Rotations.of(rotationError),
-                poseEstimate.tagCount);
+      if (isBetterEstimate(bestPoseEstimate, translationError, rotationError)) {
+        bestPoseEstimate = new BestEstimate(
+            pose2d,
+            Seconds.of(poseEstimate.timestampSeconds),
+            Meters.of(translationError),
+            Rotations.of(rotationError),
+            poseEstimate.tagCount);
       }
     }
 
-    if ((int) bestPoseEstimate.tagCount > 0) {
+    if (bestPoseEstimate.tagCount > 0) {
       poseEstimator.addVisionMeasurement(
           bestPoseEstimate.pose,
           bestPoseEstimate.timestamp,
@@ -121,6 +89,47 @@ public class AprilTags extends SubsystemBase {
     }
 
     Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);
+  }
+
+  private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(Map<String, Pose3d> cameraPoses) {
+    return cameraPoses.keySet().stream()
+        .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
+        .filter((estimate) -> estimate != null)
+        .collect(Collectors.toList());
+  }
+
+  private static boolean isInvalidPoseEstimate(PoseEstimate poseEstimate, Pose2d pose2d) {
+    return IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS).anyMatch(x -> x == poseEstimate.rawFiducials[0].id)
+        || poseEstimate.tagCount == 0
+        || pose2d.getTranslation().getNorm() == 0.0
+        || pose2d.getRotation().getRadians() == 0.0
+        || Double.isNaN(poseEstimate.avgTagDist)
+        || pose2d.getX() < 0.0
+        || pose2d.getY() < 0.0
+        || pose2d.getX() > Field.LENGTH
+        || pose2d.getY() > Field.WIDTH;
+  }
+
+  private static boolean canChangeHeading(PoseEstimate poseEstimate, PoseEstimator poseEstimator, Pose2d pose2d) {
+    boolean canChangeHeading = poseEstimate.tagCount >= 2 || RobotState.isDisabled();
+    return canChangeHeading && poseEstimator.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation()) < 1.0;
+  }
+
+  private static Pose2d adjustPoseRotation(PoseEstimator poseEstimator, PoseEstimate poseEstimate, Pose2d pose2d) {
+    return new Pose2d(
+        pose2d.getTranslation(),
+        poseEstimator.getEstimatedPose(Seconds.of(poseEstimate.timestampSeconds)).getRotation());
+  }
+
+  private static double calculateTranslationError(PoseEstimate poseEstimate) {
+    return Math.pow(Math.abs(poseEstimate.avgTagDist), 2.0)
+        / Math.pow(poseEstimate.tagCount, 2)
+        / TRANSLATION_ERROR_FACTOR;
+  }
+
+  private static boolean isBetterEstimate(BestEstimate bestPoseEstimate, double translationError, double rotationError) {
+    return translationError < bestPoseEstimate.translationError.in(Meters)
+        || rotationError < Units.degreesToRadians(360.0);
   }
 
   public static void printConfig(Map<String, Pose3d> cameraPoses) {
@@ -155,14 +164,8 @@ public class AprilTags extends SubsystemBase {
   }
 
   public static int findClosestReefTagID() {
-    int ftagID =
-        (int)
-            LimelightHelpers.getFiducialID(
-                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
-    int btagID =
-        (int)
-            LimelightHelpers.getFiducialID(
-                LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
+    int ftagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString());
+    int btagID = (int) LimelightHelpers.getFiducialID(LIMELIGHT.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString());
 
     if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
     if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
