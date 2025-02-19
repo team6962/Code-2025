@@ -21,6 +21,9 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.util.Arrays;
 
 /**
@@ -131,16 +134,19 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
       states = KinematicsUtils.getStoppedStates(getModuleStates());
     }
 
+    Logger.log(
+        getName() + "/targetModuleSpeeds_predesaturate",
+        robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+
     states =
         KinematicsUtils.desaturateWheelSpeeds(
             states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
 
+    // states = KinematicsUtils.desaturateWheelSpeeds(states, MetersPerSecond.of(1.5)); // TODO: Remove
+
     Logger.log(
-        getName() + "/targetModuleSpeeds",
+        getName() + "/targetModuleSpeeds_preset",
         robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
-    Logger.log(getName() + "/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
-    Logger.log(getName() + "/targetModuleStates", states);
-    Logger.log(getName() + "/currentModuleStates", getModuleStates());
 
     Pose2d[] poses = getModulePoses();
 

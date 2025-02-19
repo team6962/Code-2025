@@ -54,7 +54,8 @@ public class Controls {
     driver
         .rightStick()
         .whileTrue(autonomous.autoOrientToAlgae().alongWith(pieceCombos.pickupGroundAlgae()));
-    driver.leftStick().onTrue(pieceCombos.algaeProcessor());
+    // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
+    driver.leftStick().whileTrue(autonomous.processAlgae());
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED

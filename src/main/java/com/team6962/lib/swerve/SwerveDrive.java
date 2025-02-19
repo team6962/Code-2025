@@ -7,12 +7,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
 
@@ -32,6 +34,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -279,31 +282,45 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command pathfindTo(Pose2d target) {
-    autoBuilder.setOutput(speeds -> setMovement(speeds));
+    autoBuilder.setOutput(speeds -> {
+      Logger.log(
+        getName() + "/PathfindTo/targetModuleSpeeds_pathplannerOutput",
+        robotToAllianceSpeeds(speeds));
+      
+      Logger.log(
+        getName() + "/PathfindTo/time_pathplannerOutput",
+        RobotController.getMeasureFPGATime().in(Seconds));
+      
+      setMovement(speeds);
+    });
 
-    return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints());
+    Logger.log(getName() + "/PathfindTo/currentPose", getEstimatedPose());
+    Logger.log(getName() + "/PathfindTo/targetPose", target);
+    Logger.logObject(getName() + "/PathfindTo/pathConstraints", getConstants().pathConstraints());
+
+    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(target, getConstants().pathConstraints()), useMotion());
   }
 
   public Command pathfindTo(Pose2d target, LinearVelocity goalEndVelocity) {
     autoBuilder.setOutput(speeds -> setMovement(speeds));
 
-    return AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity);
+    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity), useMotion());
   }
 
   public Command pathfindTo(Translation2d target) {
     autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-    return AutoBuilder.pathfindToPose(
-        new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints());
+    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(
+        new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints()), useMotion());
   }
 
   public Command pathfindTo(Translation2d target, LinearVelocity goalEndVelocity) {
     autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-    return AutoBuilder.pathfindToPose(
+    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(
         new Pose2d(target, Rotation2d.fromRotations(0)),
         getConstants().pathConstraints(),
-        goalEndVelocity);
+        goalEndVelocity), useMotion());
   }
 
   public Command alignTo(
@@ -363,6 +380,8 @@ public class SwerveDrive extends SwerveCore {
 
       translateFeedforward = new SimpleMotorFeedforward(0.025, 0);
       rotateFeedforward = new SimpleMotorFeedforward(0.025, 0);
+
+      addRequirements(useMotion());
     }
 
     @Override

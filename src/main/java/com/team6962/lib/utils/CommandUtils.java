@@ -31,4 +31,10 @@ public final class CommandUtils {
   public static Command printInSimulation(String message) {
     return RobotBase.isSimulation() ? Commands.print(message) : Commands.none();
   }
+
+  public static Command withRequirements(Command command, Subsystem... requirements) {
+    command.addRequirements(requirements);
+
+    return command;
+  }
 }
