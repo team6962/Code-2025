@@ -214,7 +214,7 @@ public class Autonomous {
   }
 
   public Command autoOrientToAlgae() {
-    return swerveDrive.facePoint(() -> Algae.getAlgaePosition("algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
+    return swerveDrive.facePoint(() -> Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
   }
 
   public Command createAutonomousCommand() {

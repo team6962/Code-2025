@@ -178,7 +178,7 @@ public class SwerveDrive extends SwerveCore {
 
   public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
     return Commands.run(
-        () -> setMovement(convertAngle(rotation.get(), system, Coordinates.MovementSystem.ROBOT)),
+        () -> setMovement(rotation.get()),
         useRotation());
   }
 
@@ -187,42 +187,46 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command drive(Rotation2d rotation) {
-    System.out.println("run");
     return driveRotation(() -> rotation);
   }
 
   public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
-    System.out.println("running");
-    Command command =
-        new Command() {
-          private PIDController pid;
+    return new HeadingCommand(heading, system);
+  }
 
-          @Override
-          public void initialize() {
-            PIDConstants constants = getConstants().driveGains().rotation();
-            pid = new PIDController(constants.kP, constants.kI, constants.kD);
+  private class HeadingCommand extends Command {
+    private PIDController pid;
+    private Supplier<Rotation2d> heading;
+    private Coordinates.MovementSystem system;
 
-            pid.enableContinuousInput(-Math.PI, Math.PI);
-          }
+    public HeadingCommand(Supplier<Rotation2d> heading, Coordinates.MovementSystem system) {
+      this.heading = heading;
+      this.system = system;
 
-          @Override
-          public void execute() {
-            Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
-            double output = pid.calculate(error.getRadians());
+      addRequirements(useRotation());
+    }
 
-            setMovement(
-                convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
-          }
+    @Override
+    public void initialize() {
+      PIDConstants constants = getConstants().driveGains().rotation();
+      pid = new PIDController(constants.kP, constants.kI, constants.kD);
 
-          @Override
-          public void end(boolean interrupted) {
-            pid.close();
-          }
-        };
+      pid.enableContinuousInput(-Math.PI, Math.PI);
+    }
 
-    command.addRequirements(useRotation());
+    @Override
+    public void execute() {
+      Rotation2d error = heading.get().minus(getEstimatedPose().getRotation());
+      double output = pid.calculate(error.getRadians());
 
-    return command;
+      setMovement(
+          convertAngle(new Rotation2d(output), system, Coordinates.MovementSystem.ROBOT));
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      pid.close();
+    }
   }
 
   public Command driveHeading(Supplier<Rotation2d> heading) {

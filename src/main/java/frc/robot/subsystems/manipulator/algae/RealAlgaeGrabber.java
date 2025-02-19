@@ -2,7 +2,6 @@ package frc.robot.subsystems.manipulator.algae;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -207,9 +207,9 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   }
 
   public Command drop() {
-    return runSpeed(-MANIPULATOR.ALGAE_OUT_SPEED)
-        .until(() -> !detected)
-        .andThen(
+    return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED)
+        .alongWith(Commands.waitSeconds(0.25))
+        .finallyDo(
             () -> {
               expectGamePiece(false);
               stopMotors();
@@ -231,8 +231,6 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
   @Override
   public void periodic() {
     detected =
-        detectedDebouncer.calculate(
-            motors.getEncoderVelocity().abs(RotationsPerSecond) < 1.0
-                && Math.abs(motors.getOutputDutyCycle()) > 0.025);
+        detectedDebouncer.calculate(motors.getOutputCurrent().gt(Amps.of(20)));
   }
 }

@@ -85,7 +85,7 @@ public class PieceCombos {
         .pivot
         .safe()
         .andThen(elevator.algaeProcessor())
-        .andThen(manipulator.placeProcessorAlgae());
+        .andThen(manipulator.pivot.algaeProcessor());
   }
 
   public Command stow() {

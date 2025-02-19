@@ -431,6 +431,8 @@ public class Logger extends SubsystemBase {
       for (var entry : ((Map<?, ?>) object).entrySet()) {
         logObject(key + "/" + entry.getKey().toString(), entry.getValue());
       }
+    } else if (object == null) {
+      log(key, "null");
     } else {
       try {
         table.getEntry(key).setValue(object);

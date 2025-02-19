@@ -151,16 +151,23 @@ public class XBoxSwerve extends Command {
 
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
-    if ((swerveDrive.useRotation().getCurrentCommand() == rotateCommand &&
-        swerveDrive.useTranslation().getCurrentCommand() == translateCommand) || (
-          swerveDrive.useRotation().getCurrentCommand() == swerveDrive.useRotation().getDefaultCommand() &&
-          swerveDrive.useTranslation().getCurrentCommand() == swerveDrive.useTranslation().getDefaultCommand()
-        ) || Math.abs(velocity.getNorm()) > 0.05 && Math.abs(angularVelocity) > Units.degreesToRadians(3)) {
-      rotateCommand = swerveDrive.drive(velocity);
-      rotateCommand.schedule();
+    boolean moving = Math.abs(velocity.getNorm()) > 0.05 || Math.abs(angularVelocity) > Units.degreesToRadians(3);
 
-      translateCommand = swerveDrive.drive(Rotation2d.fromRadians(angularVelocity));
+    Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
+
+    // swerveDrive.drive(velocity).schedule();
+    // swerveDrive.drive(Rotation2d.fromRadians(angularVelocity)).schedule();
+
+    if (currentTranslateCommand == translateCommand || currentTranslateCommand == null || moving) {
+      translateCommand = swerveDrive.drive(velocity);
       translateCommand.schedule();
+    }
+
+    Command currentRotateCommand = swerveDrive.useRotation().getCurrentCommand();
+
+    if (currentRotateCommand == rotateCommand || currentRotateCommand == null || moving) {
+      rotateCommand = swerveDrive.drive(Rotation2d.fromRadians(angularVelocity));
+      rotateCommand.schedule();
     }
 
     // if (leftStick.getNorm() > 0.05 && (controller.getLeftBumper() ||

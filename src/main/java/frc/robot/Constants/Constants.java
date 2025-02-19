@@ -102,14 +102,14 @@ public final class Constants {
                     Units.inchesToMeters(25.283),
                     new Rotation3d(
                         0.0, Units.degreesToRadians(24.0), Units.degreesToRadians(180.0))),
-            "limelight-falgae",
+            "limelight-algae",
                 new Pose3d(
                     Units.inchesToMeters(0),
                     Units.inchesToMeters(0),
                     Units.inchesToMeters(0),
                     new Rotation3d(0.0, 0, 0.0)));
 
-    public static final String ALGAE_CAMERA_NAME = "limelight-falgae";
+    public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
 
     public static final double SPHERE_TOLERANCE = 0.5;
@@ -161,10 +161,10 @@ public final class Constants {
   public static final class SWERVE_DRIVE {
     public static final double TELEOPERATED_FINE_TUNE_DRIVE_POWER =
         0.1; // Percent driving power when using d-pad
-    public static final double TELEOPERATED_DRIVE_POWER = 0.5; // Percent driving power
+    public static final double TELEOPERATED_DRIVE_POWER = 0.3; // Percent driving power
     public static final double TELEOPERATED_BOOST_POWER =
-        1.0; // Percent power when using the triggers
-    public static final double TELEOPERATED_ROTATE_POWER = 0.5; // Percent rotating power
+        0.3; // Percent power when using the triggers
+    public static final double TELEOPERATED_ROTATE_POWER = 0.3; // Percent rotating power
   }
 
   public static final class CAN {
@@ -172,7 +172,7 @@ public final class Constants {
     public static final int PDH = 1;
     public static final int INTAKE_WHEELS = 28;
     public static final int INTAKE_PIVOT = 29;
-    public static final int HANG = 100;
+    public static final int HANG = 34;
     public static final int ELEVATOR_LEFT = 2;
     public static final int ELEVATOR_RIGHT = 3;
     public static final int MANIPULATOR_PIVOT = 4;
@@ -287,8 +287,8 @@ public final class Constants {
     }
 
     public static final class ALGAE {
-      public static final Distance L2_HEIGHT = Inches.of(0);
-      public static final Distance L3_HEIGHT = Inches.of(0);
+      public static final Distance L2_HEIGHT = Inches.of(53.0);
+      public static final Distance L3_HEIGHT = Inches.of(64.0);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
       public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
@@ -325,9 +325,9 @@ public final class Constants {
 
     public static final class ALGAE {
       public static final Angle BARGE_ANGLE = Degrees.of(32.75);
-      public static final Angle REEF_ANGLE = Degrees.of(0.0);
+      public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0);
     }
   }
 
@@ -340,8 +340,8 @@ public final class Constants {
     public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
 
-    public static final double ALGAE_OUT_SPEED = -0.2;
-    public static final double ALGAE_IN_SPEED = 0.2;
+    public static final double ALGAE_OUT_SPEED = -1.0;
+    public static final double ALGAE_IN_SPEED = 0.5;
     public static final double ALGAE_HOLD_SPEED = 0.1;
 
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
