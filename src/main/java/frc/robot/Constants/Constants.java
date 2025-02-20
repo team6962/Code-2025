@@ -98,8 +98,8 @@ public final class Constants {
                 new Pose3d(
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(26.5),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180))));
+                    Units.inchesToMeters(0),
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(0))));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
@@ -259,7 +259,7 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 8.0;
+      public static final double kP = 16.0;
       public static final double kS = 0.4;
     }
 
@@ -337,7 +337,7 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = 0.1;
 
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
-    public static final double CORAL_OUT_SPEED = 0.4;
+    public static final double CORAL_OUT_SPEED = 1.0;
     public static final double CORAL_IN_SPEED = 0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
   }

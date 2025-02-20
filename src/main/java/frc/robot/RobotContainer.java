@@ -200,9 +200,11 @@ public class RobotContainer {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
 
-    Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
+    // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
-    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    checks.schedule();
+    // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
+    // checks.schedule();
+
+    elevator.rezeroAtBottom().schedule();
   }
 }

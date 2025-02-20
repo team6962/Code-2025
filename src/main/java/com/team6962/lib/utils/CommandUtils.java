@@ -22,7 +22,7 @@ public final class CommandUtils {
     return RobotBase.isReal() ? realCommand : simCommand;
   }
 
-  public static Command logAndWait(String message, double seconds) {
+  public static Command printAndWait(String message, double seconds) {
     return Commands.parallel(
         Commands.print(message),
         Commands.waitSeconds(seconds));
@@ -36,5 +36,9 @@ public final class CommandUtils {
     command.addRequirements(requirements);
 
     return command;
+  }
+
+  public static Command waitFor(Command otherCommand) {
+    return Commands.waitUntil(() -> otherCommand.isFinished());
   }
 }

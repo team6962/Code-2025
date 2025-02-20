@@ -55,7 +55,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
     kinematics = KinematicsUtils.kinematicsFromChassis(constants.chassis());
     poseEstimator =
-        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
+        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates(), this);
 
     currentMovement = new SwerveMovement(kinematics);
 
@@ -141,8 +141,6 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
     states =
         KinematicsUtils.desaturateWheelSpeeds(
             states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
-
-    // states = KinematicsUtils.desaturateWheelSpeeds(states, MetersPerSecond.of(1.5)); // TODO: Remove
 
     Logger.log(
         getName() + "/targetModuleSpeeds_preset",

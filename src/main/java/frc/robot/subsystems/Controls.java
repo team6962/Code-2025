@@ -45,8 +45,8 @@ public class Controls {
     // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
-    driver.b();
-    driver.x();
+    driver.b().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
+    driver.x().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
     driver.y();
     driver.back();
     driver.leftBumper();
@@ -55,7 +55,7 @@ public class Controls {
         .rightStick()
         .whileTrue(autonomous.autoOrientToAlgae().alongWith(pieceCombos.pickupGroundAlgae()));
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
-    driver.leftStick().whileTrue(autonomous.processAlgae());
+    driver.leftStick().onTrue(autonomous.driveToProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED

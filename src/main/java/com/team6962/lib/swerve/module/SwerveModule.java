@@ -1,11 +1,13 @@
 package com.team6962.lib.swerve.module;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -89,6 +91,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveConfig.apply(
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
+    CTREUtils.check(
+      driveConfig.apply(new CurrentLimitsConfigs()
+        .withSupplyCurrentLimit(Amps.of(80))));
+
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
@@ -116,6 +122,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     // Apply the PID/feedforward/Motion Magic configuration given in the
     // swerve drive configuration to the steer motor
     CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
+
+    CTREUtils.check(
+      steerConfig.apply(new CurrentLimitsConfigs()
+        .withSupplyCurrentLimit(Amps.of(80))));
 
     // Configure the steer motor to brake automatically when not driven
     CTREUtils.check(

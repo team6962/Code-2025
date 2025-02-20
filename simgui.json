@@ -8,6 +8,16 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "ActivePath": {
+          "arrows": false,
+          "color": [
+            255.0,
+            255.0,
+            0.0,
+            255.0
+          ],
+          "style": "Line"
+        },
         "Algae": {
           "arrows": false,
           "color": [

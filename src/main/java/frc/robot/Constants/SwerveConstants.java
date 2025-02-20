@@ -55,13 +55,13 @@ public final class SwerveConstants {
             Amps.of(60)),
         Wheel.COLSON,
         new DriveGains( // TODO: Tune drive gains
-            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.1, 0.01)));
+            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.5, 0.01)));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
     return switch (chassisType) {
       case COMPETITION -> new Chassis(
-          Inches.of(30), Inches.of(30), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
+          Inches.of(34.979), Inches.of(34.979), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
       case TEST -> new Chassis(
           Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
     };
