@@ -21,23 +21,16 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.PHOTONVISION;
 import frc.robot.Constants.Field;
-import io.limelightvision.LimelightHelpers;
-import io.limelightvision.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 
 public class photonAprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -110,33 +103,39 @@ public class photonAprilTags extends SubsystemBase {
       Map<String, Pose3d> cameraPoses) {
 
     return cameraPoses.entrySet().stream()
-        .map(entry -> {
-          String cameraName = entry.getKey();
-          Pose3d robotToCamPose3d = entry.getValue();
-          Transform3d robotToCamTransform3d = new Transform3d(new Pose3d(0,0,0,new Rotation3d(0,0,0)),robotToCamPose3d);
-          try (PhotonCamera camera = new PhotonCamera(cameraName)) {
-            PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
-                Field.FIELD_LAYOUT, 
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
-                robotToCamTransform3d
-            );
-            Optional<EstimatedRobotPose> estimatedRobotPose = photonPoseEstimator.update(camera.getLatestResult());
-            return estimatedRobotPose;
-          }
-        })
+        .map(
+            entry -> {
+              String cameraName = entry.getKey();
+              Pose3d robotToCamPose3d = entry.getValue();
+              Transform3d robotToCamTransform3d =
+                  new Transform3d(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)), robotToCamPose3d);
+              try (PhotonCamera camera = new PhotonCamera(cameraName)) {
+                PhotonPoseEstimator photonPoseEstimator =
+                    new PhotonPoseEstimator(
+                        Field.FIELD_LAYOUT,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        robotToCamTransform3d);
+                Optional<EstimatedRobotPose> estimatedRobotPose =
+                    photonPoseEstimator.update(camera.getLatestResult());
+                return estimatedRobotPose;
+              }
+            })
         .collect(Collectors.toList());
   }
 
   private static boolean isInvalidPoseEstimate(EstimatedRobotPose poseEstimate, Pose2d pose2d) {
-    boolean hasBlacklistedTag = poseEstimate.targetsUsed.stream()
-        .anyMatch(target -> IntStream.of(PHOTONVISION.BLACKLISTED_APRILTAGS)
-            .anyMatch(x -> x == target.getFiducialId()));
-
+    boolean hasBlacklistedTag =
+        poseEstimate.targetsUsed.stream()
+            .anyMatch(
+                target ->
+                    IntStream.of(PHOTONVISION.BLACKLISTED_APRILTAGS)
+                        .anyMatch(x -> x == target.getFiducialId()));
+    double avgTagDist = photonAprilTags.avgTagDistance(poseEstimate);
     return hasBlacklistedTag
         || poseEstimate.targetsUsed.size() == 0
         || pose2d.getTranslation().getNorm() == 0.0
         || pose2d.getRotation().getRadians() == 0.0
-        || Double.isNaN(poseEstimate.avgTagDist)
+        || avgTagDist == 0.0
         || pose2d.getX() < 0.0
         || pose2d.getY() < 0.0
         || pose2d.getX() > Field.LENGTH
@@ -159,7 +158,7 @@ public class photonAprilTags extends SubsystemBase {
   }
 
   private static double calculateTranslationError(EstimatedRobotPose poseEstimate) {
-    return Math.pow(Math.abs(poseEstimate.avgTagDist), 2.0)
+    return Math.pow(Math.abs(photonAprilTags.avgTagDistance(poseEstimate)), 2.0)
         / Math.pow(poseEstimate.targetsUsed.size(), 2)
         / TRANSLATION_ERROR_FACTOR;
   }
@@ -168,6 +167,13 @@ public class photonAprilTags extends SubsystemBase {
       BestEstimate bestPoseEstimate, double translationError, double rotationError) {
     return translationError < bestPoseEstimate.translationError.in(Meters)
         || rotationError < Units.degreesToRadians(360.0);
+  }
+
+  private static double avgTagDistance(EstimatedRobotPose poseEstimate) {
+    return poseEstimate.targetsUsed.stream()
+        .mapToDouble(target -> target.getBestCameraToTarget().getTranslation().getNorm())
+        .average()
+        .orElse(0.0);
   }
 
   public static void printConfig(Map<String, Pose3d> cameraPoses) {
@@ -202,15 +208,17 @@ public class photonAprilTags extends SubsystemBase {
   }
 
   public static int findClosestReefTagID() {
-    try (PhotonCamera ftagCamera = new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString())) {
-        int ftagID = (int) ftagCamera.getLatestResult().getBestTarget().getFiducialId();
+    try (PhotonCamera ftagCamera =
+        new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[0].toString())) {
+      int ftagID = (int) ftagCamera.getLatestResult().getBestTarget().getFiducialId();
 
-        try (PhotonCamera btagCamera = new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString())) {
-            int btagID = (int) btagCamera.getLatestResult().getBestTarget().getFiducialId();
+      try (PhotonCamera btagCamera =
+          new PhotonCamera(PHOTONVISION.APRILTAG_CAMERA_POSES.keySet().toArray()[1].toString())) {
+        int btagID = (int) btagCamera.getLatestResult().getBestTarget().getFiducialId();
 
-            if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
-            if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
-        }
+        if (Field.getReefAprilTagsByFace().contains(ftagID)) return ftagID;
+        if (Field.getReefAprilTagsByFace().contains(btagID)) return btagID;
+      }
     }
     return -1;
   }
