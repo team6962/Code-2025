@@ -423,7 +423,7 @@ public class SwerveDrive extends SwerveCore {
       Pose2d target = targetSupplier.get();
 
       double rotationError =
-          MeasureMath.differenceUnderHalf(
+          MeasureMath.minDifference(
               getEstimatedPose().getRotation().getMeasure(),
               target.getRotation().getMeasure())
               .in(Radians);
@@ -482,7 +482,7 @@ public class SwerveDrive extends SwerveCore {
 
       return current.getTranslation().getDistance(target.getTranslation())
               < toleranceDistance.in(Meters)
-          && MeasureMath.differenceUnderHalf(
+          && MeasureMath.minDifference(
                   current.getRotation().getMeasure(), target.getRotation().getMeasure())
               .lt(toleranceAngle);
     }

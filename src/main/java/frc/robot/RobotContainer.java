@@ -5,6 +5,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.util.List;
+import java.util.Set;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
@@ -13,6 +16,7 @@ import com.team6962.lib.utils.KinematicsUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -27,6 +31,8 @@ import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.commands.autonomous.CoralSequences;
+import frc.robot.commands.autonomous.GeneratedAuto;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -154,7 +160,29 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autonomous.createAutonomousCommand();
+    return Commands.defer(() -> {
+      System.out.println("Generating auto command");
+      GeneratedAuto auto = new GeneratedAuto(autonomous, swerveDrive, manipulator.coral);
+
+      auto.configureAutonomous(
+        List.of(
+          new CoralSequences.CoralPosition(1, 2),
+          new CoralSequences.CoralPosition(3, 4),
+          new CoralSequences.CoralPosition(8, 1),
+          new CoralSequences.CoralPosition(2, 3),
+          new CoralSequences.CoralPosition(11, 1)
+        ),
+        true,
+        true
+      );
+
+      auto.generateSequence(swerveDrive.getEstimatedPose(), true);
+      
+      Time time = CoralSequences.getSequenceTime(auto.getSequence(), swerveDrive.getEstimatedPose());
+      System.out.println(time);
+
+      return auto;
+    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
     // return hang.stow();
     // return Commands.run(() -> {});
   }

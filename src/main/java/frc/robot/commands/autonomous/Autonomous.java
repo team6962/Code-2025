@@ -18,12 +18,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Constants.SWERVE;
+import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.commands.PieceCombos;
+import frc.robot.commands.autonomous.CoralSequences.CoralPosition;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import frc.robot.util.software.Dashboard.AutonChooser;
 
 public class Autonomous {
   private RobotStateController controller;
@@ -90,6 +93,20 @@ public class Autonomous {
     }
 
     return closestFace;
+  }
+
+  public Command intakeCoral(CoralStation station) {
+    Pose2d pose = station.pose;
+
+    return Commands.sequence(
+      Commands.parallel(
+        swerveDrive.pathfindTo(pose),
+        CommandUtils.selectByMode(pieceCombos.intakeCoral(), CommandUtils.printAndWait("Moving elevator and manipulator for coral intaking", 0.5))
+      ),
+      swerveDrive.alignTo(pose),
+      CommandUtils.selectByMode(manipulator.coral.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
+      Commands.print("Done intaking")
+    );
   }
 
   public Command processAlgae2() {
@@ -174,13 +191,13 @@ public class Autonomous {
       .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
   }
 
-  public Command placeCoral(int pole, int level) {
+  public Command placeCoral(CoralPosition position) {
     return Commands.sequence(
-      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole)),
-      CommandUtils.selectByMode(pieceCombos.coral(level), CommandUtils.printAndWait("Moving to level " + level, level * 0.5)),
-      swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)),
+      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole())),
+      CommandUtils.selectByMode(pieceCombos.coral(position.level()), CommandUtils.printAndWait("Moving to level " + position.level(), position.level() * 0.5)),
+      swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole())),
       CommandUtils.selectByMode(manipulator.coral.drop(), CommandUtils.printAndWait("Dropping coral", 0.25)),
-      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", level * 0.5))
+      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
     );
   }
 
@@ -234,14 +251,14 @@ public class Autonomous {
         () ->
             Algae.getAlgaePosition(
                 LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
-}
+  }
 
   public Command createAutonomousCommand() {
     return Commands.sequence(
-      placeCoral(0, 1),
+      placeCoral(new CoralPosition(0, 1)),
       pickupAlgae(3, 3),
       processAlgae(),
-      placeCoral(11, 4),
+      placeCoral(new CoralPosition(11, 4)),
       pickupAlgae(5, 2),
       driveToBarge()
     );

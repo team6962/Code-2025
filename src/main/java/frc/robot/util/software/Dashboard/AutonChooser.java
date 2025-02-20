@@ -1,11 +1,12 @@
 package frc.robot.util.software.Dashboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class AutonChooser {
   public static ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
@@ -45,11 +46,12 @@ public final class AutonChooser {
 
     List<Integer> reefFaces = new ArrayList<>();
 
-    // for (int i = 0; i < Field.REEF_FACES.size(); i++) {
-    //   if (reefOptions.get(i).getEntry().getBoolean(false)) {
-    //     reefFaces.add(i);
-    //   }
-    // }
+    for (int i = 0; i < 6; i++) {
+      if (reefOptions.get(i).getEntry().getBoolean(false)) {
+        reefFaces.add(i);
+      }
+    }
+
     return reefFaces;
   }
 

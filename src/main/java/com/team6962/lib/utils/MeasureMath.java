@@ -101,8 +101,12 @@ public final class MeasureMath {
   }
 
   /** Returns the difference between two angles, in the range [-0.5, 0.5] */
-  public static Angle differenceUnderHalf(Angle a, Angle b) {
+  public static Angle minDifference(Angle a, Angle b) {
     return Rotations.of(MathUtils.floorMod(a.in(Rotations) - b.in(Rotations) - 0.5, 1) - 0.5);
+  }
+
+  public static Rotation2d minDifference(Rotation2d a, Rotation2d b) {
+    return Rotation2d.fromRotations(MathUtils.floorMod(a.getRotations() - b.getRotations() - 0.5, 1) - 0.5);
   }
 
   public static Time time(double minutes, double seconds) {

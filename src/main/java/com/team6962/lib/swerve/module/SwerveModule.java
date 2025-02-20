@@ -496,7 +496,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   public static SwerveModuleState optimizeStateForTalon(
       SwerveModuleState targetState, Angle currentAngle) {
     Angle difference =
-        MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
+        MeasureMath.minDifference(targetState.angle.getMeasure(), currentAngle);
     SwerveModuleState relativeOptimized =
         optimizeStateRelative(targetState.speedMetersPerSecond, difference);
 
