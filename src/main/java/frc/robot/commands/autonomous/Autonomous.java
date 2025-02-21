@@ -26,7 +26,6 @@ import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
-import frc.robot.util.software.Dashboard.AutonChooser;
 
 public class Autonomous {
   private RobotStateController controller;
@@ -109,7 +108,7 @@ public class Autonomous {
     );
   }
 
-  public Command processAlgae2() {
+  public Command processAlgae() {
     return Commands.sequence(
       Commands.parallel(
         CommandUtils.selectByMode(pieceCombos.algaeProcessor(), CommandUtils.printAndWait("Moving elevator and manipulator for algae processor", 0.5)),
@@ -142,29 +141,6 @@ public class Autonomous {
         Rotation2d.fromDegrees(-90)
       )),
       manipulator.algae.drop()
-    );
-  }
-
-  public Command processAlgae() {
-    return Commands.sequence(
-      swerveDrive.pathfindTo(new Pose2d(
-        Units.inchesToMeters(235.726104),
-        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
-        Rotation2d.fromDegrees(90)
-      )),
-      CommandUtils.selectByMode(pieceCombos.algaeProcessor(), Commands.print("Preparing for processor")),
-      swerveDrive.alignTo(new Pose2d(
-        Units.inchesToMeters(235.726104),
-        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(14)).in(Meters),
-        Rotation2d.fromDegrees(90)
-      )),
-      CommandUtils.printInSimulation("Dropping algae"),
-      manipulator.algae.drop(),
-      swerveDrive.pathfindTo(new Pose2d(
-        Units.inchesToMeters(235.726104),
-        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
-        Rotation2d.fromDegrees(90)
-      ))
     );
   }
 
@@ -253,7 +229,7 @@ public class Autonomous {
                 LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
   }
 
-  public Command createAutonomousCommand() {
+  public Command createDemoAutonomousCommand() {
     return Commands.sequence(
       placeCoral(new CoralPosition(0, 1)),
       pickupAlgae(3, 3),

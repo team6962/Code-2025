@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.team6962.lib.swerve.SwerveConfig;
@@ -93,12 +94,10 @@ public final class CoralSequences {
             System.out.println("Best: " + bestScore + " inefficiency, " + getSequenceTime(bestSequence, startPose).in(Seconds) + " ideal seconds");
         }
 
-        displaySequence("Autonomous Sequence", bestSequence, startPose);
-
         return bestSequence;
     }
 
-    private static void displaySequence(String name, List<Placement> sequence, Pose2d startPose) {
+    public static void displaySequence(String name, Collection<Placement> sequence, Pose2d startPose) {
         List<Pose2d> poses = new ArrayList<>();
         poses.add(startPose);
 

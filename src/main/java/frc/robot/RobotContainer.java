@@ -5,7 +5,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
-import java.util.List;
 import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -13,10 +12,10 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.KinematicsUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -26,16 +25,11 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
-import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.PrematchChecks;
+import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
-import frc.robot.commands.autonomous.CoralSequences;
-import frc.robot.commands.autonomous.GeneratedAuto;
-import frc.robot.commands.autonomous.CoralSequences.CoralSource;
-import frc.robot.commands.autonomous.CoralSequences.Placement;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -77,6 +71,8 @@ public class RobotContainer {
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
+
+  private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -137,6 +133,8 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
+    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+
     // module = new SwerveModule();
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
@@ -165,26 +163,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return Commands.defer(() -> {
       System.out.println("Generating auto command");
-      GeneratedAuto auto = new GeneratedAuto(autonomous, swerveDrive, manipulator.coral);
 
-      // auto.configureAutonomous(
-      //   List.of(
-      //     new CoralSequences.CoralPosition(1, 2),
-      //     new CoralSequences.CoralPosition(3, 4),
-      //     new CoralSequences.CoralPosition(8, 1),
-      //     new CoralSequences.CoralPosition(2, 3),
-      //     new CoralSequences.CoralPosition(11, 1),
-      //     new CoralSequences.CoralPosition(7, 4),
-      //     new CoralSequences.CoralPosition(6, 2)
-      //   ),
-      //   true,
-      //   true
-      // );
-      auto.configureAutonomous();
-
-      auto.generateSequence(swerveDrive.getEstimatedPose(), true);
-
-      return auto;
+      return autoGen.generate();
     }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
     // return hang.stow();
     // return Commands.run(() -> {});
@@ -205,6 +185,8 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
+    autoGen.work();
+
     Pose2d[] poses;
 
     Translation2d algae =
@@ -223,6 +205,8 @@ public class RobotContainer {
     // System.out.println(new Translation2d(0.0,0.0));
     // System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive,
     // LIMELIGHT.ALGAE_CAMERA_POSITION)));
+
+    autoGen.work();
   }
 
   public void disabledInit() {}
