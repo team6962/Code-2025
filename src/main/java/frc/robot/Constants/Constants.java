@@ -240,7 +240,7 @@ public final class Constants {
   public static final class ELEVATOR {
     public static final double GEARING =
         (3.0 / 1.0)
-            * (4.0 / 1.0)
+            * (3.0 / 1.0)
             * (5.0 / 1.0)
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
@@ -291,7 +291,7 @@ public final class Constants {
     public static final double GEARING = 5 * 5 * 5;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.518);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.349);
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(60);
 
     public static final class PROFILE {
