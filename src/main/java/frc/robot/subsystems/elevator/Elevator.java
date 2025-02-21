@@ -142,7 +142,7 @@ public class Elevator extends DualLinearActuator {
 
   public Command calibrate() {
     SysIdRoutine calibrationRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.per(Second).of(8.0), Volts.of(6.0), Seconds.of(1.2)),
+      new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(2.5)),
       new SysIdRoutine.Mechanism(
         voltage -> {
           if (!canMoveInDirection(voltage.in(Volts))) {
