@@ -31,7 +31,7 @@ public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
-  private SparkMax leftMotor, rightMotor;
+  protected SparkMax leftMotor, rightMotor;
   private RelativeEncoder leftEncoder, rightEncoder;
   private SparkClosedLoopController leftPID, rightPID;
 

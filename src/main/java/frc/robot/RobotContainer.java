@@ -161,7 +161,15 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autonomous.createAutonomousCommand();
+    // return autonomous.createAutonomousCommand();
+
+    // return Commands.defer(() -> {
+    //   System.out.println("Generating auto command");
+
+    //   return autoGen.generate();
+    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+
+    return elevator.calibrate();
     // return hang.stow();
     // return Commands.run(() -> {});
   }
