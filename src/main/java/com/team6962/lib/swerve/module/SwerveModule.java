@@ -93,7 +93,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     CTREUtils.check(
       driveConfig.apply(new CurrentLimitsConfigs()
-        .withSupplyCurrentLimit(Amps.of(80))));
+        .withSupplyCurrentLimit(Amps.of(50))));
 
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -125,7 +125,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     CTREUtils.check(
       steerConfig.apply(new CurrentLimitsConfigs()
-        .withSupplyCurrentLimit(Amps.of(80))));
+        .withSupplyCurrentLimit(Amps.of(50))));
 
     // Configure the steer motor to brake automatically when not driven
     CTREUtils.check(
