@@ -2,6 +2,7 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -55,7 +56,8 @@ public final class SwerveConstants {
             Amps.of(60)),
         Wheel.COLSON,
         new DriveGains( // TODO: Tune drive gains
-            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.5, 0.01)));
+            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.5, 0.01))
+          .withMaxAutonomousSpeed(MetersPerSecond.of(0.5)));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
