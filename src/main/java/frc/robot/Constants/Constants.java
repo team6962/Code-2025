@@ -259,8 +259,8 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 8.0;
-      public static final double kS = 0.4;
+      public static final double kP = 20.0;
+      public static final double kS = 1.0;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
