@@ -84,12 +84,12 @@ public final class AutonChooser {
         tab.add("Right Station", false)
             .withWidget(BuiltInWidgets.kToggleButton)
             .withSize(1, 1)
-            .withPosition(0, 3);
+            .withPosition(2, 3);
     leftCoral =
         tab.add("Left Station", false)
             .withWidget(BuiltInWidgets.kToggleButton)
             .withSize(1, 1)
-            .withPosition(2, 3);
+            .withPosition(0, 3);
     startingAlgae =
         tab.add("Starting Algae", false)
             .withWidget(BuiltInWidgets.kToggleButton)
