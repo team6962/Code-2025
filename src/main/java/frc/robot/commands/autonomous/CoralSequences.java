@@ -219,9 +219,9 @@ public final class CoralSequences {
         return time;
     }
 
-    private static Distance ESTIMATED_REEF_AVOIDANCE_DIAMETER = Inches.of(116);
+    public static Distance ESTIMATED_REEF_AVOIDANCE_DIAMETER = Inches.of(116);
 
-    private static Distance estimatePathTranslationLength(Translation2d start, Translation2d end) {
+    public static Distance estimatePathTranslationLength(Translation2d start, Translation2d end) {
         start = start.minus(ReefPositioning.REEF_CENTER);
         end = end.minus(ReefPositioning.REEF_CENTER);
 
@@ -233,9 +233,9 @@ public final class CoralSequences {
 
         if (ratio > 1) return Meters.of(end.minus(start).getNorm());
 
-        double arcAngle = reefRadius * (Math.PI / 2  - Math.asin(ratio));
+        double arcAngle = reefRadius * (Math.PI / 2 - Math.asin(ratio));
         double arcLength = 2 * arcAngle;
-        double chordLength = 2 * Math.cos(arcAngle);
+        double chordLength = 2 * Math.cos(Math.asin(ratio));
 
         return Meters.of(end.minus(start).getNorm() - chordLength + arcLength);
     }
