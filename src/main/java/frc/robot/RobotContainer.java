@@ -167,19 +167,20 @@ public class RobotContainer {
       System.out.println("Generating auto command");
       GeneratedAuto auto = new GeneratedAuto(autonomous, swerveDrive, manipulator.coral);
 
-      auto.configureAutonomous(
-        List.of(
-          new CoralSequences.CoralPosition(1, 2),
-          new CoralSequences.CoralPosition(3, 4),
-          new CoralSequences.CoralPosition(8, 1),
-          new CoralSequences.CoralPosition(2, 3),
-          new CoralSequences.CoralPosition(11, 1),
-          new CoralSequences.CoralPosition(7, 4),
-          new CoralSequences.CoralPosition(6, 2)
-        ),
-        true,
-        true
-      );
+      // auto.configureAutonomous(
+      //   List.of(
+      //     new CoralSequences.CoralPosition(1, 2),
+      //     new CoralSequences.CoralPosition(3, 4),
+      //     new CoralSequences.CoralPosition(8, 1),
+      //     new CoralSequences.CoralPosition(2, 3),
+      //     new CoralSequences.CoralPosition(11, 1),
+      //     new CoralSequences.CoralPosition(7, 4),
+      //     new CoralSequences.CoralPosition(6, 2)
+      //   ),
+      //   true,
+      //   true
+      // );
+      auto.configureAutonomous();
 
       auto.generateSequence(swerveDrive.getEstimatedPose(), true);
 

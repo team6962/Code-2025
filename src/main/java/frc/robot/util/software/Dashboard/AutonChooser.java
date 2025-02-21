@@ -3,13 +3,15 @@ package frc.robot.util.software.Dashboard;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 public final class AutonChooser {
+  public static NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous");
   public static ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
   public static List<SimpleWidget> reefOptions = new ArrayList<>();
   public static SimpleWidget rightCoral;
@@ -17,24 +19,30 @@ public final class AutonChooser {
   public static SimpleWidget startingAlgae;
 
   public static boolean startingAlgae() {
-    return startingAlgae.getEntry().getBoolean(false);
+    return table.getEntry("Starting Algae").getBoolean(false);
+    // return startingAlgae.getEntry().getBoolean(false);
   }
 
   public static boolean leftCoralStation() {
-    return leftCoral.getEntry().getBoolean(false);
+    return table.getEntry("Left Station").getBoolean(false);
+    // return leftCoral.getEntry().getBoolean(false);
   }
 
   public static boolean rightCoralStation() {
-    return rightCoral.getEntry().getBoolean(false);
+    return table.getEntry("Right Station").getBoolean(false);
+    // return rightCoral.getEntry().getBoolean(false);
   }
 
   public static List<Integer> reefFaces() {
     List<Integer> reefFaces = new ArrayList<>();
 
     for (int i = 0; i < 6; i++) {
-      if (reefOptions.get(i).getEntry().getBoolean(false)) {
+      if (table.getEntry("Face " + (i + 1)).getBoolean(false)) {
         reefFaces.add(i);
       }
+      // if (reefOptions.get(i).getEntry().getBoolean(false)) {
+      //   reefFaces.add(i);
+      // }
     }
 
     return reefFaces;
