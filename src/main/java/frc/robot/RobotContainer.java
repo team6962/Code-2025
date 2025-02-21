@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
+import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
@@ -33,6 +34,8 @@ import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.autonomous.CoralSequences;
 import frc.robot.commands.autonomous.GeneratedAuto;
+import frc.robot.commands.autonomous.CoralSequences.CoralSource;
+import frc.robot.commands.autonomous.CoralSequences.Placement;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -164,22 +167,21 @@ public class RobotContainer {
       System.out.println("Generating auto command");
       GeneratedAuto auto = new GeneratedAuto(autonomous, swerveDrive, manipulator.coral);
 
-      auto.configureAutonomous(
-        List.of(
-          new CoralSequences.CoralPosition(1, 2),
-          new CoralSequences.CoralPosition(3, 4),
-          new CoralSequences.CoralPosition(8, 1),
-          new CoralSequences.CoralPosition(2, 3),
-          new CoralSequences.CoralPosition(11, 1)
-        ),
-        true,
-        true
-      );
+      // auto.configureAutonomous(
+      //   List.of(
+      //     new CoralSequences.CoralPosition(1, 2),
+      //     new CoralSequences.CoralPosition(3, 4),
+      //     new CoralSequences.CoralPosition(8, 1),
+      //     new CoralSequences.CoralPosition(2, 3),
+      //     new CoralSequences.CoralPosition(11, 1),
+      //     new CoralSequences.CoralPosition(7, 4),
+      //     new CoralSequences.CoralPosition(6, 2)
+      //   ),
+      //   true,
+      //   true
+      // );
 
       auto.generateSequence(swerveDrive.getEstimatedPose(), true);
-      
-      Time time = CoralSequences.getSequenceTime(auto.getSequence(), swerveDrive.getEstimatedPose());
-      System.out.println(time);
 
       return auto;
     }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));

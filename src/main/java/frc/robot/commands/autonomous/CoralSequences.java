@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Field;
 import frc.robot.Constants.ReefPositioning;
@@ -73,6 +74,10 @@ public final class CoralSequences {
                 bestTime = time;
                 bestSequence = sequence;
             }
+        }
+
+        if (bestSequence == null) {
+            DriverStation.reportError("No autonomous sequence", true);
         }
 
         Logger.getField().getObject("Autonomous Sequence")
@@ -157,9 +162,8 @@ public final class CoralSequences {
 
         List<List<Placement>> otherPlacements = new ArrayList<>();
 
-        otherPlacements.addAll(placementsFromPositionsEitherSource(positions.subList(1, positions.size()), CoralSource.LEFT));
-        otherPlacements.addAll(placementsFromPositionsEitherSource(positions.subList(1, positions.size()), CoralSource.RIGHT));
-
+        otherPlacements.addAll(placementsFromPositionsEitherSource(positions.subList(1, positions.size())));
+        
         for (List<Placement> otherPlacement : otherPlacements) {
             List<Placement> newPlacement = new ArrayList<>();
             newPlacement.add(firstPlacement);
@@ -204,7 +208,7 @@ public final class CoralSequences {
             MutTime sequenceTime = Seconds.mutable(0);
 
             if (placement.source != CoralSource.HELD) {
-                Pose2d stationPose = placement.source == CoralSource.LEFT ? Field.getLeftCoralStationPose() : Field.getRightCoralStationPose();
+                Pose2d stationPose = placement.source().station.pose;
                 sequenceTime.mut_plus(estimatePathTime(currentPose, stationPose));
 
                 currentPose = stationPose;
@@ -219,25 +223,72 @@ public final class CoralSequences {
         return time;
     }
 
-    public static Distance ESTIMATED_REEF_AVOIDANCE_DIAMETER = Inches.of(116);
+    public static Time getPlacementTime(Placement placement, Pose2d startPose) {
+        MutTime sequenceTime = Seconds.mutable(0);
+
+        Pose2d currentPose = startPose;
+
+        if (placement.source != CoralSource.HELD) {
+            Pose2d stationPose = placement.source == CoralSource.LEFT ? Field.getLeftCoralStationPose() : Field.getRightCoralStationPose();
+            sequenceTime.mut_plus(estimatePathTime(currentPose, stationPose));
+
+            currentPose = stationPose;
+        }
+
+        sequenceTime.mut_plus(estimatePathTime(currentPose, ReefPositioning.getCoralAlignPose(placement.target.pole())));
+
+        return sequenceTime;
+    }
+
+    public static Distance ESTIMATED_REEF_AVOIDANCE_DIAMETER = Inches.of(110);
+
+    private static Distance estimatePathTranslationLengthV2(Translation2d start, Translation2d end) {
+        Translation2d startRelative = start.minus(ReefPositioning.REEF_CENTER);
+        Translation2d endRelative = end.minus(ReefPositioning.REEF_CENTER);
+
+        Rotation2d lineAngle = endRelative.minus(startRelative).getAngle();
+        Translation2d startRotated = startRelative.rotateBy(lineAngle.unaryMinus());
+        Translation2d endRotated = endRelative.rotateBy(lineAngle.unaryMinus());
+
+        double x1 = startRotated.getX();
+        double x2 = endRotated.getX();
+        double y = endRotated.getY();
+        double r = ESTIMATED_REEF_AVOIDANCE_DIAMETER.in(Meters) / 2.0;
+
+        if (Math.abs(y) > r || Math.signum(x1) == Math.signum(x2)) return Meters.of(start.getDistance(end));
+        
+        return Meters.of(estimatePathTranslationLengthV2(x1, x2, y, r));
+    }
+
+    private static double estimatePathTranslationLengthV2(double x1, double x2, double y, double r) {
+        double t = Math.asin(Math.abs(y / r));
+
+        return 2 * (Math.PI / 2 - t) * r + Math.abs(x2 - r * Math.cos(t)) + Math.abs(x1 + r * Math.cos(t));
+    }
 
     public static Distance estimatePathTranslationLength(Translation2d start, Translation2d end) {
-        start = start.minus(ReefPositioning.REEF_CENTER);
-        end = end.minus(ReefPositioning.REEF_CENTER);
+        return estimatePathTranslationLengthV2(start, end);
+        // start = start.minus(ReefPositioning.REEF_CENTER);
+        // end = end.minus(ReefPositioning.REEF_CENTER);
 
-        Rotation2d lineRotation = end.minus(start).getAngle();
-        Translation2d startRotated = start.rotateBy(lineRotation.unaryMinus());
-        double lineDistance = startRotated.getY();
-        double reefRadius = ESTIMATED_REEF_AVOIDANCE_DIAMETER.in(Meters) / 2.0;
-        double ratio = Math.abs(lineDistance / reefRadius);
+        // Rotation2d lineRotation = end.minus(start).getAngle();
+        // Translation2d startRotated = start.rotateBy(lineRotation.unaryMinus());
+        // Translation2d endRotated = end.rotateBy(lineRotation.unaryMinus());
+        // double lineDistance = startRotated.getY();
+        // double reefRadius = ESTIMATED_REEF_AVOIDANCE_DIAMETER.in(Meters) / 2.0;
+        // double ratio = Math.abs(lineDistance / reefRadius);
 
-        if (ratio > 1) return Meters.of(end.minus(start).getNorm());
+        // double perfectLength = start.getDistance(end);
 
-        double arcAngle = reefRadius * (Math.PI / 2 - Math.asin(ratio));
-        double arcLength = 2 * arcAngle;
-        double chordLength = 2 * Math.cos(Math.asin(ratio));
+        // if (ratio > 1 ||
+        //     (startRotated.getX() < -reefRadius && endRotated.getX() < -reefRadius) ||
+        //     (startRotated.getX() > reefRadius && endRotated.getX() > reefRadius)) return Meters.of(perfectLength);
 
-        return Meters.of(end.minus(start).getNorm() - chordLength + arcLength);
+        // double arcAngle = Math.asin(ratio);
+        // double arcLength = 2 * reefRadius * (Math.PI / 2 - arcAngle);
+        // double chordLength = 2 * reefRadius * Math.cos(ratio);
+
+        // return Meters.of(perfectLength - chordLength + arcLength);
     }
 
     private static Distance estimateModuleMovement(Pose2d start, Pose2d end) {
@@ -247,7 +298,7 @@ public final class CoralSequences {
             ));
     }
 
-    private static Time estimatePathTime(Pose2d start, Pose2d end) {
+    public static Time estimatePathTime(Pose2d start, Pose2d end) {
         return estimateModuleMovement(start, end).div(swerveConfig.maxDriveSpeed());
     }
 }

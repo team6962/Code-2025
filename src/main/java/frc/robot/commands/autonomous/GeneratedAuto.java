@@ -45,15 +45,22 @@ public class GeneratedAuto extends Command {
     }
 
     public void configureAutonomous() {
-        List<CoralPosition> targetPositions = new ArrayList<>();
+        ArrayList<CoralPosition> targetPositions = new ArrayList<>();
 
         for (Integer face : AutonChooser.reefFaces()) {
             targetPositions.add(new CoralPosition(face * 2 - 1, 4));
             targetPositions.add(new CoralPosition(face * 2, 4));
         }
+
+        boolean leftStation = AutonChooser.leftCoralStation();
+        boolean rightStation = AutonChooser.rightCoralStation();
+
+        configureAutonomous(targetPositions, leftStation, rightStation);
     }
 
     public void generateSequence(Pose2d startPose, boolean hasCoral) {
+        if (targetPositions == null) configureAutonomous();
+        
         List<Placement> sequence = CoralSequences.getFastestSequence(targetPositions, leftStation, rightStation, hasCoral, startPose);
 
         if (sequence == null) {
@@ -66,7 +73,7 @@ public class GeneratedAuto extends Command {
     }
 
     public void generateCommand() {
-        if (sequence.size() == 0) {
+        if (sequence == null || sequence.size() == 0) {
             DriverStation.reportError("No autonomous sequence (before command generation)", true);
         }
 

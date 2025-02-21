@@ -16,34 +16,18 @@ public final class AutonChooser {
   public static SimpleWidget startingAlgae;
 
   public static boolean startingAlgae() {
-    if (tab == null) {
-      init();
-    }
-
     return startingAlgae.getEntry().getBoolean(false);
   }
 
   public static boolean leftCoralStation() {
-    if (tab == null) {
-      init();
-    }
-
     return leftCoral.getEntry().getBoolean(false);
   }
 
   public static boolean rightCoralStation() {
-    if (tab == null) {
-      init();
-    }
-
     return rightCoral.getEntry().getBoolean(false);
   }
 
   public static List<Integer> reefFaces() {
-    if (tab == null) {
-      init();
-    }
-
     List<Integer> reefFaces = new ArrayList<>();
 
     for (int i = 0; i < 6; i++) {
