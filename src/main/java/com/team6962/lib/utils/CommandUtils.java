@@ -23,9 +23,11 @@ public final class CommandUtils {
   }
 
   public static Command printAndWait(String message, double seconds) {
-    return Commands.parallel(
-        Commands.print(message),
-        Commands.waitSeconds(seconds));
+    // return Commands.parallel(
+    //     Commands.print(message),
+    //     Commands.waitSeconds(seconds));
+
+    return Commands.print(message);
   }
 
   public static Command printInSimulation(String message) {

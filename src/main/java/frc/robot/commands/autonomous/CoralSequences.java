@@ -11,6 +11,7 @@ import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -64,26 +65,50 @@ public final class CoralSequences {
     ) {
         List<List<Placement>> sequences = generateSequences(positions, leftStation, rightStation, startsWithCoral);
 
-        Time bestTime = Seconds.of(Double.POSITIVE_INFINITY);
+        double bestScore = Double.POSITIVE_INFINITY;
         List<Placement> bestSequence = null;
 
-        for (List<Placement> sequence : sequences) {
-            Time time = getSequenceTime(sequence, startPose);
+        int scanned = 0;
+        int total = sequences.size();
 
-            if (time.lt(bestTime)) {
-                bestTime = time;
+        for (List<Placement> sequence : sequences) {
+            double score = getTimeBiasedScore(sequence, startPose, 0.5);
+
+            if (score < bestScore) {
+                bestScore = score;
                 bestSequence = sequence;
             }
+
+            if (scanned % (total / 10) == 0) {
+                System.out.println("Scanned " + scanned + " / " + total + " routes");
+            }
+
+            scanned++;
         }
 
         if (bestSequence == null) {
             DriverStation.reportError("No autonomous sequence", true);
+        } else {
+            System.out.println(sequences.size() + " routes scanned.");
+            System.out.println("Best: " + bestScore + " inefficiency, " + getSequenceTime(bestSequence, startPose).in(Seconds) + " ideal seconds");
         }
 
-        Logger.getField().getObject("Autonomous Sequence")
-            .setPoses(bestSequence.stream().map(placement -> placement.getPoses()).flatMap(List::stream).toList());
+        displaySequence("Autonomous Sequence", bestSequence, startPose);
 
         return bestSequence;
+    }
+
+    private static void displaySequence(String name, List<Placement> sequence, Pose2d startPose) {
+        List<Pose2d> poses = new ArrayList<>();
+        poses.add(startPose);
+
+        for (Placement placement : sequence) {
+            List<Pose2d> placementPoses = placement.getPoses();
+
+            poses.addAll(placementPoses);
+        }
+
+        Logger.getField().getObject(name).setPoses(poses);
     }
 
     // SEQUENCE GENERATION
@@ -205,31 +230,41 @@ public final class CoralSequences {
         Pose2d currentPose = startPose;
 
         for (Placement placement : placements) {
-            MutTime sequenceTime = Seconds.mutable(0);
+            Pair<Time, Pose2d> result = getPlacementResult(placement, currentPose);
 
-            if (placement.source != CoralSource.HELD) {
-                Pose2d stationPose = placement.source().station.pose;
-                sequenceTime.mut_plus(estimatePathTime(currentPose, stationPose));
-
-                currentPose = stationPose;
-            }
-
-            sequenceTime.mut_plus(estimatePathTime(currentPose, ReefPositioning.getCoralAlignPose(placement.target.pole())));
-
-            time.mut_plus(sequenceTime);
-            currentPose = ReefPositioning.getCoralAlignPose(placement.target.pole());
+            time.mut_plus(result.getFirst());
+            currentPose = result.getSecond();
         }
 
         return time;
     }
 
-    public static Time getPlacementTime(Placement placement, Pose2d startPose) {
+    public static double getTimeBiasedScore(List<Placement> placements, Pose2d startPose, double timeBias) {
+        MutTime time = Seconds.mutable(0);
+        double bias = 0;
+
+        Pose2d currentPose = startPose;
+
+        for (Placement placement : placements) {
+            Pair<Time, Pose2d> result = getPlacementResult(placement, currentPose);
+
+            time.mut_plus(result.getFirst());
+            
+            bias += timeBias * time.in(Seconds);
+            
+            currentPose = result.getSecond();
+        }
+
+        return time.in(Seconds) + bias;
+    }
+
+    public static Pair<Time, Pose2d> getPlacementResult(Placement placement, Pose2d startPose) {
         MutTime sequenceTime = Seconds.mutable(0);
 
         Pose2d currentPose = startPose;
 
         if (placement.source != CoralSource.HELD) {
-            Pose2d stationPose = placement.source == CoralSource.LEFT ? Field.getLeftCoralStationPose() : Field.getRightCoralStationPose();
+            Pose2d stationPose = placement.source().station.pose;
             sequenceTime.mut_plus(estimatePathTime(currentPose, stationPose));
 
             currentPose = stationPose;
@@ -237,12 +272,20 @@ public final class CoralSequences {
 
         sequenceTime.mut_plus(estimatePathTime(currentPose, ReefPositioning.getCoralAlignPose(placement.target.pole())));
 
-        return sequenceTime;
+        currentPose = ReefPositioning.getCoralAlignPose(placement.target.pole());
+
+        return Pair.of(sequenceTime, currentPose);
     }
 
     public static Distance ESTIMATED_REEF_AVOIDANCE_DIAMETER = Inches.of(110);
 
-    private static Distance estimatePathTranslationLengthV2(Translation2d start, Translation2d end) {
+    private static double estimatePathTranslationLength(double x1, double x2, double y, double r) {
+        double t = Math.asin(Math.abs(y / r));
+
+        return 2 * (Math.PI / 2 - t) * r + Math.abs(x2 - r * Math.cos(t)) + Math.abs(x1 + r * Math.cos(t));
+    }
+
+    public static Distance estimatePathTranslationLength(Translation2d start, Translation2d end) {
         Translation2d startRelative = start.minus(ReefPositioning.REEF_CENTER);
         Translation2d endRelative = end.minus(ReefPositioning.REEF_CENTER);
 
@@ -257,38 +300,7 @@ public final class CoralSequences {
 
         if (Math.abs(y) > r || Math.signum(x1) == Math.signum(x2)) return Meters.of(start.getDistance(end));
         
-        return Meters.of(estimatePathTranslationLengthV2(x1, x2, y, r));
-    }
-
-    private static double estimatePathTranslationLengthV2(double x1, double x2, double y, double r) {
-        double t = Math.asin(Math.abs(y / r));
-
-        return 2 * (Math.PI / 2 - t) * r + Math.abs(x2 - r * Math.cos(t)) + Math.abs(x1 + r * Math.cos(t));
-    }
-
-    public static Distance estimatePathTranslationLength(Translation2d start, Translation2d end) {
-        return estimatePathTranslationLengthV2(start, end);
-        // start = start.minus(ReefPositioning.REEF_CENTER);
-        // end = end.minus(ReefPositioning.REEF_CENTER);
-
-        // Rotation2d lineRotation = end.minus(start).getAngle();
-        // Translation2d startRotated = start.rotateBy(lineRotation.unaryMinus());
-        // Translation2d endRotated = end.rotateBy(lineRotation.unaryMinus());
-        // double lineDistance = startRotated.getY();
-        // double reefRadius = ESTIMATED_REEF_AVOIDANCE_DIAMETER.in(Meters) / 2.0;
-        // double ratio = Math.abs(lineDistance / reefRadius);
-
-        // double perfectLength = start.getDistance(end);
-
-        // if (ratio > 1 ||
-        //     (startRotated.getX() < -reefRadius && endRotated.getX() < -reefRadius) ||
-        //     (startRotated.getX() > reefRadius && endRotated.getX() > reefRadius)) return Meters.of(perfectLength);
-
-        // double arcAngle = Math.asin(ratio);
-        // double arcLength = 2 * reefRadius * (Math.PI / 2 - arcAngle);
-        // double chordLength = 2 * reefRadius * Math.cos(ratio);
-
-        // return Meters.of(perfectLength - chordLength + arcLength);
+        return Meters.of(estimatePathTranslationLength(x1, x2, y, r));
     }
 
     private static Distance estimateModuleMovement(Pose2d start, Pose2d end) {

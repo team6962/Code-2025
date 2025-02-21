@@ -72,7 +72,13 @@ public class GeneratedAuto extends Command {
         this.sequence = sequence;
     }
 
+    public void generateSequence() {
+        generateSequence(swerveDrive.getEstimatedPose(), coralGrabber.hasGamePiece());
+    }
+
     public void generateCommand() {
+        if (sequence == null) generateSequence();
+
         if (sequence == null || sequence.size() == 0) {
             DriverStation.reportError("No autonomous sequence (before command generation)", true);
         }
