@@ -189,11 +189,11 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public void moveUp() {
-    moveSpeed(0.10);
+    moveSpeed(0.20);
   }
 
   public void moveDown() {
-    moveSpeed(-0.10);
+    moveSpeed(-0.20);
   }
 
   public boolean unsafeMoveDown() {
