@@ -10,6 +10,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
 
+import java.util.Set;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
@@ -61,7 +64,7 @@ public class Elevator extends DualLinearActuator {
         ELEVATOR.MAX_HEIGHT,
         Inches.of(0.5));
 
-    setDefaultCommand(Commands.run(this::stopMotors, this));
+    setDefaultCommand(hold());
   }
 
   @Override
@@ -86,6 +89,16 @@ public class Elevator extends DualLinearActuator {
 
   public Command stop() {
     return this.run(this::stopMotors);
+  }
+
+  public Command hold() {
+    return Commands.defer(
+        () -> {
+          Distance position = getAverageHeight();
+
+          return run(() -> setHeight(position));
+        },
+        Set.of(this));
   }
 
   public Command stow() {
