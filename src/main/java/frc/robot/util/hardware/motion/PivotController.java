@@ -121,8 +121,8 @@ public class PivotController extends SubsystemBase {
             0.0);
     simPID = new PIDController(kP, 0, 0);
 
-    Logger.log(this.getName() + "/minAngle", minAngle.in(Rotations));
-    Logger.log(this.getName() + "/maxAngle", maxAngle.in(Rotations));
+    Logger.logNumber(this.getName() + "/minAngle", () -> minAngle.in(Rotations));
+    Logger.logNumber(this.getName() + "/maxAngle", () -> maxAngle.in(Rotations));
     Logger.logNumber(this.getName() + "/targetAngle", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle", () -> getPosition().in(Rotations));
     Logger.logNumber(this.getName() + "/relativePosition", () -> encoder.getPosition());
