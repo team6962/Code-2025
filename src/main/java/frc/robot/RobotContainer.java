@@ -169,7 +169,10 @@ public class RobotContainer {
     //   return autoGen.generate();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
-    return elevator.calibrate();
+    return Commands.sequence(
+      elevator.calibrate(),
+      manipulator.pivot.calibrate()
+    );
     // return hang.stow();
     // return Commands.run(() -> {});
   }

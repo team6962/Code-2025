@@ -40,11 +40,11 @@ public class PivotController extends SubsystemBase {
   // Onboard spark max PID controller. Runs at 1kHz
   private SparkClosedLoopController pid;
   // CAN Spark Max motor controller;
-  private SparkMax motor;
+  protected SparkMax motor;
   // Built-in relative NEO encoder
-  private RelativeEncoder encoder;
+  protected RelativeEncoder encoder;
   // Rev absolute through-bore encoder
-  private DutyCycleEncoder absoluteEncoder;
+  protected DutyCycleEncoder absoluteEncoder;
 
   private Angle minAngle, maxAngle;
 
