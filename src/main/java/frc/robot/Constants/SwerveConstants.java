@@ -55,15 +55,15 @@ public final class SwerveConstants {
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
             Amps.of(60)),
         Wheel.COLSON,
-        new DriveGains( // TODO: Tune drive gains
-            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.5, 0.01))
-          .withMaxAutonomousSpeed(MetersPerSecond.of(0.5)));
+        new DriveGains(
+            new PIDConstants(4.0, 0.0, 1.0), new PIDConstants(1.0, 0.5, 0.01))
+          .withFineTranslation(new PIDConstants(1.0, 0.0, 0.5)));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
     return switch (chassisType) {
       case COMPETITION -> new Chassis(
-          Inches.of(34.979), Inches.of(34.979), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
+          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
       case TEST -> new Chassis(
           Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
     };

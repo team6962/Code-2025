@@ -118,8 +118,8 @@ public class DualLinearActuator extends SubsystemBase {
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
-    // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
-    // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
 
@@ -130,6 +130,9 @@ public class DualLinearActuator extends SubsystemBase {
 
     Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
+
+    Logger.logNumber(getName() + "/leftCurrent", leftMotor::getOutputCurrent);
+    Logger.logNumber(getName() + "/rightCurrent", rightMotor::getOutputCurrent);
 
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 

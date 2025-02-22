@@ -12,12 +12,14 @@ import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Constants.SWERVE;
+import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.commands.PieceCombos;
@@ -109,20 +111,22 @@ public class Autonomous {
   }
 
   public Command processAlgae() {
+    Pose2d processorPose = new Pose2d(
+      Units.inchesToMeters(235.726104),
+      SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
+      Rotation2d.fromDegrees(-90)
+    );
+
+    Pose2d processorNewPose = Field.getProcessorPose().plus(new Transform2d(new Translation2d(0, swerveDrive.getConstants().chassis().outerLength().div(2).plus(Inches.of(18)).in(Meters)), new Rotation2d()));
+
+    processorNewPose = new Pose2d(processorNewPose.getTranslation(), Rotation2d.fromDegrees(-90));
+
     return Commands.sequence(
       Commands.parallel(
         CommandUtils.selectByMode(pieceCombos.algaeProcessor(), CommandUtils.printAndWait("Moving elevator and manipulator for algae processor", 0.5)),
-        swerveDrive.pathfindTo(new Pose2d(
-          Units.inchesToMeters(235.726104),
-          SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
-          Rotation2d.fromDegrees(-90)
-        ))
+        swerveDrive.pathfindTo(processorNewPose)
       ),
-      swerveDrive.alignTo(new Pose2d(
-        Units.inchesToMeters(235.726104),
-        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(14)).in(Meters),
-        Rotation2d.fromDegrees(-90)
-      )),
+      swerveDrive.alignTo(processorNewPose),
       CommandUtils.selectByMode(manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.5)),
       swerveDrive.alignTo(new Pose2d(
         Units.inchesToMeters(235.726104),

@@ -19,7 +19,8 @@ public final class CommandUtils {
   }
 
   public static Command selectByMode(Command realCommand, Command simCommand) {
-    return RobotBase.isReal() ? realCommand : simCommand;
+    return simCommand;
+    // return RobotBase.isReal() ? realCommand : simCommand;
   }
 
   public static Command printAndWait(String message, double seconds) {

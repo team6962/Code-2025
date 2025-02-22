@@ -100,10 +100,12 @@ public class AutoGeneration extends Thread {
             for (GeneratedAuto auto : autos) {
                 if (auto.getParameters().matches(params)) return new WorkResult(false, auto);
             }
+        }
 
-            newAuto = new GeneratedAuto(autonomous, params);
-            newAuto.setup();
+        newAuto = new GeneratedAuto(autonomous, params);
+        newAuto.setup();
 
+        synchronized (autos) {
             autos.add(newAuto);
         }
 
@@ -153,8 +155,8 @@ public class AutoGeneration extends Thread {
             List<CoralPosition> positions = new LinkedList<>();
 
             for (int face : AutonChooser.reefFaces()) {
-                positions.add(new CoralPosition(face * 2, 4));
-                positions.add(new CoralPosition(face * 2 - 1, 4));
+                positions.add(new CoralPosition(face * 2, 3));
+                positions.add(new CoralPosition(face * 2 - 1, 3));
             }
 
             return new AutoParams(positions, AutonChooser.leftCoralStation(), AutonChooser.rightCoralStation(), currentPose, hasCoral);
@@ -198,9 +200,11 @@ public class AutoGeneration extends Thread {
                 return;
             }
 
-            if (autoGen.getState() != State.NEW) autoGen = autoGen.clone();
+            if (!autoGen.isAlive()) {
+                if (autoGen.getState() != State.NEW) autoGen = autoGen.clone();
 
-            if (!autoGen.isAlive()) autoGen.start();
+                autoGen.start();
+            }
         }
 
         public Command generate() {

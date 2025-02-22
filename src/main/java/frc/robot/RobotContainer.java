@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,8 +29,10 @@ import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
+import frc.robot.commands.autonomous.AutoGeneration.AutoParams;
 import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.commands.autonomous.GeneratedAuto;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
@@ -72,7 +75,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private final Generator autoGen;
+  // private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -133,7 +136,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
     // module = new SwerveModule();
 
@@ -161,10 +164,16 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    // return autonomous.createDemoAutonomousCommand();
     return Commands.defer(() -> {
-      System.out.println("Generating auto command");
+      // System.out.println("Generating auto command");
 
-      return autoGen.generate();
+      // return autoGen.generate();
+
+      GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+      auto.setup();
+
+      return auto.getCommand();
     }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
     // return hang.stow();
     // return Commands.run(() -> {});
@@ -185,7 +194,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    autoGen.work();
+    // double autoWorkTimestamp = Timer.getFPGATimestamp();
+    // autoGen.work();
+    // Logger.log("autoWorkTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
 
     Pose2d[] poses;
 
@@ -206,7 +217,7 @@ public class RobotContainer {
     // System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive,
     // LIMELIGHT.ALGAE_CAMERA_POSITION)));
 
-    autoGen.work();
+    // autoGen.work();
   }
 
   public void disabledInit() {}

@@ -463,7 +463,7 @@ public class SwerveDrive extends SwerveCore {
       updateAdjustments(translationError, rotationError);
 
       if (state == State.TRANSLATING) {
-        Translation2d translationOutput = getTranslationOutput(translationError);
+        Translation2d translationOutput = getTranslationOutput(translationError.unaryMinus());
         speeds = new ChassisSpeeds(translationOutput.getX(), translationOutput.getY(), 0);
       } else if (state == State.ROTATING) {
         Rotation2d rotationOutput = getRotationOutput(rotationError);
