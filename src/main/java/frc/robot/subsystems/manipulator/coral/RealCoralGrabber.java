@@ -7,6 +7,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,6 +37,8 @@ public class RealCoralGrabber extends CoralGrabber {
     sensor = new DigitalInput(DIO.CORAL_BEAM_BREAK);
 
     setDefaultCommand(hold());
+
+    StatusChecks.under(this).add("motor", motor);
 
     Logger.logBoolean(this.getName() + "/detectsGamePiece", this::detectsGamePiece);
     Logger.logBoolean(this.getName() + "/hasGamePiece", this::hasGamePiece);

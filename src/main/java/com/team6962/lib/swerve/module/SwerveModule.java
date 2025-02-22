@@ -21,6 +21,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -133,9 +134,13 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withFusedCANcoder(steerEncoder)
                 .withRotorToSensorRatio(config.gearing().steer())));
 
-    setName("Swerve Drive/Modules/" + getModuleName(corner.index));
+    setName(getModuleName(corner.index) + " Swerve Module");
 
     Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
+
+    StatusChecks.under(this).add("Drive Motor", driveMotor);
+    StatusChecks.under(this).add("Steer Motor", steerMotor);
+    StatusChecks.under(this).add("Steer Encoder", steerEncoder);
   }
 
   /**

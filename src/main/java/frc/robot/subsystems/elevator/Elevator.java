@@ -35,6 +35,7 @@ import frc.robot.util.hardware.motion.DualLinearActuator;
 public class Elevator extends DualLinearActuator {
   public Elevator() {
     super(
+        "Elevator",
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
         DIO.ELEVATOR_ENCODER,

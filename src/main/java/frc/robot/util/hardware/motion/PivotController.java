@@ -61,6 +61,7 @@ public class PivotController extends SubsystemBase {
   private PIDController simPID;
 
   public PivotController(
+      String name,
       int motorCAN,
       int absoluteEncoderDIO,
       double absolutePositionOffset,
@@ -73,6 +74,8 @@ public class PivotController extends SubsystemBase {
       Angle maxAngle,
       Angle tolerance,
       boolean reversed) {
+    
+    setName(name);
     // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
     // profile = new TrapezoidProfile(
     //   new Constraints(maxVelocity, maxAcceleration)
@@ -108,6 +111,7 @@ public class PivotController extends SubsystemBase {
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
+    statusChecks.add("motor", motor);
 
     sim =
         new SingleJointedArmSim(

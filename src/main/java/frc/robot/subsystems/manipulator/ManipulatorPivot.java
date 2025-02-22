@@ -21,6 +21,7 @@ public class ManipulatorPivot extends PivotController {
 
   public ManipulatorPivot() {
     super(
+        "Manipulator Pivot",
         CAN.MANIPULATOR_PIVOT,
         DIO.MANIPULATOR_ENCODER,
         MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),

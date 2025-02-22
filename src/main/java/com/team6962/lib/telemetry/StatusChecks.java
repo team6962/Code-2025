@@ -2,25 +2,25 @@ package com.team6962.lib.telemetry;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import com.team6962.lib.utils.CTREUtils;
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
 
 /**
  * {@code StatusChecks} is a utility class that provides a way to add boolean status checks to
@@ -45,6 +45,16 @@ public final class StatusChecks {
 
   private static ShuffleboardTab tab = Shuffleboard.getTab("Status Checks");
   private static Notifier notifier = new Notifier(StatusChecks::refresh);
+  private static int currentPosition = 0;
+  private static int viewWidth = 10;
+
+  private static int getColumn(int position) {
+    return position % viewWidth;
+  }
+
+  private static int getRow(int position) {
+    return position / viewWidth;
+  }
 
   public static void start() {
     tab.add("Refresh", Commands.runOnce(StatusChecks::refresh));
@@ -71,16 +81,19 @@ public final class StatusChecks {
   }
 
   public static class Category {
-    private ShuffleboardLayout grid;
+    private String categoryName;
 
     public Category(String name) {
-      grid = tab.getLayout(name, BuiltInLayouts.kGrid);
+      this.categoryName = name;
     }
 
     public void add(String name, BooleanSupplier checkSupplier) {
+      int position = currentPosition++;
+
       GenericEntry entry =
-          grid.add(name, checkSupplier.getAsBoolean())
+          tab.add(categoryName + "/" + name, checkSupplier.getAsBoolean())
               .withWidget(BuiltInWidgets.kBooleanBox)
+              .withPosition(getColumn(position), getRow(position))
               .getEntry();
 
       updates.add(() -> entry.setBoolean(checkSupplier.getAsBoolean()));
