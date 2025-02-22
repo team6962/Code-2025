@@ -93,6 +93,7 @@ public final class StatusChecks {
       GenericEntry entry =
           tab.add(categoryName + "/" + name, checkSupplier.getAsBoolean())
               .withWidget(BuiltInWidgets.kBooleanBox)
+              .withSize(1, 1)
               .withPosition(getColumn(position), getRow(position))
               .getEntry();
 
