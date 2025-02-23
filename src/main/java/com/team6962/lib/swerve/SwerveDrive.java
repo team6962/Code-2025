@@ -3,6 +3,9 @@ package com.team6962.lib.swerve;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -24,11 +27,14 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import java.util.function.Supplier;
 
 /**
@@ -395,4 +401,34 @@ public class SwerveDrive extends SwerveCore {
         },
         useMotion());
   }
+
+  // public Command calibrate() {
+  //   SysIdRoutine calibrationRoutine = new SysIdRoutine(
+  //     new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(2.0), Seconds.of(3.0)),
+  //     new SysIdRoutine.Mechanism(
+  //       voltage -> drive(new ChassisSpeeds(voltage.in(Volts) / 12.0 * , 0, 0)),
+  //       log -> log.motor("elevator")
+  //           .voltage(Volts.of((
+  //             leftMotor.getAppliedOutput() * leftMotor.getBusVoltage() +
+  //             rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()) / 2.0))
+  //           .linearPosition(getAverageHeight())
+  //           .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() + rightMotor.getEncoder().getVelocity()) / 2)),
+  //       this));
+
+  //   return Commands.sequence(
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0)
+  //   );
+  // }
 }
