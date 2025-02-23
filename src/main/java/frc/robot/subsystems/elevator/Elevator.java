@@ -167,7 +167,7 @@ public class Elevator extends DualLinearActuator {
               leftMotor.getAppliedOutput() * leftMotor.getBusVoltage() +
               rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()) / 2.0))
             .linearPosition(getAverageHeight())
-            .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() + rightMotor.getEncoder().getVelocity()) / 2)),
+            .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() + rightMotor.getEncoder().getVelocity()) / 2.0)),
         this));
 
     return Commands.sequence(

@@ -288,25 +288,33 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = 5 * 5 * 5;
+    public static final double GEARING = 9 * 5 * 4;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.349);
-    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(60);
+    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP = 4.0;
+      public static final double kP = 3.75;
       public static final double kI = 0.0;
-      public static final double kD = 0.0; // 0.1;
+      public static final double kD = 10.0; // 0.1;
       public static final double kS = 0.3;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
-    public static final Angle MAX_ANGLE = Degrees.of(35.0); // RESET TO 40.0
-    public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
+    public static final Angle MAX_ANGLE = Degrees.of(22.0); // RESET TO 40.0
+    // public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
+    public static final Angle MIN_LOW_ANGLE = Degrees.of(-135.5);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
+
+
+    public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
+    public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
+    public static final Angle PID_MAX_ANGLE = Degrees.of(0.0);
+    public static final Angle TOLERANCE = Degrees.of(2.0);
+
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(22.5);

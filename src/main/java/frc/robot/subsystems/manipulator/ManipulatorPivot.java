@@ -38,13 +38,13 @@ public class ManipulatorPivot extends PivotController {
         MANIPULATOR_PIVOT.GEARING,
         MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
         MANIPULATOR_PIVOT.MAX_ANGLE,
-        Degrees.of(2),
+        MANIPULATOR_PIVOT.TOLERANCE,
         false);
     // setDefaultCommand(stow());
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    setDefaultCommand(hold());
+    // setDefaultCommand(hold());
   }
 
   @Override
@@ -112,17 +112,30 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE);
   }
 
+  public Command pidTestMin() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MIN_ANGLE);
+  }
+
+  public Command pidTestMid() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MID_ANGLE);
+  }
+
+  public Command pidTestMax() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MAX_ANGLE);
+  }
+
   public Command stop() {
     return run(this::stopMotor);
   }
 
-  public Command up() {
-    return run(this::moveUp);
-  }
+  // public Command up() {
+  //   return run(this::moveUp);
+  // }
 
-  public Command down() {
-    return run(this::moveDown);
-  }
+  // public Command down() {
+  //   return run(this::moveDown);
+  // }
+  
 
   public Command calibrate() {
     SysIdRoutine calibrationRoutine = new SysIdRoutine(
