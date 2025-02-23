@@ -94,16 +94,16 @@ public class PivotController extends SubsystemBase {
 
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, kI, kD, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, kI, kD, 0.0, minAngle.in(Rotations), maxAngle.in(Rotations), false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
-    Logger.logMeasure(this.getName() + "/targetPosition", () -> getTargetAngle());
-    Logger.logMeasure(this.getName() + "/position", () -> getPosition());
-    Logger.logMeasure(
-        this.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()));
-    Logger.logMeasure(
-        this.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()));
-    Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
+    // Logger.logMeasure(this.getName() + "/targetPosition", () -> getTargetAngle());
+    // Logger.logMeasure(this.getName() + "/position", () -> getPosition());
+    // Logger.logMeasure(
+    //     this.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()));
+    // Logger.logMeasure(
+    //     this.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()));
+    // Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
@@ -130,6 +130,8 @@ public class PivotController extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
     Logger.logBoolean(this.getName() + "/forwardSafety", this::triggeredForwardSafety);
     Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
+    Logger.logNumber(this.getName() + "/kS", () -> calculateKS(getPosition()));
+    Logger.logNumber(this.getName() + "/appliedDutyCycle", () -> motor.getAppliedOutput());
     // Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
 
     encoder.setPosition(getPosition().in(Rotations));
@@ -160,8 +162,8 @@ public class PivotController extends SubsystemBase {
           targetAngle.in(Rotations),
           ControlType.kPosition,
           ClosedLoopSlot.kSlot0,
-          Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + getPosition().in(Radians))
-              * kS);
+          calculateKS(getPosition())
+          );
     } else {
       motor.stopMotor();
     }
@@ -208,7 +210,7 @@ public class PivotController extends SubsystemBase {
   }
 
   public Command move(double speed) {
-    return runOnce(() -> moveSpeed(speed));
+    return run(() -> moveSpeed(speed)).finallyDo(motor::stopMotor);
   }
 
   public void moveSpeed(double speed) {
@@ -216,12 +218,16 @@ public class PivotController extends SubsystemBase {
     else motor.set(0);
   }
 
-  public void moveUp() {
-    moveSpeed(0.1);
+  public Command up() {
+    return move(0.6);
   }
 
-  public void moveDown() {
-    moveSpeed(-0.1);
+  public Command down() {
+    return move(-0.6);
+  }
+
+  public double calculateKS(Angle currentAngle) {
+    return kS * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
   }
 
   public Angle getPosition() {

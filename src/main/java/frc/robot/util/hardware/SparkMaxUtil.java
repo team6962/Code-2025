@@ -98,8 +98,22 @@ public final class SparkMaxUtil {
   }
 
   public static void configurePID(
-      SparkMaxConfig config, double kP, double kI, double kD, double kV, boolean wrap) {
-    config.closedLoop.pidf(kP, kI, kD, kV / 12.0);
+      SparkMaxConfig config,
+      double kP,
+      double kI,
+      double kD,
+      double kV,
+      double minValue,
+      double maxValue,
+      boolean wrap) {
+    config.closedLoop
+        .p(kP)
+        .i(kI)
+        .d(kD);
+        // .velocityFF(kV / 12.0);
+        // .minOutput(minValue)
+        // .maxOutput(maxValue);
+        
 
     if (wrap) {
       config.closedLoop.positionWrappingEnabled(true);

@@ -28,7 +28,7 @@ public class RealIntakePivot extends IntakePivot {
     motor = new SparkMax(CAN.INTAKE_PIVOT, MotorType.kBrushless);
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.configurePID(motorConfig, 1.0, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     closedLoopController = motor.getClosedLoopController();
