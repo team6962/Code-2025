@@ -61,6 +61,7 @@ public class PivotController extends SubsystemBase {
   private PIDController simPID;
 
   public PivotController(
+      String name,
       int motorCAN,
       int absoluteEncoderDIO,
       double absolutePositionOffset,
@@ -73,6 +74,8 @@ public class PivotController extends SubsystemBase {
       Angle maxAngle,
       Angle tolerance,
       boolean reversed) {
+    
+    setName(name);
     // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
     // profile = new TrapezoidProfile(
     //   new Constraints(maxVelocity, maxAcceleration)
@@ -108,6 +111,7 @@ public class PivotController extends SubsystemBase {
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
+    statusChecks.add("motor", motor);
 
     sim =
         new SingleJointedArmSim(
@@ -121,8 +125,8 @@ public class PivotController extends SubsystemBase {
             0.0);
     simPID = new PIDController(kP, 0, 0);
 
-    Logger.log(this.getName() + "/minAngle", minAngle.in(Rotations));
-    Logger.log(this.getName() + "/maxAngle", maxAngle.in(Rotations));
+    Logger.logNumber(this.getName() + "/minAngle", () -> minAngle.in(Rotations));
+    Logger.logNumber(this.getName() + "/maxAngle", () -> maxAngle.in(Rotations));
     Logger.logNumber(this.getName() + "/targetAngle", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle", () -> getPosition().in(Rotations));
     Logger.logNumber(this.getName() + "/relativePosition", () -> encoder.getPosition());
@@ -217,11 +221,11 @@ public class PivotController extends SubsystemBase {
   }
 
   public void moveUp() {
-    moveSpeed(0.05);
+    moveSpeed(0.1);
   }
 
   public void moveDown() {
-    moveSpeed(-0.05);
+    moveSpeed(-0.1);
   }
 
   public Angle getPosition() {

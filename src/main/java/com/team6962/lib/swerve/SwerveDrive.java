@@ -507,4 +507,34 @@ public class SwerveDrive extends SwerveCore {
         },
         useMotion());
   }
+
+  // public Command calibrate() {
+  //   SysIdRoutine calibrationRoutine = new SysIdRoutine(
+  //     new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(2.0), Seconds.of(3.0)),
+  //     new SysIdRoutine.Mechanism(
+  //       voltage -> drive(new ChassisSpeeds(voltage.in(Volts) / 12.0 * , 0, 0)),
+  //       log -> log.motor("elevator")
+  //           .voltage(Volts.of((
+  //             leftMotor.getAppliedOutput() * leftMotor.getBusVoltage() +
+  //             rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()) / 2.0))
+  //           .linearPosition(getAverageHeight())
+  //           .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() + rightMotor.getEncoder().getVelocity()) / 2)),
+  //       this));
+
+  //   return Commands.sequence(
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0),
+  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
+  //     Commands.waitSeconds(1.0)
+  //   );
+  // }
 }

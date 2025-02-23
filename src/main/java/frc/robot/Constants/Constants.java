@@ -156,7 +156,7 @@ public final class Constants {
     public static final double TELEOPERATED_DRIVE_POWER = 1.0; // Percent driving power
     public static final double TELEOPERATED_BOOST_POWER =
         1.0; // Percent power when using the triggers
-    public static final double TELEOPERATED_ROTATE_POWER = 1.0; // Percent rotating power
+    public static final double TELEOPERATED_ROTATE_POWER = 0.4; // Percent rotating power
   }
 
   public static final class CAN {
@@ -295,7 +295,7 @@ public final class Constants {
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(60);
 
     public static final class PROFILE {
-      public static final double kP = 4.0;
+      public static final double kP = 2.0;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 0.1;
       public static final double kS = 0.3;

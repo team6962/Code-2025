@@ -17,6 +17,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -64,6 +65,7 @@ public class DualLinearActuator extends SubsystemBase {
    * @param tolerance The tolerance for the height control.
    */
   public DualLinearActuator(
+      String name,
       int leftCAN,
       int rightCAN,
       int absoluteEncoderDIO,
@@ -78,6 +80,7 @@ public class DualLinearActuator extends SubsystemBase {
       Distance minHeight,
       Distance maxHeight,
       Distance tolerance) {
+    setName(name);
 
     this.kS = kS;
     this.baseHeight = baseHeight;
@@ -139,6 +142,8 @@ public class DualLinearActuator extends SubsystemBase {
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
+    statusChecks.add("leftMotor", leftMotor);
+    statusChecks.add("rightMotor", rightMotor);
   }
 
   private void seedEncoders(Distance height) {
@@ -184,8 +189,14 @@ public class DualLinearActuator extends SubsystemBase {
 
   public void moveSpeed(double speed) {
     if (canMoveInDirection(speed)) {
+      double startTime = Timer.getFPGATimestamp();
       leftMotor.set(speed);
+      double swapTime = Timer.getFPGATimestamp();
       rightMotor.set(speed);
+      double endTime = Timer.getFPGATimestamp();
+
+      Logger.log(this.getName() + "/leftTime", swapTime - startTime);
+      Logger.log(this.getName() + "/rightTime", endTime - swapTime);
     } else {
       stopMotors();
     }
