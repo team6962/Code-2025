@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * {@code StatusChecks} is a utility class that provides a way to add boolean status checks to
@@ -45,6 +48,7 @@ public final class StatusChecks {
 
   private static ShuffleboardTab tab = Shuffleboard.getTab("Status Checks");
   private static Notifier notifier = new Notifier(StatusChecks::refresh);
+  private static final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("StatusChecks");
   private static int currentPosition = 0;
   private static int viewWidth = 10;
 
@@ -81,9 +85,11 @@ public final class StatusChecks {
   }
 
   public static class Category {
+    private final NetworkTable table;
     private String categoryName;
 
     public Category(String name) {
+      table = networkTable.getSubTable(name);
       this.categoryName = name;
     }
 
@@ -96,6 +102,9 @@ public final class StatusChecks {
               .withSize(1, 1)
               .withPosition(getColumn(position), getRow(position))
               .getEntry();
+      
+      NetworkTableEntry ntEntry = table.getEntry(name);
+      ntEntry.setBoolean(checkSupplier.getAsBoolean());
 
       updates.add(() -> entry.setBoolean(checkSupplier.getAsBoolean()));
       updates.add(

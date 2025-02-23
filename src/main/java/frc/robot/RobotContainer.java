@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,7 +29,6 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.autonomous.AutoGeneration.AutoParams;
-import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.autonomous.GeneratedAuto;
 import frc.robot.subsystems.Controls;
@@ -175,6 +173,20 @@ public class RobotContainer {
 
       return auto.getCommand();
     }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+
+    // return autonomous.createAutonomousCommand();
+
+    // return Commands.defer(() -> {
+    //   System.out.println("Generating auto command");
+
+    //   return autoGen.generate();
+    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+
+    // return Commands.sequence(
+    //   // elevator.calibrate()
+    //   manipulator.pivot.calibrate()
+    // );
+
     // return hang.stow();
     // return Commands.run(() -> {});
   }

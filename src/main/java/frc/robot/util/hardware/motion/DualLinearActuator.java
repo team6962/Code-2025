@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
@@ -31,7 +32,7 @@ public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
-  private SparkMax leftMotor, rightMotor;
+  protected SparkMax leftMotor, rightMotor;
   private RelativeEncoder leftEncoder, rightEncoder;
   private SparkClosedLoopController leftPID, rightPID;
 
@@ -103,13 +104,13 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
     this.ceilingLimit = new DigitalInput(ceilingLimitDIO);
@@ -136,7 +137,6 @@ public class DualLinearActuator extends SubsystemBase {
 
     Logger.logNumber(getName() + "/leftCurrent", leftMotor::getOutputCurrent);
     Logger.logNumber(getName() + "/rightCurrent", rightMotor::getOutputCurrent);
-
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
