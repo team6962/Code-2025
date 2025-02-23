@@ -35,6 +35,9 @@ import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -69,6 +72,8 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
+  private final NetworkTable table;
+
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   // private SteerModuleTest steerModuleTest = new SteerModuleTest();
@@ -82,6 +87,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     instance = this;
+
+    table = NetworkTableInstance.getDefault().getTable("StatusChecks");
 
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog(), true);
