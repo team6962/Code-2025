@@ -153,7 +153,7 @@ public final class Constants {
   public static final class SWERVE_DRIVE {
     public static final double TELEOPERATED_FINE_TUNE_DRIVE_POWER =
         0.1; // Percent driving power when using d-pad
-    public static final double TELEOPERATED_DRIVE_POWER = 1.0; // Percent driving power
+    public static final double TELEOPERATED_DRIVE_POWER = 0.5; // Percent driving power
     public static final double TELEOPERATED_BOOST_POWER =
         1.0; // Percent power when using the triggers
     public static final double TELEOPERATED_ROTATE_POWER = 0.4; // Percent rotating power
@@ -298,7 +298,7 @@ public final class Constants {
       public static final double kP = 2.0;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 0.1;
-      public static final double kS = 0.3;
+      public static final double kS = 0.2;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 

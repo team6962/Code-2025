@@ -2,8 +2,11 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -57,7 +60,9 @@ public final class SwerveConstants {
         Wheel.COLSON,
         new DriveGains(
             new PIDConstants(4.0, 0.0, 1.0), new PIDConstants(1.0, 0.5, 0.01))
-          .withFineTranslation(new PIDConstants(1.0, 0.0, 0.5)));
+          .withFineTranslation(new PIDConstants(2.0, 0.0, 0.5)))
+      .withMaxDriveSpeed(MetersPerSecond.of(3.9))
+      .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {

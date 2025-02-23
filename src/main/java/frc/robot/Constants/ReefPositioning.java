@@ -45,7 +45,7 @@ public final class ReefPositioning {
         0
     );
 
-    public static final Distance ROBOT_TO_EDGE_LEAVE_ALGAE = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(18));
+    public static final Distance ROBOT_TO_EDGE_LEAVE_ALGAE = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(17));
 
     public static final Translation2d LEAVE_ALGAE_RELATIVE = new Translation2d(
         REEF_TO_EDGE.plus(ROBOT_TO_EDGE_LEAVE_ALGAE).in(Meters),
@@ -95,11 +95,11 @@ public final class ReefPositioning {
     }
 
     public static Pose2d getCoralPlacePose(int pole) {
-        return rotatePose(getPolePose(PLACE_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(0)); // 180
+        return rotatePose(getPolePose(PLACE_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getCoralAlignPose(int pole) {
-        return rotatePose(getPolePose(ALIGN_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(0)); // 180
+        return rotatePose(getPolePose(ALIGN_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getAlgaePlacePose(int face) {

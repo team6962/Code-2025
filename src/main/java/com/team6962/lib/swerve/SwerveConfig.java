@@ -65,6 +65,8 @@ public class SwerveConfig {
   private final Motor steerMotor;
   private final Wheel wheel;
   private final DriveGains driveGains;
+  private LinearVelocity maxSpeed;
+  private AngularVelocity maxRotation;
 
   public SwerveConfig(
       Chassis chassis,
@@ -81,6 +83,18 @@ public class SwerveConfig {
     this.steerMotor = steerMotor;
     this.wheel = wheel;
     this.driveGains = driveGains;
+  }
+
+  public SwerveConfig withMaxDriveSpeed(LinearVelocity maxSpeed) {
+    this.maxSpeed = maxSpeed;
+
+    return this;
+  }
+
+  public SwerveConfig withMaxRotationSpeed(AngularVelocity maxRotation) {
+    this.maxRotation = maxRotation;
+
+    return this;
   }
 
   public Chassis chassis() {
@@ -320,7 +334,7 @@ public class SwerveConfig {
   }
 
   public LinearVelocity maxDriveSpeed() {
-    return driveMotorRotorToMechanism(driveMotor.freeSpeedRotor());
+    return maxSpeed == null ? driveMotorRotorToMechanism(driveMotor.freeSpeedRotor()) : maxSpeed;
   }
 
   public AngularVelocity maxSteerSpeed() {
@@ -371,7 +385,7 @@ public class SwerveConfig {
   }
 
   public AngularVelocity maxRotationSpeed() {
-    return RadiansPerSecond.of(
+    return maxRotation != null ? maxRotation : RadiansPerSecond.of(
         maxDriveSpeed().in(MetersPerSecond) / chassis.driveRadius().in(Meters));
   }
 

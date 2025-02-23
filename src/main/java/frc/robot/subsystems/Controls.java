@@ -101,6 +101,7 @@ public class Controls {
     operator.back().onTrue(pieceCombos.algaeL2());
     operator.start().onTrue(pieceCombos.algaeL3());
     operator.rightStick().onTrue(pieceCombos.intakeCoral()); // big right paddle
+    operator.leftStick().onTrue(pieceCombos.stow());
     operator.rightBumper().whileTrue(manipulator.coral.backwards());
     operator.rightTrigger().whileTrue(manipulator.coral.magicButton());
     operator.leftBumper().whileTrue(pieceCombos.pickupGroundAlgae());
