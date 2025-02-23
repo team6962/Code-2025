@@ -1,5 +1,6 @@
 package frc.robot.util.hardware.motion;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.revrobotics.RelativeEncoder;
@@ -31,7 +32,7 @@ public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
   private double kS = 0.0;
 
-  private SparkMax leftMotor, rightMotor;
+  protected SparkMax leftMotor, rightMotor;
   private RelativeEncoder leftEncoder, rightEncoder;
   private SparkClosedLoopController leftPID, rightPID;
 
@@ -103,13 +104,13 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, false);
+    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
     this.ceilingLimit = new DigitalInput(ceilingLimitDIO);
@@ -134,6 +135,8 @@ public class DualLinearActuator extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
 
+    Logger.logMeasure(this.getName() + "/leftCurrent", () -> Amps.of(leftMotor.getOutputCurrent()));
+    Logger.logMeasure(this.getName() + "/rightCurrent", () -> Amps.of(rightMotor.getOutputCurrent()));
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);

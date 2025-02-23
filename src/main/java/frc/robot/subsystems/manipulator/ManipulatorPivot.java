@@ -2,10 +2,16 @@ package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
@@ -32,13 +38,13 @@ public class ManipulatorPivot extends PivotController {
         MANIPULATOR_PIVOT.GEARING,
         MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
         MANIPULATOR_PIVOT.MAX_ANGLE,
-        Degrees.of(2),
+        MANIPULATOR_PIVOT.TOLERANCE,
         false);
     // setDefaultCommand(stow());
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    setDefaultCommand(hold());
+    // setDefaultCommand(hold());
   }
 
   @Override
@@ -106,15 +112,64 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE);
   }
 
+  public Command pidTestMin() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MIN_ANGLE);
+  }
+
+  public Command pidTestMid() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MID_ANGLE);
+  }
+
+  public Command pidTestMax() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.PID_MAX_ANGLE);
+  }
+
   public Command stop() {
     return run(this::stopMotor);
   }
 
-  public Command up() {
-    return run(this::moveUp);
-  }
+  // public Command up() {
+  //   return run(this::moveUp);
+  // }
 
-  public Command down() {
-    return run(this::moveDown);
+  // public Command down() {
+  //   return run(this::moveDown);
+  // }
+  
+
+  public Command calibrate() {
+    SysIdRoutine calibrationRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(1.5)),
+      new SysIdRoutine.Mechanism(
+        voltage -> {
+          if (!canMoveInDirection(voltage.in(Volts))) {
+            DriverStation.reportError("Reached limit switch", false);
+
+            return;
+          }
+
+          motor.setVoltage(voltage);
+        },
+        log -> log.motor("manipulator-pivot")
+            .voltage(Volts.of(motor.getAppliedOutput() * motor.getBusVoltage()))
+            .angularPosition(getPosition())
+            .angularVelocity(RotationsPerSecond.of(motor.getEncoder().getVelocity())),
+        this));
+
+    return Commands.sequence(
+      Commands.waitSeconds(1.0),
+      calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+      Commands.runOnce(motor::stopMotor),
+      Commands.waitSeconds(1.0),
+      calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+      Commands.runOnce(motor::stopMotor),
+      Commands.waitSeconds(1.0),
+      calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+      Commands.runOnce(motor::stopMotor),
+      Commands.waitSeconds(1.0),
+      calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+      Commands.runOnce(motor::stopMotor),
+      Commands.waitSeconds(1.0)
+    );
   }
 }
