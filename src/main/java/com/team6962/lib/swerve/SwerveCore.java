@@ -131,9 +131,13 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
       states = KinematicsUtils.getStoppedStates(getModuleStates());
     }
 
+    Logger.log(
+        getName() + "/targetModuleSpeeds_predesaturate",
+        robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
+
     states =
         KinematicsUtils.desaturateWheelSpeeds(
-            states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
+            states, constants.maxDriveSpeed());
 
     Logger.log(
         getName() + "/targetModuleSpeeds",

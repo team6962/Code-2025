@@ -221,11 +221,11 @@ public class PivotController extends SubsystemBase {
   }
 
   public void moveUp() {
-    moveSpeed(0.05);
+    moveSpeed(0.1);
   }
 
   public void moveDown() {
-    moveSpeed(-0.05);
+    moveSpeed(-0.1);
   }
 
   public Angle getPosition() {

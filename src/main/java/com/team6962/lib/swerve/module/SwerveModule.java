@@ -1,11 +1,13 @@
 package com.team6962.lib.swerve.module;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -90,6 +92,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveConfig.apply(
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
+    CTREUtils.check(driveConfig.apply(new CurrentLimitsConfigs()
+      .withSupplyCurrentLimit(Amps.of(50))));
+
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
@@ -124,6 +129,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive)
                 .withNeutralMode(NeutralModeValue.Brake)));
+    
+    CTREUtils.check(steerConfig.apply(new CurrentLimitsConfigs()
+      .withSupplyCurrentLimit(Amps.of(50))));
 
     // Configure the fusing of the absolute steer encoder's reported position
     // with the motor's internal relative encoder, and set the steer motor

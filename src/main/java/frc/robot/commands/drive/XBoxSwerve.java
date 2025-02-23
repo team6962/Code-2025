@@ -70,6 +70,10 @@ public class XBoxSwerve extends Command {
         swerveDrive
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
             .in(RadiansPerSecond);
+
+
+    Logger.logNumber("XBoxSwerve/nomVel", () -> NOMINAL_DRIVE_VELOCITY);
+    Logger.logNumber("XBoxSwerve/maxVel", () -> MAX_DRIVE_VELOCITY);
   }
 
   // Called when the command is initially scheduled.
@@ -108,6 +112,8 @@ public class XBoxSwerve extends Command {
     angularVelocity +=
         -rightStick.getX()
             * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+
+    Logger.log("XBoxSwerve/rightTrig", rightTrigger);
 
     velocity =
         velocity.plus(
@@ -149,6 +155,7 @@ public class XBoxSwerve extends Command {
     ChassisSpeeds drivenSpeeds =
         new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
 
+    Logger.log("XBoxSwerve/maxDriveSpeed", swerveDrive.getConstants().maxDriveSpeed());
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
     boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
