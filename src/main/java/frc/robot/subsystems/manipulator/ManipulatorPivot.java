@@ -36,7 +36,7 @@ public class ManipulatorPivot extends PivotController {
         MANIPULATOR_PIVOT.PROFILE.kD,
         MANIPULATOR_PIVOT.PROFILE.kS,
         MANIPULATOR_PIVOT.GEARING,
-        MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+        MANIPULATOR_PIVOT.MIN_ANGLE,
         MANIPULATOR_PIVOT.MAX_ANGLE,
         MANIPULATOR_PIVOT.TOLERANCE,
         false);
@@ -44,7 +44,7 @@ public class ManipulatorPivot extends PivotController {
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    // setDefaultCommand(hold());
+    setDefaultCommand(hold());
   }
 
   @Override

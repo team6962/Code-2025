@@ -26,6 +26,7 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.PrematchChecks;
+import frc.robot.commands.SafeManipulator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs;
@@ -127,6 +128,8 @@ public class RobotContainer {
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
+    SafeManipulator safeManipulator = new SafeManipulator(elevator, manipulator);
+    safeManipulator.passiveSafety().schedule();
     // // collisionDetector = new CollisionDetector();x
 
     // System.out.println(swerveDrive);

@@ -22,20 +22,35 @@ public class SafeManipulator {
     }
 
     public static Angle calcSafeMinAngle(Distance elevatorHeight) {
-       if (elevatorHeight.lt(Inches.of(40.0))) {
-        return Degrees.of(-15.0);
+       if (elevatorHeight.lt(Inches.of(43))) {
+        return Degrees.of(-50.0);
        }
 
-       if (Inches.of(45).lt(elevatorHeight) && elevatorHeight.lt(Inches.of(50.0))) {
+       if (Inches.of(43).lt(elevatorHeight) && elevatorHeight.lt(Inches.of(54))) {
         return Degrees.of(-90.0);
        }
 
-       return MANIPULATOR_PIVOT.MIN_LOW_ANGLE;
-        
+       if (Inches.of(54).lt(elevatorHeight)) {
+        return MANIPULATOR_PIVOT.MIN_ANGLE;
+       }
+
+       return MANIPULATOR_PIVOT.SAFE_ANGLE;
     }
 
     public static Angle calcSafeMaxAngle(Distance elevatorHeight) {
-        return MANIPULATOR_PIVOT.MAX_ANGLE;
+        if (elevatorHeight.lt(Inches.of(40))) {
+            return MANIPULATOR_PIVOT.MAX_ANGLE;
+        }
+
+        if (Inches.of(43).lt(elevatorHeight) && elevatorHeight.lt(Inches.of(82))) {
+            return Degrees.of(-20.0);
+        }
+
+        if (Inches.of(82).lt(elevatorHeight)) {
+            return MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE;
+        }
+
+        return MANIPULATOR_PIVOT.SAFE_ANGLE;
     }
 
     public void setSafeAngle() {
@@ -53,6 +68,10 @@ public class SafeManipulator {
 
     public Command safeMove(Command elevatorCommand) {
         return elevatorCommand.deadlineFor(Commands.run(() -> setSafeAngle()));
+    }
+    
+    public Command passiveSafety() {
+        return Commands.run(() -> setSafeAngle()).repeatedly();
     }
 
 }

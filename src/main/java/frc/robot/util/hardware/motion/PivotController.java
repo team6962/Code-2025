@@ -210,6 +210,7 @@ public class PivotController extends SubsystemBase {
   public void setMinMaxAngle(Angle minAngle, Angle maxAngle) {
     this.minAngle = minAngle;
     this.maxAngle = maxAngle;
+    System.out.println("SETTING!");
     targetAngle = clampAngle(targetAngle);
   }
 
@@ -223,11 +224,11 @@ public class PivotController extends SubsystemBase {
   }
 
   public Command up() {
-    return move(0.6);
+    return move(0.3);
   }
 
   public Command down() {
-    return move(-0.6);
+    return move(-0.3);
   }
 
   public double calculateKS(Angle currentAngle) {

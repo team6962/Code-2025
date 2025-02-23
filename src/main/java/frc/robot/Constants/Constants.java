@@ -298,13 +298,13 @@ public final class Constants {
       public static final double kP = 3.75;
       public static final double kI = 0.0;
       public static final double kD = 10.0; // 0.1;
-      public static final double kS = 0.3;
+      public static final double kS = 0.15;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
     public static final Angle MAX_ANGLE = Degrees.of(22.0); // RESET TO 40.0
     // public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
-    public static final Angle MIN_LOW_ANGLE = Degrees.of(-135.5);
+    public static final Angle MIN_ANGLE = Degrees.of(-135.5);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
@@ -320,7 +320,7 @@ public final class Constants {
       public static final Angle L1_ANGLE = Degrees.of(22.5);
       public static final Angle L23_ANGLE = Degrees.of(-34.5);
       public static final Angle L4_ANGLE = Degrees.of(-56.5);
-      public static final Angle INTAKE_ANGLE = Degrees.of(-135.5);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-135.4);
     }
 
     public static final class ALGAE {
