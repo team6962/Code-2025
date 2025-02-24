@@ -12,7 +12,6 @@ import com.team6962.lib.utils.CTREUtils;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,12 +40,6 @@ public final class StatusChecks {
   private StatusChecks() {}
   private static final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("StatusChecks");
 
-  public static void start() {
-  }
-
-  public static void start(Time autoRefreshPeriod) {
-    start();
-  }
 
   private static List<Runnable> updates = new ArrayList<>();
 
