@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
@@ -136,7 +135,7 @@ public class RobotContainer {
 
     // module = new SwerveModule();
     Trigger refreshButton = new Trigger(() -> NetworkTableInstance.getDefault()
-            .getTable("refreshButton")
+            .getTable("StatusChecks")
             .getEntry("refreshButton")
             .getBoolean(false));
     

@@ -1,7 +1,5 @@
 package com.team6962.lib.telemetry;
 
-import static edu.wpi.first.units.Units.Seconds;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -11,25 +9,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import com.team6962.lib.utils.CTREUtils;
 
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.BooleanTopic;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * {@code StatusChecks} is a utility class that provides a way to add boolean status checks to
@@ -51,31 +39,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public final class StatusChecks {
   private StatusChecks() {}
-
-  // private static ShuffleboardTab tab = Shuffleboard.getTab("Status Checks");
-
-  // private static ComplexWidget refreshButton = tab.add("Refresh", Commands.runOnce(StatusChecks::refresh)).withWidget("Command");
   private static final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("StatusChecks");
-  // private static NetworkTableEntry ntEntry = networkTable.getEntry("Refresh");
-
-  // private static int currentPosition = 0;
-  // private static int viewWidth = 10;
-
-  // private static int getColumn(int position) {
-  //   return position % viewWidth;
-  // }
-
-  // private static int getRow(int position) {
-  //   return position / viewWidth;
-  // }
 
   public static void start() {
-
   }
 
   public static void start(Time autoRefreshPeriod) {
     start();
-
   }
 
   private static List<Runnable> updates = new ArrayList<>();
@@ -99,22 +69,12 @@ public final class StatusChecks {
 
   public static class Category {
     private final NetworkTable table;
-    private String categoryName;
 
     public Category(String name) {
       table = networkTable.getSubTable(name);
-      this.categoryName = name;
     }
 
     public void add(String name, BooleanSupplier checkSupplier) {
-      // int position = currentPosition++;
-
-      // GenericEntry entry =
-      //     tab.add(categoryName + "/" + name, checkSupplier.getAsBoolean())
-      //         .withWidget(BuiltInWidgets.kBooleanBox)
-      //         .withSize(1, 1)
-      //         .withPosition(getColumn(position), getRow(position))
-      //         .getEntry();
       
       NetworkTableEntry ntEntry = table.getEntry(name);
       ntEntry.setBoolean(checkSupplier.getAsBoolean());
