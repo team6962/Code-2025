@@ -5,9 +5,7 @@
 package frc.robot;
 
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.net.WebServer;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -65,11 +63,14 @@ public class Robot extends TimedRobot {
     time = timestampAfter;
     computeTime = timestampAfter - timestampBefore;
 
-    if (NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton").getBoolean(false)) {
-      NetworkTableInstance.getDefault()
+    if (NetworkTableInstance.getDefault()
         .getTable("StatusChecks")
         .getEntry("refreshButton")
-        .setBoolean(false);
+        .getBoolean(false)) {
+      NetworkTableInstance.getDefault()
+          .getTable("StatusChecks")
+          .getEntry("refreshButton")
+          .setBoolean(false);
       StatusChecks.refresh();
     }
   }

@@ -1,24 +1,21 @@
 package com.team6962.lib.telemetry;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import com.team6962.lib.utils.CTREUtils;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 /**
  * {@code StatusChecks} is a utility class that provides a way to add boolean status checks to
@@ -40,11 +37,13 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public final class StatusChecks {
   private StatusChecks() {}
-  private static final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("StatusChecks");
 
+  private static final NetworkTable networkTable =
+      NetworkTableInstance.getDefault().getTable("StatusChecks");
 
   private static List<Runnable> updates = new ArrayList<>();
-  public static Command refreshCommand(){
+
+  public static Command refreshCommand() {
     return Commands.runOnce(() -> refresh());
   }
 
@@ -69,7 +68,7 @@ public final class StatusChecks {
     }
 
     public void add(String name, BooleanSupplier checkSupplier) {
-      
+
       NetworkTableEntry ntEntry = table.getEntry(name);
       ntEntry.setBoolean(checkSupplier.getAsBoolean());
 
@@ -104,20 +103,18 @@ public final class StatusChecks {
     public void add(String name, SparkMax motor) {
       add(motor.getDeviceId() + ". " + "Alive " + name, () -> motor.getFirmwareVersion() != 0);
       add(
-          motor.getDeviceId() +". " + "No Faults " + name,
-          () -> 
-              !(motor.getFaults().rawBits != 0
-                 || motor.getStickyFaults().rawBits != 0));
+          motor.getDeviceId() + ". " + "No Faults " + name,
+          () -> !(motor.getFaults().rawBits != 0 || motor.getStickyFaults().rawBits != 0));
     }
 
     public void add(String name, DutyCycleEncoder encoder) {
       add(name + " Connected", () -> encoder.isConnected());
     }
 
-    public void timestampAdd(String name, DoubleSupplier checkSupplier) {
-      NetworkTableEntry ntEntry = table.getEntry(name);
-      ntEntry.setNumber(checkSupplier.getAsDouble());
-      updates.add(() -> ntEntry.setNumber(checkSupplier.getAsDouble()));
-    }
+    // public void timestampAdd(String name, DoubleSupplier checkSupplier) {
+    //   NetworkTableEntry ntEntry = table.getEntry(name);
+    //   ntEntry.setNumber(checkSupplier.getAsDouble());
+    //   updates.add(() -> ntEntry.setNumber(checkSupplier.getAsDouble()));
+    // }
   }
 }

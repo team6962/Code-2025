@@ -9,7 +9,6 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.commands.ManipulatorSafeties;
@@ -113,7 +111,8 @@ public class RobotContainer {
     // ledStrip =
     //     new LEDs(
     //         stateController,
-    //         () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    //         () -> 1.0 +
+    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
@@ -131,12 +130,11 @@ public class RobotContainer {
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
     // module = new SwerveModule();
-    NetworkTableEntry refreshButtonEntry = NetworkTableInstance.getDefault()
-    .getTable("StatusChecks")
-    .getEntry("refreshButton");
+    NetworkTableEntry refreshButtonEntry =
+        NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
 
-    statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
-    
+    // statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
+
     refreshButtonEntry.setBoolean(false);
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
@@ -172,9 +170,8 @@ public class RobotContainer {
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     return Commands.sequence(
-      // elevator.calibrate()
-      manipulator.pivot.calibrate()
-    );
+        // elevator.calibrate()
+        manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
   }
