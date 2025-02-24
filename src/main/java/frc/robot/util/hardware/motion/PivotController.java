@@ -136,8 +136,14 @@ public class PivotController extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
     Logger.logNumber(this.getName() + "/kS", () -> calculateKS(getPosition()));
     Logger.logNumber(this.getName() + "/appliedDutyCycle", () -> motor.getAppliedOutput());
+    Logger.logMeasure(this.getName() + "/relativeAngle", () -> wrapAngle(Rotations.of(motor.getEncoder().getPosition())));
+    Logger.logMeasure(this.getName() + "/absoluteAngle", () -> wrapAngle(Rotations.of(absoluteEncoder.get())));
     // Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
 
+    seedEncoder();
+  }
+
+  public void seedEncoder() {
     encoder.setPosition(getPosition().in(Rotations));
   }
 
@@ -150,7 +156,7 @@ public class PivotController extends SubsystemBase {
       return;
     }
 
-    encoder.setPosition(getPosition().in(Rotations));
+    // encoder.setPosition(getPosition().in(Rotations));
 
     // Set onboard PID controller to follow
 
@@ -161,13 +167,19 @@ public class PivotController extends SubsystemBase {
     // System.out.println("kS: " + kS);
     // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
 
+    // if (targetAngle.gt(Degrees.of(90).minus(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET))) {
+    //   targetAngle = targetAngle.minus(MANIPULATOR_PIVOT.BACKLASH);
+    // } else {
+    //   targetAngle = targetAngle.plus(MANIPULATOR_PIVOT.BACKLASH);
+    // }
+
     if (canMoveInDirection(targetAngle.minus(getPosition()).in(Rotations))) {
       pid.setReference(
           targetAngle.in(Rotations),
           ControlType.kPosition,
           ClosedLoopSlot.kSlot0,
           calculateKS(getPosition())
-          );
+      );
     } else {
       motor.stopMotor();
     }
@@ -235,6 +247,25 @@ public class PivotController extends SubsystemBase {
     return kS * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
   }
 
+  private Angle wrapAngle(Angle angle) {
+    double factor = reversed ? -1 : 1;
+
+    // map from 0 - 1 rotations to -0.5 to 0.5 rotations, where 0 is straight
+    // out
+    double absoluteAngle = angle.in(Rotations) * factor; // rotations
+
+    // keeps the range between 0 and 1
+    if (absoluteAngle < 0) absoluteAngle++;
+    absoluteAngle %= 1.0;
+
+    // wrap at 0.5 rotations
+    if (absoluteAngle > 0.5) {
+      absoluteAngle -= 1;
+    }
+
+    return Rotations.of(absoluteAngle);
+  }
+
   public Angle getPosition() {
     if (Robot.isSimulation()) return Radians.of(sim.getAngleRads());
 
@@ -282,7 +313,7 @@ public class PivotController extends SubsystemBase {
 
   @Override
   public void periodic() {
-    encoder.setPosition(getPosition().in(Rotations));
+    // encoder.setPosition(getPosition().in(Rotations));
 
     if (triggeredForwardSafety() || triggeredReverseSafety()) {
       stopMotor();
