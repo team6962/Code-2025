@@ -137,6 +137,8 @@ public class DualLinearActuator extends SubsystemBase {
 
     Logger.logMeasure(this.getName() + "/leftCurrent", () -> Amps.of(leftMotor.getOutputCurrent()));
     Logger.logMeasure(this.getName() + "/rightCurrent", () -> Amps.of(rightMotor.getOutputCurrent()));
+    Logger.logBoolean(this.getName() + "/absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
+
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);

@@ -138,7 +138,7 @@ public class RobotContainer {
     Trigger refreshButtonTrigger = new Trigger(() -> refreshButtonEntry
             .getBoolean(false));
     
-    refreshButtonTrigger.onTrue(StatusChecks.refreshCommand());
+    refreshButtonTrigger.onTrue(StatusChecks.refreshCommand().alongWith(Commands.runOnce(() -> System.out.println("running"))));
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 

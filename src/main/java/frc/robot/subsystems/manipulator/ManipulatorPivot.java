@@ -59,13 +59,13 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving);
+    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving).finallyDo(this::seedEncoder);
   }
 
   public Command hold() {
     return Commands.defer(
         () -> {
-          Angle position = getPosition();
+          Angle position = getRelativePosition();
 
           return run(() -> moveTowards(position));
         },
@@ -152,7 +152,7 @@ public class ManipulatorPivot extends PivotController {
         },
         log -> log.motor("manipulator-pivot")
             .voltage(Volts.of(motor.getAppliedOutput() * motor.getBusVoltage()))
-            .angularPosition(getPosition())
+            .angularPosition(getRelativePosition())
             .angularVelocity(RotationsPerSecond.of(motor.getEncoder().getVelocity())),
         this));
 
