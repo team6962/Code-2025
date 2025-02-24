@@ -10,7 +10,7 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -69,8 +69,6 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private final NetworkTable table;
-
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   // private SteerModuleTest steerModuleTest = new SteerModuleTest();
@@ -84,8 +82,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     instance = this;
-
-    table = NetworkTableInstance.getDefault().getTable("StatusChecks");
 
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog(), true);
@@ -134,12 +130,15 @@ public class RobotContainer {
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
     // module = new SwerveModule();
-    Trigger refreshButton = new Trigger(() -> NetworkTableInstance.getDefault()
-            .getTable("StatusChecks")
-            .getEntry("refreshButton")
+    NetworkTableEntry refreshButtonEntry = NetworkTableInstance.getDefault()
+    .getTable("StatusChecks")
+    .getEntry("refreshButton");
+
+    refreshButtonEntry.setBoolean(false);
+    Trigger refreshButtonTrigger = new Trigger(() -> refreshButtonEntry
             .getBoolean(false));
     
-    refreshButton.onTrue(StatusChecks.refreshCommand());
+    refreshButtonTrigger.onTrue(StatusChecks.refreshCommand());
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
