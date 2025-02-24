@@ -16,7 +16,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.SafeManipulator;
+import frc.robot.commands.ManipulatorSafeties;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
