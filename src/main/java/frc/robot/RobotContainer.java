@@ -160,7 +160,6 @@ public class RobotContainer {
     // Logger.log("conversionTest/states",
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
 
-    StatusChecks.start();
     Logger.start(Milliseconds.of(20));
   }
 
