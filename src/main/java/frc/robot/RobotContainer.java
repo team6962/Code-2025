@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.commands.PieceCombos;
@@ -133,6 +135,12 @@ public class RobotContainer {
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
     // module = new SwerveModule();
+    Trigger refreshButton = new Trigger(() -> NetworkTableInstance.getDefault()
+            .getTable("refreshButton")
+            .getEntry("refreshButton")
+            .getBoolean(false));
+    
+    refreshButton.onTrue(StatusChecks.refreshCommand());
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
@@ -154,6 +162,7 @@ public class RobotContainer {
     // Logger.log("conversionTest/states",
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
 
+    StatusChecks.start();
     Logger.start(Milliseconds.of(20));
   }
 

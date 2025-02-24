@@ -57,9 +57,6 @@ public class SafeManipulator {
         Distance elevatorHeight = elevator.getAverageHeight();
         Angle minAngle = calcSafeMinAngle(elevatorHeight);
         Angle maxAngle = calcSafeMaxAngle(elevatorHeight);
-        System.out.println("MIN:" + minAngle);
-        System.out.println("MAX:" + maxAngle);
-
 
         manipulator.pivot.setMinMaxAngle(
             minAngle,

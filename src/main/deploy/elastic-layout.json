@@ -23,7 +23,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 1",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -35,7 +36,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 2",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -47,7 +49,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 3",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -59,7 +62,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 4",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -71,7 +75,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 5",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -83,7 +88,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Face 6",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -95,7 +101,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Right Station",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -107,7 +114,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Left Station",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           },
           {
@@ -119,7 +127,8 @@
             "type": "Toggle Button",
             "properties": {
               "topic": "/Shuffleboard/Autonomous/Starting Algae",
-              "period": 0.06
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]
@@ -141,14 +150,14 @@
             },
             "children": [
               {
-                "title": "17. Drive Motor Alive",
+                "title": "17. Alive Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/17. Drive Motor Alive",
+                  "topic": "/StatusChecks/Back Left Swerve Module/17. Alive Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -158,14 +167,14 @@
                 }
               },
               {
-                "title": "17. Drive Motor Faults",
+                "title": "17. No Faults Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/17. Drive Motor Faults",
+                  "topic": "/StatusChecks/Back Left Swerve Module/17. No Faults Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -175,14 +184,14 @@
                 }
               },
               {
-                "title": "27. Steer Motor Alive",
+                "title": "27. Alive Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/27. Steer Motor Alive",
+                  "topic": "/StatusChecks/Back Left Swerve Module/27. Alive Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -192,48 +201,48 @@
                 }
               },
               {
-                "title": "27. Steer Motor Faults",
-                "x": 128.0,
-                "y": 256.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/27. Steer Motor Faults",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "37. Steer Encoder Alive",
-                "x": 128.0,
-                "y": 512.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/37. Steer Encoder Alive",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "37. Steer Encoder Faults",
+                "title": "27. No Faults Steer Motor",
                 "x": 0.0,
-                "y": 512.0,
+                "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Left Swerve Module/37. Steer Encoder Faults",
+                  "topic": "/StatusChecks/Back Left Swerve Module/27. No Faults Steer Motor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "37. Alive Steer Encoder",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Back Left Swerve Module/37. Alive Steer Encoder",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "37. No Faults Steer Encoder",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Back Left Swerve Module/37. No Faults Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -256,14 +265,14 @@
             },
             "children": [
               {
-                "title": "16. Drive Motor Alive",
+                "title": "16. Alive Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/16. Drive Motor Alive",
+                  "topic": "/StatusChecks/Back Right Swerve Module/16. Alive Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -273,14 +282,14 @@
                 }
               },
               {
-                "title": "16. Drive Motor Faults",
+                "title": "16. No Faults Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/16. Drive Motor Faults",
+                  "topic": "/StatusChecks/Back Right Swerve Module/16. No Faults Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -290,14 +299,14 @@
                 }
               },
               {
-                "title": "26. Steer Motor Alive",
+                "title": "26. Alive Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/26. Steer Motor Alive",
+                  "topic": "/StatusChecks/Back Right Swerve Module/26. Alive Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -307,14 +316,14 @@
                 }
               },
               {
-                "title": "26. Steer Motor Faults",
+                "title": "26. No Faults Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/26. Steer Motor Faults",
+                  "topic": "/StatusChecks/Back Right Swerve Module/26. No Faults Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -324,14 +333,14 @@
                 }
               },
               {
-                "title": "36. Steer Encoder Alive",
+                "title": "36. Alive Steer Encoder",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/36. Steer Encoder Alive",
+                  "topic": "/StatusChecks/Back Right Swerve Module/36. Alive Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -341,14 +350,14 @@
                 }
               },
               {
-                "title": "36. Steer Encoder Faults",
+                "title": "36. No Faults Steer Encoder",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Back Right Swerve Module/36. Steer Encoder Faults",
+                  "topic": "/StatusChecks/Back Right Swerve Module/36. No Faults Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -371,14 +380,14 @@
             },
             "children": [
               {
-                "title": "15. Drive Motor Alive",
+                "title": "15. Alive Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/15. Drive Motor Alive",
+                  "topic": "/StatusChecks/Front Left Swerve Module/15. Alive Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -388,14 +397,14 @@
                 }
               },
               {
-                "title": "15. Drive Motor Faults",
+                "title": "15. No Faults Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/15. Drive Motor Faults",
+                  "topic": "/StatusChecks/Front Left Swerve Module/15. No Faults Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -405,14 +414,14 @@
                 }
               },
               {
-                "title": "25. Steer Motor Alive",
+                "title": "25. Alive Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/25. Steer Motor Alive",
+                  "topic": "/StatusChecks/Front Left Swerve Module/25. Alive Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -422,14 +431,14 @@
                 }
               },
               {
-                "title": "25. Steer Motor Faults",
+                "title": "25. No Faults Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/25. Steer Motor Faults",
+                  "topic": "/StatusChecks/Front Left Swerve Module/25. No Faults Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -439,14 +448,14 @@
                 }
               },
               {
-                "title": "35. Steer Encoder Alive",
+                "title": "35. Alive Steer Encoder",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/35. Steer Encoder Alive",
+                  "topic": "/StatusChecks/Front Left Swerve Module/35. Alive Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -456,14 +465,14 @@
                 }
               },
               {
-                "title": "35. Steer Encoder Faults",
-                "x": 0.0,
-                "y": 0.0,
+                "title": "35. No Faults Steer Encoder",
+                "x": 256.0,
+                "y": 512.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Left Swerve Module/35. Steer Encoder Faults",
+                  "topic": "/StatusChecks/Front Left Swerve Module/35. No Faults Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -486,14 +495,14 @@
             },
             "children": [
               {
-                "title": "14. Drive Motor Alive",
+                "title": "14. Alive Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/14. Drive Motor Alive",
+                  "topic": "/StatusChecks/Front Right Swerve Module/14. Alive Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -503,14 +512,14 @@
                 }
               },
               {
-                "title": "14. Drive Motor Faults",
+                "title": "14. No Faults Drive Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/14. Drive Motor Faults",
+                  "topic": "/StatusChecks/Front Right Swerve Module/14. No Faults Drive Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -520,14 +529,14 @@
                 }
               },
               {
-                "title": "24. Steer Motor Alive",
+                "title": "24. Alive Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/24. Steer Motor Alive",
+                  "topic": "/StatusChecks/Front Right Swerve Module/24. Alive Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -537,14 +546,14 @@
                 }
               },
               {
-                "title": "24. Steer Motor Faults",
+                "title": "24. No Faults Steer Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/24. Steer Motor Faults",
+                  "topic": "/StatusChecks/Front Right Swerve Module/24. No Faults Steer Motor",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -554,14 +563,14 @@
                 }
               },
               {
-                "title": "34. Steer Encoder Alive",
+                "title": "34. Alive Steer Encoder",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/34. Steer Encoder Alive",
+                  "topic": "/StatusChecks/Front Right Swerve Module/34. Alive Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -571,210 +580,14 @@
                 }
               },
               {
-                "title": "34. Steer Encoder Faults",
+                "title": "34. No Faults Steer Encoder",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/StatusChecks/Front Right Swerve Module/34. Steer Encoder Faults",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Elevator",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 768.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "2. leftMotor Alive",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/2. leftMotor Alive",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "2. leftMotor Faults",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/2. leftMotor Faults",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "3. rightMotor Alive",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/3. rightMotor Alive",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "3. rightMotor Faults",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/3. rightMotor Faults",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "absoluteEncoderConnected",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/absoluteEncoderConnected",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "absoluteEncoderUpdated",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Elevator/absoluteEncoderUpdated",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Manipulator Pivot",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 512.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "4. motor Alive",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Manipulator Pivot/4. motor Alive",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "4. motor Faults",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Manipulator Pivot/4. motor Faults",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "absoluteEncoderConnected",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Manipulator Pivot/absoluteEncoderConnected",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "absoluteEncoderUpdated",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/StatusChecks/Manipulator Pivot/absoluteEncoderUpdated",
+                  "topic": "/StatusChecks/Front Right Swerve Module/34. No Faults Steer Encoder",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -787,7 +600,7 @@
           },
           {
             "title": "General",
-            "x": 768.0,
+            "x": 896.0,
             "y": 0.0,
             "width": 128.0,
             "height": 768.0,
@@ -899,35 +712,227 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Manipulator Pivot",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "4. Alive motor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Manipulator Pivot/4. Alive motor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "4. No Faults motor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Manipulator Pivot/4. No Faults motor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "absoluteEncoderConnected",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Manipulator Pivot/absoluteEncoderConnected",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "absoluteEncoderUpdated",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Manipulator Pivot/absoluteEncoderUpdated",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 768.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "2. Alive leftMotor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/2. Alive leftMotor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "2. No Faults leftMotor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/2. No Faults leftMotor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "3. Alive rightMotor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/3. Alive rightMotor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "3. No Faults rightMotor",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/3. No Faults rightMotor",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "absoluteEncoderConnected",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/absoluteEncoderConnected",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "absoluteEncoderUpdated",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/StatusChecks/Elevator/absoluteEncoderUpdated",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
           }
         ],
         "containers": [
           {
-            "title": "Joystick 0",
+            "title": "Refresh",
             "x": 640.0,
             "y": 512.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Command",
             "properties": {
-              "topic": "/StatusChecks/General/Joystick 0",
+              "topic": "/Shuffleboard/Status Checks/Refresh",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "show_type": false
             }
           },
           {
-            "title": "Joystick 1",
-            "x": 640.0,
-            "y": 640.0,
+            "title": "running",
+            "x": 1152.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/StatusChecks/General/Joystick 1",
+              "topic": "/Shuffleboard/Status Checks/Refresh/running",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -938,8 +943,8 @@
           },
           {
             "title": "Loop Time",
-            "x": 896.0,
-            "y": 128.0,
+            "x": 768.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -955,13 +960,47 @@
           },
           {
             "title": "Sys Time Valid",
-            "x": 896.0,
-            "y": 0.0,
+            "x": 768.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/StatusChecks/General/Sys Time Valid",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Joystick 1",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/StatusChecks/General/Joystick 1",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Joystick 0",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/StatusChecks/General/Joystick 0",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -977,7 +1016,42 @@
       "name": "Driver Dashboard",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Has Coral",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Driver Dashboard/Has Coral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Has Algae",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Driver Dashboard/Has Algae",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
       }
     }
   ]
