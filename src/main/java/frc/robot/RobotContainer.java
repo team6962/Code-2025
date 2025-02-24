@@ -9,10 +9,9 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-import com.team6962.lib.utils.KinematicsUtils;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -23,22 +22,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.SafeManipulator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.software.Dashboard.AutonChooser;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,7 +55,7 @@ public class RobotContainer {
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
-  public final LEDs ledStrip;
+  // public final LEDs ledStrip;
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -117,10 +111,10 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    ledStrip =
-        new LEDs(
-            stateController,
-            () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    // ledStrip =
+    //     new LEDs(
+    //         stateController,
+    //         () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
