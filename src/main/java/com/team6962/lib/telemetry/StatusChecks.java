@@ -3,6 +3,7 @@ package com.team6962.lib.telemetry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -14,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -42,14 +44,13 @@ public final class StatusChecks {
 
 
   private static List<Runnable> updates = new ArrayList<>();
-
   public static Command refreshCommand(){
     return Commands.runOnce(() -> refresh());
   }
 
   public static void refresh() {
     System.out.println("Refreshing Status Checks");
-    // updates.forEach(Runnable::run);
+    updates.forEach(Runnable::run);
   }
 
   public static Category under(String name) {
@@ -111,6 +112,12 @@ public final class StatusChecks {
 
     public void add(String name, DutyCycleEncoder encoder) {
       add(name + " Connected", () -> encoder.isConnected());
+    }
+
+    public void timestampAdd(String name, DoubleSupplier checkSupplier) {
+      NetworkTableEntry ntEntry = table.getEntry(name);
+      ntEntry.setNumber(checkSupplier.getAsDouble());
+      updates.add(() -> ntEntry.setNumber(checkSupplier.getAsDouble()));
     }
   }
 }

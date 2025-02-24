@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -134,11 +135,9 @@ public class RobotContainer {
     .getTable("StatusChecks")
     .getEntry("refreshButton");
 
-    refreshButtonEntry.setBoolean(false);
-    Trigger refreshButtonTrigger = new Trigger(() -> refreshButtonEntry
-            .getBoolean(false));
+    statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
     
-    refreshButtonTrigger.onTrue(StatusChecks.refreshCommand().alongWith(Commands.runOnce(() -> System.out.println("running"))));
+    refreshButtonEntry.setBoolean(false);
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
