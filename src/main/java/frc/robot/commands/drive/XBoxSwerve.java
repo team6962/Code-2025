@@ -121,10 +121,14 @@ public class XBoxSwerve extends Command {
                 MathUtils.map(rightTrigger, 0, 1, NOMINAL_DRIVE_VELOCITY, MAX_DRIVE_VELOCITY)));
 
     if (controller.getPOV() != -1) {
-      Translation2d povVelocity =
-          new Translation2d(
-              Math.cos(Units.degreesToRadians(controller.getPOV())) * FINE_TUNE_DRIVE_VELOCITY,
-              -Math.sin(Units.degreesToRadians(controller.getPOV())) * FINE_TUNE_DRIVE_VELOCITY);
+      // Equivalent to (sin θ, cos θ) × FINE_TUNE_DRIVE_VELOCITY. Using this for
+      // clarity.
+      Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus().plus(Rotation2d.fromDegrees(90));
+
+      Translation2d povVelocity = new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0).rotateBy(povDirection);
+
+      povVelocity = povVelocity.rotateBy(swerveDrive.getEstimatedPose().getRotation());
+
       velocity = velocity.plus(povVelocity);
     }
 
