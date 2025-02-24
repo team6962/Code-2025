@@ -88,12 +88,18 @@ public final class Constants {
     // z it top-to-bottom
     public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES =
         Map.of(
-            "limelight-ftag",
+            "limelight-ltag",
                 new Pose3d(
-                    Units.inchesToMeters(7.442142),
-                    Units.inchesToMeters(1.0),
-                    Units.inchesToMeters(25.283),
-                    new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
+                    Units.inchesToMeters(14),
+                    Units.inchesToMeters(-1.5),
+                    Units.inchesToMeters(7.5),
+                    new Rotation3d(Units.degreesToRadians(180.0), Units.degreesToRadians(10.0), 0.0)),
+            "limelight-rtag",
+                new Pose3d(
+                    Units.inchesToMeters(14),
+                    Units.inchesToMeters(1.5),
+                    Units.inchesToMeters(7.5),
+                    new Rotation3d(Units.degreesToRadians(180.0), Units.degreesToRadians(10.0), 0.0)),
             "limelight-btag",
                 new Pose3d(
                     Units.inchesToMeters(0.0),
