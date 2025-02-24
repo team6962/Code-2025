@@ -195,18 +195,18 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    Pose2d[] poses;
+    // Pose2d[] poses;
 
-    Translation2d algae =
-        Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
+    // Translation2d algae =
+    //     Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
 
-    if (algae != null) {
-      poses = new Pose2d[] {new Pose2d(algae, new Rotation2d())};
-    } else {
-      poses = new Pose2d[0];
-    }
+    // if (algae != null) {
+    //   poses = new Pose2d[] {new Pose2d(algae, new Rotation2d())};
+    // } else {
+    //   poses = new Pose2d[0];
+    // }
 
-    Logger.getField().getObject("Algae").setPoses(poses);
+    // Logger.getField().getObject("Algae").setPoses(poses);
   }
 
   public void disabledPeriodic() {

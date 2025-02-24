@@ -1,15 +1,19 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotContainer;
+import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeManipulator;
@@ -118,12 +122,19 @@ public class Controls {
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 
-    // driverTab.addBoolean("Is Aimed", () -> shooter.isAimed())
-    //   .withWidget(BuiltInWidgets.kBooleanBox)
-    //   .withPosition(3, 0)
-    //   .withSize(2, 2)
-    //   .withProperties(Map.of("min", 0, "max", 100));
+    driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(0, 0)
+        .withSize(2, 2)
+        .withProperties(Map.of("min", 0, "max", 100));
 
+    driverTab.addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(2, 0)
+        .withSize(2, 2)
+        .withProperties(Map.of("min", 0, "max", 100));
+
+      
     // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
     // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
     // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /

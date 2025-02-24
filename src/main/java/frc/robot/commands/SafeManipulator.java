@@ -38,7 +38,7 @@ public class SafeManipulator {
     }
 
     public static Angle calcSafeMaxAngle(Distance elevatorHeight) {
-        if (elevatorHeight.lt(Inches.of(40))) {
+        if (elevatorHeight.lt(Inches.of(43))) {
             return MANIPULATOR_PIVOT.MAX_ANGLE;
         }
 
