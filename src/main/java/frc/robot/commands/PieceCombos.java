@@ -16,11 +16,7 @@ public class PieceCombos {
   }
 
   public Command intakeCoral() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.coralIntake())
-        .andThen(manipulator.intakeCoral());
+    return elevator.coralIntake().alongWith(manipulator.intakeCoral());
   }
 
   public Command coral(int level) {
@@ -38,31 +34,21 @@ public class PieceCombos {
   }
 
   public Command coralL2() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.coralL2())
-        .andThen(manipulator.placeCoralL23());
+    return elevator.coralL2()
+        .alongWith(manipulator.placeCoralL23());
   }
 
   public Command coralL3() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.coralL3())
-        .andThen(manipulator.placeCoralL23());
+    return elevator.coralL3()
+        .alongWith(manipulator.placeCoralL23());
   }
 
   public Command coralL4() {
-    return manipulator.pivot.safe().andThen(elevator.coralL4()).andThen(manipulator.placeCoralL4());
+    return elevator.coralL4().alongWith(manipulator.placeCoralL4());
   }
 
   public Command pickupGroundAlgae() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.algaeGround())
-        .andThen(manipulator.pickupGroundAlgae());
+    return elevator.algaeGround().alongWith(manipulator.pickupGroundAlgae());
   }
 
   public Command algae(int level) {
@@ -74,19 +60,11 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.algaeL2())
-        .andThen(manipulator.pickupReefAlgae());
+    return elevator.algaeL3().alongWith(manipulator.pickupReefAlgae());
   }
 
   public Command algaeL3() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.algaeL3())
-        .andThen(manipulator.pickupReefAlgae());
+    return elevator.algaeL3().alongWith(manipulator.pickupReefAlgae());
   }
 
   public Command algaeBarge() {

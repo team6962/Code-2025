@@ -88,12 +88,18 @@ public final class Constants {
     // z it top-to-bottom
     public static final Map<String, Pose3d> APRILTAG_CAMERA_POSES =
         Map.of(
-            "limelight-ftag",
+            "limelight-ltag",
                 new Pose3d(
-                    Units.inchesToMeters(7.442142),
-                    Units.inchesToMeters(1.0),
-                    Units.inchesToMeters(25.283),
-                    new Rotation3d(0.0, Units.degreesToRadians(24.0), 0.0)),
+                    Units.inchesToMeters(14),
+                    Units.inchesToMeters(-1.5),
+                    Units.inchesToMeters(7.5),
+                    new Rotation3d(Units.degreesToRadians(180.0), Units.degreesToRadians(10.0), 0.0)),
+            "limelight-rtag",
+                new Pose3d(
+                    Units.inchesToMeters(14),
+                    Units.inchesToMeters(1.5),
+                    Units.inchesToMeters(7.5),
+                    new Rotation3d(Units.degreesToRadians(180.0), Units.degreesToRadians(10.0), 0.0)),
             "limelight-btag",
                 new Pose3d(
                     Units.inchesToMeters(0.0),
@@ -175,7 +181,6 @@ public final class Constants {
 
   public static final class DIO {
     public static final int HANG_ENCODER = 0;
-    public static final int ELEVATOR_ENCODER = 1;
     public static final int MANIPULATOR_ENCODER = 2;
     public static final int CORAL_BEAM_BREAK = 3;
     public static final int ELEVATOR_FLOOR_LIMIT = 4;
@@ -245,7 +250,6 @@ public final class Constants {
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
-    public static final Angle ENCODER_OFFSET = Rotations.of(0.715);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
@@ -272,8 +276,8 @@ public final class Constants {
 
     public static final class CORAL {
       public static final Distance L1_HEIGHT = Inches.of(39.0);
-      public static final Distance L2_HEIGHT = Inches.of(49.8);
-      public static final Distance L3_HEIGHT = Inches.of(60.3);
+      public static final Distance L2_HEIGHT = Inches.of(48.4);
+      public static final Distance L3_HEIGHT = Inches.of(59.2);
       public static final Distance L4_HEIGHT = Inches.of(80.2);
       public static final Distance INTAKE_HEIGHT = Inches.of(58.5);
     }
@@ -288,23 +292,23 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = 9 * 5 * 4;
+    public static final double GEARING = 5 * 5 * 5;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.349);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.512);
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP = 3.75;
+      public static final double kP =  3.75; //3.75;
       public static final double kI = 0.0;
-      public static final double kD = 0.1; // 10;
-      public static final double kS = 0.3;
+      public static final double kD = 0.0; // 10.0; // 0.1;
+      public static final double kS = 0.15;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
     public static final Angle MAX_ANGLE = Degrees.of(22.0); // RESET TO 40.0
     // public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
-    public static final Angle MIN_LOW_ANGLE = Degrees.of(-135.5);
+    public static final Angle MIN_ANGLE = Degrees.of(-135.5);
     public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
@@ -320,7 +324,7 @@ public final class Constants {
       public static final Angle L1_ANGLE = Degrees.of(22.5);
       public static final Angle L23_ANGLE = Degrees.of(-34.5);
       public static final Angle L4_ANGLE = Degrees.of(-56.5);
-      public static final Angle INTAKE_ANGLE = Degrees.of(-135.5);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-135.4);
     }
 
     public static final class ALGAE {

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.manipulator;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -23,7 +22,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class ManipulatorPivot extends PivotController {
-  private boolean isCalibrating = false;
 
   public ManipulatorPivot() {
     super(
@@ -36,7 +34,7 @@ public class ManipulatorPivot extends PivotController {
         MANIPULATOR_PIVOT.PROFILE.kD,
         MANIPULATOR_PIVOT.PROFILE.kS,
         MANIPULATOR_PIVOT.GEARING,
-        MANIPULATOR_PIVOT.MIN_LOW_ANGLE,
+        MANIPULATOR_PIVOT.MIN_ANGLE,
         MANIPULATOR_PIVOT.MAX_ANGLE,
         MANIPULATOR_PIVOT.TOLERANCE,
         false);
@@ -44,13 +42,13 @@ public class ManipulatorPivot extends PivotController {
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    // setDefaultCommand(hold());
+    setDefaultCommand(hold());
   }
 
   @Override
   public void periodic() {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return;
-    if (isCalibrating) return;
+    super.periodic();
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
       stopMotor();
       return;
@@ -59,13 +57,13 @@ public class ManipulatorPivot extends PivotController {
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving);
+    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving).finallyDo(this::seedEncoder);
   }
 
   public Command hold() {
     return Commands.defer(
         () -> {
-          Angle position = getPosition();
+          Angle position = getRelativePosition();
 
           return run(() -> moveTowards(position));
         },
@@ -152,7 +150,7 @@ public class ManipulatorPivot extends PivotController {
         },
         log -> log.motor("manipulator-pivot")
             .voltage(Volts.of(motor.getAppliedOutput() * motor.getBusVoltage()))
-            .angularPosition(getPosition())
+            .angularPosition(getRelativePosition())
             .angularVelocity(RotationsPerSecond.of(motor.getEncoder().getVelocity())),
         this));
 

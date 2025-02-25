@@ -16,23 +16,25 @@ import com.team6962.lib.utils.KinematicsUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.commands.ManipulatorSafeties;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.autonomous.AutoGeneration.AutoParams;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.autonomous.GeneratedAuto;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -61,7 +63,7 @@ public class RobotContainer {
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
-  public final LEDs ledStrip;
+  // public final LEDs ledStrip;
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -69,6 +71,7 @@ public class RobotContainer {
   public final Autonomous autonomous;
   public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
+  // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -115,10 +118,11 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    ledStrip =
-        new LEDs(
-            stateController,
-            () -> 1.0 + KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    // ledStrip =
+    //     new LEDs(
+    //         stateController,
+    //         () -> 1.0 +
+    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
@@ -126,7 +130,8 @@ public class RobotContainer {
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
-    // // collisionDetector = new CollisionDetector();x
+    // manipulatorSafeties = new ManipulatorSafeties(elevator, manipulator);
+    // // collisionDetector = new CollisionDetector();
 
     // System.out.println(swerveDrive);
 
@@ -137,6 +142,12 @@ public class RobotContainer {
     // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
     // module = new SwerveModule();
+    NetworkTableEntry refreshButtonEntry =
+        NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
+
+    statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
+
+    refreshButtonEntry.setBoolean(false);
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
@@ -187,6 +198,9 @@ public class RobotContainer {
     //   manipulator.pivot.calibrate()
     // );
 
+    // return Commands.sequence(
+        // elevator.calibrate()
+        // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
   }
@@ -210,18 +224,18 @@ public class RobotContainer {
     // autoGen.work();
     // Logger.log("autoWorkTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
 
-    Pose2d[] poses;
+    // Pose2d[] poses;
 
-    Translation2d algae =
-        Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
+    // Translation2d algae =
+    //     Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
 
-    if (algae != null) {
-      poses = new Pose2d[] {new Pose2d(algae, new Rotation2d())};
-    } else {
-      poses = new Pose2d[0];
-    }
+    // if (algae != null) {
+    //   poses = new Pose2d[] {new Pose2d(algae, new Rotation2d())};
+    // } else {
+    //   poses = new Pose2d[0];
+    // }
 
-    Logger.getField().getObject("Algae").setPoses(poses);
+    // Logger.getField().getObject("Algae").setPoses(poses);
   }
 
   public void disabledPeriodic() {

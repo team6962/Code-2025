@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import com.team6962.lib.telemetry.StatusChecks;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,6 +39,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
   }
 
   /**
@@ -57,6 +62,17 @@ public class Robot extends TimedRobot {
     double timestampAfter = Timer.getFPGATimestamp();
     time = timestampAfter;
     computeTime = timestampAfter - timestampBefore;
+
+    if (NetworkTableInstance.getDefault()
+        .getTable("StatusChecks")
+        .getEntry("refreshButton")
+        .getBoolean(false)) {
+      NetworkTableInstance.getDefault()
+          .getTable("StatusChecks")
+          .getEntry("refreshButton")
+          .setBoolean(false);
+      StatusChecks.refresh();
+    }
   }
 
   public static double getLoopTime() {

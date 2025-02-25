@@ -46,10 +46,8 @@ public class Elevator extends DualLinearActuator {
         "Elevator",
         CAN.ELEVATOR_LEFT,
         CAN.ELEVATOR_RIGHT,
-        DIO.ELEVATOR_ENCODER,
         DIO.ELEVATOR_CEIL_LIMIT,
         DIO.ELEVATOR_FLOOR_LIMIT,
-        Constants.ELEVATOR.ENCODER_OFFSET.in(Rotations), // CHANGE THIS
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
         Constants.ELEVATOR.GEARING,

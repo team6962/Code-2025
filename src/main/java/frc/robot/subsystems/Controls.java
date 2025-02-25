@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,7 +87,7 @@ public class Controls {
     // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
     // operator.a().onTrue(manipulator.pivot.coralL23());
     // operator.b().onTrue(manipulator.pivot.algaeReef());
-    // operator.x().onTrue(manipulator.pivot.intakeCoral());
+    // operator.x().onTrue(manipulator.pivot.coralIntake());
     // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
@@ -119,12 +121,19 @@ public class Controls {
 
     ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
 
-    // driverTab.addBoolean("Is Aimed", () -> shooter.isAimed())
-    //   .withWidget(BuiltInWidgets.kBooleanBox)
-    //   .withPosition(3, 0)
-    //   .withSize(2, 2)
-    //   .withProperties(Map.of("min", 0, "max", 100));
+    driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(0, 0)
+        .withSize(2, 2)
+        .withProperties(Map.of("min", 0, "max", 100));
 
+    driverTab.addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(2, 0)
+        .withSize(2, 2)
+        .withProperties(Map.of("min", 0, "max", 100));
+
+      
     // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
     // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
     // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /
