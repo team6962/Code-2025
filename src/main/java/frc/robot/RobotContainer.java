@@ -63,7 +63,7 @@ public class RobotContainer {
   public final Autonomous autonomous;
   public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
-  public final ManipulatorSafeties manipulatorSafeties;
+  // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
@@ -120,7 +120,7 @@ public class RobotContainer {
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
-    manipulatorSafeties = new ManipulatorSafeties(elevator, manipulator);
+    // manipulatorSafeties = new ManipulatorSafeties(elevator, manipulator);
     // // collisionDetector = new CollisionDetector();
 
     // System.out.println(swerveDrive);
@@ -133,7 +133,7 @@ public class RobotContainer {
     NetworkTableEntry refreshButtonEntry =
         NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
 
-    // statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
+    statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
 

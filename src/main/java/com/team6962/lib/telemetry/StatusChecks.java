@@ -111,10 +111,10 @@ public final class StatusChecks {
       add(name + " Connected", () -> encoder.isConnected());
     }
 
-    // public void timestampAdd(String name, DoubleSupplier checkSupplier) {
-    //   NetworkTableEntry ntEntry = table.getEntry(name);
-    //   ntEntry.setNumber(checkSupplier.getAsDouble());
-    //   updates.add(() -> ntEntry.setNumber(checkSupplier.getAsDouble()));
-    // }
+    public void timestampAdd(String name, DoubleSupplier checkSupplier) {
+      NetworkTableEntry ntEntry = table.getEntry(name);
+      ntEntry.setNumber(checkSupplier.getAsDouble());
+      updates.add(() -> ntEntry.setNumber(checkSupplier.getAsDouble()));
+    }
   }
 }
