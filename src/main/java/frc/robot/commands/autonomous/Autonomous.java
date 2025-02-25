@@ -138,13 +138,13 @@ public class Autonomous {
 
   public Command driveToProcessor() {
     return Commands.sequence(
-      pieceCombos.algaeProcessor(),
+      CommandUtils.selectByMode(pieceCombos.algaeProcessor(), CommandUtils.printAndWait("Preparing for algae processor", 0.5)),
       swerveDrive.pathfindTo(new Pose2d(
         Units.inchesToMeters(235.726104),
         SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
         Rotation2d.fromDegrees(-90)
       )),
-      manipulator.algae.drop()
+      CommandUtils.selectByMode(manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.25))
     );
   }
 
