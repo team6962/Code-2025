@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class ManipulatorPivot extends PivotController {
-  private boolean isCalibrating = false;
 
   public ManipulatorPivot() {
     super(
@@ -43,13 +42,13 @@ public class ManipulatorPivot extends PivotController {
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    setDefaultCommand(hold());
+    // setDefaultCommand(hold());
   }
 
   @Override
   public void periodic() {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return;
-    if (isCalibrating) return;
+    super.periodic();
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
       stopMotor();
       return;

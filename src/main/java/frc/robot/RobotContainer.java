@@ -219,7 +219,7 @@ public class RobotContainer {
 
     Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
-    Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    checks.schedule();
+    // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
+    // checks.schedule();
   }
 }

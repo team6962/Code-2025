@@ -21,8 +21,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Robot;
@@ -50,9 +52,7 @@ public class PivotController extends SubsystemBase {
 
   public final Angle tolerance;
 
-  private double encoderOffset = 0.0;
-
-  private boolean reversed;
+  private final boolean reversed;
 
   private Debouncer debouncer = new Debouncer(0.1);
 
@@ -81,14 +81,14 @@ public class PivotController extends SubsystemBase {
     //   new Constraints(maxVelocity, maxAcceleration)
     // );
 
-    this.motor = new SparkMax(motorCAN, MotorType.kBrushless);
-    this.kS = kS;
-    encoder = motor.getEncoder();
-    this.encoderOffset = absolutePositionOffset;
-    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
+    motor = new SparkMax(motorCAN, MotorType.kBrushless);
+    encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
 
+    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, absolutePositionOffset);
+
+    this.kS = kS;
     this.minAngle = minAngle;
     this.maxAngle = maxAngle;
     this.tolerance = tolerance;
@@ -99,14 +99,6 @@ public class PivotController extends SubsystemBase {
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(motorConfig, kP, kI, kD, 0.0, minAngle.in(Rotations), maxAngle.in(Rotations), false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
-
-    // Logger.logMeasure(this.getName() + "/targetPosition", () -> getTargetAngle());
-    // Logger.logMeasure(this.getName() + "/position", () -> getPosition());
-    // Logger.logMeasure(
-    //     this.getName() + "/relativePosition", () -> Rotations.of(encoder.getPosition()));
-    // Logger.logMeasure(
-    //     this.getName() + "/rawAbsolutePosition", () -> Rotations.of(absoluteEncoder.get()));
-    // Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
@@ -127,14 +119,14 @@ public class PivotController extends SubsystemBase {
 
     
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
-    Logger.logBoolean(this.getName() + "/forwardSafety", this::triggeredForwardSafety);
-    Logger.logBoolean(this.getName() + "/reverseSafety", this::triggeredReverseSafety);
+    Logger.logBoolean(this.getName() + "/safety/forward", this::triggeredForwardSafety);
+    Logger.logBoolean(this.getName() + "/safety/reverse", this::triggeredReverseSafety);
     Logger.logNumber(this.getName() + "/appliedDutyCycle", () -> motor.getAppliedOutput());
-    Logger.logNumber(this.getName() + "/angle/target", () -> getTargetAngle().in(Rotations));
 
+    Logger.logNumber(this.getName() + "/angle/target", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/relative", () -> getRelativePosition().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/absolute", () -> getAbsolutePosition().in(Rotations));
-    Logger.logNumber(this.getName() + "/angle/rawAbsolute", () -> getRawAbsolutePosition().in(Rotations));
+    Logger.logNumber(this.getName() + "/angle/raw", () -> getRawAbsolutePosition().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/min", () -> getMinAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/max", () -> getMaxAngle().in(Rotations));
 
@@ -144,7 +136,9 @@ public class PivotController extends SubsystemBase {
   }
 
   public void seedEncoder() {
+    Logger.log(this.getName() + "/lastSeeded", Timer.getFPGATimestamp());
     encoder.setPosition(getAbsolutePosition().in(Rotations));
+    System.out.println("AFTA::::::::::::::" + getRelativePosition());
   }
 
   public void moveTowards(Angle requestedAngle) {
@@ -230,16 +224,17 @@ public class PivotController extends SubsystemBase {
   }
 
   public void moveSpeed(double speed) {
-    if (canMoveInDirection(speed)) motor.set(speed);
-    else motor.set(0);
+    // if (canMoveInDirection(speed))
+    motor.set(speed);
+    // else motor.set(0);
   }
 
   public Command up() {
-    return move(0.3);
+    return move(0.1);
   }
 
   public Command down() {
-    return move(-0.3);
+    return move(-0.1);
   }
 
   public double calculateKS(Angle currentAngle) {
@@ -305,7 +300,7 @@ public class PivotController extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // encoder.setPosition(getPosition().in(Rotations));
+    seedEncoder();
 
     if (triggeredForwardSafety() || triggeredReverseSafety()) {
       stopMotor();

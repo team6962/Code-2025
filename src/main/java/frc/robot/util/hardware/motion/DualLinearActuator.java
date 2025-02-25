@@ -36,18 +36,15 @@ public class DualLinearActuator extends SubsystemBase {
   private RelativeEncoder leftEncoder, rightEncoder;
   private SparkClosedLoopController leftPID, rightPID;
 
-  private DutyCycleEncoder absoluteEncoder;
   private DigitalInput ceilingLimit, floorLimit;
   private Distance baseHeight, minHeight, maxHeight, tolerance;
-
-  private double encoderOffset = 0.0;
 
   private Debouncer debouncer = new Debouncer(0.1);
 
   private Distance cycleHeight;
 
-  private int cyclesCompleted;
-  private Distance lastPosition = Meters.of(0.0);
+  private boolean zeroed = false;
+
 
   /**
    * Constructs a new DualLinearController.
@@ -69,10 +66,8 @@ public class DualLinearActuator extends SubsystemBase {
       String name,
       int leftCAN,
       int rightCAN,
-      int absoluteEncoderDIO,
       int ceilingLimitDIO,
       int floorLimitDIO,
-      double absolutePositionOffset,
       double kP,
       double kS,
       double gearing,
@@ -89,7 +84,6 @@ public class DualLinearActuator extends SubsystemBase {
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
     this.cycleHeight = mechanismToSensor;
-    encoderOffset = absolutePositionOffset;
 
     leftMotor = new SparkMax(leftCAN, MotorType.kBrushless);
     rightMotor = new SparkMax(rightCAN, MotorType.kBrushless);
@@ -97,9 +91,6 @@ public class DualLinearActuator extends SubsystemBase {
     rightEncoder = rightMotor.getEncoder();
     leftPID = leftMotor.getClosedLoopController();
     rightPID = rightMotor.getClosedLoopController();
-
-    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, encoderOffset);
-    lastPosition = getCycleDelta();
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
@@ -115,13 +106,11 @@ public class DualLinearActuator extends SubsystemBase {
 
     this.ceilingLimit = new DigitalInput(ceilingLimitDIO);
     this.floorLimit = new DigitalInput(floorLimitDIO);
-    // leftEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
-    // rightEncoder.setPosition(baseHeight.plus(getCycleDelta()).in(Meters));
     leftEncoder.setPosition(baseHeight.in(Meters));
     rightEncoder.setPosition(baseHeight.in(Meters));
 
-    Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/height/target", () -> getTargetHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/height/avg", () -> getAverageHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
@@ -130,22 +119,20 @@ public class DualLinearActuator extends SubsystemBase {
     // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
     // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
     // Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/rawAbsolutePosition", absoluteEncoder::get);
 
-    Logger.logBoolean(this.getName() + "/ceilingLimit", this::triggeredCeilingLimit);
-    Logger.logBoolean(this.getName() + "/floorLimit", this::triggeredFloorLimit);
+    Logger.logBoolean(this.getName() + "/limits/ceil", this::triggeredCeilingLimit);
+    Logger.logBoolean(this.getName() + "/limits/floor", this::triggeredFloorLimit);
 
-    Logger.logMeasure(this.getName() + "/leftCurrent", () -> Amps.of(leftMotor.getOutputCurrent()));
-    Logger.logMeasure(this.getName() + "/rightCurrent", () -> Amps.of(rightMotor.getOutputCurrent()));
-    Logger.logBoolean(this.getName() + "/absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
+    Logger.logBoolean(this.getName() + "/zeroed", () -> zeroed);
+
+    zeroed = triggeredFloorLimit();
 
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
-    statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
-    statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
     statusChecks.add("leftMotor", leftMotor);
     statusChecks.add("rightMotor", rightMotor);
+    seedEncoders(maxHeight);
   }
 
   private void seedEncoders(Distance height) {
@@ -179,10 +166,6 @@ public class DualLinearActuator extends SubsystemBase {
 
   public Distance getMinHeight() {
     return minHeight;
-  }
-
-  public Distance getCycleDelta() {
-    return cycleHeight.times(absoluteEncoder.get());
   }
 
   public Command move(double speed) {
@@ -223,10 +206,14 @@ public class DualLinearActuator extends SubsystemBase {
     return true;
   }
 
-  public boolean doneMoving() {
-    if (getTargetHeight() == null) return true;
+  public boolean inRange(Distance height) {
+    if (height == null) return true;
     return debouncer.calculate(
-        getAverageHeight().minus(targetHeight).abs(Meters) < tolerance.in(Meters));
+        getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
+  }
+
+  public boolean doneMoving() {
+    return inRange(targetHeight);
   }
 
   public void stopMotors() {
@@ -249,11 +236,18 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public boolean triggeredCeilingLimit() {
+    if (!zeroed) {
+      return true;
+    }
     return !ceilingLimit.get();
   }
 
   public boolean triggeredFloorLimit() {
-    return !floorLimit.get();
+    if (!floorLimit.get()) {
+      zeroed = true;
+      return true;
+    }
+    return false;
   }
 
   public boolean canMoveInDirection(double velocity) {
@@ -264,24 +258,10 @@ public class DualLinearActuator extends SubsystemBase {
     }
   }
 
-  public Distance calculateHeight() {
-    return cycleHeight.times(cyclesCompleted).plus(getCycleDelta());
-  }
-
   @Override
   public void periodic() {
-    if (lastPosition.gt(cycleHeight.minus(tolerance)) && getCycleDelta().lt(tolerance)) {
-      cyclesCompleted++;
-    }
-
-    if (lastPosition.lt(tolerance) && getCycleDelta().lt(cycleHeight.minus(tolerance))) {
-      cyclesCompleted--;
-    }
-
     if (triggeredFloorLimit()) {
       seedEncoders(baseHeight);
     }
-
-    lastPosition = getCycleDelta();
   }
 }
