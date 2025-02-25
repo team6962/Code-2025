@@ -276,8 +276,8 @@ public final class Constants {
 
     public static final class CORAL {
       public static final Distance L1_HEIGHT = Inches.of(39.0);
-      public static final Distance L2_HEIGHT = Inches.of(49.8);
-      public static final Distance L3_HEIGHT = Inches.of(60.3);
+      public static final Distance L2_HEIGHT = Inches.of(48.4);
+      public static final Distance L3_HEIGHT = Inches.of(59.2);
       public static final Distance L4_HEIGHT = Inches.of(80.2);
       public static final Distance INTAKE_HEIGHT = Inches.of(58.5);
     }
@@ -299,7 +299,7 @@ public final class Constants {
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP =  0.5; //3.75;
+      public static final double kP =  3.75; //3.75;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 10.0; // 0.1;
       public static final double kS = 0.15;

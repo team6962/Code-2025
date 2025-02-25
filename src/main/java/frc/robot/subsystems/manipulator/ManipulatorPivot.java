@@ -42,7 +42,7 @@ public class ManipulatorPivot extends PivotController {
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
-    // setDefaultCommand(hold());
+    setDefaultCommand(hold());
   }
 
   @Override

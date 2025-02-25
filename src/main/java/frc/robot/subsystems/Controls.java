@@ -84,10 +84,10 @@ public class Controls {
     // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
 
     // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
-    operator.a().onTrue(manipulator.pivot.coralL23());
-    operator.b().onTrue(manipulator.pivot.algaeReef());
-    operator.x().onTrue(manipulator.pivot.coralIntake());
-    operator.y().onTrue(manipulator.pivot.stow());
+    // operator.a().onTrue(manipulator.pivot.coralL23());
+    // operator.b().onTrue(manipulator.pivot.algaeReef());
+    // operator.x().onTrue(manipulator.pivot.coralIntake());
+    // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
     // operator.leftStick().onTrue(elevator.algaeL2());
