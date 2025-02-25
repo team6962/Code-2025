@@ -482,7 +482,7 @@ public class SwerveConfig {
         momentOfInertia(),
         new ModuleConfig(
             wheel().radius(),
-            maxDriveSpeed(),
+            driveMotorRotorToMechanism(driveMotor.freeSpeedRotor()),
             wheel().staticFriction(),
             driveMotor().stats().withReduction(gearing().drive()),
             driveMotor().maxCurrent(),
