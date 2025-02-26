@@ -88,9 +88,11 @@ public class AutoGeneration extends Thread {
     }
 
     private WorkResult generate() {
-        AutoParams params = getParameters();
+        return generate(getParameters());
+    }
 
-        if (params.targetPositions.size() == 0 || (!params.leftStation && !params.rightStation)) {
+    private WorkResult generate(AutoParams params) {
+        if (!params.leftStation && !params.rightStation) {
             return new WorkResult(false, null);
         }
 
@@ -117,8 +119,8 @@ public class AutoGeneration extends Thread {
      * 
      * @return Can be null!
      */
-    public GeneratedAuto get() {
-        return generate().auto();
+    public GeneratedAuto get(AutoParams params) {
+        return generate(params).auto();
     }
 
     private static record WorkerState(boolean working) {
@@ -177,10 +179,6 @@ public class AutoGeneration extends Thread {
         }
 
         public void work() {
-            // autoGen.setParameters(AutoParams.test(poseSupplier.get()));
-            autoGen.setParameters(AutoParams.get(poseSupplier.get(), hasCoralSupplier.getAsBoolean()));
-            autoGen.setWorking(true);
-
             shouldWork = RobotState.isAutonomous() || RobotState.isDisabled();
 
             if (RobotState.isDisabled() || !RobotState.isAutonomous()) {
@@ -190,7 +188,6 @@ public class AutoGeneration extends Thread {
             if (!shouldWork) {
                 workRun = false;
                 autoGen.setWorking(false);
-
                 return;
             }
 
@@ -199,6 +196,9 @@ public class AutoGeneration extends Thread {
 
                 return;
             }
+
+            autoGen.setParameters(AutoParams.get(poseSupplier.get(), hasCoralSupplier.getAsBoolean()));
+            autoGen.setWorking(true);
 
             if (!autoGen.isAlive()) {
                 if (autoGen.getState() != State.NEW) autoGen = autoGen.clone();
@@ -210,7 +210,7 @@ public class AutoGeneration extends Thread {
         public Command generate() {
             workRun = true;
 
-            GeneratedAuto auto = autoGen.get();
+            GeneratedAuto auto = autoGen.get(AutoParams.get(poseSupplier.get(), hasCoralSupplier.getAsBoolean()));
 
             if (auto == null) return Commands.none();
 

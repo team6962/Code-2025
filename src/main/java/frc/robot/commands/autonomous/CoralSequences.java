@@ -21,9 +21,8 @@ import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.Constants;
-import frc.robot.Constants.Field;
-import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Field.CoralStation;
+import frc.robot.Constants.ReefPositioning;
 
 public final class CoralSequences {
     private CoralSequences() {}
@@ -80,7 +79,7 @@ public final class CoralSequences {
                 bestSequence = sequence;
             }
 
-            if (scanned % (total / 10) == 0) {
+            if (total >= 10 && scanned % (total / 10) == 0) {
                 System.out.println("Scanned " + scanned + " / " + total + " routes");
             }
 

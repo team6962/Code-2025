@@ -32,6 +32,7 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.commands.ManipulatorSafeties;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.autonomous.AutoGeneration.AutoParams;
+import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.autonomous.GeneratedAuto;
 import frc.robot.subsystems.Controls;
@@ -76,7 +77,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  // private final Generator autoGen;
+  private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -139,7 +140,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -174,24 +175,24 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // return autonomous.createDemoAutonomousCommand();
-    return Commands.defer(() -> {
-      // System.out.println("Generating auto command");
+    // return Commands.defer(() -> {
+    //   // System.out.println("Generating auto command");
 
-      // return autoGen.generate();
+    //   // return autoGen.generate();
 
-      GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
-      auto.setup();
+    //   GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+    //   auto.setup();
 
-      return auto.getCommand();
-    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+    //   return auto.getCommand();
+    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     // return autonomous.createAutonomousCommand();
 
-    // return Commands.defer(() -> {
-    //   System.out.println("Generating auto command");
+    return Commands.defer(() -> {
+      System.out.println("Generating autonomous command");
 
-    //   return autoGen.generate();
-    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+      return autoGen.generate();
+    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     // return Commands.sequence(
     //   // elevator.calibrate()
@@ -220,9 +221,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    // double autoWorkTimestamp = Timer.getFPGATimestamp();
-    // autoGen.work();
-    // Logger.log("autoWorkTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
+    double autoWorkTimestamp = Timer.getFPGATimestamp();
+    autoGen.work();
+    Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
 
     // Pose2d[] poses;
 
