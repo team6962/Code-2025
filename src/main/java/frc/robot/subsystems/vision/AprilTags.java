@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.subsystems.LEDs;
 import frc.robot.Constants.Field;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
@@ -61,6 +62,10 @@ public class AprilTags extends SubsystemBase {
       double rotationError = canChangeHeading ? MAX_ROTATION_ERROR : LARGE_ROTATION_ERROR;
       if (!canChangeHeading) {
         pose2d = adjustPoseRotation(poseEstimator, poseEstimate, pose2d);
+      }
+
+      if (canChangeHeading) {
+        LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
       }
 
       double translationError = calculateTranslationError(poseEstimate);
