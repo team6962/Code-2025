@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -456,14 +457,21 @@ public class SwerveDrive extends SwerveCore {
     @Override
     public void execute() {
       ChassisSpeeds speeds;
+      
 
       Translation2d translationError = getTranslationError();
       Rotation2d rotationError = getRotationError();
       
+      
       updateAdjustments(translationError, rotationError);
-
+      
       if (state == State.TRANSLATING) {
-        Translation2d translationOutput = getTranslationOutput(translationError.unaryMinus());
+        Translation2d translationOutput = new Translation2d(0, 0);
+        if (Robot.isSimulation()){
+          translationOutput = getTranslationOutput(translationError);
+        }else{
+          translationOutput = getTranslationOutput(translationError.unaryMinus());
+        }
         speeds = new ChassisSpeeds(translationOutput.getX(), translationOutput.getY(), 0);
       } else if (state == State.ROTATING) {
         Rotation2d rotationOutput = getRotationOutput(rotationError);
