@@ -110,10 +110,14 @@ public final class SwerveConstants {
       };
       case TEST -> new Module[] {
         Constants.SWERVE.MODULE_CONFIGS[0],
+        Constants.SWERVE.MODULE_CONFIGS[3],
         Constants.SWERVE.MODULE_CONFIGS[1],
-        Constants.SWERVE.MODULE_CONFIGS[2],
-        Constants.SWERVE.MODULE_CONFIGS[3]
+        Constants.SWERVE.MODULE_CONFIGS[2]
       };
     };
   }
 }
+// case 0 -> "Front Left";
+// case 1 -> "Front Right";
+// case 2 -> "Back Left";
+// case 3 -> "Back Right";
