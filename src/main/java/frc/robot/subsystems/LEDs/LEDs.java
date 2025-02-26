@@ -68,7 +68,11 @@ public class LEDs extends SubsystemBase {
     strip.start();
   }
 
-  public static Command setStateCommand(State state) {
+  public LEDs(RobotStateController stateController2, Object object) {
+    //TODO Auto-generated constructor stub
+}
+
+public static Command setStateCommand(State state) {
     return Commands.run(() -> setState(state));
   }
 
@@ -83,7 +87,7 @@ public class LEDs extends SubsystemBase {
 
     LEDPattern pattern = blink.overlayOn(scroll);
 
-    return pattern;
+    return scroll;
   }
 
   private static void apply(LEDPattern pattern) {
