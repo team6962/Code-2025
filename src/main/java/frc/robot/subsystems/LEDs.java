@@ -25,6 +25,7 @@ public class LEDs extends SubsystemBase {
     OFF,
     DISABLED,
     ENABLED,
+    HAS_VISION_TARGETS,
     DRIVING_AUTO,
     DRIVING_TELEOP_RED,
     DRIVING_TELEOP_BLUE,
@@ -87,6 +88,8 @@ public class LEDs extends SubsystemBase {
       case ENABLED:
         setColorWave(0, length, getBumperLEDColor(), new int[] {80, 80, 80}, 1.0, Direction.LEFT);
         break;
+      case HAS_VISION_TARGETS:
+        setRainbow(0, length);
       case DRIVING_AUTO:
         setColorWave(0, length, ANTARES_YELLOW, ANTARES_BLUE, 1.0, Direction.LEFT);
         break;
