@@ -158,7 +158,7 @@ public class AutoGeneration extends Thread {
 
             for (int face : AutonChooser.reefFaces()) {
                 positions.add(new CoralPosition(face * 2, 3));
-                positions.add(new CoralPosition(face * 2 - 1, 3));
+                positions.add(new CoralPosition(((face * 2 - 1) % 12 + 12) % 12, 3));
             }
 
             return new AutoParams(positions, AutonChooser.leftCoralStation(), AutonChooser.rightCoralStation(), currentPose, hasCoral);
