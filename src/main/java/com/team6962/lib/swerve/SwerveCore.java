@@ -7,6 +7,8 @@ import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -137,9 +139,9 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
         getName() + "/targetModuleSpeeds_predesaturate",
         robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
 
-    // states =
-    //     KinematicsUtils.desaturateWheelSpeeds(
-    //         states, constants.maxDriveSpeed());
+    states =
+        KinematicsUtils.desaturateWheelSpeeds(
+            states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
 
     Logger.log(
         getName() + "/targetModuleSpeeds_preset",
