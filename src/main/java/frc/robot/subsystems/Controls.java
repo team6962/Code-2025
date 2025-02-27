@@ -58,7 +58,7 @@ public class Controls {
         .rightStick()
         .onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
-    driver.leftStick().onTrue(autonomous.driveToProcessor()); // TODO: Change to whileTrue() before test
+    driver.leftStick().onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
