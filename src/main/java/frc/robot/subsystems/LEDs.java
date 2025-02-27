@@ -6,7 +6,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.LED;
+import frc.robot.Constants.Constants.PWM;
 import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
@@ -15,7 +17,7 @@ public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static int length = 60;
+  private static int length = 30;
   private static State state = State.OFF;
   private static double time = 0;
   private static double centerFillTimer = 0;
@@ -68,7 +70,7 @@ public class LEDs extends SubsystemBase {
     this.stateController = stateController;
     this.animationSpeed = animationSpeed;
 
-    strip = new AddressableLED(9);
+    strip = new AddressableLED(PWM.LEDS);
     buffer = new AddressableLEDBuffer(length);
     strip.setLength(buffer.getLength());
 

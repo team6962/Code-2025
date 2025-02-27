@@ -120,7 +120,7 @@ public class AprilTags extends SubsystemBase {
 
   private static boolean canChangeHeading(
       PoseEstimate poseEstimate, PoseEstimator poseEstimator, Pose2d pose2d) {
-    boolean canChangeHeading = poseEstimate.tagCount >= 2 || RobotState.isDisabled();
+    boolean canChangeHeading = poseEstimate.tagCount >= 1 || RobotState.isDisabled();
     return canChangeHeading
         && poseEstimator.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation())
             < 1.0;

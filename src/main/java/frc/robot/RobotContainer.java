@@ -11,6 +11,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -25,11 +26,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.LED;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -60,7 +63,7 @@ public class RobotContainer {
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
-  // public final LEDs ledStrip;
+  public final LEDs ledStrip;
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -116,11 +119,11 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    // ledStrip =
-    //     new LEDs(
-    //         stateController,
-    //         () -> 1.0 +
-    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    ledStrip =
+        new LEDs(
+            stateController,
+            () -> 1.0 +
+    KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
@@ -255,8 +258,9 @@ public class RobotContainer {
     // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
     // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    // checks.schedule();
+    //checks.schedule();
 
-    elevator.rezeroAtBottom().schedule();
+    // elevator.rezeroAtBottom().schedule();
+    // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
   }
 }

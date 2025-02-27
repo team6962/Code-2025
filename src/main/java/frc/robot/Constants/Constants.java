@@ -184,6 +184,9 @@ public final class Constants {
     public static final int ELEVATOR_FLOOR_LIMIT = 5;
   }
 
+  public static final class PWM {
+    public static final int LEDS = 9;
+  }
   public static final class NEO {
     public static final DCMotor STATS =
         new DCMotor(12.0, 3.0, 160.0, 2.065, Units.rotationsPerMinuteToRadiansPerSecond(5820), 1);
