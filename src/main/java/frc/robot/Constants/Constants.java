@@ -265,13 +265,13 @@ public final class Constants {
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(35.5);
-    public static final Distance MAX_HEIGHT = Inches.of(80.2);
+    public static final Distance MAX_HEIGHT = Inches.of(83.6);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(39.0);
+      public static final Distance L1_HEIGHT = Inches.of(39.5);
       public static final Distance L2_HEIGHT = Inches.of(48.4);
       public static final Distance L3_HEIGHT = Inches.of(59.2);
       public static final Distance L4_HEIGHT = Inches.of(80.2);
@@ -302,7 +302,7 @@ public final class Constants {
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
-    public static final Angle MAX_ANGLE = Degrees.of(22.0); // RESET TO 40.0
+    public static final Angle MAX_ANGLE = Degrees.of(36.0); // RESET TO 40.0
     public static final Angle MIN_ANGLE = Degrees.of(-135.5);
 
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
@@ -327,21 +327,22 @@ public final class Constants {
     public static final NavigableMap<Distance, Angle> MAX_ANGLES;
     static {
       MAX_ANGLES = new TreeMap<>();
-      MAX_ANGLES.put(Inches.of(43), MAX_ANGLE);
+      MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
+      MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
       MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
       MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
-      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MAX_ANGLE);      
+      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));      
     }
 
     public static final class CORAL {
-      public static final Angle L1_ANGLE = Degrees.of(22.5);
+      public static final Angle L1_ANGLE = Degrees.of(0.0);
       public static final Angle L23_ANGLE = Degrees.of(-34.5);
       public static final Angle L4_ANGLE = Degrees.of(-56.5);
       public static final Angle INTAKE_ANGLE = Degrees.of(-135.4);
     }
 
     public static final class ALGAE {
-      public static final Angle BARGE_ANGLE = Degrees.of(32.75);
+      public static final Angle BARGE_ANGLE = Degrees.of(21.90);
       public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
       public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0);
