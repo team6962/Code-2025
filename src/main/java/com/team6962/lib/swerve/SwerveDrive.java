@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.Set;
@@ -450,9 +451,15 @@ public class SwerveDrive extends SwerveCore {
     private void updateAdjustments(Translation2d translationError, Rotation2d rotationError) {
       boolean translationNeedsAdjustment = translationError.getNorm() > toleranceDistance.in(Meters);
       boolean rotationNeedsAdjustment = rotationError.getMeasure().abs(Rotations) > toleranceAngle.in(Rotations);
+      double translationErrorRatio = translationError.getNorm() / toleranceDistance.in(Meters);
+      double rotationErrorRatio = rotationError.getMeasure().abs(Rotation) / toleranceAngle.abs(Rotations);
       
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
+      if (translationNeedsAdjustment && rotationNeedsAdjustment) {
+        if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
+        else state = State.ROTATING;
+      }
 
       System.out.println("State: " + state + ", Is finished: " + isFinished() + ", Necessary adjustments: " + translationNeedsAdjustment + ", " + rotationNeedsAdjustment + " (tolerance is " + toleranceAngle + ", error is " + rotationError.getDegrees() + ")");
     }
