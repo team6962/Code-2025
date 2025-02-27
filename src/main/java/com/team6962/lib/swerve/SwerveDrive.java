@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -448,10 +449,12 @@ public class SwerveDrive extends SwerveCore {
 
     private void updateAdjustments(Translation2d translationError, Rotation2d rotationError) {
       boolean translationNeedsAdjustment = translationError.getNorm() > toleranceDistance.in(Meters);
-      boolean rotationNeedsAdjustment = rotationError.getMeasure().gt(toleranceAngle);
+      boolean rotationNeedsAdjustment = rotationError.getMeasure().abs(Rotations) > toleranceAngle.in(Rotations);
       
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
+
+      System.out.println("State: " + state + ", Is finished: " + isFinished() + ", Necessary adjustments: " + translationNeedsAdjustment + ", " + rotationNeedsAdjustment + " (tolerance is " + toleranceAngle + ", error is " + rotationError.getDegrees() + ")");
     }
 
     @Override
@@ -469,7 +472,7 @@ public class SwerveDrive extends SwerveCore {
         Translation2d translationOutput = new Translation2d(0, 0);
         if (Robot.isSimulation()){
           translationOutput = getTranslationOutput(translationError);
-        }else{
+        } else {
           translationOutput = getTranslationOutput(translationError.unaryMinus());
         }
         speeds = new ChassisSpeeds(translationOutput.getX(), translationOutput.getY(), 0);

@@ -88,6 +88,7 @@ public final class CoralSequences {
 
         if (bestSequence == null) {
             DriverStation.reportError("No autonomous sequence", true);
+            System.out.println("No autonomous sequence!");
         } else {
             System.out.println(sequences.size() + " routes scanned.");
             System.out.println("Best: " + bestScore + " inefficiency, " + getSequenceTime(bestSequence, startPose).in(Seconds) + " ideal seconds");
