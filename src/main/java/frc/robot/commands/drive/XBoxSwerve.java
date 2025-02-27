@@ -68,7 +68,7 @@ public class XBoxSwerve extends Command {
             .in(RadiansPerSecond);
     MAX_ANGULAR_VELOCITY =
         swerveDrive
-            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_BOOST_POWER)
+            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_BOOST_POWER)
             .in(RadiansPerSecond);
 
 
@@ -95,8 +95,8 @@ public class XBoxSwerve extends Command {
 
     double leftTrigger = controller.getLeftTriggerAxis();
     double rightTrigger = controller.getRightTriggerAxis();
-    Translation2d leftStick = new Translation2d(-controller.getLeftY(), -controller.getLeftX());
-    Translation2d rightStick = new Translation2d(controller.getRightX(), -controller.getRightY());
+    Translation2d leftStick = new Translation2d(-controller.getLeftY(), -controller.getLeftX()).times(2);
+    Translation2d rightStick = new Translation2d(controller.getRightX(), -controller.getRightY()).times(2);
 
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));
@@ -119,6 +119,8 @@ public class XBoxSwerve extends Command {
         velocity.plus(
             leftStick.times(
                 MathUtils.map(rightTrigger, 0, 1, NOMINAL_DRIVE_VELOCITY, MAX_DRIVE_VELOCITY)));
+
+    Logger.log("XBoxSwerve/leftStick", leftStick);
 
     if (controller.getPOV() != -1) {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();

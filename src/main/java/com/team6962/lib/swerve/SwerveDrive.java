@@ -324,7 +324,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command alignTo(Supplier<Pose2d> target) {
-    return alignTo(target, Inches.of(1), Degrees.of(4));
+    return alignTo(target, Inches.of(0.5), Degrees.of(2));
   }
 
   public Command alignTo(Pose2d target) {

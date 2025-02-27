@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 /*
@@ -132,6 +133,10 @@ public class PivotController extends SubsystemBase {
 
     Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
 
+    RobotContainer.disabledPeriodic.subscribe(this::disabledPeriodic);
+  }
+
+  public void disabledPeriodic() {
     seedEncoder();
   }
 

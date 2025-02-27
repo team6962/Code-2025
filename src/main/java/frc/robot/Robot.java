@@ -57,10 +57,10 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     double timestampBefore = Timer.getFPGATimestamp();
     loopTime = timestampBefore - time;
+    time = Timer.getFPGATimestamp();
     CommandScheduler.getInstance().run();
     robotContainer.latePeriodic();
     double timestampAfter = Timer.getFPGATimestamp();
-    time = timestampAfter;
     computeTime = timestampAfter - timestampBefore;
 
     if (NetworkTableInstance.getDefault()

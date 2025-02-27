@@ -158,7 +158,8 @@ public final class Constants {
     public static final double TELEOPERATED_DRIVE_POWER = 0.5; // Percent driving power
     public static final double TELEOPERATED_BOOST_POWER =
         1.0; // Percent power when using the triggers
-    public static final double TELEOPERATED_ROTATE_POWER = 0.4; // Percent rotating power
+    public static final double TELEOPERATED_ROTATE_POWER = 0.2; // Percent rotating power
+    public static final double TELEOPERATED_ROTATE_BOOST_POWER = 0.4; // Percent rotating power
   }
 
   public static final class CAN {

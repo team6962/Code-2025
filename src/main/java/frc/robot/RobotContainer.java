@@ -35,6 +35,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
 /**
@@ -45,6 +46,7 @@ import frc.robot.util.software.Dashboard.AutonChooser;
  */
 public class RobotContainer {
   private static RobotContainer instance;
+  public static RobotEvent disabledPeriodic = new RobotEvent();
 
   /**
    * Get the RobotContainer instance (for testing or competition only!)
@@ -240,6 +242,8 @@ public class RobotContainer {
     // LIMELIGHT.ALGAE_CAMERA_POSITION)));
 
     // autoGen.work();
+
+    disabledPeriodic.run();
   }
 
   public void disabledInit() {}

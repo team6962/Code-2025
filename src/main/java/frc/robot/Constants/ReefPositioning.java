@@ -20,7 +20,7 @@ public final class ReefPositioning {
     // public static final Distance REEF_TO_POLE = Inches.of(30.738196);
     public static final Distance BETWEEN_POLES = Inches.of(12.937756);
     public static final Distance ROBOT_TO_EDGE_PLACE_CORAL = SWERVE.CONFIG.chassis().outerLength().div(2).plus(Inches.of(1));
-    public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
+    public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(6));
 
     public static final Distance ROBOT_TO_EDGE_PLACE_ALGAE = SWERVE.CONFIG.chassis().outerLength().div(2);
     public static final Distance ROBOT_TO_EDGE_ALIGN_ALGAE = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
