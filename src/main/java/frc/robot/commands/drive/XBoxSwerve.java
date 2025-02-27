@@ -161,18 +161,29 @@ public class XBoxSwerve extends Command {
     Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
     boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
+    Logger.log("XBoxSwerve/movingTranslation", movingTranslation);
+
     Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
+    Logger.logObject("XBoxSwerve/currentTranslateCommand", currentTranslateCommand);
 
     if (currentTranslateCommand == translateCommand || currentTranslateCommand == null || movingTranslation) {
+      if (translateCommand != null) translateCommand.cancel();
+
       translateCommand = swerveDrive.drive(velocity);
+      translateCommand.setName("XBoxSwerveTranslate");
       translateCommand.schedule();
     }
 
     boolean movingRotation = Math.abs(angularVelocity) > Units.degreesToRadians(3);
+    Logger.log("XBoxSwerve/movingRotation", movingRotation);
     Command currentRotateCommand = swerveDrive.useRotation().getCurrentCommand();
+    Logger.logObject("XBoxSwerve/currentRotateCommand", currentRotateCommand);
 
     if (currentRotateCommand == rotateCommand || currentRotateCommand == null || movingRotation) {
+      if (rotateCommand != null) rotateCommand.cancel();
+
       rotateCommand = swerveDrive.drive(Rotation2d.fromRadians(angularVelocity));
+      rotateCommand.setName("XBoxSwerveRotate");
       rotateCommand.schedule();
     }
 

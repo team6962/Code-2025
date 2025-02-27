@@ -47,8 +47,8 @@ public class Controls {
     // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
-    driver.b();
-    driver.x().whileTrue(autonomous.pathfindToPole(1));
+    driver.b().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
+    driver.x().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back();
@@ -57,7 +57,8 @@ public class Controls {
     driver
         .rightStick()
         .onTrue(pieceCombos.pickupGroundAlgae());
-    driver.leftStick().onTrue(pieceCombos.algaeProcessor());
+    // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
+    driver.leftStick().onTrue(autonomous.driveToProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -65,6 +66,8 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
+    driver.button(19).onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
+    driver.button(20).onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
     // Operator
@@ -115,7 +118,7 @@ public class Controls {
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
-    ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
+    ShuffleboardTab driverTab = DriverDashboard.getTab();
 
     driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)

@@ -100,8 +100,8 @@ public final class Constants {
                 new Pose3d(
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(26.5),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180))));
+                    Units.inchesToMeters(0),
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(0))));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
@@ -155,7 +155,7 @@ public final class Constants {
   public static final class SWERVE_DRIVE {
     public static final double TELEOPERATED_FINE_TUNE_DRIVE_POWER =
         0.1; // Percent driving power when using d-pad
-    public static final double TELEOPERATED_DRIVE_POWER = 1.0; // Percent driving power
+    public static final double TELEOPERATED_DRIVE_POWER = 0.5; // Percent driving power
     public static final double TELEOPERATED_BOOST_POWER =
         1.0; // Percent power when using the triggers
     public static final double TELEOPERATED_ROTATE_POWER = 0.4; // Percent rotating power
@@ -362,7 +362,7 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = 0.1;
 
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
-    public static final double CORAL_OUT_SPEED = 0.4;
+    public static final double CORAL_OUT_SPEED = 1.0;
     public static final double CORAL_IN_SPEED = 0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
   }

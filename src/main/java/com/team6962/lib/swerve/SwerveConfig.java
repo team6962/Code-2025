@@ -65,6 +65,8 @@ public class SwerveConfig {
   private final Motor steerMotor;
   private final Wheel wheel;
   private final DriveGains driveGains;
+  private LinearVelocity maxSpeed;
+  private AngularVelocity maxRotation;
 
   public SwerveConfig(
       Chassis chassis,
@@ -81,6 +83,18 @@ public class SwerveConfig {
     this.steerMotor = steerMotor;
     this.wheel = wheel;
     this.driveGains = driveGains;
+  }
+
+  public SwerveConfig withMaxDriveSpeed(LinearVelocity maxSpeed) {
+    this.maxSpeed = maxSpeed;
+
+    return this;
+  }
+
+  public SwerveConfig withMaxRotationSpeed(AngularVelocity maxRotation) {
+    this.maxRotation = maxRotation;
+
+    return this;
   }
 
   public Chassis chassis() {
@@ -244,7 +258,22 @@ public class SwerveConfig {
     }
   }
 
-  public static record DriveGains(PIDConstants translation, PIDConstants rotation) {
+  public static class DriveGains {
+    PIDConstants translation, rotation;
+
+    public DriveGains(PIDConstants translation, PIDConstants rotation) {
+      this.translation = translation;
+      this.rotation = rotation;
+    }
+
+    public PIDConstants translation() {
+      return translation;
+    }
+
+    public PIDConstants rotation() {
+      return rotation;
+    }
+
     public PIDController createTranslationController() {
       return new PIDController(translation.kP, translation.kI, translation.kD);
     }
@@ -256,10 +285,56 @@ public class SwerveConfig {
     public PPHolonomicDriveController pathController() {
       return new PPHolonomicDriveController(translation, rotation);
     }
+
+    private LinearVelocity maxAutoSpeed;
+
+    public void setMaxAutonomousSpeed(LinearVelocity speed) {
+      maxAutoSpeed = speed;
+    }
+
+    public DriveGains withMaxAutonomousSpeed(LinearVelocity speed) {
+      maxAutoSpeed = speed;
+
+      return this;
+    }
+
+    public LinearVelocity maxAutonomousSpeed() {
+      return maxAutoSpeed;
+    }
+
+    private PIDConstants fineTranslation, fineRotation;
+
+    public DriveGains withFineTranslation(PIDConstants fineTranslation) {
+      this.fineTranslation = fineTranslation;
+
+      return this;
+    }
+
+    public DriveGains withFineRotation(PIDConstants fineRotation) {
+      this.fineRotation = fineRotation;
+
+      return this;
+    }
+
+    public DriveGains withFineGains(
+        PIDConstants fineTranslation, PIDConstants fineRotation) {
+      this.fineTranslation = fineTranslation;
+      this.fineRotation = fineRotation;
+
+      return this;
+    }
+
+    public PIDConstants fineTranslation() {
+      return fineTranslation != null ? fineTranslation : translation;
+    }
+
+    public PIDConstants fineRotation() {
+      return fineRotation != null ? fineRotation : rotation;
+    }
   }
 
   public LinearVelocity maxDriveSpeed() {
-    return driveMotorRotorToMechanism(driveMotor.freeSpeedRotor());
+    return maxSpeed == null ? driveMotorRotorToMechanism(driveMotor.freeSpeedRotor()) : maxSpeed;
   }
 
   public AngularVelocity maxSteerSpeed() {
@@ -273,7 +348,7 @@ public class SwerveConfig {
    */
   public PathConstraints pathConstraints() {
     return new PathConstraints(
-        maxDriveSpeed(),
+        driveGains.maxAutoSpeed == null ? maxDriveSpeed() : driveGains.maxAutoSpeed,
         maxLinearAcceleration(Amps.of(60)),
         maxRotationSpeed(),
         maxAngularAcceleration(Amps.of(60)));
@@ -310,7 +385,7 @@ public class SwerveConfig {
   }
 
   public AngularVelocity maxRotationSpeed() {
-    return RadiansPerSecond.of(
+    return maxRotation != null ? maxRotation : RadiansPerSecond.of(
         maxDriveSpeed().in(MetersPerSecond) / chassis.driveRadius().in(Meters));
   }
 
@@ -407,7 +482,7 @@ public class SwerveConfig {
         momentOfInertia(),
         new ModuleConfig(
             wheel().radius(),
-            maxDriveSpeed(),
+            driveMotorRotorToMechanism(driveMotor.freeSpeedRotor()),
             wheel().staticFriction(),
             driveMotor().stats().withReduction(gearing().drive()),
             driveMotor().maxCurrent(),

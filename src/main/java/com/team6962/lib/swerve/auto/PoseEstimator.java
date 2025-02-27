@@ -45,14 +45,18 @@ public class PoseEstimator extends SubsystemBase {
   private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
   private Twist2d chassisVelocity = new Twist2d();
 
+  private Coordinates coordinates;
+
   public PoseEstimator(
       SwerveDriveKinematics kinematics,
       Supplier<SwerveModulePosition[]> modulePositions,
-      Supplier<SwerveModuleState[]> moduleStates) {
+      Supplier<SwerveModuleState[]> moduleStates,
+      Coordinates coordinates) {
     this.kinematics = kinematics;
     this.gyroscope = new SwerveGyroscope(() -> positionChanges, kinematics);
     this.modulePositionsSupplier = modulePositions;
     this.moduleStatesSupplier = moduleStates;
+    this.coordinates = coordinates;
 
     lastPositions = modulePositions.get();
 
@@ -61,11 +65,7 @@ public class PoseEstimator extends SubsystemBase {
             kinematics,
             RotationUtils.fromAngle(gyroscope.getHeading()),
             modulePositions.get(),
-            new Pose2d(5, 5, Rotation2d.fromDegrees(0)));
-
-    if (RobotBase.isSimulation()) {
-      poseEstimator.resetPose(new Pose2d(7.57, 5.75, Rotation2d.fromDegrees(0)));
-    }
+            new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
     Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
   }
@@ -92,13 +92,13 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
-    poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
+    poseEstimator.addVisionMeasurement(coordinates.absoluteToAlliancePose(visionMeasurement), timestamp.in(Seconds));
   }
 
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
-        visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
+      coordinates.absoluteToAlliancePose(visionRobotPoseMeters), timestamp.in(Seconds), visionMeasurementStdDevs);
   }
 
   public void resetPosition(Pose2d expectedPose) {

@@ -7,6 +7,8 @@ import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -20,6 +22,9 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.util.Arrays;
 
 /**
@@ -51,7 +56,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
     kinematics = KinematicsUtils.kinematicsFromChassis(constants.chassis());
     poseEstimator =
-        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
+        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates(), this);
 
     currentMovement = new SwerveMovement(kinematics);
 
@@ -136,14 +141,11 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
     states =
         KinematicsUtils.desaturateWheelSpeeds(
-            states, constants.maxDriveSpeed());
+            states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
 
     Logger.log(
-        getName() + "/targetModuleSpeeds",
+        getName() + "/targetModuleSpeeds_preset",
         robotToAllianceSpeeds(kinematics.toChassisSpeeds(states)));
-    Logger.log(getName() + "/targetModuleSpeeds_robotRelative", kinematics.toChassisSpeeds(states));
-    Logger.log(getName() + "/targetModuleStates", states);
-    Logger.log(getName() + "/currentModuleStates", getModuleStates());
 
     Pose2d[] poses = getModulePoses();
 

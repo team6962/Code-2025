@@ -1,5 +1,9 @@
 package frc.robot.commands.autonomous;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -8,14 +12,21 @@ import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.commands.PieceCombos;
+import frc.robot.Constants.Constants.SWERVE;
+import frc.robot.Constants.Field;
+import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.StationPositioning;
+import frc.robot.commands.PieceCombos;
+import frc.robot.commands.autonomous.CoralSequences.CoralPosition;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 
@@ -38,144 +49,153 @@ public class Autonomous {
     this.manipulator = manipulator;
     this.elevator = elevator;
     this.pieceCombos = pieceCombos;
-
-    // System.out.println(swerveDrive.getEstimatedPose().getX() + ", " +
-    // swerveDrive.getEstimatedPose().getY());
-    // addCommands(cycleTopCoral());
-
-    // for (int i = 0; i < Field.REEF_FACE_POSITIONS.size(); i ++) {
-    //   System.out.println(Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getX(), Inches) + ",
-    // " + Meters.convertFrom(Field.REEF_FACE_POSITIONS.get(i).getY(), Inches));
-    // }
   }
 
-  // public int getClosestReefFace() {
-  //   List<Translation2d> reefFaces = Field.REEF_FACE_POSITIONS;
+  public static enum PolePattern {
+    LEFT(1, 2),
+    RIGHT(0, 2),
+    CLOSEST(0, 1);
 
-  //   double closestDist = Integer.MAX_VALUE;
-  //   int closestFace = -1;
+    public final int start;
+    public final int increment;
 
-  //   for (int i = 0; i < reefFaces.size(); i ++) {
-  //     Translation2d curFace = reefFaces.get(i);
-      
-  //     double distance = Math.hypot(
-  //       swerveDrive.getEstimatedPose().getX() - curFace.getX(),
-  //       swerveDrive.getEstimatedPose().getY() - curFace.getY()
-  //     );
+    private PolePattern(int start, int increment) {
+      this.start = start;
+      this.increment = increment;
+    }
+  }
 
-  //     System.out.println(distance);
+  public int getClosestReefPole(Pose2d pose, PolePattern pattern) {
+    int closestPole = 0;
+    double closestDistance = Double.MAX_VALUE;
 
-  //     if (distance < closestDist) {
-  //       closestDist = distance;
-  //       closestFace = i;
-  //     }
-  //   }
+    for (int i = pattern.start; i < 12; i += pattern.increment) {
+      Translation2d pole = ReefPositioning.getCoralAlignPose(i).getTranslation();
 
-  //   return closestFace;
-  // }
+      if (pose.getTranslation().getDistance(pole) < closestDistance) {
+        closestPole = i;
+        closestDistance = pose.getTranslation().getDistance(pole);
+      }
+    }
 
-  /**
-   * Outputs the numbers of the reef pole on a certain reef face
-   *
-   * @param face
-   * @return Index 0 is the left pole (from the robot's perspective), index 1 is on the right
-   */
-  public int[] reefPolesFromReefFace(int face) {
-    return new int[] {face * 2, face * 2 + 1};
+    return closestPole;
+  }
+
+  public int getClosestReefFace(Pose2d pose) {
+    int closestFace = 0;
+    double closestDistance = Double.MAX_VALUE;
+
+    for (int i = 0; i < 6; i++) {
+      Translation2d face = ReefPositioning.getAlgaeAlignPose(i).getTranslation();
+
+      if (pose.getTranslation().getDistance(face) < closestDistance) {
+        closestFace = i;
+        closestDistance = pose.getTranslation().getDistance(face);
+      }
+    }
+
+    return closestFace;
+  }
+
+  public Command intakeCoral(CoralStation station) {
+    Pose2d pose = StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
+    return Commands.sequence(
+      Commands.parallel(
+        swerveDrive.pathfindTo(pose),
+        CommandUtils.selectByMode(pieceCombos.intakeCoral(), CommandUtils.printAndWait("Moving elevator and manipulator for coral intaking", 0.5))
+      ),
+      swerveDrive.alignTo(pose),
+      CommandUtils.selectByMode(manipulator.coral.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
+      Commands.print("Done intaking")
+    );
+  }
+
+  public Command processAlgae() {
+    Pose2d processorPose = new Pose2d(
+      Units.inchesToMeters(235.726104),
+      SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
+      Rotation2d.fromDegrees(-90)
+    );
+
+    Pose2d processorNewPose = Field.getProcessorPose().plus(new Transform2d(new Translation2d(0, swerveDrive.getConstants().chassis().outerLength().div(2).plus(Inches.of(18)).in(Meters)), new Rotation2d()));
+
+    processorNewPose = new Pose2d(processorNewPose.getTranslation(), Rotation2d.fromDegrees(-90));
+
+    return Commands.sequence(
+      Commands.parallel(
+        CommandUtils.selectByMode(pieceCombos.algaeProcessor(), CommandUtils.printAndWait("Moving elevator and manipulator for algae processor", 0.5)),
+        swerveDrive.pathfindTo(processorNewPose)
+      ),
+      swerveDrive.alignTo(processorNewPose),
+      CommandUtils.selectByMode(manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.5)),
+      swerveDrive.alignTo(new Pose2d(
+        Units.inchesToMeters(235.726104),
+        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(24)).in(Meters),
+        Rotation2d.fromDegrees(-90)
+      ), Inches.of(4), Degrees.of(45))
+    );
   }
 
   public Command driveToProcessor() {
-    return swerveDrive.pathfindTo(new Pose2d(6.172, 0.508, Rotation2d.fromDegrees(-90)));
+    return Commands.sequence(
+      CommandUtils.selectByMode(pieceCombos.algaeProcessor(), CommandUtils.printAndWait("Preparing for algae processor", 0.5)),
+      swerveDrive.pathfindTo(new Pose2d(
+        Units.inchesToMeters(235.726104),
+        SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
+        Rotation2d.fromDegrees(-90)
+      )),
+      CommandUtils.selectByMode(manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.25))
+    );
   }
 
-  // public Command pathfindToTopCoralStation() {
-  //   return swerveDrive.pathfindTo(new Pose2d(1.1, 7.0, Rotation2d.fromDegrees(135)));
-  // }
+  public Command alignCoral(int pole) {
+    return swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole))
+      .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
+  }
 
-  // /**
-  //  * Aligns to either reef pole on the closest reef face
-  //  * @param side 0 means left, 1 means right (from the robot's perspective)
-  //  * @return
-  //  */
-  // public Command reefPoleAlign(int side) {
-  //   return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
-  // }
+  public Command alignAlgae(int face) {
+    return swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
+      .andThen(swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)));
+  }
 
-  // public Command pathfindToTopLeftReefPoles() {
-  //   return swerveDrive.pathfindTo(new Pose2d(3.45, 5.4, Rotation2d.fromDegrees(300)));
-  // }
+  public Command alignToClosestPole(PolePattern pattern) {
+    return Commands.defer(() -> alignCoral(getClosestReefPole(swerveDrive.getEstimatedPose(), pattern)), Set.of(swerveDrive.useMotion()));
+  }
 
-  // /**
-  //  * Pathfinds to reef pole based on pole number
-  //  *
-  //  * @param poleNum Number from 1-12 starting on the right side top pole, moving counterclockwise
-  //  * @return
-  //  */
-  // public Command pathfindToReefPole(int poleNum) {
-  //   return swerveDrive.pathfindTo(
-  //       new Pose2d(
-  //           Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getX(), Inches),
-  //           Meters.convertFrom(Field.CORAL_PLACEMENT_POSES.get(poleNum).getY(), Inches),
-  //           Field.CORAL_PLACEMENT_POSES.get(poleNum).getRotation()));
-  // }
-
-  // public Command pathfindToReefPole(int faceNumber, Pole pole) {
-  //   Pose2d polePose = Field.getPolePose(faceNumber, pole);
-  //   return swerveDrive.pathfindTo(polePose);
-  // }
+  public Command alignToClosestFace(PolePattern pattern) {
+    return Commands.defer(() -> alignAlgae(getClosestReefFace(swerveDrive.getEstimatedPose())), Set.of(swerveDrive.useMotion()));
+  }
 
   public Command driveToPole(int pole) {
     return swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole))
       .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
   }
 
-  public Command placeCoral(int pole, int level) {
+  public Command placeCoral(CoralPosition position) {
     return Commands.sequence(
-      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(pole)),
-      CommandUtils.selectByMode(pieceCombos.coral(level), CommandUtils.logAndWait("Moving to level " + level, level * 0.5)),
-      swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)),
-      CommandUtils.selectByMode(manipulator.coral.drop(), CommandUtils.logAndWait("Dropping coral", 0.25)),
-      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.logAndWait("Stowing elevator", level * 0.5))
+      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole())),
+      CommandUtils.selectByMode(pieceCombos.coral(position.level()), CommandUtils.printAndWait("Moving to level " + position.level(), position.level() * 0.5)),
+      swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole())),
+      CommandUtils.selectByMode(manipulator.coral.drop(), CommandUtils.printAndWait("Dropping coral", 0.25)),
+      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
     );
   }
-
-  // /**
-  //  * Aligns to either reef pole on the closest reef face
-  //  *
-  //  * @param side 0 means left, 1 means right (from the robot's perspective)
-  //  * @return
-  //  */
-  // public Command reefPoleAlign(int side) {
-  //   return pathfindToReefPole(reefPolesFromReefFace(getClosestReefFace())[side]);
-  // }
 
   public Command driveToAlgae(int face) {
     return swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
       .andThen(swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)));
   }
 
-  // public Command scoreCoral() {
-  //   return null;
-  // }
-
-  // public Command cycleTopCoral() {
-  //   return Commands.sequence(
-  //     pathfindToReefPole(4),
-  //     pathfindToTopCoralStation(),
-  //     pathfindToReefPole(3),
-  //     pathfindToTopCoralStation(),
-  //     pathfindToReefPole(2),
-  //     pathfindToTopCoralStation(),
-  //     pathfindToReefPole(1),
-  //     pathfindToTopCoralStation(),
-  //     pathfindToReefPole(0),
-  //     pathfindToTopCoralStation()
-  //   );
-  // }
-
-  // public Command coralStation() {
-  //   return null;
-  // }
+  public Command pickupAlgae(int face, int level) {
+    return Commands.sequence(
+      swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(face)),
+      CommandUtils.selectByMode(pieceCombos.algae(level), CommandUtils.printAndWait("Moving to level " + level, level * 0.5)),
+      swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)),
+      CommandUtils.selectByMode(manipulator.algae.intake(), CommandUtils.printAndWait("Intaking algae", 0.5)),
+      swerveDrive.alignTo(ReefPositioning.getAlgaeLeavePose(face), Inches.of(3), Degrees.of(45)),
+      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", level * 0.5))
+    );
+  }
 
   public Command pathfindToPole(int poleNumber) {
     return swerveDrive
@@ -211,19 +231,16 @@ public class Autonomous {
         () ->
             Algae.getAlgaePosition(
                 LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION));
-}
+  }
 
-  public Command createAutonomousCommand() {
+  public Command createDemoAutonomousCommand() {
     return Commands.sequence(
-      placeCoral(0, 1),
-      driveToAlgae(3),
-      driveToBarge(),
-      placeCoral(11, 4),
-      driveToAlgae(5),
+      placeCoral(new CoralPosition(0, 1)),
+      pickupAlgae(3, 3),
+      processAlgae(),
+      placeCoral(new CoralPosition(11, 4)),
+      pickupAlgae(5, 2),
       driveToBarge()
     );
-    // return Commands.sequence(
-    //   reefPoleAlign(1)
-    // );
   }
 }

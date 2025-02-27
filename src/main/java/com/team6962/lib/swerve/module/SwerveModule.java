@@ -92,8 +92,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveConfig.apply(
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
-    CTREUtils.check(driveConfig.apply(new CurrentLimitsConfigs()
-      .withSupplyCurrentLimit(Amps.of(50))));
+    CTREUtils.check(
+      driveConfig.apply(new CurrentLimitsConfigs()
+        .withSupplyCurrentLimit(Amps.of(80))));
 
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -131,7 +132,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withNeutralMode(NeutralModeValue.Brake)));
     
     CTREUtils.check(steerConfig.apply(new CurrentLimitsConfigs()
-      .withSupplyCurrentLimit(Amps.of(50))));
+      .withSupplyCurrentLimit(Amps.of(80))));
 
     // Configure the fusing of the absolute steer encoder's reported position
     // with the motor's internal relative encoder, and set the steer motor
@@ -499,7 +500,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   public static SwerveModuleState optimizeStateForTalon(
       SwerveModuleState targetState, Angle currentAngle) {
     Angle difference =
-        MeasureMath.differenceUnderHalf(targetState.angle.getMeasure(), currentAngle);
+        MeasureMath.minDifference(targetState.angle.getMeasure(), currentAngle);
     SwerveModuleState relativeOptimized =
         optimizeStateRelative(targetState.speedMetersPerSecond, difference);
 

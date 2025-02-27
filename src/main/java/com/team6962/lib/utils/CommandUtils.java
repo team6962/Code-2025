@@ -19,12 +19,29 @@ public final class CommandUtils {
   }
 
   public static Command selectByMode(Command realCommand, Command simCommand) {
+    // return simCommand;
     return RobotBase.isReal() ? realCommand : simCommand;
   }
 
-  public static Command logAndWait(String message, double seconds) {
-    return Commands.parallel(
-        Commands.print(message),
-        Commands.waitSeconds(seconds));
+  public static Command printAndWait(String message, double seconds) {
+    // return Commands.parallel(
+    //     Commands.print(message),
+    //     Commands.waitSeconds(seconds));
+
+    return Commands.print(message);
+  }
+
+  public static Command printInSimulation(String message) {
+    return RobotBase.isSimulation() ? Commands.print(message) : Commands.none();
+  }
+
+  public static Command withRequirements(Command command, Subsystem... requirements) {
+    command.addRequirements(requirements);
+
+    return command;
+  }
+
+  public static Command waitFor(Command otherCommand) {
+    return Commands.waitUntil(() -> otherCommand.isFinished());
   }
 }

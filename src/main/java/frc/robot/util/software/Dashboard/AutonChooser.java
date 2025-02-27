@@ -1,56 +1,57 @@
 package frc.robot.util.software.Dashboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import java.util.ArrayList;
-import java.util.List;
+import frc.robot.subsystems.DriverDashboard;
 
 public final class AutonChooser {
+  public static NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous");
   public static ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
   public static List<SimpleWidget> reefOptions = new ArrayList<>();
   public static SimpleWidget rightCoral;
   public static SimpleWidget leftCoral;
   public static SimpleWidget startingAlgae;
+  public static SimpleWidget autoComputed;
 
   public static boolean startingAlgae() {
-    if (tab == null) {
-      init();
-    }
-
-    return startingAlgae.getEntry().getBoolean(false);
+    return table.getEntry("Starting Algae").getBoolean(false);
+    // return startingAlgae.getEntry().getBoolean(false);
   }
 
   public static boolean leftCoralStation() {
-    if (tab == null) {
-      init();
-    }
-
-    return leftCoral.getEntry().getBoolean(false);
+    return table.getEntry("Left Station").getBoolean(false);
+    // return leftCoral.getEntry().getBoolean(false);
   }
 
   public static boolean rightCoralStation() {
-    if (tab == null) {
-      init();
-    }
-
-    return rightCoral.getEntry().getBoolean(false);
+    return table.getEntry("Right Station").getBoolean(false);
+    // return rightCoral.getEntry().getBoolean(false);
   }
 
   public static List<Integer> reefFaces() {
-    if (tab == null) {
-      init();
-    }
-
     List<Integer> reefFaces = new ArrayList<>();
 
-    // for (int i = 0; i < Field.REEF_FACES.size(); i++) {
-    //   if (reefOptions.get(i).getEntry().getBoolean(false)) {
-    //     reefFaces.add(i);
-    //   }
-    // }
+    for (int i = 0; i < 6; i++) {
+      if (table.getEntry("Face " + (i + 1)).getBoolean(false)) {
+        reefFaces.add(i);
+      }
+      // if (reefOptions.get(i).getEntry().getBoolean(false)) {
+      //   reefFaces.add(i);
+      // }
+    }
+
     return reefFaces;
+  }
+
+  public static void setAutoComputed(boolean value) {
+    DriverDashboard.getTable().getEntry("Auto Precomputed").setBoolean(value);
   }
 
   public static void init() {
@@ -99,6 +100,11 @@ public final class AutonChooser {
         tab.add("Starting Algae", false)
             .withWidget(BuiltInWidgets.kToggleButton)
             .withSize(1, 1)
-            .withPosition(2, 0);
+            .withPosition(4, 2);
+    autoComputed =
+        DriverDashboard.getTab().add("Auto Precomputed", false)
+            .withWidget(BuiltInWidgets.kBooleanBox)
+            .withSize(2, 2)
+            .withPosition(4, 0);
   }
 }

@@ -36,6 +36,17 @@ public final class Field {
   public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // meters
   public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // meters
 
+  public static enum CoralStation {
+    LEFT(true),
+    RIGHT(false);
+
+    public final Pose2d pose;
+
+    CoralStation(boolean reflect) {
+      this.pose = StationPositioning.getCenterIntakePose(reflect);
+    }
+  }
+
   public static enum Pole {
     LEFT,
     RIGHT

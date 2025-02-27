@@ -2,7 +2,11 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -54,14 +58,17 @@ public final class SwerveConstants {
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
             Amps.of(60)),
         Wheel.COLSON,
-        new DriveGains( // TODO: Tune drive gains
-            new PIDConstants(5.0, 1.0, 0), new PIDConstants(1.0, 0.1, 0.01)));
+        new DriveGains(
+            new PIDConstants(3.0, 0.0, 0.5), new PIDConstants(1.0, 0.5, 0.01))
+          .withFineTranslation(new PIDConstants(3.0, 0.0, 0.5)))
+      .withMaxDriveSpeed(MetersPerSecond.of(3.9))
+      .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
     return switch (chassisType) {
       case COMPETITION -> new Chassis(
-          Inches.of(30), Inches.of(30), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
+          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
       case TEST -> new Chassis(
           Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
     };
@@ -77,24 +84,17 @@ public final class SwerveConstants {
 
     if (idString.equals("TEST")) {
       System.out.println(
-          "████████╗███████╗░██████╗████████╗  ░█████╗░██╗░░██╗░█████╗░░██████╗░██████╗██╗░██████╗██╗\n"
-              + "╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝  ██╔══██╗██║░░██║██╔══██╗██╔════╝██╔════╝██║██╔════╝██║\n"
-              + "░░░██║░░░█████╗░░╚█████╗░░░░██║░░░  ██║░░╚═╝███████║███████║╚█████╗░╚█████╗░██║╚█████╗░██║\n"
-              + "░░░██║░░░██╔══╝░░░╚═══██╗░░░██║░░░  ██║░░██╗██╔══██║██╔══██║░╚═══██╗░╚═══██╗██║░╚═══██╗╚═╝\n"
-              + "░░░██║░░░███████╗██████╔╝░░░██║░░░  ╚█████╔╝██║░░██║██║░░██║██████╔╝██████╔╝██║██████╔╝██╗\n"
-              + "░░░╚═╝░░░╚══════╝╚═════╝░░░░╚═╝░░░  ░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░╚═════╝░╚═╝╚═════╝░╚═╝");
+          "=== !!! ### TEST CHASSIS ### !!! ===");
       return ChassisType.TEST;
     } else if (idString.equals("COMPETITION")) {
       System.out.println(
-          "█▀▀ █▀█ █▀▄▀█ █▀█ █▀▀ ▀█▀ █ ▀█▀ █ █▀█ █▄░█ █\n"
-              + "█▄▄ █▄█ █░▀░█ █▀▀ ██▄ ░█░ █ ░█░ █ █▄█ █░▀█ ▄");
+          "=== COMPETITION CHASSIS ===");
 
       return ChassisType.COMPETITION;
     } else {
       System.out.println("Bad chassis id. Default to");
       System.out.println(
-          "█▀▀ █▀█ █▀▄▀█ █▀█ █▀▀ ▀█▀ █ ▀█▀ █ █▀█ █▄░█ █\n"
-              + "█▄▄ █▄█ █░▀░█ █▀▀ ██▄ ░█░ █ ░█░ █ █▄█ █░▀█ ▄");
+          "=== COMPETITION CHASSIS ===");
 
       return ChassisType.COMPETITION;
     }

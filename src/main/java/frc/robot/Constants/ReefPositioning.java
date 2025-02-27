@@ -19,7 +19,7 @@ public final class ReefPositioning {
     public static final Distance REEF_TO_EDGE = Inches.of(32.745545);
     // public static final Distance REEF_TO_POLE = Inches.of(30.738196);
     public static final Distance BETWEEN_POLES = Inches.of(12.937756);
-    public static final Distance ROBOT_TO_EDGE_PLACE_CORAL = SWERVE.CONFIG.chassis().outerLength().div(2);
+    public static final Distance ROBOT_TO_EDGE_PLACE_CORAL = SWERVE.CONFIG.chassis().outerLength().div(2).plus(Inches.of(1));
     public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
 
     public static final Distance ROBOT_TO_EDGE_PLACE_ALGAE = SWERVE.CONFIG.chassis().outerLength().div(2);
@@ -42,6 +42,13 @@ public final class ReefPositioning {
 
     public static final Translation2d ALIGN_ALGAE_RELATIVE = new Translation2d(
         REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN_ALGAE).in(Meters),
+        0
+    );
+
+    public static final Distance ROBOT_TO_EDGE_LEAVE_ALGAE = ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(17));
+
+    public static final Translation2d LEAVE_ALGAE_RELATIVE = new Translation2d(
+        REEF_TO_EDGE.plus(ROBOT_TO_EDGE_LEAVE_ALGAE).in(Meters),
         0
     );
 
@@ -88,11 +95,11 @@ public final class ReefPositioning {
     }
 
     public static Pose2d getCoralPlacePose(int pole) {
-        return getPolePose(PLACE_CORAL_RELATIVE, pole);
+        return rotatePose(getPolePose(PLACE_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getCoralAlignPose(int pole) {
-        return getPolePose(ALIGN_CORAL_RELATIVE, pole);
+        return rotatePose(getPolePose(ALIGN_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getAlgaePlacePose(int face) {
@@ -101,5 +108,16 @@ public final class ReefPositioning {
 
     public static Pose2d getAlgaeAlignPose(int face) {
         return getFacePose(ALIGN_ALGAE_RELATIVE, face);
+    }
+
+    public static Pose2d getAlgaeLeavePose(int face) {
+        return getFacePose(LEAVE_ALGAE_RELATIVE, face);
+    }
+
+    private static Pose2d rotatePose(Pose2d pose, Rotation2d rotation) {
+        return new Pose2d(
+            pose.getTranslation(),
+            pose.getRotation().plus(rotation)
+        );
     }
 }

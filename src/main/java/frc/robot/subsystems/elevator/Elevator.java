@@ -55,7 +55,7 @@ public class Elevator extends DualLinearActuator {
         ELEVATOR.BASE_HEIGHT,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
-        Inches.of(0.5));
+        Inches.of(2.5));
 
     setDefaultCommand(hold());
   }

@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
@@ -109,8 +110,8 @@ public class DualLinearActuator extends SubsystemBase {
     leftEncoder.setPosition(baseHeight.in(Meters));
     rightEncoder.setPosition(baseHeight.in(Meters));
 
-    Logger.logNumber(this.getName() + "/height/target", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/height/avg", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
@@ -123,10 +124,8 @@ public class DualLinearActuator extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/limits/ceil", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/limits/floor", this::triggeredFloorLimit);
 
-    Logger.logBoolean(this.getName() + "/zeroed", () -> zeroed);
-
-    zeroed = triggeredFloorLimit();
-
+    Logger.logMeasure(this.getName() + "/leftCurrent", () -> Amps.of(leftMotor.getOutputCurrent()));
+    Logger.logMeasure(this.getName() + "/rightCurrent", () -> Amps.of(rightMotor.getOutputCurrent()));
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);

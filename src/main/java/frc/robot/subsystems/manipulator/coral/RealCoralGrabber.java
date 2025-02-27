@@ -45,6 +45,11 @@ public class RealCoralGrabber extends CoralGrabber {
   }
 
   @Override
+  public boolean hasGamePiece() {
+      return detectsGamePiece;
+  }
+
+  @Override
   public boolean detectsGamePiece() {
     return detectsGamePiece;
   }

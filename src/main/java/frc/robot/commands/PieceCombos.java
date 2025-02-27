@@ -61,6 +61,14 @@ public class PieceCombos {
         manipulator.pickupGroundAlgae());
   }
 
+  public Command algae(int level) {
+    return switch (level) {
+      case 2 -> algaeL2();
+      case 3 -> algaeL3();
+      default -> CommandUtils.noneWithRequirements(elevator, manipulator);
+    };
+  }
+
   public Command algaeL2() {
     return safeSubsystems.safeMoveCommand(
         elevator.algaeL2(),

@@ -5,10 +5,13 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.util.Set;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -22,9 +25,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.PrematchChecks;
+import frc.robot.commands.SafeSubsystems;
+import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.RobotStateController;
@@ -68,6 +71,8 @@ public class RobotContainer {
   // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
+
+  private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -130,6 +135,8 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
+    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
         NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
@@ -162,17 +169,34 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return autonomous.createAutonomousCommand();
-
+    // return autonomous.createDemoAutonomousCommand();
     // return Commands.defer(() -> {
-    //   System.out.println("Generating auto command");
+    //   // System.out.println("Generating auto command");
 
-    //   return autoGen.generate();
+    //   // return autoGen.generate();
+
+    //   GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+    //   auto.setup();
+
+    //   return auto.getCommand();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
-    return Commands.sequence(
+    // return autonomous.createAutonomousCommand();
+
+    return Commands.defer(() -> {
+      System.out.println("Generating autonomous command");
+
+      return autoGen.generate();
+    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+
+    // return Commands.sequence(
+    //   // elevator.calibrate()
+    //   manipulator.pivot.calibrate()
+    // );
+
+    // return Commands.sequence(
         // elevator.calibrate()
-        manipulator.pivot.calibrate());
+        // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
   }
@@ -192,6 +216,10 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
+    double autoWorkTimestamp = Timer.getFPGATimestamp();
+    autoGen.work();
+    Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
+
     // Pose2d[] poses;
 
     // Translation2d algae =
@@ -210,6 +238,8 @@ public class RobotContainer {
     // System.out.println(new Translation2d(0.0,0.0));
     // System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive,
     // LIMELIGHT.ALGAE_CAMERA_POSITION)));
+
+    // autoGen.work();
   }
 
   public void disabledInit() {}
@@ -218,9 +248,11 @@ public class RobotContainer {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
     // Amps.of(60)).schedule();
 
-    Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
+    // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
     // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
     // checks.schedule();
+
+    elevator.rezeroAtBottom().schedule();
   }
 }
