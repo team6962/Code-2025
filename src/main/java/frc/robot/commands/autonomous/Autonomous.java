@@ -22,6 +22,7 @@ import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.StationPositioning;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.autonomous.CoralSequences.CoralPosition;
 import frc.robot.subsystems.RobotStateController;
@@ -97,8 +98,7 @@ public class Autonomous {
   }
 
   public Command intakeCoral(CoralStation station) {
-    Pose2d pose = station.pose;
-
+    Pose2d pose = StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
     return Commands.sequence(
       Commands.parallel(
         swerveDrive.pathfindTo(pose),

@@ -36,16 +36,14 @@ public final class Field {
   public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // meters
   public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // meters
 
-  private static final Pose2d RIGHT_CORAL_STATION = new Pose2d(Inches.of(33.289704 + 20), Inches.of(25.533630 + 20), Rotation2d.fromDegrees(144.011392 + 90));
-
   public static enum CoralStation {
-    LEFT(new Pose2d(RIGHT_CORAL_STATION.getX(), WIDTH - RIGHT_CORAL_STATION.getY(), RIGHT_CORAL_STATION.getRotation().unaryMinus())),
-    RIGHT(RIGHT_CORAL_STATION);
+    LEFT(true),
+    RIGHT(false);
 
     public final Pose2d pose;
 
-    CoralStation(Pose2d pose) {
-      this.pose = pose;
+    CoralStation(boolean reflect) {
+      this.pose = StationPositioning.getCenterIntakePose(reflect);
     }
   }
 
