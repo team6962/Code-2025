@@ -95,13 +95,13 @@ public final class Constants {
                     Units.inchesToMeters(14.5),
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(7.5),
-                    new Rotation3d(Units.degreesToRadians(180.0), Units.degreesToRadians(19.0), 0.0)),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(19.0), 0.0)),
             "limelight-btag",
                 new Pose3d(
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(0))));
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(0.0))));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
