@@ -50,12 +50,13 @@ public class Controls {
     driver.b();
     driver.x().whileTrue(autonomous.pathfindToPole(1));
     driver.y();
+    driver.start().onTrue(pieceCombos.stow());
     driver.back();
     driver.leftBumper();
     driver.rightBumper();
     driver
         .rightStick()
-        .whileTrue(autonomous.autoOrientToAlgae().alongWith(pieceCombos.pickupGroundAlgae()));
+        .onTrue(pieceCombos.pickupGroundAlgae());
     driver.leftStick().onTrue(pieceCombos.algaeProcessor());
     driver.povCenter(); // USED
     driver.povUp(); // USED
@@ -97,18 +98,15 @@ public class Controls {
     operator.povDown().whileTrue(elevator.down());
     operator.povRight().whileTrue(manipulator.pivot.up());
     operator.povLeft().whileTrue(manipulator.pivot.down());
-    // operator.povLeft().whileTrue(hang.deploy());
-    // operator.povRight().whileTrue(hang.stow());,
     operator.back().onTrue(pieceCombos.algaeL2());
     operator.start().onTrue(pieceCombos.algaeL3());
-    operator.rightStick().onTrue(pieceCombos.intakeCoral()); // big right paddle
-    operator.rightBumper().whileTrue(manipulator.coral.backwards());
-    operator.rightTrigger().whileTrue(manipulator.coral.magicButton());
-    operator.leftBumper().whileTrue(manipulator.algae.intake());
-    operator.leftTrigger().whileTrue(manipulator.algae.drop());
+    operator.leftStick().onTrue(pieceCombos.algaeBarge());
+    operator.rightStick().onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    // operator.povRight().whileTrue(manipulator.pivot.up());
-    // operator.povLeft().whileTrue(manipulator.pivot.down());
+    operator.rightBumper().whileTrue(manipulator.coral.backwards());
+    operator.rightTrigger().whileTrue(manipulator.coral.magicButton().andThen(rumbleBoth()));
+    operator.leftBumper().whileTrue(manipulator.algae.intake().andThen(rumbleBoth()));
+    operator.leftTrigger().whileTrue(manipulator.algae.drop());
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >

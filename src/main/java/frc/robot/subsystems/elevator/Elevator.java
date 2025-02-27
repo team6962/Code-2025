@@ -72,14 +72,6 @@ public class Elevator extends DualLinearActuator {
     return this.run(() -> moveTo(height)).until(this::doneMoving);
   }
 
-  public Command up() {
-    return this.runEnd(this::moveUp, this::stopMotors);
-  }
-
-  public Command down() {
-    return this.runEnd(this::moveDown, this::stopMotors);
-  }
-
   public Command stop() {
     return this.run(this::stopMotors);
   }

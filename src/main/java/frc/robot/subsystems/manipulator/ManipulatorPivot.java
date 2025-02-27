@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -20,6 +21,8 @@ import frc.robot.RobotContainer;
 import frc.robot.util.hardware.motion.PivotController;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import com.team6962.lib.telemetry.Logger;
 
 public class ManipulatorPivot extends PivotController {
 
@@ -125,16 +128,7 @@ public class ManipulatorPivot extends PivotController {
   public Command stop() {
     return run(this::stopMotor);
   }
-
-  // public Command up() {
-  //   return run(this::moveUp);
-  // }
-
-  // public Command down() {
-  //   return run(this::moveDown);
-  // }
   
-
   public Command calibrate() {
     SysIdRoutine calibrationRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(1.5)),

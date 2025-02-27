@@ -169,30 +169,24 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public Command move(double speed) {
-    return runOnce(() -> moveSpeed(speed));
+    return runEnd(() -> moveSpeed(speed), this::stopMotors);
   }
 
   public void moveSpeed(double speed) {
     if (canMoveInDirection(speed)) {
-      double startTime = Timer.getFPGATimestamp();
       leftMotor.set(speed);
-      double swapTime = Timer.getFPGATimestamp();
       rightMotor.set(speed);
-      double endTime = Timer.getFPGATimestamp();
-
-      Logger.log(this.getName() + "/leftTime", swapTime - startTime);
-      Logger.log(this.getName() + "/rightTime", endTime - swapTime);
     } else {
       stopMotors();
     }
   }
 
-  public void moveUp() {
-    moveSpeed(0.20);
+  public Command up() {
+    return move(0.2);
   }
 
-  public void moveDown() {
-    moveSpeed(-0.20);
+  public Command down() {
+    return move(-0.2);
   }
 
   public boolean unsafeMoveDown() {

@@ -138,7 +138,6 @@ public class PivotController extends SubsystemBase {
   public void seedEncoder() {
     Logger.log(this.getName() + "/lastSeeded", Timer.getFPGATimestamp());
     encoder.setPosition(getAbsolutePosition().in(Rotations));
-    // System.out.println("AFTA::::::::::::::" + getRelativePosition());
   }
 
   public void moveTowards(Angle requestedAngle) {
@@ -220,13 +219,15 @@ public class PivotController extends SubsystemBase {
   }
 
   public Command move(double speed) {
-    return run(() -> moveSpeed(speed)).finallyDo(motor::stopMotor);
+    return runEnd(() -> moveSpeed(speed), motor::stopMotor);
   }
 
   public void moveSpeed(double speed) {
-    // if (canMoveInDirection(speed))
-    motor.set(speed);
-    // else motor.set(0);
+    if (canMoveInDirection(speed)) {
+      motor.set(speed);
+    } else {
+      motor.stopMotor();
+    }
   }
 
   public Command up() {
@@ -280,12 +281,20 @@ public class PivotController extends SubsystemBase {
     return true;
   }
 
+  public boolean pastMax() {
+    return getAbsolutePosition().gt(maxAngle);
+  }
+
+  public boolean pastMin() {
+    return getAbsolutePosition().lt(minAngle);
+  }
+
   public boolean triggeredForwardSafety() {
-    return getAbsolutePosition().gt(maxAngle) && encoder.getVelocity() > 0.0;
+    return pastMax() && encoder.getVelocity() > 0.0;
   }
 
   public boolean triggeredReverseSafety() {
-    return getAbsolutePosition().lt(minAngle) && encoder.getVelocity() < -0.0;
+    return pastMin() && encoder.getVelocity() < -0.0;
   }
 
   public boolean doneMoving() {
