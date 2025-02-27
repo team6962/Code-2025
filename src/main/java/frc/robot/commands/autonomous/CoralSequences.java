@@ -80,15 +80,16 @@ public final class CoralSequences {
                 bestSequence = sequence;
             }
 
-            if (scanned % (total / 10) == 0) {
-                System.out.println("Scanned " + scanned + " / " + total + " routes");
-            }
+            // if (scanned % (total / 10) == 0) {
+            //     System.out.println("Scanned " + scanned + " / " + total + " routes");
+            // }
 
             scanned++;
         }
 
         if (bestSequence == null) {
             DriverStation.reportError("No autonomous sequence", true);
+            System.out.println("No autonomous sequence!");
         } else {
             System.out.println(sequences.size() + " routes scanned.");
             System.out.println("Best: " + bestScore + " inefficiency, " + getSequenceTime(bestSequence, startPose).in(Seconds) + " ideal seconds");

@@ -65,6 +65,8 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
+    driver.button(19).onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
+    driver.button(20).onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
     // Operator
