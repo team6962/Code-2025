@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import frc.robot.subsystems.DriverDashboard;
 
 public final class AutonChooser {
   public static NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous");
@@ -17,6 +18,7 @@ public final class AutonChooser {
   public static SimpleWidget rightCoral;
   public static SimpleWidget leftCoral;
   public static SimpleWidget startingAlgae;
+  public static SimpleWidget autoComputed;
 
   public static boolean startingAlgae() {
     return table.getEntry("Starting Algae").getBoolean(false);
@@ -46,6 +48,10 @@ public final class AutonChooser {
     }
 
     return reefFaces;
+  }
+
+  public static void setAutoComputed(boolean value) {
+    DriverDashboard.getTable().getEntry("Auto Precomputed").setBoolean(value);
   }
 
   public static void init() {
@@ -95,5 +101,10 @@ public final class AutonChooser {
             .withWidget(BuiltInWidgets.kToggleButton)
             .withSize(1, 1)
             .withPosition(4, 2);
+    autoComputed =
+        DriverDashboard.getTab().add("Auto Precomputed", false)
+            .withWidget(BuiltInWidgets.kBooleanBox)
+            .withSize(2, 2)
+            .withPosition(4, 0);
   }
 }

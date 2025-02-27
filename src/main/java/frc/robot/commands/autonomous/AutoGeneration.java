@@ -115,6 +115,18 @@ public class AutoGeneration extends Thread {
     }
     
 
+    public boolean doneComputing(AutoParams params) {
+        if (!params.leftStation && !params.rightStation) return false;
+
+        synchronized (autos) {
+            for (GeneratedAuto auto : autos) {
+                if (auto.getParameters().matches(params)) return true;
+            }
+        }
+        
+        return false;
+    }
+
     /**
      * 
      * @return Can be null!
@@ -184,6 +196,10 @@ public class AutoGeneration extends Thread {
             if (RobotState.isDisabled() || !RobotState.isAutonomous()) {
                 workRun = false;
             }
+
+            AutoParams newParams = AutoParams.get(poseSupplier.get(), hasCoralSupplier.getAsBoolean());
+
+            AutonChooser.setAutoComputed(autoGen.doneComputing(newParams));
             
             if (!shouldWork) {
                 workRun = false;
@@ -197,7 +213,7 @@ public class AutoGeneration extends Thread {
                 return;
             }
 
-            autoGen.setParameters(AutoParams.get(poseSupplier.get(), hasCoralSupplier.getAsBoolean()));
+            autoGen.setParameters(newParams);
             autoGen.setWorking(true);
 
             if (!autoGen.isAlive()) {

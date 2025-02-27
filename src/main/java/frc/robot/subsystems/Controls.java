@@ -119,7 +119,7 @@ public class Controls {
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
-    ShuffleboardTab driverTab = Shuffleboard.getTab("Driver Dashboard");
+    ShuffleboardTab driverTab = DriverDashboard.getTab();
 
     driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)
