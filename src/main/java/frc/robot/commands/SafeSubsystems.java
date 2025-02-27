@@ -5,50 +5,46 @@ import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.MANIPULATOR;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 
-public class ManipulatorSafeties extends SubsystemBase {
+public class SafeSubsystems extends SubsystemBase {
     Manipulator manipulator;
     Elevator elevator;
     
-    public ManipulatorSafeties(Elevator elevator, Manipulator manipulator) {
+    public SafeSubsystems(Elevator elevator, Manipulator manipulator) {
         this.elevator = elevator;
         this.manipulator = manipulator;
     }
 
     public static Angle calcSafeMinAngle(Distance elevatorHeight) {
-       if (elevatorHeight.lt(Inches.of(43))) {
-        return Degrees.of(-50.0);
-       }
+        Angle returnAngle = MANIPULATOR_PIVOT.MIN_ANGLES.ceilingEntry(elevatorHeight).getValue();
+        if (returnAngle == null) {
+            return MANIPULATOR_PIVOT.SAFE_ANGLE;
+        }
 
-       if (Inches.of(43).lt(elevatorHeight) && elevatorHeight.lt(Inches.of(54))) {
-        return Degrees.of(-90.0);
-       }
-
-       if (Inches.of(54).lt(elevatorHeight)) {
-        return MANIPULATOR_PIVOT.MIN_ANGLE;
-       }
-
-       return MANIPULATOR_PIVOT.SAFE_ANGLE;
+       return returnAngle;
     }
 
     public static Angle calcSafeMaxAngle(Distance elevatorHeight) {
-        if (elevatorHeight.lt(Inches.of(43))) {
-            return MANIPULATOR_PIVOT.MAX_ANGLE;
+        Angle returnAngle = MANIPULATOR_PIVOT.MAX_ANGLES.ceilingEntry(elevatorHeight).getValue();
+        if (returnAngle == null) {
+            return MANIPULATOR_PIVOT.SAFE_ANGLE;
         }
+        return returnAngle;
+    }
 
-        if (Inches.of(43).lt(elevatorHeight) && elevatorHeight.lt(Inches.of(82))) {
-            return Degrees.of(-20.0);
-        }
-
-        if (Inches.of(82).lt(elevatorHeight)) {
-            return MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE;
-        }
-
-        return MANIPULATOR_PIVOT.SAFE_ANGLE;
+    public Command safeMoveCommand(Command elevatorCommand, Command manipulatorCommand) {
+        return Commands.sequence(
+            manipulator.pivot.safe(),
+            elevatorCommand,
+            manipulatorCommand
+        );
     }
     
     @Override

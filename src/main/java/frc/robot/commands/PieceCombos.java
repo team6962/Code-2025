@@ -9,14 +9,16 @@ import frc.robot.subsystems.manipulator.Manipulator;
 public class PieceCombos {
   Elevator elevator;
   Manipulator manipulator;
+  SafeSubsystems safeSubsystems;
 
-  public PieceCombos(Elevator elevator, Manipulator manipulator) {
+  public PieceCombos(Elevator elevator, Manipulator manipulator, SafeSubsystems safeSubsystems) {
     this.elevator = elevator;
     this.manipulator = manipulator;
+    this.safeSubsystems = safeSubsystems;
   }
 
   public Command intakeCoral() {
-    return elevator.coralIntake().alongWith(manipulator.intakeCoral());
+    return safeSubsystems.safeMoveCommand(elevator.coralIntake(), manipulator.intakeCoral());
   }
 
   public Command coral(int level) {
@@ -30,41 +32,51 @@ public class PieceCombos {
   }
 
   public Command coralL1() {
-    return manipulator.pivot.safe().andThen(elevator.coralL1()).andThen(manipulator.placeCoralL1());
+    return safeSubsystems.safeMoveCommand(
+      elevator.coralL1(),
+      manipulator.placeCoralL1());
   }
 
   public Command coralL2() {
-    return elevator.coralL2()
-        .alongWith(manipulator.placeCoralL23());
+    return safeSubsystems.safeMoveCommand(
+        elevator.coralL2(),
+        manipulator.placeCoralL23());
   }
 
   public Command coralL3() {
-    return elevator.coralL3()
-        .alongWith(manipulator.placeCoralL23());
+    return safeSubsystems.safeMoveCommand(
+        elevator.coralL3(),
+        manipulator.placeCoralL23());
   }
 
   public Command coralL4() {
-    return elevator.coralL4().alongWith(manipulator.placeCoralL4());
+    return safeSubsystems.safeMoveCommand(
+        elevator.coralL4(),
+        manipulator.placeCoralL4());
   }
 
   public Command pickupGroundAlgae() {
-    return elevator.algaeGround().alongWith(manipulator.pickupGroundAlgae());
+    return safeSubsystems.safeMoveCommand(
+        elevator.algaeGround(),
+        manipulator.pickupGroundAlgae());
   }
 
   public Command algaeL2() {
-    return elevator.algaeL3().alongWith(manipulator.pickupReefAlgae());
+    return safeSubsystems.safeMoveCommand(
+        elevator.algaeL2(),
+        manipulator.pickupReefAlgae());
   }
 
   public Command algaeL3() {
-    return elevator.algaeL3().alongWith(manipulator.pickupReefAlgae());
+    return safeSubsystems.safeMoveCommand(
+        elevator.algaeL3(),
+        manipulator.pickupReefAlgae());
   }
 
   public Command algaeBarge() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.algaeBarge())
-        .andThen(manipulator.placeBargeAlgae());
+    return safeSubsystems.safeMoveCommand(
+        elevator.algaeBarge(),
+        manipulator.pivot.algaeBarge());
   }
 
   public Command algaeProcessor() {

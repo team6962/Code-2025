@@ -15,6 +15,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
+
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -177,8 +179,8 @@ public final class Constants {
     public static final int HANG_ENCODER = 0;
     public static final int MANIPULATOR_ENCODER = 2;
     public static final int CORAL_BEAM_BREAK = 3;
-    public static final int ELEVATOR_FLOOR_LIMIT = 4;
-    public static final int ELEVATOR_CEIL_LIMIT = 5;
+    public static final int ELEVATOR_CEIL_LIMIT = 4;
+    public static final int ELEVATOR_FLOOR_LIMIT = 5;
   }
 
   public static final class NEO {
@@ -293,7 +295,7 @@ public final class Constants {
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP =  3.75; //3.75;
+      public static final double kP =  4.0; //3.75;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 10.0; // 0.1;
       public static final double kS = 0.15;
@@ -301,18 +303,35 @@ public final class Constants {
     }
 
     public static final Angle MAX_ANGLE = Degrees.of(22.0); // RESET TO 40.0
-    // public static final Angle MIN_LOW_ANGLE = Degrees.of(-150.0);
     public static final Angle MIN_ANGLE = Degrees.of(-135.5);
-    public static final Angle MIN_RAISED_ANGLE = Degrees.of(-150.0);
+
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
+    public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
+    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-18.0);
 
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
     public static final Angle PID_MAX_ANGLE = Degrees.of(0.0);
     public static final Angle TOLERANCE = Degrees.of(2.0);
 
+    public static final NavigableMap<Distance, Angle> MIN_ANGLES;
+    static {
+      MIN_ANGLES = new TreeMap<>();
+      MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
+      MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
+      MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);      
+    }
+
+    public static final NavigableMap<Distance, Angle> MAX_ANGLES;
+    static {
+      MAX_ANGLES = new TreeMap<>();
+      MAX_ANGLES.put(Inches.of(43), MAX_ANGLE);
+      MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
+      MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
+      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MAX_ANGLE);      
+    }
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(22.5);

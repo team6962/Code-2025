@@ -23,13 +23,14 @@ public class PrematchChecks extends SequentialCommandGroup {
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
-      Hang hang) {
+      Hang hang,
+      SafeSubsystems safeSubsystems) {
     this.swerveDrive = swerveDrive;
     this.elevator = elevator;
     this.manipulator = manipulator;
     this.hang = hang;
 
-    PieceCombos combos = new PieceCombos(elevator, manipulator);
+    PieceCombos combos = new PieceCombos(elevator, manipulator, safeSubsystems);
 
     addCommands(
         manipulator.pivot.safe(),

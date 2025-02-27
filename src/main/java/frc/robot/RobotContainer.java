@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.commands.ManipulatorSafeties;
+import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.PrematchChecks;
 import frc.robot.commands.autonomous.Autonomous;
@@ -63,6 +63,7 @@ public class RobotContainer {
   public final Autonomous autonomous;
   public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
+  public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
@@ -116,11 +117,11 @@ public class RobotContainer {
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
-    pieceCombos = new PieceCombos(elevator, manipulator);
+    safeties = new SafeSubsystems(elevator, manipulator);
+    pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
-    // manipulatorSafeties = new ManipulatorSafeties(elevator, manipulator);
     // // collisionDetector = new CollisionDetector();
 
     // System.out.println(swerveDrive);

@@ -110,7 +110,17 @@ public class ManipulatorPivot extends PivotController {
   }
 
   public Command safe() {
-    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE);
+    Angle currentAngle = getAbsolutePosition();
+    if (currentAngle.lt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE)) {
+        Logger.log("GRUB", "below" + Timer.getFPGATimestamp());
+        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MIN_ANGLE);
+    }
+    if (currentAngle.gt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)) {
+        Logger.log("GRUB", "above" + Timer.getFPGATimestamp());
+        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE);
+    }
+    Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
+    return pivotTo(() -> currentAngle);
   }
 
   public Command pidTestMin() {
