@@ -124,8 +124,12 @@ public class DualLinearActuator extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/limits/ceil", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/limits/floor", this::triggeredFloorLimit);
 
-    Logger.logMeasure(this.getName() + "/leftCurrent", () -> Amps.of(leftMotor.getOutputCurrent()));
-    Logger.logMeasure(this.getName() + "/rightCurrent", () -> Amps.of(rightMotor.getOutputCurrent()));
+    Logger.logMeasure(this.getName() + "/motors/left/current", () -> Amps.of(leftMotor.getOutputCurrent()));
+    Logger.logNumber(this.getName() + "/motors/left/dutycycle", () -> leftMotor.getAppliedOutput());
+
+    Logger.logMeasure(this.getName() + "/motors/right/current", () -> Amps.of(rightMotor.getOutputCurrent()));
+    Logger.logNumber(this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
+
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
