@@ -17,6 +17,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -375,7 +376,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         new SysIdRoutine(
             new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
-                voltage -> motor.setControl(new TorqueCurrentFOC(voltage.in(Volts))),
+                voltage -> motor.setControl(new VoltageOut(voltage.in(Volts))),
                 log ->
                     logEncoder.accept(
                         log.motor(
