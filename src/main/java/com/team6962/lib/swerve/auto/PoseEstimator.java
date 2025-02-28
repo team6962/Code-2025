@@ -75,14 +75,22 @@ public class PoseEstimator extends SubsystemBase {
     SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
     Time timestamp = Seconds.of(Timer.getFPGATimestamp());
 
+    Logger.log("/PoseEstimator/gyroAngle", gyroscope.getHeading());
+    Logger.log("/PoseEstimator/lastModulePositions", lastPositions);
+    Logger.log("/PoseEstimator/modulePositions", modulePositions);
+    Logger.log("/PoseEstimator/timestamp", timestamp);
+
     poseEstimator.updateWithTime(
         timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
     AprilTags.injectVisionData(LIMELIGHT.APRILTAG_CAMERA_POSES, this);
     chassisVelocity =
         kinematics.toTwist2d(
             KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1.0)));
+    
+    Logger.logObject("/PoseEstimator/chassisVelocity", chassisVelocity);
 
     positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
+    Logger.log("/PoseEstimator/positionChanges", positionChanges);
 
     lastPositions = modulePositions;
   }
@@ -93,12 +101,18 @@ public class PoseEstimator extends SubsystemBase {
 
   public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
     poseEstimator.addVisionMeasurement(coordinates.absoluteToAlliancePose(visionMeasurement), timestamp.in(Seconds));
+
+    Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionMeasurement);
+    Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }
 
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
       coordinates.absoluteToAlliancePose(visionRobotPoseMeters), timestamp.in(Seconds), visionMeasurementStdDevs);
+    
+    Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
+    Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }
 
   public void resetPosition(Pose2d expectedPose) {

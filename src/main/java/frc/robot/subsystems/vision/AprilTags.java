@@ -5,8 +5,15 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -18,15 +25,10 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.LEDs;
 import frc.robot.Constants.Field;
+import frc.robot.subsystems.LEDs;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -49,6 +51,34 @@ public class AprilTags extends SubsystemBase {
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
     List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses);
+
+    int index = 0;
+    for (PoseEstimate estimate : poseEstimates) {
+      Logger.log("/PoseEstimates/" + index + "/pose", estimate.pose);
+      Logger.log("/PoseEstimates/" + index + "/timestamp", estimate.timestampSeconds);
+      Logger.log("/PoseEstimates/" + index + "/avgTagArea", estimate.avgTagArea);
+      Logger.log("/PoseEstimates/" + index + "/avgTagDist", estimate.avgTagDist);
+      Logger.log("/PoseEstimates/" + index + "/isMegaTag2", estimate.isMegaTag2);
+      Logger.log("/PoseEstimates/" + index + "/tagSpan", estimate.tagSpan);
+      Logger.log("/PoseEstimates/" + index + "/latency", estimate.latency);
+      Logger.logObject("/PoseEstimates/" + index + "/rawFiducials", estimate.rawFiducials);
+
+      index++;
+    }
+
+    Logger.log("/PoseEstimates/count", index);
+
+    while (index < 2) {
+      Logger.log("/PoseEstimates/" + index + "/pose", "null");
+      Logger.log("/PoseEstimates/" + index + "/timestamp", "null");
+      Logger.log("/PoseEstimates/" + index + "/avgTagArea", "null");
+      Logger.log("/PoseEstimates/" + index + "/avgTagDist", "null");
+      Logger.log("/PoseEstimates/" + index + "/isMegaTag2", "null");
+      Logger.log("/PoseEstimates/" + index + "/tagSpan", "null");
+      Logger.log("/PoseEstimates/" + index + "/latency", "null");
+
+      index++;
+    }
 
     BestEstimate bestPoseEstimate = new BestEstimate();
     List<Pose2d> loggedVisionPoses = new ArrayList<>();
