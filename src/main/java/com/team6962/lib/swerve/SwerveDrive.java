@@ -463,8 +463,6 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
-      Logger.getField().getObject("Align Target").setPose(new Pose2d(targetSupplier.get().getTranslation(), new Rotation2d()));
-      
       Translation2d translationError = getTranslationError();
       Rotation2d rotationError = getRotationError();
       
