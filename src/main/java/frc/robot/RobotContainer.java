@@ -63,7 +63,7 @@ public class RobotContainer {
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
-  public final LEDs ledStrip;
+  // public final LEDs ledStrip;
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -119,11 +119,11 @@ public class RobotContainer {
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
-    ledStrip =
-        new LEDs(
-            stateController,
-            () -> 1.0 +
-    KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    // ledStrip =
+    //     new LEDs(
+    //         stateController,
+    //         () -> 1.0 +
+    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = new Elevator();
