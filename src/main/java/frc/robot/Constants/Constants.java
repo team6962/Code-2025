@@ -319,6 +319,7 @@ public final class Constants {
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
     public static final Angle PID_MAX_ANGLE = Degrees.of(0.0);
     public static final Angle TOLERANCE = Degrees.of(2.0);
+    public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
     static {

@@ -129,7 +129,7 @@ public class ManipulatorPivot extends PivotController {
   }
 
   public Command safe() {
-    return safe(tolerance);
+    return safe(MANIPULATOR_PIVOT.SAFE_TOLERANCE);
   }
 
   public Command pidTestMin() {
