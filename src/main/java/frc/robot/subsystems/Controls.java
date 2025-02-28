@@ -51,7 +51,7 @@ public class Controls {
     driver.x().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
-    driver.back();
+    driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
     driver

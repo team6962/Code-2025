@@ -137,7 +137,7 @@ public final class KinematicsUtils {
       output[i] =
           new SwerveModuleState(
               0,
-              Rotation2d.fromDegrees(135)
+              Rotation2d.fromDegrees(45)
                   .plus(new Rotation2d(SwerveModule.Corner.fromIndex(i).getModuleRotation())));
     }
 
