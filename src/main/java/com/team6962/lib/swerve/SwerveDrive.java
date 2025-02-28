@@ -38,6 +38,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -396,6 +397,9 @@ public class SwerveDrive extends SwerveCore {
           target.getTranslation().getX() - getEstimatedPose().getTranslation().getX();
       double translationYError =
           target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
+
+      Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
+      Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
       
       return new Translation2d(translationXError, translationYError);
     }
@@ -477,7 +481,7 @@ public class SwerveDrive extends SwerveCore {
       
       if (state == State.TRANSLATING) {
         Translation2d translationOutput = new Translation2d(0, 0);
-        if (Robot.isSimulation()){
+        if (Coordinates.isAllianceInverted().orElse(false)){
           translationOutput = getTranslationOutput(translationError);
         } else {
           translationOutput = getTranslationOutput(translationError.unaryMinus());
