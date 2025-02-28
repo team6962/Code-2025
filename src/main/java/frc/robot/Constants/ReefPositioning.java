@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -64,12 +65,14 @@ public final class ReefPositioning {
   }
 
   private static Pose2d relativeToFieldAndReflect(
-      Translation2d relativeTranslation, Rotation2d rotation, boolean reverse) {
+      Translation2d relativeTranslation, Rotation2d rotation, Translation2d unreflectedOffset, boolean reverse) {
     Pose2d relativePose = new Pose2d(relativeTranslation, new Rotation2d());
 
     if (reverse) {
       relativePose = reflectPose(relativePose);
     }
+
+    relativePose = relativePose.plus(new Transform2d(unreflectedOffset, new Rotation2d()));
 
     return relativeToFieldPose(relativePose, rotation);
   }
@@ -86,8 +89,8 @@ public final class ReefPositioning {
         return pole % 2 == 1;
     }
 
-    public static Pose2d getPolePose(Translation2d relativeTranslation, int pole) {
-        return relativeToFieldAndReflect(relativeTranslation, getRotationOfPole(pole), getMirroringOfPole(pole));
+    public static Pose2d getPolePose(Translation2d relativeTranslation, Translation2d unreflectedOffset, int pole) {
+        return relativeToFieldAndReflect(relativeTranslation, getRotationOfPole(pole), unreflectedOffset, getMirroringOfPole(pole));
     }
 
     public static Pose2d getFacePose(Translation2d relativeTranslation, int face) {
@@ -95,11 +98,11 @@ public final class ReefPositioning {
     }
 
     public static Pose2d getCoralPlacePose(int pole) {
-        return rotatePose(getPolePose(PLACE_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
+        return rotatePose(getPolePose(PLACE_CORAL_RELATIVE, new Translation2d(0, Units.inchesToMeters(1.0)), pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getCoralAlignPose(int pole) {
-        return rotatePose(getPolePose(ALIGN_CORAL_RELATIVE, pole), Rotation2d.fromDegrees(180)); // 180
+        return rotatePose(getPolePose(ALIGN_CORAL_RELATIVE, new Translation2d(0, Units.inchesToMeters(1.0)), pole), Rotation2d.fromDegrees(180)); // 180
     }
 
     public static Pose2d getAlgaePlacePose(int face) {

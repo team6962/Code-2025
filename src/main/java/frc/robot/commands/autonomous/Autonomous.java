@@ -68,7 +68,7 @@ public class Autonomous {
     }
   }
 
-  public int getClosestReefPole(Pose2d pose, PolePattern pattern) {
+  private int getClosestReefPole(Pose2d pose, PolePattern pattern) {
     int closestPole = 0;
     double closestDistance = Double.MAX_VALUE;
 
