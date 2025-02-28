@@ -263,7 +263,7 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 20.0;
+      public static final double kP = 25.0;
       public static final double kS = 1.0;
     }
 
@@ -279,7 +279,7 @@ public final class Constants {
       public static final Distance L2_HEIGHT = Inches.of(48.4);
       public static final Distance L3_HEIGHT = Inches.of(59.2);
       public static final Distance L4_HEIGHT = Inches.of(80.2);
-      public static final Distance INTAKE_HEIGHT = Inches.of(58.75);
+      public static final Distance INTAKE_HEIGHT = Inches.of(58.50);
     }
 
     public static final class ALGAE {

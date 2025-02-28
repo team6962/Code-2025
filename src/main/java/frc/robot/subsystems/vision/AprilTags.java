@@ -95,8 +95,15 @@ public class AprilTags extends SubsystemBase {
       }
 
       if (canChangeHeading) {
-        LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        // LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        LimelightHelpers.setLEDMode_ForceBlink("limelight-ftag");
+        LimelightHelpers.setLEDMode_ForceBlink("limelight-btag");
+      } else {
+        LimelightHelpers.setLEDMode_ForceOff("limelight-ftag");
+        LimelightHelpers.setLEDMode_ForceOff("limelight-btag");
+        
       }
+      Logger.log("vision/canChangeHeding", canChangeHeading);
 
       double translationError = calculateTranslationError(poseEstimate);
 
