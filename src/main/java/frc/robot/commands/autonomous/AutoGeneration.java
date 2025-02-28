@@ -175,8 +175,8 @@ public class AutoGeneration extends Thread {
             List<CoralPosition> positions = new LinkedList<>();
 
             for (int face : AutonChooser.reefFaces()) {
-                positions.add(new CoralPosition(face * 2, 3));
-                positions.add(new CoralPosition(((face * 2 - 1) % 12 + 12) % 12, 3));
+                positions.add(new CoralPosition(face * 2, 4));
+                positions.add(new CoralPosition(((face * 2 - 1) % 12 + 12) % 12, 4));
             }
 
             return new AutoParams(positions, AutonChooser.leftCoralStation(), AutonChooser.rightCoralStation(), currentPose, hasCoral);
