@@ -7,7 +7,7 @@ package frc.robot.subsystems.LEDs;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -17,12 +17,17 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
 import frc.robot.subsystems.RobotStateController;
+import edu.wpi.first.units.measure.Distance;
+import java.util.Locale;
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static State state = State.DRIVING_AUTO;
+  private static State state = State.DRIVING_TELEOP_BLUE;
+  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
+
 
   public static enum State {
     OFF,
@@ -44,7 +49,7 @@ public class LEDs extends SubsystemBase {
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
-  public static final Color ANTARES_BLUE = new Color(37, 46, 69);
+  public static final Color ANTARES_BLUE = new Color(37, 46, 150);
   public static final Color ANTARES_YELLOW = new Color(242, 222, 139);
   public static final Color RED = new Color(255, 0, 0);
   public static final Color GREEN = new Color(0, 255, 0);
@@ -81,15 +86,17 @@ public static Command setStateCommand(State state) {
   }
 
   private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
-    LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
-    LEDPattern blink = base.blink(Seconds.of(Blink));
-    LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
+    //LEDPattern = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
+    LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+    LEDPattern blink = m_rainbow.blink(Seconds.of(Blink));
+    LEDPattern scroll = m_rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(1));
+    //LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
 
     LEDPattern pattern = blink.overlayOn(scroll);
 
     return scroll;
   }
-
+  
   private static void apply(LEDPattern pattern) {
     // Apply the LED pattern to the data buffer
     pattern.applyTo(buffer);
@@ -116,7 +123,8 @@ public static Command setStateCommand(State state) {
         apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
-        apply(createColor(BLUE, ANTARES_BLUE, 0.0, 50.0));
+        apply(createColor(BLUE, ANTARES_BLUE, 10.0, 10.0));
+    
         break;
       case HAS_ALGAE:
         apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
