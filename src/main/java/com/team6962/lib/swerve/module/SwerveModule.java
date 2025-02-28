@@ -30,6 +30,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -38,6 +39,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -146,6 +148,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     setName(getModuleName(corner.index) + " Swerve Module");
 
     Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
+    Logger.logSwerveModulePosition(getName() + "/measuredPosition", () -> getPosition());
 
     StatusChecks.under(this).add("Drive Motor", driveMotor);
     StatusChecks.under(this).add("Steer Motor", steerMotor);
@@ -239,6 +242,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     }
 
     targetState = optimizeStateForTalon(targetState, getSteerAngle());
+    
+    if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
+      targetState = new SwerveModuleState(0, targetState.angle);
+    }
 
     Logger.log(getName() + "/targetState", targetState);
 

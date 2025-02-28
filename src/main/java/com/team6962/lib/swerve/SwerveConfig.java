@@ -443,7 +443,7 @@ public class SwerveConfig {
    */
 
   public Distance driveMotorRotorToMechanism(Angle movement) {
-    return Meters.of(movement.in(Radians) / gearing.drive * wheel.radius().in(Meters));
+    return wheel.radius().times(movement.in(Radians) / gearing.drive);
   }
 
   public LinearVelocity driveMotorRotorToMechanism(AngularVelocity movement) {

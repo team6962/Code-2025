@@ -75,6 +75,14 @@ public class SwerveGyroscope extends SubsystemBase {
   public void periodic() {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
+
+      Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
+      Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
+      Logger.log(getName() + "/Gyroscope/discontinuousPitch", Degrees.of(navx.getPitch()));
+      Logger.log(getName() + "/Gyroscope/discontinuousRoll", Degrees.of(navx.getRoll()));
+      Logger.log(getName() + "/Gyroscope/linearAccelX", Degrees.of(navx.getWorldLinearAccelX()));
+      Logger.log(getName() + "/Gyroscope/linearAccelY", Degrees.of(navx.getWorldLinearAccelY()));
+      Logger.log(getName() + "/Gyroscope/linearAccelZ", Degrees.of(navx.getWorldLinearAccelZ()));
     } else {
       Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 

@@ -80,7 +80,7 @@ public class PoseEstimator extends SubsystemBase {
     AprilTags.injectVisionData(LIMELIGHT.APRILTAG_CAMERA_POSES, this);
     chassisVelocity =
         kinematics.toTwist2d(
-            KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(Robot.getLoopTime())));
+            KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1.0)));
 
     positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
 

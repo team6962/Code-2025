@@ -77,6 +77,7 @@ public class Logger extends SubsystemBase {
 
   private static void update() {
     threadLastPing = Timer.getFPGATimestamp();
+    Logger.log("Logger/updateTime", threadLastPing);
 
     synchronized (updates) {
       for (Updatable update : updates) {
