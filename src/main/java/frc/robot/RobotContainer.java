@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import java.util.Set;
@@ -262,5 +263,7 @@ public class RobotContainer {
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+
+    swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
   }
 }
