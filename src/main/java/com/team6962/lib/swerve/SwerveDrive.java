@@ -38,13 +38,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -393,22 +391,19 @@ public class SwerveDrive extends SwerveCore {
     public Translation2d getTranslationError() {
       Pose2d target = targetSupplier.get();
 
-      double translationXError =
-          target.getTranslation().getX() - getEstimatedPose().getTranslation().getX();
-      double translationYError =
-          target.getTranslation().getY() - getEstimatedPose().getTranslation().getY();
-
       Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
       Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
       
-      return new Translation2d(translationXError, translationYError);
+      Translation2d error = target.getTranslation().minus(getEstimatedPose().getTranslation());
+      
+      return error;
     }
 
     private Translation2d getTranslationOutput(Translation2d translationError) {
       Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
 
-      double translationXOutput = translationXPID.calculate(translationError.getX());
-      double translationYOutput = translationYPID.calculate(translationError.getY());
+      double translationXOutput = translationXPID.calculate(-translationError.getX()); // Setpoint is 0, so need to invert
+      double translationYOutput = translationYPID.calculate(-translationError.getY()); // Setpoint is 0, so need to invert
 
       translationXOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vxMetersPerSecond, translationXOutput);
       translationYOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vyMetersPerSecond, translationYOutput);
@@ -464,29 +459,26 @@ public class SwerveDrive extends SwerveCore {
         if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
         else state = State.ROTATING;
       }
-
-      System.out.println("State: " + state + ", Is finished: " + isFinished() + ", Necessary adjustments: " + translationNeedsAdjustment + ", " + rotationNeedsAdjustment + " (tolerance is " + toleranceAngle + ", error is " + rotationError.getDegrees() + ")");
     }
 
     @Override
     public void execute() {
-      ChassisSpeeds speeds;
+      Logger.getField().getObject("Align Target").setPose(new Pose2d(targetSupplier.get().getTranslation(), new Rotation2d()));
       
-
       Translation2d translationError = getTranslationError();
       Rotation2d rotationError = getRotationError();
       
-      
       updateAdjustments(translationError, rotationError);
+
+      ChassisSpeeds speeds;
       
       if (state == State.TRANSLATING) {
         Translation2d translationOutput = new Translation2d(0, 0);
-        if (Coordinates.isAllianceInverted().orElse(false)){
-          translationOutput = getTranslationOutput(translationError);
-        } else {
-          translationOutput = getTranslationOutput(translationError.unaryMinus());
-        }
+        translationOutput = getTranslationOutput(translationError);
         speeds = new ChassisSpeeds(translationOutput.getX(), translationOutput.getY(), 0);
+
+        Logger.log("AlignCommand/absoluteSpeeds", speeds);
+        speeds = absoluteToRobotSpeeds(speeds);
       } else if (state == State.ROTATING) {
         Rotation2d rotationOutput = getRotationOutput(rotationError);
         speeds = new ChassisSpeeds(0, 0, rotationOutput.getRadians());
@@ -494,7 +486,7 @@ public class SwerveDrive extends SwerveCore {
         speeds = new ChassisSpeeds(0, 0, 0);
       }
 
-      setMovement(allianceToRobotSpeeds(speeds));
+      setMovement(speeds);
     }
 
     @Override
