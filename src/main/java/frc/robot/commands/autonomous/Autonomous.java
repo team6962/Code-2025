@@ -3,6 +3,7 @@ package frc.robot.commands.autonomous;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.Set;
 
@@ -15,8 +16,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Field;
@@ -98,13 +101,15 @@ public class Autonomous {
   }
 
   public Command intakeCoral(CoralStation station) {
-    Pose2d pose = StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
+    Pose2d align = StationPositioning.getNearestAlignPose(station, swerveDrive.getEstimatedPose());
+    Pose2d intake = StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
+
     return Commands.sequence(
       Commands.parallel(
-        swerveDrive.pathfindTo(pose),
+        swerveDrive.pathfindTo(align),
         CommandUtils.selectByMode(pieceCombos.intakeCoral(), CommandUtils.printAndWait("Moving elevator and manipulator for coral intaking", 0.5))
       ),
-      swerveDrive.alignTo(pose),
+      swerveDrive.alignTo(intake),
       CommandUtils.selectByMode(manipulator.coral.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
       Commands.print("Done intaking")
     );
@@ -173,11 +178,14 @@ public class Autonomous {
 
   public Command placeCoral(CoralPosition position) {
     return Commands.sequence(
-      swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole())),
+      CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
+        .withDeadline(swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole()))),
       CommandUtils.selectByMode(pieceCombos.coral(position.level()), CommandUtils.printAndWait("Moving to level " + position.level(), position.level() * 0.5)),
       swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole())),
       CommandUtils.selectByMode(manipulator.coral.drop(), CommandUtils.printAndWait("Dropping coral", 0.25)),
+      swerveDrive.moveTowards(ReefPositioning.getCoralAlignPose(position.pole()).getTranslation(), MetersPerSecond.of(0.5), Inches.of(12.0)),
       CommandUtils.selectByMode(pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
+        .raceWith(CommandUtils.selectByMode(Commands.waitUntil(() -> elevator.getAverageHeight().lte(ELEVATOR.CORAL.L2_HEIGHT)), Commands.waitSeconds(0.1)))
     );
   }
 
