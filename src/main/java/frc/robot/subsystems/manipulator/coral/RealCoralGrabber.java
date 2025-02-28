@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -39,9 +38,6 @@ public class RealCoralGrabber extends CoralGrabber {
     setDefaultCommand(hold());
 
     StatusChecks.under(this).add("motor", motor);
-
-    Logger.logBoolean(this.getName() + "/detectsGamePiece", this::hasGamePiece);
-    Logger.logBoolean(this.getName() + "/hasGamePiece", this::hasGamePiece);
   }
 
   @Override
@@ -77,7 +73,7 @@ public class RealCoralGrabber extends CoralGrabber {
   public Command hold() {
     return run(
         () -> {
-          if (hasGamePiece() && hasGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
+          if (hasGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
           else motor.set(0);
         });
   }

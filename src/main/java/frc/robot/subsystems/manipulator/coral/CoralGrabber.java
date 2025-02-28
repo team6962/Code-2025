@@ -13,7 +13,6 @@ public abstract class CoralGrabber extends SubsystemBase {
     setName("Coral Grabber");
 
     Logger.logBoolean(getName() + "/hasGamePiece", this::hasGamePiece);
-    Logger.logBoolean(getName() + "/detectsGamePiece", this::hasGamePiece);
   }
 
   public abstract boolean hasGamePiece();
