@@ -302,6 +302,12 @@ public class PivotController extends SubsystemBase {
     return pastMin() && encoder.getVelocity() < -0.0;
   }
 
+  public boolean doneMoving(Angle tolerance) {
+    if (getTargetAngle() == null) return true;
+    return debouncer.calculate(
+        getRelativePosition().minus(targetAngle).abs(Radians) < tolerance.in(Radians));
+  }
+
   public boolean doneMoving() {
     if (getTargetAngle() == null) return true;
     return debouncer.calculate(

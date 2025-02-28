@@ -58,6 +58,11 @@ public class ManipulatorPivot extends PivotController {
     }
   }
 
+  public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    return run(() -> moveTowards(angleSupplier.get())).until(() -> this.doneMoving(tolerance)).finallyDo(this::seedEncoder);
+  }
+
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
     return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving).finallyDo(this::seedEncoder);
@@ -109,18 +114,22 @@ public class ManipulatorPivot extends PivotController {
     return pivotTo(() -> MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
-  public Command safe() {
+  public Command safe(Angle tolerance) {
     Angle currentAngle = getAbsolutePosition();
     if (currentAngle.lt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE)) {
         Logger.log("GRUB", "below" + Timer.getFPGATimestamp());
-        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MIN_ANGLE);
+        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MIN_ANGLE, tolerance);
     }
     if (currentAngle.gt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)) {
         Logger.log("GRUB", "above" + Timer.getFPGATimestamp());
-        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE);
+        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE, tolerance);
     }
     Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
-    return pivotTo(() -> currentAngle);
+    return pivotTo(() -> currentAngle, tolerance);
+  }
+
+  public Command safe() {
+    return safe(tolerance);
   }
 
   public Command pidTestMin() {
