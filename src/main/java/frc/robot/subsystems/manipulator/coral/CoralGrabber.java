@@ -9,24 +9,14 @@ import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.Set;
 
 public abstract class CoralGrabber extends SubsystemBase {
-  private boolean hasGamePiece = false;
-
   public CoralGrabber() {
     setName("Coral Grabber");
 
     Logger.logBoolean(getName() + "/hasGamePiece", this::hasGamePiece);
-    Logger.logBoolean(getName() + "/detectsGamePiece", this::detectsGamePiece);
+    Logger.logBoolean(getName() + "/detectsGamePiece", this::hasGamePiece);
   }
 
-  public abstract boolean detectsGamePiece();
-
-  public boolean hasGamePiece() {
-    return hasGamePiece;
-  }
-
-  protected void setHasGamePiece(boolean hasGamePiece) {
-    this.hasGamePiece = hasGamePiece;
-  }
+  public abstract boolean hasGamePiece();
 
   public Command magicButton() {
     return Commands.defer(() -> hasGamePiece() ? drop() : intake(), Set.of(this));

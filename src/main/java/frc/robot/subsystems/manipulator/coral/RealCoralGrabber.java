@@ -40,7 +40,7 @@ public class RealCoralGrabber extends CoralGrabber {
 
     StatusChecks.under(this).add("motor", motor);
 
-    Logger.logBoolean(this.getName() + "/detectsGamePiece", this::detectsGamePiece);
+    Logger.logBoolean(this.getName() + "/detectsGamePiece", this::hasGamePiece);
     Logger.logBoolean(this.getName() + "/hasGamePiece", this::hasGamePiece);
   }
 
@@ -49,28 +49,21 @@ public class RealCoralGrabber extends CoralGrabber {
       return detectsGamePiece;
   }
 
-  @Override
-  public boolean detectsGamePiece() {
-    return detectsGamePiece;
-  }
-
   public Command runSpeed(double speed) {
     return this.run(() -> motor.set(speed));
   }
 
   public Command intake() {
     return runSpeed(MANIPULATOR.CORAL_IN_SPEED)
-        .until(this::detectsGamePiece)
-        .andThen(() -> setHasGamePiece(true));
+        .until(this::hasGamePiece);
   }
 
   public Command drop() {
     return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
         .withDeadline(
             Commands.sequence(
-                Commands.waitUntil(this::detectsGamePiece),
-                Commands.waitUntil(() -> !detectsGamePiece())))
-        .andThen(() -> setHasGamePiece(false));
+                Commands.waitUntil(this::hasGamePiece),
+                Commands.waitUntil(() -> !hasGamePiece())));
   }
 
   public Command forwards() {
@@ -84,7 +77,7 @@ public class RealCoralGrabber extends CoralGrabber {
   public Command hold() {
     return run(
         () -> {
-          if (hasGamePiece() && detectsGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
+          if (hasGamePiece() && hasGamePiece()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
           else motor.set(0);
         });
   }

@@ -10,6 +10,7 @@ public class SimCoralGrabber extends CoralGrabber {
   private final Time intakeTime;
   private final Time dropTime;
   private final Time stopTime;
+  private boolean hasGamePiece = true;
 
   public SimCoralGrabber(Time intakeTime, Time dropTime, Time stopTime) {
     this.intakeTime = intakeTime;
@@ -25,11 +26,6 @@ public class SimCoralGrabber extends CoralGrabber {
     return new SimCoralGrabber(Seconds.of(0), Seconds.of(0), Seconds.of(0));
   }
 
-  @Override
-  public boolean detectsGamePiece() {
-    return hasGamePiece();
-  }
-
   private Command wait(Time time) {
     Command command =
         time.isNear(Seconds.of(0), Seconds.of(0.01)) ? Commands.none() : Commands.waitTime(time);
@@ -39,13 +35,22 @@ public class SimCoralGrabber extends CoralGrabber {
   }
 
   @Override
+  public boolean hasGamePiece() {
+      return hasGamePiece;
+  }
+
+  public void expectGamePiece(boolean value) {
+    hasGamePiece = value;
+  }
+
+  @Override
   public Command intake() {
-    return wait(intakeTime).andThen(runOnce(() -> setHasGamePiece(true)));
+    return wait(intakeTime).andThen(runOnce(() -> expectGamePiece(true)));
   }
 
   @Override
   public Command drop() {
-    return wait(dropTime).andThen(runOnce(() -> setHasGamePiece(false)));
+    return wait(dropTime).andThen(runOnce(() -> expectGamePiece(false)));
   }
 
   @Override
