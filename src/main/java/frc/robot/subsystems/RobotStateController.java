@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
+
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
@@ -25,5 +27,8 @@ public class RobotStateController extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if (RobotState.isDisabled()) {
+      LEDs.setState(LEDs.State.DISABLED);
+    }
   }
 }

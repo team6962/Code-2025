@@ -13,6 +13,8 @@ import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 
+import com.github.tommyettinger.colorful.oklab.ColorTools;
+
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
@@ -85,10 +87,13 @@ public class LEDs extends SubsystemBase {
         setColor(0, length, new int[] {0, 0, 0});
         break;
       case DISABLED:
-        setColorWave(0, length, WHITE, LIGHT_BLUE, 1.0, Direction.LEFT);
+        setColorWave(0, length, new int[] {0, 0, 0}, getBumperLEDColor(), 1.0, Direction.LEFT);
         break;
       case ENABLED:
+        
         setColorWave(0, length, getBumperLEDColor(), new int[] {80, 80, 80}, 1.0, Direction.LEFT);
+        
+        
         break;
       case HAS_VISION_TARGETS:
         setRainbow(0, length);
@@ -187,8 +192,8 @@ public class LEDs extends SubsystemBase {
 
   private static void setRainbow(int start, int stop) {
     for (int pixel = start; pixel < stop; pixel++) {
-      // int[] rgb = HCLtoRGB(new double[] {(pixel / 100.0 + time * 1.0) % 1.0, 0.3, 0.6});
-      // setColor(pixel, rgb);
+      int[] rgb = HCLtoRGB(new double[] {(pixel / 100.0 + time * 1.0) % 1.0, 0.3, 0.6});
+      setColor(pixel, rgb);
     }
   }
 
@@ -318,10 +323,10 @@ public class LEDs extends SubsystemBase {
     setColor(0, length, new int[] {0, 0, 0});
   }
 
-  // private static int[] HCLtoRGB(double[] HCL) {
-  //   float OKLAB = ColorTools.oklabByHCL((float) HCL[0], (float) HCL[1], (float) HCL[2], (float)
-  // 1.0);
-  //   return new int[] {ColorTools.redInt(OKLAB), ColorTools.greenInt(OKLAB),
-  // ColorTools.blueInt(OKLAB)};
-  // }
+  private static int[] HCLtoRGB(double[] HCL) {
+    float OKLAB = ColorTools.oklabByHCL((float) HCL[0], (float) HCL[1], (float) HCL[2], (float)
+  1.0);
+    return new int[] {ColorTools.redInt(OKLAB), ColorTools.greenInt(OKLAB),
+  ColorTools.blueInt(OKLAB)};
+  }
 }
