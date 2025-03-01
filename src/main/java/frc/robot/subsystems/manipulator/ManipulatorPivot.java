@@ -115,17 +115,17 @@ public class ManipulatorPivot extends PivotController {
   }
 
   public Command safe(Angle tolerance) {
-    Angle currentAngle = getAbsolutePosition();
-    if (currentAngle.lt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE)) {
-        Logger.log("GRUB", "below" + Timer.getFPGATimestamp());
-        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MIN_ANGLE, tolerance);
-    }
-    if (currentAngle.gt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)) {
-        Logger.log("GRUB", "above" + Timer.getFPGATimestamp());
-        return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE, tolerance);
-    }
-    Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
-    return pivotTo(() -> currentAngle, tolerance);
+    // Angle currentAngle = getAbsolutePosition();
+    // if (currentAngle.lt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE)) {
+    //     Logger.log("GRUB", "below" + Timer.getFPGATimestamp());
+    //     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MIN_ANGLE, tolerance);
+    // }
+    // if (currentAngle.gt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)) {
+    //     Logger.log("GRUB", "above" + Timer.getFPGATimestamp());
+    //     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE, tolerance);
+    // }
+    // Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
+    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
   }
 
   public Command safe() {

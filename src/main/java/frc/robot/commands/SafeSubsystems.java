@@ -1,14 +1,10 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants.MANIPULATOR;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -44,6 +40,16 @@ public class SafeSubsystems extends SubsystemBase {
             manipulator.pivot.safe(),
             elevatorCommand,
             manipulatorCommand
+        );
+    }
+
+    public Command parallelSafeCommand(Command elevatorCommand, Command manipulatorCommand) {
+        return Commands.sequence(
+            manipulator.pivot.safe(),
+            Commands.parallel(
+                elevatorCommand,
+                manipulatorCommand
+            )
         );
     }
     

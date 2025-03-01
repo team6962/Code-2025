@@ -32,31 +32,31 @@ public class PieceCombos {
   }
 
   public Command coralL1() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
       elevator.coralL1(),
       manipulator.placeCoralL1());
   }
 
   public Command coralL2() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.coralL2(),
         manipulator.placeCoralL23());
   }
 
   public Command coralL3() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.coralL3(),
         manipulator.placeCoralL23());
   }
 
   public Command coralL4() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.coralL4(),
         manipulator.placeCoralL4());
   }
 
   public Command pickupGroundAlgae() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.algaeGround(),
         manipulator.pickupGroundAlgae());
   }
@@ -70,13 +70,13 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.algaeL2(),
         manipulator.pickupReefAlgae());
   }
 
   public Command algaeL3() {
-    return safeSubsystems.safeMoveCommand(
+    return safeSubsystems.parallelSafeCommand(
         elevator.algaeL3(),
         manipulator.pickupReefAlgae());
   }
@@ -91,8 +91,8 @@ public class PieceCombos {
     return manipulator
         .pivot
         .safe()
-        .andThen(elevator.algaeProcessor())
-        .andThen(manipulator.pivot.algaeProcessor());
+        .andThen(elevator.algaeProcessor()
+          .alongWith(manipulator.pivot.algaeProcessor()));
   }
 
   public Command stow() {
