@@ -9,18 +9,17 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.subsystems.RobotStateController;
-import frc.robot.util.CachedRobotState;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
 
@@ -84,7 +83,7 @@ public class XBoxSwerve extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!CachedRobotState.isTeleop()) return;
+    if (!RobotState.isTeleop()) return;
 
     // Disable drive if the controller disconnects
     if (!controller.isConnected()) {

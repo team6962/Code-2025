@@ -17,17 +17,22 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.Constants.Field;
-import frc.robot.util.CachedRobotState;
+import frc.robot.subsystems.LEDs;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
+import io.limelightvision.LimelightHelpers.RawFiducial;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -148,7 +153,7 @@ public class AprilTags extends SubsystemBase {
   private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
       Map<String, Pose3d> cameraPoses) {
     return cameraPoses.keySet().stream()
-        .map(name -> CachedRobotState.isRed().orElse(false) ?
+        .map(name -> DriverStation.getAlliance().map(a -> a == Alliance.Red).orElse(false) ?
           LimelightHelpers.getBotPoseEstimate_wpiRed(name) :
           LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
         .filter((estimate) -> estimate != null)
@@ -170,7 +175,7 @@ public class AprilTags extends SubsystemBase {
 
   private static boolean canChangeHeading(
       PoseEstimate poseEstimate, PoseEstimator poseEstimator, Pose2d pose2d) {
-    boolean canChangeHeading = poseEstimate.tagCount >= 1 || CachedRobotState.isDisabled();
+    boolean canChangeHeading = poseEstimate.tagCount >= 1 || RobotState.isDisabled();
     return canChangeHeading
         && poseEstimator.getEstimatedPose().getTranslation().getDistance(pose2d.getTranslation())
             < 1.0;

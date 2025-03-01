@@ -6,11 +6,6 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,8 +15,12 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.Constants.TEAM_COLOR;
-import frc.robot.util.CachedRobotState;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -87,7 +86,7 @@ public final class Field {
     if (reefAprilTags == null) {
       reefAprilTags = new ArrayList<Integer>();
 
-      if (CachedRobotState.isRed().orElse(false)) {
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
         reefAprilTags.add(10);
         reefAprilTags.add(9);
         reefAprilTags.add(8);
