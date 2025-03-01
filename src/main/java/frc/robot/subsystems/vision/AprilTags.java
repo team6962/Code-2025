@@ -148,7 +148,9 @@ public class AprilTags extends SubsystemBase {
   private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
       Map<String, Pose3d> cameraPoses) {
     return cameraPoses.keySet().stream()
-        .map(LimelightHelpers::getBotPoseEstimate_wpiBlue)
+        .map(name -> CachedRobotState.isRed().orElse(false) ?
+          LimelightHelpers.getBotPoseEstimate_wpiRed(name) :
+          LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
         .filter((estimate) -> estimate != null)
         .collect(Collectors.toList());
   }
