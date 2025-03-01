@@ -45,15 +45,15 @@ public class CachedRobotState extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (RobotState.isAutonomous()) isAutonomous = true;
-        if (RobotState.isDisabled()) isDisabled = true;
-        if (RobotState.isTeleop()) isTeleop = true;
-        if (RobotState.isTest()) isTest = true;
-        if (RobotState.isEStopped()) isEStopped = true;
-        if (RobotState.isEnabled()) isEnabled = true;
+        isAutonomous = RobotState.isAutonomous();
+        isDisabled = RobotState.isDisabled();
+        isTeleop = RobotState.isTeleop();
+        isTest = RobotState.isTest();
+        isEStopped = RobotState.isEStopped();
+        isEnabled = RobotState.isEnabled();
 
-        if (DriverStation.isFMSAttached()) isFMSAttached = true;
-        if (DriverStation.isDSAttached()) isDSAttached = true;
+        isFMSAttached = DriverStation.isFMSAttached();
+        isDSAttached = DriverStation.isDSAttached();
 
         alliance = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? Optional.of(Alliance.Red) : Optional.of(Alliance.Blue);
     }
