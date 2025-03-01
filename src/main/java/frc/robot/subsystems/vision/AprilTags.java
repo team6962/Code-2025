@@ -17,6 +17,7 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -29,6 +30,7 @@ import frc.robot.Constants.Field;
 import frc.robot.subsystems.LEDs;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
+import io.limelightvision.LimelightHelpers.RawFiducial;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -51,6 +53,18 @@ public class AprilTags extends SubsystemBase {
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
     List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses);
+
+    // poseEstimates.add(new PoseEstimate(
+    //   new Pose2d(3, 4, Rotation2d.fromDegrees(90)),
+    //   Timer.getFPGATimestamp(),
+    //   0,
+    //   2,
+    //   0.1,
+    //   1,
+    //   0.5,
+    //   new RawFiducial[0],
+    //   true
+    // ));
 
     int index = 0;
     for (PoseEstimate estimate : poseEstimates) {

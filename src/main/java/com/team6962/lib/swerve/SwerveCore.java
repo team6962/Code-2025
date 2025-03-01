@@ -56,7 +56,7 @@ public class SwerveCore extends SubsystemBase implements Coordinates {
 
     kinematics = KinematicsUtils.kinematicsFromChassis(constants.chassis());
     poseEstimator =
-        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates(), this);
+        new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
 
     currentMovement = new SwerveMovement(kinematics);
 

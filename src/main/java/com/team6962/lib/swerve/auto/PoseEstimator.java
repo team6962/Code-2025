@@ -2,9 +2,12 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.function.Supplier;
+
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,13 +20,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.subsystems.vision.AprilTags;
-import java.util.function.Supplier;
 
 /**
  * {@code PoseEstimator} is a class that estimates the pose of a swerve drive robot using a
@@ -45,18 +45,14 @@ public class PoseEstimator extends SubsystemBase {
   private SwerveModulePosition[] positionChanges = KinematicsUtils.blankModulePositions(4);
   private Twist2d chassisVelocity = new Twist2d();
 
-  private Coordinates coordinates;
-
   public PoseEstimator(
       SwerveDriveKinematics kinematics,
       Supplier<SwerveModulePosition[]> modulePositions,
-      Supplier<SwerveModuleState[]> moduleStates,
-      Coordinates coordinates) {
+      Supplier<SwerveModuleState[]> moduleStates) {
     this.kinematics = kinematics;
     this.gyroscope = new SwerveGyroscope(() -> positionChanges, kinematics);
     this.modulePositionsSupplier = modulePositions;
     this.moduleStatesSupplier = moduleStates;
-    this.coordinates = coordinates;
 
     lastPositions = modulePositions.get();
 
@@ -100,7 +96,7 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
-    poseEstimator.addVisionMeasurement(coordinates.absoluteToAlliancePose(visionMeasurement), timestamp.in(Seconds));
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
 
     Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionMeasurement);
     Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
@@ -109,7 +105,7 @@ public class PoseEstimator extends SubsystemBase {
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
-      coordinates.absoluteToAlliancePose(visionRobotPoseMeters), timestamp.in(Seconds), visionMeasurementStdDevs);
+      visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
     
     Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
     Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
