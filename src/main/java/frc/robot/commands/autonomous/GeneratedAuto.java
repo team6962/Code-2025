@@ -31,24 +31,26 @@ public class GeneratedAuto {
             params.hasCoral(), params.startPose()
         );
 
-        checkSequence();
+        if (checkSequence()) {
+            SequentialCommandGroup group = new SequentialCommandGroup();
+            
+            for (Placement placement : sequence) {
+                group.addCommands(placeCoral(placement));
+            }
 
-        SequentialCommandGroup group = new SequentialCommandGroup();
-        
-        for (Placement placement : sequence) {
-            group.addCommands(placeCoral(placement));
+            command = group;
         }
-
-        command = group;
     }
 
-    private void checkSequence() {
+    private boolean checkSequence() {
         if (sequence == null || sequence.size() == 0) {
             DriverStation.reportError("Failed to generate autononous sequence", true);
             command = Commands.print("Failed to run nonexistent sequence");
 
-            return;
+            return false;
         }
+        
+        return true;
     }
 
     private Command placeCoral(Placement placement) {
