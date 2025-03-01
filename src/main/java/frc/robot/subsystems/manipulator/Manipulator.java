@@ -62,7 +62,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command dropReefAlgae() {
-    return pivot.algaeReef().alongWith(algae.intake());
+    return pivot.algaeReef().alongWith(algae.drop());
   }
 
   public Command placeBargeAlgae() {
@@ -70,7 +70,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command placeProcessorAlgae() {
-    return pivot.algaeProcessor().andThen(algae.drop());
+    return pivot.algaeProcessor();
   }
 
   public Command stow() {

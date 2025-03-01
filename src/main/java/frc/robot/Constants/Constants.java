@@ -285,7 +285,7 @@ public final class Constants {
       public static final Distance L3_HEIGHT = Inches.of(64.0);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
-      public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
+      public static final Distance PROCESSOR_HEIGHT = Inches.of(41.5);
     }
   }
 
@@ -348,7 +348,7 @@ public final class Constants {
       public static final Angle BARGE_ANGLE = Degrees.of(21.90);
       public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0);
+      public static final Angle PROCESSOR_ANGLE = SAFE_ANGLE; //Degrees.of(0.0);
     }
   }
 
