@@ -125,25 +125,36 @@ public final class Constants {
   public static final class SWERVE {
     public static final Angle ALL_OFFSET = Degrees.of(135);
 
+    // Offset included
+    // Front left: 0.195 radians
+    // Front right: 3.425 radians = 0.283 radians
+    // Back left: 3.373 radians = 
+    // Back right: -2.824 radians
+
+    // (4) Back left: 2.85 radians - 0.5 rots + x = 0 (x = 0.5 rots - 2.85 radians)
+    // (3) Back right: -11.982 radians - 0.25 rots + x = 0 (x = 0.25 rots + 11.982 radians)
+    // (2) Front left: -4.077 radians - 0 rots + x = 0 (x = 4.077 radians)
+    // (1) Front right: 4.292 radians - 0.75 rots + x = 0 (x = -4.292 radians + 0.75 rots)
+
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module(
-          14, 24, 34, Rotations.of(0)),//Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
-      new SwerveConfig.Module(
-          15, 25, 35, Rotations.of(0)),//Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
-      new SwerveConfig.Module(
+      new SwerveConfig.Module( // Front right
+          14, 24, 34, Radians.of(-4.292).minus(Rotations.of(0.25))),//Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+      new SwerveConfig.Module( // Front left
+          15, 25, 35, Radians.of(4.077)),//Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
+      new SwerveConfig.Module( // Back right
           16,
           26,
           36,
-          Rotations.of(0)),//Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
-      new SwerveConfig.Module(
+          Radians.of(11.982).minus(Rotations.of(0.5))),//Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
+      new SwerveConfig.Module( // Back left
           17,
           27,
           37,
-          Rotations.of(0)),//Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
+          Rotations.of(-0.75).minus(Radians.of(2.85))),//Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
