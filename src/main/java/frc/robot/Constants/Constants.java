@@ -311,7 +311,7 @@ public final class Constants {
     public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
-    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-18.0);
+    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
 
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
@@ -339,7 +339,7 @@ public final class Constants {
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(0.0);
-      public static final Angle L23_ANGLE = Degrees.of(-34.5);
+      public static final Angle L23_ANGLE = Degrees.of(-35.5);
       public static final Angle L4_ANGLE = Degrees.of(-56.5);
       public static final Angle INTAKE_ANGLE = Degrees.of(-135.4);
     }
