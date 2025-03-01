@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,7 +19,6 @@ import frc.robot.util.hardware.SparkMaxUtil;
 public class RealCoralGrabber extends CoralGrabber {
   private final SparkMax motor;
   private final DigitalInput sensor;
-  private final Debouncer debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
   private boolean detectsGamePiece = false;
 
   public RealCoralGrabber() {
@@ -86,6 +84,6 @@ public class RealCoralGrabber extends CoralGrabber {
   public void periodic() {
     super.periodic();
 
-    detectsGamePiece = debouncer.calculate(!sensor.get());
+    detectsGamePiece = !sensor.get();
   }
 }
