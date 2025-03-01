@@ -78,7 +78,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private final Generator autoGen;
+  // private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -143,7 +143,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -191,11 +191,13 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    return Commands.defer(() -> {
-      System.out.println("Generating autonomous command");
+    // return Commands.defer(() -> {
+    //   System.out.println("Generating autonomous command");
 
-      return autoGen.generate();
-    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+    //   return autoGen.generate();
+    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+
+    return Commands.none();
 
     // return Commands.sequence(
     //   // elevator.calibrate()
@@ -224,9 +226,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    double autoWorkTimestamp = Timer.getFPGATimestamp();
-    autoGen.work();
-    Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
+    // double autoWorkTimestamp = Timer.getFPGATimestamp();
+    // autoGen.work();
+    // Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
 
     // Pose2d[] poses;
 

@@ -39,6 +39,8 @@ public class GeneratedAuto {
             }
 
             command = group;
+        } else {
+            command = Commands.none();
         }
     }
 
