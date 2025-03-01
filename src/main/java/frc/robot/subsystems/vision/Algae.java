@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.team6962.lib.swerve.SwerveDrive;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -14,10 +15,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.subsystems.LEDs;
+import frc.robot.util.CachedRobotState;
 
 public class Algae {
   private static final double MAX_FOV_RATIO = Math.PI / 2;
@@ -63,7 +64,7 @@ public class Algae {
     algaePosition =
         robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
 
-    if (!RobotState.isDisabled()) {
+    if (!CachedRobotState.isDisabled()) {
       LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
     }
 

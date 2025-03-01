@@ -38,6 +38,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
 
@@ -96,6 +97,8 @@ public class RobotContainer {
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog(), true);
     // Logger.autoLog("PDH", PDH);
+
+    CachedRobotState.init();
 
     AutonChooser.init();
 

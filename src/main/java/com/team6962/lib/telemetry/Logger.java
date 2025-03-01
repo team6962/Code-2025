@@ -8,9 +8,17 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.studica.frc.AHRS;
+
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,16 +45,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
-  private static List<Updatable> updates = new ArrayList<>();
+  private static List<Updatable> updates = new LinkedList<>();
   private static Notifier notifier = new Notifier(Logger::update);
   private static Field2d field2d = new Field2d();
   private static double threadLastPing = Timer.getFPGATimestamp();

@@ -63,18 +63,16 @@ public class PoseEstimator extends SubsystemBase {
             modulePositions.get(),
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
-    Logger.logSpeeds("Swerve Drive/Pose Estimator/estimatedSpeeds", this::getEstimatedSpeeds);
+    Logger.logSpeeds(getName() + "/estimatedSpeeds", this::getEstimatedSpeeds);
+    Logger.logSwerveModulePositions(getName() + "/lastModulePositions", () -> lastPositions);
+    Logger.logSwerveModulePositions(getName() + "/modulePositions", modulePositions);
+    Logger.logSwerveModulePositions(getName() + "/positionChanges", () -> positionChanges);
   }
 
   @Override
   public void periodic() {
     SwerveModulePosition[] modulePositions = this.modulePositionsSupplier.get();
     Time timestamp = Seconds.of(Timer.getFPGATimestamp());
-
-    Logger.log("/PoseEstimator/gyroAngle", gyroscope.getHeading());
-    Logger.log("/PoseEstimator/lastModulePositions", lastPositions);
-    Logger.log("/PoseEstimator/modulePositions", modulePositions);
-    Logger.log("/PoseEstimator/timestamp", timestamp);
 
     poseEstimator.updateWithTime(
         timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
@@ -83,10 +81,7 @@ public class PoseEstimator extends SubsystemBase {
         kinematics.toTwist2d(
             KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1.0)));
     
-    Logger.logObject("/PoseEstimator/chassisVelocity", chassisVelocity);
-
     positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
-    Logger.log("/PoseEstimator/positionChanges", positionChanges);
 
     lastPositions = modulePositions;
   }
@@ -106,7 +101,7 @@ public class PoseEstimator extends SubsystemBase {
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
       visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
-    
+
     Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
     Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }

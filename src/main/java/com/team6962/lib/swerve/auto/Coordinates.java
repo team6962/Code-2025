@@ -2,15 +2,17 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Inches;
 
+import java.util.Optional;
+
 import com.team6962.lib.utils.KinematicsUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import java.util.Optional;
+import frc.robot.util.CachedRobotState;
 
 /** An interface that provides methods for converting between different coordinate systems. */
 public interface Coordinates {
@@ -47,12 +49,12 @@ public interface Coordinates {
    * from the Driver Station.
    */
   public static Optional<Boolean> isAllianceInverted() {
-    return DriverStation.getAlliance().map(a -> a == DriverStation.Alliance.Red);
+    return CachedRobotState.isAllianceInverted();
   }
 
   /** Returns whether the alliance has been received from the Driver Station. */
   public static boolean knowsAlliance() {
-    return DriverStation.getAlliance().isPresent();
+    return CachedRobotState.knowsAlliance();
   }
 
   public default Rotation2d getAbsoluteEstimatedHeading() {
