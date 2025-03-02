@@ -308,7 +308,7 @@ public final class Constants {
     public static final Angle MIN_ANGLE = Degrees.of(-135.5);
 
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
-    public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
+    public static final Angle SAFE_ANGLE = Degrees.of(-30.0);
 
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
     public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
