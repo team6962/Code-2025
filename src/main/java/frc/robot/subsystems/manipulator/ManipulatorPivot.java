@@ -128,13 +128,8 @@ public class ManipulatorPivot extends PivotController {
     // Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
     // return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
 
-    Angle targetAngle = MeasureMath.clamp(
-      getAbsolutePosition(),
-      MANIPULATOR_PIVOT.SAFE_MIN_ANGLE,
-      MANIPULATOR_PIVOT.SAFE_MAX_ANGLE
-    );
-
-    return pivotTo(() -> targetAngle, tolerance);
+    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance)
+      .until(() -> getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE) && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
   }
 
   public Command safe() {
