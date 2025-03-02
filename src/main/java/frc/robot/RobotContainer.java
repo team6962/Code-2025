@@ -215,7 +215,7 @@ public class RobotContainer {
     // return Commands.run(() -> {});
 
     return swerveDrive.driveSpeeds(
-      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
+      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
       Coordinates.MovementSystem.ROBOT
     )
       .withTimeout(2.0);
