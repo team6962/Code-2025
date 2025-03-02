@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
@@ -213,7 +214,10 @@ public class RobotContainer {
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return swerveDrive.drive(new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)))
+    return swerveDrive.driveSpeeds(
+      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
+      Coordinates.MovementSystem.ROBOT
+    )
       .withTimeout(2.0);
 
   }
