@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 
@@ -13,6 +15,7 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.KinematicsUtils;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -191,13 +194,13 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
+
+    // REMOVE MAIN AUTON
     // return Commands.defer(() -> {
     //   System.out.println("Generating autonomous command");
 
     //   return autoGen.generate();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
-
-    return Commands.none();
 
     // return Commands.sequence(
     //   // elevator.calibrate()
@@ -209,6 +212,10 @@ public class RobotContainer {
         // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
+
+    return swerveDrive.drive(new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)))
+      .withTimeout(2.0);
+
   }
 
   public static double getVoltage() {
