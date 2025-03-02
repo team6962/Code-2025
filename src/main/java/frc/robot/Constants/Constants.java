@@ -358,7 +358,7 @@ public final class Constants {
 
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
-    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
 
     public static final double ALGAE_OUT_SPEED = -1.0;

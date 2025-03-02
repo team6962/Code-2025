@@ -230,7 +230,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
   public Command drop() {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED)
-        .alongWith(Commands.waitSeconds(0.25))
+        .withTimeout(Seconds.of(0.25))
         .finallyDo(
             () -> {
               expectGamePiece(false);
