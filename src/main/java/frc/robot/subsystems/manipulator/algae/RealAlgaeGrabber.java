@@ -17,6 +17,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -155,7 +156,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     /** Sets the duty cycle of the motor. */
     @Override
     public void setDutyCycle(double dutyCycle) {
-      motor.set(dutyCycle);
+      motor.setVoltage(12.0 * dutyCycle);
     }
 
     /** Returns the output current of the motor. */
