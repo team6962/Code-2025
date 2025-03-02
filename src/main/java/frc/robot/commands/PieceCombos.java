@@ -72,13 +72,13 @@ public class PieceCombos {
   public Command algaeL2() {
     return safeSubsystems.parallelSafeCommand(
         elevator.algaeL2(),
-        manipulator.pickupReefAlgae());
+        manipulator.pivot.algaeReef());
   }
 
   public Command algaeL3() {
     return safeSubsystems.parallelSafeCommand(
         elevator.algaeL3(),
-        manipulator.dropReefAlgae());
+        manipulator.pivot.algaeReef());
   }
 
   public Command algaeBarge() {
