@@ -242,8 +242,7 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING =
-              (3.0 / 1.0)
-            * (3.0 / 1.0)
+              (4.0 / 1.0)
             * (5.0 / 1.0)
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
