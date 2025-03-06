@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.auto.AutoPaths;
 import frc.robot.commands.autonomous.AutoGeneration.AutoParams;
 import frc.robot.commands.autonomous.CoralSequences.CoralSource;
 import frc.robot.commands.autonomous.CoralSequences.Placement;
@@ -60,7 +61,7 @@ public class GeneratedAuto {
             group.addCommands(autonomous.intakeCoral(placement.source().station));
         }
 
-        group.addCommands(autonomous.placeCoral(placement.target()));
+        group.addCommands(autonomous.placeCoral(new AutoPaths.CoralPosition(placement.target().pole(), placement.target().level())));
 
         return group;
     }
