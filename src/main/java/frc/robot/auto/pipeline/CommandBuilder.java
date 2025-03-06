@@ -1,27 +1,40 @@
-package frc.robot.commands.auto;
+package frc.robot.auto.pipeline;
 
 import java.util.List;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.auto.utils.AutoPaths;
+import frc.robot.auto.utils.AutonomousCommands;
 
-public class PathCommandBuilder {
-    private Autonomous autonomous;
+public class CommandBuilder {
+    private AutonomousCommands autonomous;
     private SequentialCommandGroup group = new SequentialCommandGroup();
     private List<AutoPaths.CoralMovement> path;
     private int currentIndex = 0;
+    private SequenceChooser sequenceChooser;
 
-    public PathCommandBuilder(Autonomous autonomous) {
+    public CommandBuilder(AutonomousCommands autonomous) {
         this.autonomous = autonomous;
     }
 
-    public void start(List<AutoPaths.CoralMovement> path) {
+    public void start(AutoPaths.PlanParameters parameters) {
+        sequenceChooser.start(parameters);
         group = new SequentialCommandGroup();
-        this.path = path;
+        currentIndex = 0;
+        path = null;
     }
 
     public void work() {
+        if (!sequenceChooser.isDone()) {
+            sequenceChooser.work();
+            return;
+        }
+
+        if (path == null) {
+            path = sequenceChooser.getBestPath();
+        }
+
         AutoPaths.CoralMovement movement = path.get(currentIndex);
 
         if (movement.source != AutoPaths.CoralSource.PREPLACED) {
@@ -34,10 +47,10 @@ public class PathCommandBuilder {
     }
 
     public boolean isDone() {
-        return currentIndex + 1 >= path.size();
+        return sequenceChooser.isDone() && currentIndex + 1 == path.size();
     }
 
-    public Command getCommand() {
+    public Command getPathCommand() {
         return group;
     }
 }

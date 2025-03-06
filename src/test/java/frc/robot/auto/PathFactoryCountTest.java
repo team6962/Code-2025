@@ -1,4 +1,4 @@
-package com.team6962.lib.swerve.module;
+package frc.robot.auto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import frc.robot.commands.auto.AutoPaths;
-import frc.robot.commands.auto.PathOutlineFactory;
+import frc.robot.auto.utils.AutoPaths;
+import frc.robot.auto.utils.PathOutlineFactory;
 
 public class PathFactoryCountTest {
     private void countTest(int expectedCount, AutoPaths.PlanConstraints constraints) {

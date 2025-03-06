@@ -1,4 +1,4 @@
-package frc.robot.commands.auto;
+package frc.robot.auto.utils;
 
 import static edu.wpi.first.units.Units.Degrees;
 
@@ -68,6 +68,10 @@ public final class AutoPaths {
         public PlanConstraints(List<CoralPosition> targets, CoralSources sources) {
             this.targets = targets;
             this.sources = sources;
+        }
+
+        public boolean pathExists() {
+            return targets.size() > 0 && sources.count > 0;
         }
     }
 

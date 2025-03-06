@@ -1,13 +1,13 @@
-package frc.robot.commands.auto;
+package frc.robot.auto.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import frc.robot.Constants.Field.CoralStation;
-import frc.robot.commands.auto.AutoPaths.CoralMovement;
-import frc.robot.commands.auto.AutoPaths.CoralPosition;
-import frc.robot.commands.auto.AutoPaths.CoralSource;
+import frc.robot.auto.utils.AutoPaths.CoralMovement;
+import frc.robot.auto.utils.AutoPaths.CoralPosition;
+import frc.robot.auto.utils.AutoPaths.CoralSource;
 
 public class PathOutlineFactory implements Iterator<List<AutoPaths.CoralMovement>> {
     private AutoPaths.PlanConstraints constraints;
@@ -44,10 +44,6 @@ public class PathOutlineFactory implements Iterator<List<AutoPaths.CoralMovement
         return index < count;
     }
 
-    /**
-     * Until there are no remaining destinations or sources, choose a destination
-     * and a source. Remove a destination and, if the source is preplaced, remove it.
-     */
     public int getPathCount() {
         int count = 1;
 

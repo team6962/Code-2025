@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.auto.utils;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -25,28 +25,24 @@ import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
+import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.auto.AutoPaths.CoralPosition;
-import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 
-public class Autonomous {
-  private RobotStateController controller;
+public class AutonomousCommands {
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
   private Elevator elevator;
   private PieceCombos pieceCombos;
 
-  public Autonomous(
-      RobotStateController controller,
+  public AutonomousCommands(
       SwerveDrive swerveDrive,
       Manipulator manipulator,
       Elevator elevator,
       PieceCombos pieceCombos
     ) {
-    this.controller = controller;
     this.swerveDrive = swerveDrive;
     this.manipulator = manipulator;
     this.elevator = elevator;

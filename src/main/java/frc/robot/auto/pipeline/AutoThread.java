@@ -1,23 +1,29 @@
-package frc.robot.commands.auto;
+package frc.robot.auto.pipeline;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import static edu.wpi.first.units.Units.Milliseconds;
 
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.autonomous.Autonomous;
+import frc.robot.auto.utils.AutoPaths;
+import frc.robot.auto.utils.AutonomousCommands;
 
 public class AutoThread extends Thread {
-    private BestCommandBuilder commandBuilder;
+    private CommandBuilder commandBuilder;
     private AutoPaths.PlanParameters parameters;
-    private Autonomous autonomous;
-    private AtomicBoolean shouldWork;
 
-    public AutoThread(Autonomous autonomous, AutoPaths.PlanParameters parameters) {
-        this.autonomous = autonomous;
-        this.commandBuilder = null;
+    private static final Time WORK_DELAY = Milliseconds.of(20);
+
+    public AutoThread(AutonomousCommands autonomous) {
+        this.commandBuilder = new CommandBuilder(autonomous);
+    }
+
+    private boolean shouldWorkInBackground() {
+        return RobotState.isDisabled();
     }
 
     public void setParameters(AutoPaths.PlanParameters parameters) {
-        if (parameters == null) {
+        if (parameters == null || !parameters.constraints.pathExists()) {
             synchronized (this) {
                 this.parameters = null;
                 commandBuilder = null;
@@ -31,11 +37,9 @@ public class AutoThread extends Thread {
         }
 
         if (needsReplacement) {
-            BestCommandBuilder builder = new BestCommandBuilder(autonomous, parameters.constraints, parameters.startPose);
-
             synchronized (this) {
                 this.parameters = parameters;
-                commandBuilder = builder;
+                commandBuilder.start(parameters);
             }
         }
     }
@@ -43,9 +47,9 @@ public class AutoThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            if (!shouldWork.get()) {
+            if (!shouldWorkInBackground()) {
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep((long) WORK_DELAY.in(Milliseconds));
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -53,7 +57,7 @@ public class AutoThread extends Thread {
                 continue;
             }
 
-            BestCommandBuilder builder;
+            CommandBuilder builder;
 
             synchronized (this) {
                 builder = commandBuilder;
@@ -66,18 +70,26 @@ public class AutoThread extends Thread {
     public Command getCommand() {
         if (commandBuilder == null) return null;
 
-        Command command;
+        boolean done;
 
         synchronized (this) {
-            command = commandBuilder.getCommand();
+            done = commandBuilder.isDone();
         }
 
-        if (command != null) return command;
+        if (!done) {
+            synchronized (this) {
+                return commandBuilder.getPathCommand();
+            }
+        }
 
         interrupt();
 
         synchronized (this) {
-            return commandBuilder.getCommand();
+            while (!commandBuilder.isDone()) {
+                commandBuilder.work();
+            }
+
+            return commandBuilder.getPathCommand();
         }
     }
 
