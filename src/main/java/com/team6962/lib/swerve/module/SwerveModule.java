@@ -76,7 +76,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     SwerveConfig.Module moduleConstants = getModuleConstants();
 
     // Connect to the module's drive motor
-    driveMotor = new TalonFX(moduleConstants.driveMotorId());
+    driveMotor = new TalonFX(moduleConstants.driveMotorId(), config.canBus());
 
     // Get the 'configurator' for the drive motor, which allows us to
     // configure the motor's settings
@@ -99,7 +99,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         .withSupplyCurrentLimit(Amps.of(80))));
 
     // Connect to the module's steer encoder
-    steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
+    steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), config.canBus());
 
     // Get the 'configurator' for the steer encoder, which allows us to
     // configure the encoder's settings
@@ -114,7 +114,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                     moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
     // Connect to the module's steer motor
-    steerMotor = new TalonFX(moduleConstants.steerMotorId());
+    steerMotor = new TalonFX(moduleConstants.steerMotorId(), config.canBus());
 
     // Get the 'configurator' for the steer motor, which allows us to
     // configure the motor's settings

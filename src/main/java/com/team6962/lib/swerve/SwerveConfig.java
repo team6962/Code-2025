@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -27,6 +28,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.module.SwerveModule.Corner;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -67,6 +69,7 @@ public class SwerveConfig {
   private final DriveGains driveGains;
   private LinearVelocity maxSpeed;
   private AngularVelocity maxRotation;
+  private CANBus canBus;
 
   public SwerveConfig(
       Chassis chassis,
@@ -83,6 +86,7 @@ public class SwerveConfig {
     this.steerMotor = steerMotor;
     this.wheel = wheel;
     this.driveGains = driveGains;
+    this.canBus = new CANBus("");
   }
 
   public SwerveConfig withMaxDriveSpeed(LinearVelocity maxSpeed) {
@@ -95,6 +99,16 @@ public class SwerveConfig {
     this.maxRotation = maxRotation;
 
     return this;
+  }
+
+  public SwerveConfig withCANBus(CANBus canBus) {
+    this.canBus = canBus;
+
+    return this;
+  }
+
+  public CANBus canBus() {
+    return canBus;
   }
 
   public Chassis chassis() {

@@ -1,5 +1,7 @@
 package com.team6962.lib.swerve;
 
+import java.util.Arrays;
+
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.SwerveGyroscope;
@@ -22,10 +24,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import java.util.Arrays;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing the swerve modules,
