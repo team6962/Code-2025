@@ -136,6 +136,11 @@ public final class Constants {
     // (2) Front left: -4.077 radians - 0 rots + x = 0 (x = 4.077 radians)
     // (1) Front right: 4.292 radians - 0.75 rots + x = 0 (x = -4.292 radians + 0.75 rots)
 
+    // Test Chassis
+    // Front Left: 11,21,31
+    // Front Right: 10,20,30
+    // Back Left: 12,22,32
+    // Back Right: 13,23,33
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
