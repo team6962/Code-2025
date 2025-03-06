@@ -142,7 +142,7 @@ public final class Constants {
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
       new SwerveConfig.Module( // Front right
-          14, 24, 34, Radians.of(-4.292).minus(Rotations.of(0.25))),//Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+          14, 24, 34, Radians.of(-4.292).minus(Rotations.of(0.25)).minus(Degrees.of(90))),//Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
       new SwerveConfig.Module( // Front left
           15, 25, 35, Radians.of(4.077)),//Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
       new SwerveConfig.Module( // Back right
@@ -154,7 +154,7 @@ public final class Constants {
           17,
           27,
           37,
-          Rotations.of(-0.75).minus(Radians.of(2.85))),//Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
+          Rotations.of(-0.75).minus(Radians.of(2.85)).plus(Degrees.of(90))),//Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
