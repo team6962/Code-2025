@@ -81,7 +81,7 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(pieceCombos.coralL1());
+    operator.a().onTrue(pieceCombos.safeRaise());
     operator.b().onTrue(pieceCombos.coralL2());
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(pieceCombos.coralL4());

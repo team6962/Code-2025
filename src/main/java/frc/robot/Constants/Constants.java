@@ -253,8 +253,7 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING =
-        (3.0 / 1.0)
-            * (3.0 / 1.0)
+              (4.0 / 1.0)
             * (5.0 / 1.0)
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
@@ -296,7 +295,7 @@ public final class Constants {
       public static final Distance L3_HEIGHT = Inches.of(64.0);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
-      public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
+      public static final Distance PROCESSOR_HEIGHT = Inches.of(41.5);
     }
   }
 
@@ -319,10 +318,10 @@ public final class Constants {
     public static final Angle MIN_ANGLE = Degrees.of(-135.5);
 
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
-    public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
+    public static final Angle SAFE_ANGLE = Degrees.of(-30.0);
 
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
-    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-18.0);
+    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
 
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
@@ -350,7 +349,7 @@ public final class Constants {
 
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(0.0);
-      public static final Angle L23_ANGLE = Degrees.of(-34.5);
+      public static final Angle L23_ANGLE = Degrees.of(-35.5);
       public static final Angle L4_ANGLE = Degrees.of(-56.5);
       public static final Angle INTAKE_ANGLE = Degrees.of(-135.4);
     }
@@ -359,7 +358,7 @@ public final class Constants {
       public static final Angle BARGE_ANGLE = Degrees.of(21.90);
       public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0);
+      public static final Angle PROCESSOR_ANGLE = SAFE_ANGLE; //Degrees.of(0.0);
     }
   }
 
@@ -369,7 +368,7 @@ public final class Constants {
 
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
-    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
 
     public static final double ALGAE_OUT_SPEED = -1.0;
@@ -379,7 +378,7 @@ public final class Constants {
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.7;
     public static final double CORAL_IN_SPEED = 0.2;
-    public static final double CORAL_ADJUST_SPEED = -0.2;
+    public static final double CORAL_ADJUST_SPEED = 0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
   }

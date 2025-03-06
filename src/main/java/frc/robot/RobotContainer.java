@@ -3,16 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.KinematicsUtils;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -78,7 +82,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private final Generator autoGen;
+  // private final Generator autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -143,7 +147,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -191,11 +195,13 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    return Commands.defer(() -> {
-      System.out.println("Generating autonomous command");
 
-      return autoGen.generate();
-    }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+    // REMOVE MAIN AUTON
+    // return Commands.defer(() -> {
+    //   System.out.println("Generating autonomous command");
+
+    //   return autoGen.generate();
+    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     // return Commands.sequence(
     //   // elevator.calibrate()
@@ -207,6 +213,13 @@ public class RobotContainer {
         // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
+
+    return swerveDrive.driveSpeeds(
+      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
+      Coordinates.MovementSystem.ROBOT
+    )
+      .withTimeout(2.0);
+
   }
 
   public static double getVoltage() {
@@ -224,9 +237,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    double autoWorkTimestamp = Timer.getFPGATimestamp();
-    autoGen.work();
-    Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
+    // double autoWorkTimestamp = Timer.getFPGATimestamp();
+    // autoGen.work();
+    // Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
 
     // Pose2d[] poses;
 

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.utils.MeasureMath;
 
 public class ManipulatorPivot extends PivotController {
 
@@ -125,7 +126,10 @@ public class ManipulatorPivot extends PivotController {
     //     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE, tolerance);
     // }
     // Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
-    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
+    // return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
+
+    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance)
+      .until(() -> getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE) && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
   }
 
   public Command safe() {

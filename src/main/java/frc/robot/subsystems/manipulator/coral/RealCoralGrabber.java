@@ -49,9 +49,9 @@ public class RealCoralGrabber extends CoralGrabber {
 
   public Command intake() {
     return runSpeed(MANIPULATOR.CORAL_IN_SPEED)
-        .until(this::hasGamePiece)
-        .andThen(runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED)
-          .withDeadline(Commands.waitTime(MANIPULATOR.CORAL_ADJUST_TIME)));
+        .until(this::hasGamePiece);
+        // .andThen(runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED)
+        //   .withDeadline(Commands.waitTime(MANIPULATOR.CORAL_ADJUST_TIME)));
   }
 
   public Command drop() {

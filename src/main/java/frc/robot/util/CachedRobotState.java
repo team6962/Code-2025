@@ -5,8 +5,9 @@ import java.util.Optional;
 import com.team6962.lib.telemetry.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CachedRobotState extends SubsystemBase {
@@ -56,6 +57,17 @@ public class CachedRobotState extends SubsystemBase {
         isDSAttached = DriverStation.isDSAttached();
 
         alliance = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? Optional.of(Alliance.Red) : Optional.of(Alliance.Blue);
+
+        Logger.log("ImmediateRobotState/isAutonomous", isAutonomous);
+        Logger.log("ImmediateRobotState/isDisabled", isDisabled);
+        Logger.log("ImmediateRobotState/isTeleop", isTeleop);
+        Logger.log("ImmediateRobotState/isTest", isTest);
+        Logger.log("ImmediateRobotState/isEStopped", isEStopped);
+        Logger.log("ImmediateRobotState/isEnabled", isEnabled);
+        Logger.log("ImmediateRobotState/isFMSAttached", isFMSAttached);
+        Logger.log("ImmediateRobotState/isDSAttached", isDSAttached);
+        Logger.log("ImmediateRobotState/alliance", alliance.map(a -> a.toString()).orElse("Unknown"));
+        Logger.log("ImmediateRobotState/lastCache", Timer.getFPGATimestamp());
     }
 
     public static boolean isAutonomous() {
