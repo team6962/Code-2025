@@ -74,7 +74,7 @@ public class RobotContainer {
   public final Elevator elevator;
   public final Hang hang;
   public final Autonomous autonomous;
-  public final Algae algaeDetector;
+  // public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -103,12 +103,11 @@ public class RobotContainer {
     // Logger.autoLog("PDH", PDH);
 
     CachedRobotState.init();
-
     AutonChooser.init();
 
     LiveWindow.disableAllTelemetry();
 
-    DriverStation.silenceJoystickConnectionWarning(true);
+    DriverStation.silenceJoystickConnectionWarning(false);
 
     StatusChecks.Category statusChecks = StatusChecks.under("General");
 
@@ -133,11 +132,11 @@ public class RobotContainer {
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
-    elevator = new Elevator();
+    elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
-    algaeDetector = new Algae();
+    // algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
 
@@ -156,27 +155,6 @@ public class RobotContainer {
     statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
-
-    // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
-
-    // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
-
-    // Pathfinding.ensureInitialized();
-
-    // swerveModuleTest = new SwerveModuleTest();
-
-    // new Talon10Test();
-
-    // steerModuleTest = new SteerModuleTest();
-
-    // test = new DriveModuleTest();
-
-    // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
-
-    // Logger.log("conversionTest/speeds", testSpeeds);
-    // Logger.log("conversionTest/states",
-    // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
-
     Logger.start(Milliseconds.of(20));
   }
 

@@ -263,26 +263,16 @@ public final class Constants {
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
+    public static final Distance TOLERANCE = Inches.of(0.1);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
-
-    public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
-
-    static {
-      HEIGHT_TO_ANGLE_MAP.put(0.0, new AngleRange(Degrees.of(0.0), Degrees.of(45.0)));
-      HEIGHT_TO_ANGLE_MAP.put(1.0, new AngleRange(Degrees.of(10.0), Degrees.of(40.0)));
-      HEIGHT_TO_ANGLE_MAP.put(2.0, new AngleRange(Degrees.of(20.0), Degrees.of(35.0)));
-      HEIGHT_TO_ANGLE_MAP.put(3.0, new AngleRange(Degrees.of(30.0), Degrees.of(30.0)));
-      HEIGHT_TO_ANGLE_MAP.put(4.0, new AngleRange(Degrees.of(40.0), Degrees.of(25.0)));
-    }
-
     public static final class PROFILE {
-      public static final double kP = 25.0;
-      public static final double kS = 1.0;
+      public static final double kP = 4.0;
+      public static final double kS = 2.0;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(35.5);
-    public static final Distance MAX_HEIGHT = Inches.of(83.6);
+    public static final Distance MAX_HEIGHT = Inches.of(84.5);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE

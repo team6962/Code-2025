@@ -10,6 +10,8 @@ import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.AngleRange;
 import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
 import frc.robot.subsystems.manipulator.coral.CoralGrabber;
+import frc.robot.subsystems.manipulator.pivot.ManipulatorPivot;
+
 import java.util.Map;
 
 public class Manipulator extends SubsystemBase {
@@ -18,23 +20,9 @@ public class Manipulator extends SubsystemBase {
   public final CoralGrabber coral;
 
   public Manipulator() {
-    pivot = new ManipulatorPivot();
-
+    pivot = ManipulatorPivot.create();
     algae = AlgaeGrabber.create();
     coral = CoralGrabber.create();
-  }
-
-  public void setPivotAnglesBasedOnHeight(Distance elevatorHeight) {
-    Map.Entry<Double, AngleRange> entry =
-        Constants.ELEVATOR.HEIGHT_TO_ANGLE_MAP.floorEntry(elevatorHeight.in(Meters));
-    if (entry != null) {
-      AngleRange angleRange = entry.getValue();
-      pivot.setMinMaxAngle(angleRange.getMinAngle(), angleRange.getMaxAngle());
-      //   System.out.println("Set min and max angles for height " + elevatorHeight + " to " +
-      // angleRange);
-      // } else {
-      //   System.out.println("No angle range found for height " + elevatorHeight);
-    }
   }
 
   public Command placeCoralL1() {

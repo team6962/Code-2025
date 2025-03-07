@@ -1,4 +1,4 @@
-package frc.robot.subsystems.manipulator;
+package frc.robot.subsystems.manipulator.pivot;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -25,9 +25,9 @@ import java.util.function.Supplier;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
 
-public class ManipulatorPivot extends PivotController {
+public class RealManipulatorPivot extends PivotController implements ManipulatorPivot {
 
-  public ManipulatorPivot() {
+  public RealManipulatorPivot() {
     super(
         "Manipulator Pivot",
         CAN.MANIPULATOR_PIVOT,
