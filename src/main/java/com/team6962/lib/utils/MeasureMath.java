@@ -106,7 +106,8 @@ public final class MeasureMath {
   }
 
   public static Rotation2d minDifference(Rotation2d a, Rotation2d b) {
-    return Rotation2d.fromRotations(MathUtils.floorMod(a.getRotations() - b.getRotations() - 0.5, 1) - 0.5);
+    return Rotation2d.fromRotations(
+        MathUtils.floorMod(a.getRotations() - b.getRotations() - 0.5, 1) - 0.5);
   }
 
   public static Time time(double minutes, double seconds) {

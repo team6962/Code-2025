@@ -1,17 +1,15 @@
 package frc.robot.subsystems.manipulator.pivot;
 
-import java.util.function.Supplier;
-
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import java.util.function.Supplier;
 
 public class DisabledManipulatorPivot implements ManipulatorPivot {
   public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
     return CommandUtils.noneWithRequirements(this);
   }
+
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     return CommandUtils.noneWithRequirements(this);
   }

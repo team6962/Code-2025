@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -21,9 +20,6 @@ import frc.robot.RobotContainer;
 import frc.robot.util.hardware.motion.PivotController;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import com.team6962.lib.telemetry.Logger;
-import com.team6962.lib.utils.MeasureMath;
 
 public class RealManipulatorPivot extends PivotController implements ManipulatorPivot {
 
@@ -61,12 +57,16 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return run(() -> moveTowards(angleSupplier.get())).until(() -> this.doneMoving(tolerance)).finallyDo(this::seedEncoder);
+    return run(() -> moveTowards(angleSupplier.get()))
+        .until(() -> this.doneMoving(tolerance))
+        .finallyDo(this::seedEncoder);
   }
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
     if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
-    return run(() -> moveTowards(angleSupplier.get())).until(this::doneMoving).finallyDo(this::seedEncoder);
+    return run(() -> moveTowards(angleSupplier.get()))
+        .until(this::doneMoving)
+        .finallyDo(this::seedEncoder);
   }
 
   public Command hold() {
@@ -129,7 +129,10 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     // return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
 
     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance)
-      .until(() -> getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE) && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
+        .until(
+            () ->
+                getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)
+                    && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
   }
 
   public Command safe() {
@@ -151,40 +154,41 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
   public Command stop() {
     return run(this::stopMotor);
   }
-  
+
   public Command calibrate() {
-    SysIdRoutine calibrationRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(1.5)),
-      new SysIdRoutine.Mechanism(
-        voltage -> {
-          if (!canMoveInDirection(voltage.in(Volts))) {
-            DriverStation.reportError("Reached limit switch", false);
+    SysIdRoutine calibrationRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(1.5)),
+            new SysIdRoutine.Mechanism(
+                voltage -> {
+                  if (!canMoveInDirection(voltage.in(Volts))) {
+                    DriverStation.reportError("Reached limit switch", false);
 
-            return;
-          }
+                    return;
+                  }
 
-          motor.setVoltage(voltage);
-        },
-        log -> log.motor("manipulator-pivot")
-            .voltage(Volts.of(motor.getAppliedOutput() * motor.getBusVoltage()))
-            .angularPosition(getRelativePosition())
-            .angularVelocity(RotationsPerSecond.of(motor.getEncoder().getVelocity())),
-        this));
+                  motor.setVoltage(voltage);
+                },
+                log ->
+                    log.motor("manipulator-pivot")
+                        .voltage(Volts.of(motor.getAppliedOutput() * motor.getBusVoltage()))
+                        .angularPosition(getRelativePosition())
+                        .angularVelocity(RotationsPerSecond.of(motor.getEncoder().getVelocity())),
+                this));
 
     return Commands.sequence(
-      Commands.waitSeconds(1.0),
-      calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-      Commands.runOnce(motor::stopMotor),
-      Commands.waitSeconds(1.0),
-      calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-      Commands.runOnce(motor::stopMotor),
-      Commands.waitSeconds(1.0),
-      calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-      Commands.runOnce(motor::stopMotor),
-      Commands.waitSeconds(1.0),
-      calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
-      Commands.runOnce(motor::stopMotor),
-      Commands.waitSeconds(1.0)
-    );
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.runOnce(motor::stopMotor),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+        Commands.runOnce(motor::stopMotor),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.runOnce(motor::stopMotor),
+        Commands.waitSeconds(1.0),
+        calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+        Commands.runOnce(motor::stopMotor),
+        Commands.waitSeconds(1.0));
   }
 }
