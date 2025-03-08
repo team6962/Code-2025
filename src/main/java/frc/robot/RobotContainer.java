@@ -103,7 +103,7 @@ public class RobotContainer {
 
     LiveWindow.disableAllTelemetry();
 
-    DriverStation.silenceJoystickConnectionWarning(false);
+    DriverStation.silenceJoystickConnectionWarning(true);
 
     StatusChecks.Category statusChecks = StatusChecks.under("General");
 
@@ -268,7 +268,7 @@ public class RobotContainer {
         // Log all git properties
         gitProps.forEach(
             (key, value) -> {
-              String propertyPath = "/metadata/git/" + key.toString().replace('.', '/');
+              String propertyPath = "/Metadata/" + key.toString();
               StringLogEntry entry = new StringLogEntry(log, propertyPath);
               entry.append(value.toString());
 
