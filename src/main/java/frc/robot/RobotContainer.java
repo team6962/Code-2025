@@ -215,7 +215,7 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    autoGen.setParameters(new AutoPaths.PlanParameters(null, null));
+    autoGen.setParameters(AutoPaths.PlanParameters.fromAutoChooser(manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // Pose2d[] poses;
 

@@ -2,6 +2,9 @@ package frc.robot.auto.pipeline;
 
 import java.util.List;
 
+import com.team6962.lib.telemetry.Logger;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.auto.utils.AutoPaths;
@@ -16,6 +19,7 @@ public class CommandBuilder {
 
     public CommandBuilder(AutonomousCommands autonomous) {
         this.autonomous = autonomous;
+        sequenceChooser = new SequenceChooser();
     }
 
     public void start(AutoPaths.PlanParameters parameters) {
@@ -23,17 +27,29 @@ public class CommandBuilder {
         group = new SequentialCommandGroup();
         currentIndex = 0;
         path = null;
+
+        System.out.println("Starting to generate a new autonomous path");
+
+        Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/isDone", false);
+        Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/currentIndex", 0);
+        Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "started");
     }
 
     public void work() {
         if (!sequenceChooser.isDone()) {
+            Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "waiting");
             sequenceChooser.work();
             return;
         }
 
+        // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/workTimestamp", Timer.getFPGATimestamp());
+        // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "running");
+
         if (path == null) {
             path = sequenceChooser.getBestPath();
         }
+        
+        if (currentIndex + 1 >= path.size()) return;
 
         AutoPaths.CoralMovement movement = path.get(currentIndex);
 
@@ -44,10 +60,14 @@ public class CommandBuilder {
         group.addCommands(autonomous.placeCoral(movement.destination));
 
         currentIndex++;
+
+        // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/currentIndex", currentIndex);
+        // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/isDone", isDone());
+        // Logger.logObject(AutoPaths.Logging.COMMAND_BUILDER + "/pathCommand", getPathCommand());
     }
 
     public boolean isDone() {
-        return sequenceChooser.isDone() && currentIndex + 1 == path.size();
+        return sequenceChooser.isDone() && path != null && currentIndex + 1 >= path.size();
     }
 
     public Command getPathCommand() {

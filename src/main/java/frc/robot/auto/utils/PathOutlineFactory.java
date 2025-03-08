@@ -22,14 +22,13 @@ public class PathOutlineFactory implements Iterator<List<AutoPaths.CoralMovement
     }
 
     public PathOutlineFactory(AutoPaths.PlanConstraints constraints) {
-        this.constraints = constraints;
-        this.count = getPathCount();
+        start(constraints);
     }
 
     public void start(AutoPaths.PlanConstraints constraints) {
         this.constraints = constraints;
         this.index = 0;
-        this.count = getPathCount();
+        this.count = computePathCount();
     }
 
     @Override
@@ -45,6 +44,10 @@ public class PathOutlineFactory implements Iterator<List<AutoPaths.CoralMovement
     }
 
     public int getPathCount() {
+        return count;
+    }
+
+    private int computePathCount() {
         int count = 1;
 
         int sources = constraints.sources.count;

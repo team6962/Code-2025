@@ -2,6 +2,7 @@ package frc.robot.auto.utils;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.team6962.lib.utils.MeasureMath;
@@ -9,6 +10,7 @@ import com.team6962.lib.utils.MeasureMath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.Field.CoralStation;
+import frc.robot.util.software.Dashboard.AutonChooser;
 
 public final class AutoPaths {
     public static class CoralPosition {
@@ -73,6 +75,10 @@ public final class AutoPaths {
         public boolean pathExists() {
             return targets.size() > 0 && sources.count > 0;
         }
+
+        public boolean equals(PlanConstraints other) {
+            return other != null && other.targets.equals(targets) && other.sources.equals(sources);
+        }
     }
 
     public static class PlanParameters {
@@ -85,9 +91,28 @@ public final class AutoPaths {
         }
 
         public boolean matches(PlanParameters other) {
-            return other != null && other.constraints.equals(constraints) &&
-                other.startPose.getTranslation().getDistance(startPose.getTranslation()) < Units.inchesToMeters(6) &&
-                MeasureMath.minDifference(other.startPose.getRotation(), startPose.getRotation()).getMeasure().abs(Degrees) < 10;
+            boolean a = other != null;
+            boolean b = other.constraints.equals(constraints);
+            boolean c = other.startPose.getTranslation().getDistance(startPose.getTranslation()) < Units.inchesToMeters(6);
+            boolean d = MeasureMath.minDifference(other.startPose.getRotation(), startPose.getRotation()).getMeasure().abs(Degrees) < 10;
+
+            return a && b && c && d;
+        }
+
+        public static PlanParameters fromAutoChooser(boolean preplaced, Pose2d startPose) {
+            CoralSources sources = new CoralSources(preplaced, AutonChooser.leftCoralStation(), AutonChooser.rightCoralStation());
+            
+            List<CoralPosition> targets = new LinkedList<>();
+
+            for (int i : AutonChooser.reefFaces()) {
+                int pole1 = (6 - i * 2 + 12) % 12; // ((6 - i * 2) % 12 + 12) % 12
+                int pole2 = (5 - i * 2 + 12) % 12;
+
+                targets.add(new CoralPosition(pole1, 4));
+                targets.add(new CoralPosition(pole2, 4));
+            }
+
+            return new PlanParameters(new PlanConstraints(targets, sources), startPose);
         }
     }
 
@@ -118,5 +143,17 @@ public final class AutoPaths {
         public boolean equals(Object obj) {
             return obj instanceof CoralMovement && ((CoralMovement) obj).destination.equals(destination) && ((CoralMovement) obj).source == source;
         }
+    }
+
+    private AutoPaths() {}
+
+    public static final class Logging {
+        public static final String AUTO = "Autonomous";
+        public static final String SEQUENCE_CHOOSER = AUTO + "/SequenceChooser";
+        public static final String COMMAND_BUILDER = AUTO + "/CommandBuilder";
+        public static final String AUTO_THREAD = AUTO + "/AutoThread";
+        public static final String AUTO_GENERATION = AUTO + "/AutoGeneration";
+
+        private Logging() {}
     }
 }
