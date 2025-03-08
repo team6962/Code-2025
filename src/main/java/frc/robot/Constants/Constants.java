@@ -203,10 +203,8 @@ public final class Constants {
     public static final int ELEVATOR_LEFT = 2;
     public static final int ELEVATOR_RIGHT = 3;
     public static final int MANIPULATOR_PIVOT = 4;
-    public static final int MANIPULATOR_ALGAE_RIGHT = 5;
-    public static final int MANIPULATOR_ALGAE_LEFT = 6;
-    public static final int MANIPULATOR_CORAL = 7;
-    public static final int MANIPULATOR_FUNNEL = 8; //CONFIRM
+    public static final int MANIPULATOR_GRABBER = 5;
+    public static final int MANIPULATOR_FUNNEL = 6; //CONFIRM
   }
 
   public static final class DIO {
@@ -388,17 +386,19 @@ public final class Constants {
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
     public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
+    public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
 
     public static final double ALGAE_OUT_SPEED = -1.0;
     public static final double ALGAE_IN_SPEED = 0.5;
     public static final double ALGAE_HOLD_SPEED = 0.1;
 
-    public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
     public static final double CORAL_OUT_SPEED = 0.7;
     public static final double CORAL_IN_SPEED = 0.2;
     public static final double CORAL_ADJUST_SPEED = 0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
+
+    public static final double BASE_SPEED = 0.5;
 
     public static final double FUNNEL_IN_SPEED = 0.5;
   }

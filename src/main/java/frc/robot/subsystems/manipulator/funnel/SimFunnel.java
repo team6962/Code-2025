@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.manipulator.coral.CoralGrabber;
+import frc.robot.subsystems.manipulator.grabber.Grabber;
 
 public class SimFunnel extends Funnel{
     private final Time intakeTime;
@@ -32,7 +32,7 @@ public class SimFunnel extends Funnel{
     }
 
     @Override
-    public Command intake(CoralGrabber coral) {
+    public Command intake(Grabber coral) {
       return wait(intakeTime);
     }
   

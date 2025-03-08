@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.MANIPULATOR;
 import frc.robot.util.hardware.SparkMaxUtil;
-import frc.robot.subsystems.manipulator.coral.CoralGrabber;
+import frc.robot.subsystems.manipulator.grabber.Grabber;
 
 public class RealFunnel extends Funnel{
     private final SparkMax motor;
@@ -35,8 +35,8 @@ public class RealFunnel extends Funnel{
         return this.run(() -> motor.set(speed));
     }
 
-    public Command intake(CoralGrabber grabber) {
-        return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED).until(grabber::hasGamePiece);
+    public Command intake(Grabber grabber) {
+        return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED).until(grabber::hasCoral);
     }
 
     public Command forwards() {
