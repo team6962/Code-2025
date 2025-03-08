@@ -51,8 +51,6 @@ public class LEDs extends SubsystemBase {
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
-  public static final Color ANTARES_BLUE = new Color(37, 46, 150);
-  public static final Color ANTARES_YELLOW = new Color(242, 222, 139);
   public static final Color RED = new Color(255, 0, 0);
   public static final Color GREEN = new Color(0, 255, 0);
   public static final Color BLUE = new Color(0, 20, 255);
@@ -123,13 +121,13 @@ public static Command setStateCommand(State state) {
         apply(createColor(WHITE, WHITE, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_RED:
-        apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
+        apply(createColor(RED, YELLOW, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
         apply(createColor(BLUE, CYAN, 0.0, 50.0));
         break;
       case HAS_ALGAE:
-        apply(createColor(RED, ANTARES_YELLOW, 0.0, 0.0));
+        apply(createColor(RED, YELLOW, 0.0, 0.0));
         break;
       case HAS_CORAL:
         break;
@@ -143,7 +141,7 @@ public static Command setStateCommand(State state) {
         apply(createColor(DARK_GREEN, DARK_GREEN, 0.0, 0.0));
         break;
       case AIMING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
+        apply(createColor(YELLOW, YELLOW, 1.0, 0.0));
         break;
       case SCORING_BARGE:
         apply(createColor(YELLOW, YELLOW, 0.0, 0.0));
