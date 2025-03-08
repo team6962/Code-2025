@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.MANIPULATOR;
 
-public class SimGrabber extends Grabber{
+public class SimGrabber extends Grabber {
   private boolean hasCoral = true;
 
   private boolean hasAlgae = false;
@@ -21,35 +21,38 @@ public class SimGrabber extends Grabber{
   private final Time algaeGripTime;
 
   private final Time stopTime;
-  
-  public SimGrabber(Time coralIntakeTime, Time coralDropTime, Time algaeIntakeTime, Time algaeDropTime, Time stopTime, Time algaeGripTime) {
+
+  public SimGrabber(
+      Time coralIntakeTime,
+      Time coralDropTime,
+      Time algaeIntakeTime,
+      Time algaeDropTime,
+      Time stopTime,
+      Time algaeGripTime) {
     this.coralIntakeTime = coralIntakeTime;
     this.coralDropTime = coralDropTime;
 
     this.algaeIntakeTime = algaeIntakeTime;
     this.algaeDropTime = algaeDropTime;
-    
+
     this.algaeGripTime = algaeGripTime;
 
     this.stopTime = stopTime;
   }
 
   public static SimGrabber simulated() {
-    return new SimGrabber(Seconds.of(0.25),
-                          Seconds.of(0.25),
-                          Seconds.of(0.25),
-                          Seconds.of(0.25), 
-                          MANIPULATOR.ALGAE_GRIP_CHECK_TIME, 
-                          Seconds.of(0));
+    return new SimGrabber(
+        Seconds.of(0.25),
+        Seconds.of(0.25),
+        Seconds.of(0.25),
+        Seconds.of(0.25),
+        MANIPULATOR.ALGAE_GRIP_CHECK_TIME,
+        Seconds.of(0));
   }
 
   public static SimGrabber disabled() {
-    return new SimGrabber(Seconds.of(0), 
-                          Seconds.of(0), 
-                          Seconds.of(0), 
-                          Seconds.of(0), 
-                          Seconds.of(0), 
-                          Seconds.of(0));
+    return new SimGrabber(
+        Seconds.of(0), Seconds.of(0), Seconds.of(0), Seconds.of(0), Seconds.of(0), Seconds.of(0));
   }
 
   private Command waitTimeCommand(Time time) {
@@ -100,7 +103,7 @@ public class SimGrabber extends Grabber{
   }
 
   @Override
-  public Command checkAlgaeGrip(){
+  public Command checkAlgaeGrip() {
     return waitTimeCommand(algaeGripTime);
   }
 

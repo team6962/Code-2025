@@ -3,9 +3,9 @@ package frc.robot.subsystems.manipulator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.manipulator.funnel.Funnel;
 import frc.robot.subsystems.manipulator.grabber.Grabber;
 import frc.robot.subsystems.manipulator.pivot.ManipulatorPivot;
-import frc.robot.subsystems.manipulator.funnel.Funnel;
 
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
@@ -34,7 +34,7 @@ public class Manipulator extends SubsystemBase {
     return pivot.coralIntake().alongWith(grabber.intakeCoral().alongWith(funnel.intake(grabber)));
   }
 
-  public Command runCoralIntake(){
+  public Command runCoralIntake() {
     return grabber.intakeCoral().alongWith(funnel.intake(grabber));
   }
 

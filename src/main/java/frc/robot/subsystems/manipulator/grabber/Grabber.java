@@ -8,57 +8,57 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.Set;
 
-public abstract class Grabber extends SubsystemBase{
-    private boolean hasAlgae = false;
+public abstract class Grabber extends SubsystemBase {
+  private boolean hasAlgae = false;
 
-    public Grabber(){
-        setName("Grabber");
+  public Grabber() {
+    setName("Grabber");
 
-        Logger.logBoolean(getName() + "/hasAlgae", this::hasAlgae);
-        Logger.logBoolean(getName() + "/hasCoral", this::hasCoral);
-    }
+    Logger.logBoolean(getName() + "/hasAlgae", this::hasAlgae);
+    Logger.logBoolean(getName() + "/hasCoral", this::hasCoral);
+  }
 
-    public abstract boolean hasCoral();
+  public abstract boolean hasCoral();
 
-    public void expectAlgae(boolean hasAlgae) {
-      this.hasAlgae = hasAlgae;
-    }
-    
-    public boolean hasAlgae() {
-      return hasAlgae;
-    }
+  public void expectAlgae(boolean hasAlgae) {
+    this.hasAlgae = hasAlgae;
+  }
 
-    public Command coralMagicButton() {
-        return Commands.defer(() -> hasCoral() ? dropCoral() : intakeCoral(), Set.of(this));
-    }
+  public boolean hasAlgae() {
+    return hasAlgae;
+  }
 
-    public Command algaeMagicButton() {
-        return Commands.defer(() -> hasAlgae() ? dropAlgae() : intakeAlgae(), Set.of(this));
-    }
+  public Command coralMagicButton() {
+    return Commands.defer(() -> hasCoral() ? dropCoral() : intakeCoral(), Set.of(this));
+  }
 
-    public abstract Command intakeCoral();
+  public Command algaeMagicButton() {
+    return Commands.defer(() -> hasAlgae() ? dropAlgae() : intakeAlgae(), Set.of(this));
+  }
 
-    public abstract Command dropCoral();
-  
-    public abstract Command intakeAlgae();
+  public abstract Command intakeCoral();
 
-    public abstract Command dropAlgae();
-    
-    public abstract Command checkAlgaeGrip();
-  
-    public abstract Command stop();
+  public abstract Command dropCoral();
 
-    public Command forwards() {
-        return Commands.none();
-    }
+  public abstract Command intakeAlgae();
 
-    public Command backwards() {
-        return Commands.none();
-    }
+  public abstract Command dropAlgae();
 
-    public static Grabber create() {
-        if (!ENABLED_SYSTEMS.MANIPULATOR) return SimGrabber.disabled();
-        else if (RobotBase.isReal()) return new RealGrabber();
-        else return SimGrabber.simulated();
-    }
+  public abstract Command checkAlgaeGrip();
+
+  public abstract Command stop();
+
+  public Command forwards() {
+    return Commands.none();
+  }
+
+  public Command backwards() {
+    return Commands.none();
+  }
+
+  public static Grabber create() {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return SimGrabber.disabled();
+    else if (RobotBase.isReal()) return new RealGrabber();
+    else return SimGrabber.simulated();
+  }
 }

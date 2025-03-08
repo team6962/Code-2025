@@ -204,7 +204,7 @@ public final class Constants {
     public static final int ELEVATOR_RIGHT = 3;
     public static final int MANIPULATOR_PIVOT = 4;
     public static final int MANIPULATOR_GRABBER = 5;
-    public static final int MANIPULATOR_FUNNEL = 6; //CONFIRM
+    public static final int MANIPULATOR_FUNNEL = 6; // CONFIRM
   }
 
   public static final class DIO {

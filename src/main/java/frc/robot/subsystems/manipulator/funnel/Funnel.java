@@ -7,22 +7,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.subsystems.manipulator.grabber.Grabber;
 
-public abstract class Funnel extends SubsystemBase{
-    public Funnel() {
-        setName("Funnel");
-    }
+public abstract class Funnel extends SubsystemBase {
+  public Funnel() {
+    setName("Funnel");
+  }
 
-    public abstract Command intake(Grabber coral);
+  public abstract Command intake(Grabber coral);
 
-    public abstract Command stop();
+  public abstract Command stop();
 
-    public Command forwards() {
-        return Commands.none();
-    }
+  public Command forwards() {
+    return Commands.none();
+  }
 
-    public static Funnel create() {
-        if (!ENABLED_SYSTEMS.MANIPULATOR) return SimFunnel.disabled();
-        else if (RobotBase.isReal()) return new RealFunnel();
-        else return SimFunnel.simulated();
-    }
+  public static Funnel create() {
+    if (!ENABLED_SYSTEMS.MANIPULATOR) return SimFunnel.disabled();
+    else if (RobotBase.isReal()) return new RealFunnel();
+    else return SimFunnel.simulated();
+  }
 }
