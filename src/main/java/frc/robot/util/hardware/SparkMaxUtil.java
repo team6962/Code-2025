@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.Constants.NEO;
@@ -106,14 +105,10 @@ public final class SparkMaxUtil {
       double minValue,
       double maxValue,
       boolean wrap) {
-    config.closedLoop
-        .p(kP)
-        .i(kI)
-        .d(kD);
-        // .velocityFF(kV / 12.0);
-        // .minOutput(minValue)
-        // .maxOutput(maxValue);
-        
+    config.closedLoop.p(kP).i(kI).d(kD);
+    // .velocityFF(kV / 12.0);
+    // .minOutput(minValue)
+    // .maxOutput(maxValue);
 
     if (wrap) {
       config.closedLoop.positionWrappingEnabled(true);

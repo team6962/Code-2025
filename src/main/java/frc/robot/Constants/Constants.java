@@ -12,16 +12,10 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -33,6 +27,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -128,7 +126,7 @@ public final class Constants {
     // Offset included
     // Front left: 0.195 radians
     // Front right: 3.425 radians = 0.283 radians
-    // Back left: 3.373 radians = 
+    // Back left: 3.373 radians =
     // Back right: -2.824 radians
 
     // (4) Back left: 2.85 radians - 0.5 rots + x = 0 (x = 0.5 rots - 2.85 radians)
@@ -147,19 +145,35 @@ public final class Constants {
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
       new SwerveConfig.Module( // Front right
-          14, 24, 34, Radians.of(-4.292).minus(Rotations.of(0.25)).minus(Degrees.of(90))),//Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+          14,
+          24,
+          34,
+          Radians.of(-4.292)
+              .minus(Rotations.of(0.25))
+              .minus(
+                  Degrees.of(90))), // Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
       new SwerveConfig.Module( // Front left
-          15, 25, 35, Radians.of(4.077)),//Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
+          15,
+          25,
+          35,
+          Radians.of(
+              4.077)), // Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), //
+      // -0.440
       new SwerveConfig.Module( // Back right
           16,
           26,
           36,
-          Radians.of(11.982).minus(Rotations.of(0.5))),//Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
+          Radians.of(11.982)
+              .minus(Rotations.of(0.5))), // Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 *
+      // Math.PI).plus(ALL_OFFSET)), // -1.842
       new SwerveConfig.Module( // Back left
           17,
           27,
           37,
-          Rotations.of(-0.75).minus(Radians.of(2.85)).plus(Degrees.of(90))),//Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
+          Rotations.of(-0.75)
+              .minus(Radians.of(2.85))
+              .plus(Degrees.of(90))), // Radians.of(-1.049 - Math.PI + 3.0 / 4.0 *
+      // Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -201,6 +215,7 @@ public final class Constants {
   public static final class PWM {
     public static final int LEDS = 9;
   }
+
   public static final class NEO {
     public static final DCMotor STATS =
         new DCMotor(12.0, 3.0, 160.0, 2.065, Units.rotationsPerMinuteToRadiansPerSecond(5820), 1);
@@ -258,13 +273,14 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING =
-              (4.0 / 1.0)
+        (4.0 / 1.0)
             * (5.0 / 1.0)
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.1);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
+
     public static final class PROFILE {
       public static final double kP = 4.0;
       public static final double kS = 2.0;
@@ -302,7 +318,7 @@ public final class Constants {
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP =  4.0; //3.75;
+      public static final double kP = 4.0; // 3.75;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 10.0; // 0.1;
       public static final double kS = 0.15;
@@ -325,21 +341,23 @@ public final class Constants {
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
+
     static {
       MIN_ANGLES = new TreeMap<>();
       MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
       MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
-      MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);      
+      MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
     }
 
     public static final NavigableMap<Distance, Angle> MAX_ANGLES;
+
     static {
       MAX_ANGLES = new TreeMap<>();
       MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
       MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
       MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
       MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
-      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));      
+      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));
     }
 
     public static final class CORAL {
@@ -353,7 +371,7 @@ public final class Constants {
       public static final Angle BARGE_ANGLE = Degrees.of(21.90);
       public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = SAFE_ANGLE; //Degrees.of(0.0);
+      public static final Angle PROCESSOR_ANGLE = SAFE_ANGLE; // Degrees.of(0.0);
     }
   }
 

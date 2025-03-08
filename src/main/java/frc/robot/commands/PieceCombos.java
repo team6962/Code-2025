@@ -3,7 +3,6 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.team6962.lib.utils.CommandUtils;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -34,33 +33,24 @@ public class PieceCombos {
   }
 
   public Command coralL1() {
-    return safeSubsystems.parallelSafeCommand(
-      elevator.coralL1(),
-      manipulator.placeCoralL1());
+    return safeSubsystems.parallelSafeCommand(elevator.coralL1(), manipulator.placeCoralL1());
   }
 
   public Command coralL2() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.coralL2(),
-        manipulator.placeCoralL23());
+    return safeSubsystems.parallelSafeCommand(elevator.coralL2(), manipulator.placeCoralL23());
   }
 
   public Command coralL3() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.coralL3(),
-        manipulator.placeCoralL23());
+    return safeSubsystems.parallelSafeCommand(elevator.coralL3(), manipulator.placeCoralL23());
   }
 
   public Command coralL4() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.coralL4(),
-        manipulator.placeCoralL4());
+    return safeSubsystems.parallelSafeCommand(elevator.coralL4(), manipulator.placeCoralL4());
   }
 
   public Command pickupGroundAlgae() {
     return safeSubsystems.parallelSafeCommand(
-        elevator.algaeGround(),
-        manipulator.pickupGroundAlgae());
+        elevator.algaeGround(), manipulator.pickupGroundAlgae());
   }
 
   public Command algae(int level) {
@@ -72,25 +62,20 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.algaeL2(),
-        manipulator.pivot.algaeReef());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL2(), manipulator.pivot.algaeReef());
   }
 
   public Command algaeL3() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.algaeL3(),
-        manipulator.pivot.algaeReef());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL3(), manipulator.pivot.algaeReef());
   }
 
   public Command algaeBarge() {
-    return safeSubsystems.safeMoveCommand(
-        elevator.algaeBarge(),
-        manipulator.pivot.algaeBarge());
+    return safeSubsystems.safeMoveCommand(elevator.algaeBarge(), manipulator.pivot.algaeBarge());
   }
 
   public Command algaeProcessor() {
-    return safeSubsystems.parallelSafeCommand(elevator.algaeProcessor(), manipulator.placeProcessorAlgae());
+    return safeSubsystems.parallelSafeCommand(
+        elevator.algaeProcessor(), manipulator.placeProcessorAlgae());
   }
 
   public Command stow() {

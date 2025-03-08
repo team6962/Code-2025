@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -26,7 +25,7 @@ public class Algae {
   public static Translation2d getAlgaePosition(
       String name, SwerveDrive swerveDrive, Translation3d cameraToRobot) {
     if (RobotBase.isSimulation() && ALGAE.SIMULATE_STATIC_ALGAE) {
-        return new Translation2d(2.281, 4.03);
+      return new Translation2d(2.281, 4.03);
     }
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
