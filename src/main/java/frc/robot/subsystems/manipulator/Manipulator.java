@@ -6,16 +6,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
 import frc.robot.subsystems.manipulator.coral.CoralGrabber;
 import frc.robot.subsystems.manipulator.pivot.ManipulatorPivot;
+import frc.robot.subsystems.manipulator.funnel.Funnel;
 
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
   public final AlgaeGrabber algae;
   public final CoralGrabber coral;
+  public final Funnel funnel;
 
   public Manipulator() {
     pivot = ManipulatorPivot.create();
     algae = AlgaeGrabber.create();
     coral = CoralGrabber.create();
+    funnel = Funnel.create();
   }
 
   public Command placeCoralL1() {
@@ -31,7 +34,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.coralIntake().alongWith(coral.intake());
+    return pivot.coralIntake().alongWith(coral.intake().alongWith(funnel.intake(coral)));
   }
 
   public Command pickupGroundAlgae() {
