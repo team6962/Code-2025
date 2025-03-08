@@ -1,13 +1,8 @@
 package frc.robot.subsystems;
 
-import java.util.Map;
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -19,6 +14,8 @@ import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -54,11 +51,11 @@ public class Controls {
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
-    driver
-        .rightStick()
-        .onTrue(pieceCombos.pickupGroundAlgae());
+    driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
-    driver.leftStick().onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
+    driver
+        .leftStick()
+        .onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -104,7 +101,9 @@ public class Controls {
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
     operator.leftStick().onTrue(pieceCombos.algaeBarge());
-    operator.rightStick().onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+    operator
+        .rightStick()
+        .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
     operator.rightBumper().whileTrue(manipulator.coral.backwards());
     operator.rightTrigger().whileTrue(manipulator.coral.magicButton().andThen(rumbleBoth()));
@@ -120,19 +119,20 @@ public class Controls {
 
     ShuffleboardTab driverTab = DriverDashboard.getTab();
 
-    driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+    driverTab
+        .addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(0, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
-    driverTab.addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+    driverTab
+        .addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(2, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
-      
     // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
     // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
     // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /

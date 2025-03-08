@@ -12,7 +12,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -50,8 +49,10 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
     setName("Algae Grabber");
 
-    StatusChecks.under(this).add("leftMotor", ((NEO550Motor) ((MotorGroup) motors).get(0)).getSparkMax());
-    StatusChecks.under(this).add("rightMotor", ((NEO550Motor) ((MotorGroup) motors).get(1)).getSparkMax());
+    StatusChecks.under(this)
+        .add("leftMotor", ((NEO550Motor) ((MotorGroup) motors).get(0)).getSparkMax());
+    StatusChecks.under(this)
+        .add("rightMotor", ((NEO550Motor) ((MotorGroup) motors).get(1)).getSparkMax());
   }
 
   /** Represents a motor or group of motors that can be controlled together. */

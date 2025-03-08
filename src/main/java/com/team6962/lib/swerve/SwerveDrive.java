@@ -11,9 +11,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
@@ -22,7 +19,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -43,6 +39,8 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -222,7 +220,8 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
-      Rotation2d targetHeading = convertAngle(heading.get(), system, Coordinates.PoseSystem.ALLIANCE);
+      Rotation2d targetHeading =
+          convertAngle(heading.get(), system, Coordinates.PoseSystem.ALLIANCE);
       Rotation2d currentHeading = getEstimatedPose().getRotation();
 
       if (targetHeading == null) return;
@@ -284,33 +283,42 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command pathfindTo(Pose2d target) {
-    return Commands.defer(() -> {
-      autoBuilder.setOutput(speeds -> setMovement(speeds));
+    return Commands.defer(
+        () -> {
+          autoBuilder.setOutput(speeds -> setMovement(speeds));
 
-      return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(target, getConstants().pathConstraints()), useMotion());
-    }, Set.of(useMotion()));
+          return CommandUtils.withRequirements(
+              AutoBuilder.pathfindToPose(target, getConstants().pathConstraints()), useMotion());
+        },
+        Set.of(useMotion()));
   }
 
   public Command pathfindTo(Pose2d target, LinearVelocity goalEndVelocity) {
     autoBuilder.setOutput(speeds -> setMovement(speeds));
 
-    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity), useMotion());
+    return CommandUtils.withRequirements(
+        AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity),
+        useMotion());
   }
 
   public Command pathfindTo(Translation2d target) {
     autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(
-        new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints()), useMotion());
+    return CommandUtils.withRequirements(
+        AutoBuilder.pathfindToPose(
+            new Pose2d(target, Rotation2d.fromRotations(0)), getConstants().pathConstraints()),
+        useMotion());
   }
 
   public Command pathfindTo(Translation2d target, LinearVelocity goalEndVelocity) {
     autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
 
-    return CommandUtils.withRequirements(AutoBuilder.pathfindToPose(
-        new Pose2d(target, Rotation2d.fromRotations(0)),
-        getConstants().pathConstraints(),
-        goalEndVelocity), useMotion());
+    return CommandUtils.withRequirements(
+        AutoBuilder.pathfindToPose(
+            new Pose2d(target, Rotation2d.fromRotations(0)),
+            getConstants().pathConstraints(),
+            goalEndVelocity),
+        useMotion());
   }
 
   public Command alignTo(
@@ -331,9 +339,8 @@ public class SwerveDrive extends SwerveCore {
   }
 
   /**
-   * A command to precisely align to a target position. This should not be used
-   * to drive to a target far away, as it will not pathfind and may have
-   * unexpected behavior.
+   * A command to precisely align to a target position. This should not be used to drive to a target
+   * far away, as it will not pathfind and may have unexpected behavior.
    */
   private class AlignCommand extends Command {
     private PIDController translationXPID;
@@ -379,9 +386,10 @@ public class SwerveDrive extends SwerveCore {
               getConstants().driveGains().fineRotation().kI,
               getConstants().driveGains().fineRotation().kD,
               new TrapezoidProfile.Constraints(
-                getConstants().maxRotationSpeed().in(RadiansPerSecond),
-                getConstants().maxAngularAcceleration(Amps.of(60)).in(RadiansPerSecondPerSecond)
-              ));
+                  getConstants().maxRotationSpeed().in(RadiansPerSecond),
+                  getConstants()
+                      .maxAngularAcceleration(Amps.of(60))
+                      .in(RadiansPerSecondPerSecond)));
       rotationPID.enableContinuousInput(-Math.PI, Math.PI);
 
       translateFeedforward = new SimpleMotorFeedforward(0.01, 0);
@@ -393,20 +401,26 @@ public class SwerveDrive extends SwerveCore {
 
       Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
       Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
-      
+
       Translation2d error = target.getTranslation().minus(getEstimatedPose().getTranslation());
-      
+
       return error;
     }
 
     private Translation2d getTranslationOutput(Translation2d translationError) {
       Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
 
-      double translationXOutput = translationXPID.calculate(-translationError.getX()); // Setpoint is 0, so need to invert
-      double translationYOutput = translationYPID.calculate(-translationError.getY()); // Setpoint is 0, so need to invert
+      double translationXOutput =
+          translationXPID.calculate(-translationError.getX()); // Setpoint is 0, so need to invert
+      double translationYOutput =
+          translationYPID.calculate(-translationError.getY()); // Setpoint is 0, so need to invert
 
-      translationXOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vxMetersPerSecond, translationXOutput);
-      translationYOutput += translateFeedforward.calculateWithVelocities(getEstimatedSpeeds().vyMetersPerSecond, translationYOutput);
+      translationXOutput +=
+          translateFeedforward.calculateWithVelocities(
+              getEstimatedSpeeds().vxMetersPerSecond, translationXOutput);
+      translationYOutput +=
+          translateFeedforward.calculateWithVelocities(
+              getEstimatedSpeeds().vyMetersPerSecond, translationYOutput);
 
       if (getConstants().driveGains().maxAutonomousSpeed() != null) {
         double autoSpeed = getConstants().driveGains().maxAutonomousSpeed().in(MetersPerSecond);
@@ -426,8 +440,7 @@ public class SwerveDrive extends SwerveCore {
 
       double rotationError =
           MeasureMath.minDifference(
-              getEstimatedPose().getRotation().getMeasure(),
-              target.getRotation().getMeasure())
+                  getEstimatedPose().getRotation().getMeasure(), target.getRotation().getMeasure())
               .in(Radians);
 
       return Rotation2d.fromRadians(rotationError);
@@ -438,7 +451,9 @@ public class SwerveDrive extends SwerveCore {
 
       double rotationOutput = rotationPID.calculate(rotationError.getRadians());
 
-      rotationOutput += rotateFeedforward.calculateWithVelocities(getEstimatedSpeeds().omegaRadiansPerSecond, rotationOutput);
+      rotationOutput +=
+          rotateFeedforward.calculateWithVelocities(
+              getEstimatedSpeeds().omegaRadiansPerSecond, rotationOutput);
 
       Rotation2d rotationOutputMeasure = Rotation2d.fromRadians(rotationOutput);
 
@@ -448,11 +463,14 @@ public class SwerveDrive extends SwerveCore {
     }
 
     private void updateAdjustments(Translation2d translationError, Rotation2d rotationError) {
-      boolean translationNeedsAdjustment = translationError.getNorm() > toleranceDistance.in(Meters);
-      boolean rotationNeedsAdjustment = rotationError.getMeasure().abs(Rotations) > toleranceAngle.in(Rotations);
+      boolean translationNeedsAdjustment =
+          translationError.getNorm() > toleranceDistance.in(Meters);
+      boolean rotationNeedsAdjustment =
+          rotationError.getMeasure().abs(Rotations) > toleranceAngle.in(Rotations);
       double translationErrorRatio = translationError.getNorm() / toleranceDistance.in(Meters);
-      double rotationErrorRatio = rotationError.getMeasure().abs(Rotation) / toleranceAngle.abs(Rotations);
-      
+      double rotationErrorRatio =
+          rotationError.getMeasure().abs(Rotation) / toleranceAngle.abs(Rotations);
+
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
       if (translationNeedsAdjustment && rotationNeedsAdjustment) {
@@ -465,11 +483,11 @@ public class SwerveDrive extends SwerveCore {
     public void execute() {
       Translation2d translationError = getTranslationError();
       Rotation2d rotationError = getRotationError();
-      
+
       updateAdjustments(translationError, rotationError);
 
       ChassisSpeeds speeds;
-      
+
       if (state == State.TRANSLATING) {
         Translation2d translationOutput = new Translation2d(0, 0);
         translationOutput = getTranslationOutput(translationError);
@@ -498,7 +516,7 @@ public class SwerveDrive extends SwerveCore {
                   current.getRotation().getMeasure(), target.getRotation().getMeasure())
               .lt(toleranceAngle);
     }
-    
+
     @Override
     public void end(boolean interrupted) {
       translationXPID.close();
@@ -530,7 +548,8 @@ public class SwerveDrive extends SwerveCore {
   //             leftMotor.getAppliedOutput() * leftMotor.getBusVoltage() +
   //             rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()) / 2.0))
   //           .linearPosition(getAverageHeight())
-  //           .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() + rightMotor.getEncoder().getVelocity()) / 2)),
+  //           .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() +
+  // rightMotor.getEncoder().getVelocity()) / 2)),
   //       this));
 
   //   return Commands.sequence(
@@ -551,15 +570,17 @@ public class SwerveDrive extends SwerveCore {
   // }
 
   public Command moveTowards(Translation2d target, LinearVelocity speed, Distance distance) {
-    return Commands.defer(() -> {
-      Translation2d offset = target.minus(getEstimatedPose().getTranslation());
+    return Commands.defer(
+        () -> {
+          Translation2d offset = target.minus(getEstimatedPose().getTranslation());
 
-      if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
-        return Commands.waitTime(distance.div(speed));
-      } else {
-        return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
-          .withTimeout(distance.div(speed));
-      }
-    }, Set.of(useTranslation()));
+          if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
+            return Commands.waitTime(distance.div(speed));
+          } else {
+            return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
+                .withTimeout(distance.div(speed));
+          }
+        },
+        Set.of(useTranslation()));
   }
 }

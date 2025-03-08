@@ -9,7 +9,6 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -178,7 +177,8 @@ public class RobotContainer {
 
     //   // return autoGen.generate();
 
-    //   GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+    //   GeneratedAuto auto = new GeneratedAuto(autonomous,
+    // AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
     //   auto.setup();
 
     //   return auto.getCommand();
@@ -194,8 +194,8 @@ public class RobotContainer {
     // );
 
     // return Commands.sequence(
-        // elevator.calibrate()
-        // manipulator.pivot.calibrate());
+    // elevator.calibrate()
+    // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
   }
@@ -215,7 +215,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    autoGen.setParameters(AutoPaths.PlanParameters.fromAutoChooser(manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
+    autoGen.setParameters(
+        AutoPaths.PlanParameters.fromAutoChooser(
+            manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // Pose2d[] poses;
 
@@ -250,7 +252,7 @@ public class RobotContainer {
     // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
     // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    //checks.schedule();
+    // checks.schedule();
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;

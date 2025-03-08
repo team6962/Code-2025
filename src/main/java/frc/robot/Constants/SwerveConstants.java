@@ -2,10 +2,8 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -38,30 +36,29 @@ public final class SwerveConstants {
     ChassisType chassisType = getChassisType();
 
     return new SwerveConfig(
-        getChassis(chassisType),
-        Gearing.MK4I_L2_PLUS,
-        getModules(chassisType),
-        new Motor(
-            DCMotor.getKrakenX60(1),
-            new Slot0Configs()
-                .withKP(0.01)
-                .withKD(0.01)
-                .withKI(0.1)
-                .withKV(0.117)
-                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
-            Amps.of(60)),
-        new Motor(
-            DCMotor.getKrakenX60(1),
-            new Slot0Configs()
-                .withKP(50)
-                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
-            Amps.of(60)),
-        Wheel.COLSON,
-        new DriveGains(
-            new PIDConstants(5.0, 0.0, 0.1), new PIDConstants(2.0, 0.5, 0.01))
-          .withFineTranslation(new PIDConstants(5.0, 0.0, 0.1)))
-      .withMaxDriveSpeed(MetersPerSecond.of(3.9))
-      .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
+            getChassis(chassisType),
+            Gearing.MK4I_L2_PLUS,
+            getModules(chassisType),
+            new Motor(
+                DCMotor.getKrakenX60(1),
+                new Slot0Configs()
+                    .withKP(0.01)
+                    .withKD(0.01)
+                    .withKI(0.1)
+                    .withKV(0.117)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
+                Amps.of(60)),
+            new Motor(
+                DCMotor.getKrakenX60(1),
+                new Slot0Configs()
+                    .withKP(50)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
+                Amps.of(60)),
+            Wheel.COLSON,
+            new DriveGains(new PIDConstants(5.0, 0.0, 0.1), new PIDConstants(2.0, 0.5, 0.01))
+                .withFineTranslation(new PIDConstants(5.0, 0.0, 0.1)))
+        .withMaxDriveSpeed(MetersPerSecond.of(3.9))
+        .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
@@ -82,18 +79,15 @@ public final class SwerveConstants {
     String idString = Preferences.getString("Chassis", "COMPETITION");
 
     if (idString.equals("TEST")) {
-      System.out.println(
-          "=== !!! ### TEST CHASSIS ### !!! ===");
+      System.out.println("=== !!! ### TEST CHASSIS ### !!! ===");
       return ChassisType.TEST;
     } else if (idString.equals("COMPETITION")) {
-      System.out.println(
-          "=== COMPETITION CHASSIS ===");
+      System.out.println("=== COMPETITION CHASSIS ===");
 
       return ChassisType.COMPETITION;
     } else {
       System.out.println("Bad chassis id. Default to");
-      System.out.println(
-          "=== COMPETITION CHASSIS ===");
+      System.out.println("=== COMPETITION CHASSIS ===");
 
       return ChassisType.COMPETITION;
     }

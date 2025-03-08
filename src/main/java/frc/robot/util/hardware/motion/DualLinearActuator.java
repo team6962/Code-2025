@@ -13,13 +13,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -36,7 +33,6 @@ public class DualLinearActuator extends SubsystemBase {
   protected SparkMax leftMotor, rightMotor;
   private RelativeEncoder leftEncoder, rightEncoder;
   private SparkClosedLoopController leftPID, rightPID;
-
   private DigitalInput ceilingLimit, floorLimit;
   private Distance baseHeight, minHeight, maxHeight, tolerance;
 
@@ -45,7 +41,6 @@ public class DualLinearActuator extends SubsystemBase {
   private Distance cycleHeight;
 
   private boolean zeroed = false;
-
 
   /**
    * Constructs a new DualLinearController.
@@ -96,13 +91,15 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
+    SparkMaxUtil.configurePID(
+        motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
+    SparkMaxUtil.configurePID(
+        motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
     this.ceilingLimit = new DigitalInput(ceilingLimitDIO);
@@ -124,11 +121,14 @@ public class DualLinearActuator extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/limits/ceil", this::triggeredCeilingLimit);
     Logger.logBoolean(this.getName() + "/limits/floor", this::triggeredFloorLimit);
 
-    Logger.logMeasure(this.getName() + "/motors/left/current", () -> Amps.of(leftMotor.getOutputCurrent()));
+    Logger.logMeasure(
+        this.getName() + "/motors/left/current", () -> Amps.of(leftMotor.getOutputCurrent()));
     Logger.logNumber(this.getName() + "/motors/left/dutycycle", () -> leftMotor.getAppliedOutput());
 
-    Logger.logMeasure(this.getName() + "/motors/right/current", () -> Amps.of(rightMotor.getOutputCurrent()));
-    Logger.logNumber(this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
+    Logger.logMeasure(
+        this.getName() + "/motors/right/current", () -> Amps.of(rightMotor.getOutputCurrent()));
+    Logger.logNumber(
+        this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
 
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
@@ -205,8 +205,7 @@ public class DualLinearActuator extends SubsystemBase {
 
   public boolean inRange(Distance height) {
     if (height == null) return true;
-    return debouncer.calculate(
-        getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
+    return debouncer.calculate(getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
   }
 
   public boolean doneMoving() {

@@ -1,8 +1,5 @@
 package frc.robot.util.software.Dashboard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -10,9 +7,12 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import frc.robot.subsystems.DriverDashboard;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class AutonChooser {
-  public static NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous");
+  public static NetworkTable table =
+      NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous");
   public static ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
   public static List<SimpleWidget> reefOptions = new ArrayList<>();
   public static SimpleWidget rightCoral;
@@ -102,7 +102,8 @@ public final class AutonChooser {
             .withSize(1, 1)
             .withPosition(4, 2);
     autoComputed =
-        DriverDashboard.getTab().add("Auto Precomputed", false)
+        DriverDashboard.getTab()
+            .add("Auto Precomputed", false)
             .withWidget(BuiltInWidgets.kBooleanBox)
             .withSize(2, 2)
             .withPosition(4, 0);

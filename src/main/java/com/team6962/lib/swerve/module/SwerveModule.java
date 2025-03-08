@@ -15,7 +15,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -31,7 +30,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -40,7 +38,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -96,8 +93,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
     CTREUtils.check(
-      driveConfig.apply(new CurrentLimitsConfigs()
-        .withSupplyCurrentLimit(Amps.of(80))));
+        driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
 
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -133,9 +129,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive)
                 .withNeutralMode(NeutralModeValue.Brake)));
-    
-    CTREUtils.check(steerConfig.apply(new CurrentLimitsConfigs()
-      .withSupplyCurrentLimit(Amps.of(80))));
+
+    CTREUtils.check(
+        steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
 
     // Configure the fusing of the absolute steer encoder's reported position
     // with the motor's internal relative encoder, and set the steer motor
@@ -243,7 +239,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     }
 
     targetState = optimizeStateForTalon(targetState, getSteerAngle());
-    
+
     if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
       targetState = new SwerveModuleState(0, targetState.angle);
     }
@@ -507,8 +503,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   public static SwerveModuleState optimizeStateForTalon(
       SwerveModuleState targetState, Angle currentAngle) {
-    Angle difference =
-        MeasureMath.minDifference(targetState.angle.getMeasure(), currentAngle);
+    Angle difference = MeasureMath.minDifference(targetState.angle.getMeasure(), currentAngle);
     SwerveModuleState relativeOptimized =
         optimizeStateRelative(targetState.speedMetersPerSecond, difference);
 

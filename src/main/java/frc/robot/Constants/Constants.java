@@ -12,16 +12,10 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -33,6 +27,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -185,6 +183,7 @@ public final class Constants {
   public static final class PWM {
     public static final int LEDS = 9;
   }
+
   public static final class NEO {
     public static final DCMotor STATS =
         new DCMotor(12.0, 3.0, 160.0, 2.065, Units.rotationsPerMinuteToRadiansPerSecond(5820), 1);
@@ -297,7 +296,7 @@ public final class Constants {
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP =  4.0; //3.75;
+      public static final double kP = 4.0; // 3.75;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 10.0; // 0.1;
       public static final double kS = 0.15;
@@ -320,21 +319,23 @@ public final class Constants {
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
+
     static {
       MIN_ANGLES = new TreeMap<>();
       MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
       MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
-      MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);      
+      MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
     }
 
     public static final NavigableMap<Distance, Angle> MAX_ANGLES;
+
     static {
       MAX_ANGLES = new TreeMap<>();
       MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
       MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
       MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
       MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
-      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));      
+      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));
     }
 
     public static final class CORAL {
