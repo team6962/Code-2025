@@ -1,5 +1,6 @@
 {
   "download": {
+    "deleteAfter": false,
     "localDir": "/home/arjun/git/team6962/pinlogs",
     "serverTeam": "6962"
   }
