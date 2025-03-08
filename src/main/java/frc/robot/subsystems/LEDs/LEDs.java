@@ -20,12 +20,14 @@ import frc.robot.subsystems.RobotStateController;
 import edu.wpi.first.units.measure.Distance;
 import java.util.Locale;
 
+import com.team6962.lib.telemetry.Logger;
+
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static State state = State.DRIVING_TELEOP_BLUE;
-  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  private static State state = State.AIMING_BARGE;
+  //private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private static final Distance kLedSpacing = Meters.of(1 / 60.0);
 
 
@@ -107,6 +109,7 @@ public static Command setStateCommand(State state) {
 
   @Override
   public void periodic() {
+      Logger.log("LED", state.toString());
         switch (state) {
       case OFF:
         apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 0.0, 0.0));
@@ -123,10 +126,10 @@ public static Command setStateCommand(State state) {
         apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
-        apply(createColor(BLUE, CYAN, 10.0, 50.0));
+        apply(createColor(BLUE, CYAN, 0.0, 50.0));
         break;
       case HAS_ALGAE:
-        apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
+        apply(createColor(RED, ANTARES_YELLOW, 0.0, 0.0));
         break;
       case HAS_CORAL:
         break;
