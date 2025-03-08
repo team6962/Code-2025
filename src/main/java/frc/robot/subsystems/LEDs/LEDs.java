@@ -26,7 +26,7 @@ public class LEDs extends SubsystemBase {
   private RobotStateController stateController;
   private static State state = State.DRIVING_TELEOP_BLUE;
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
+  private static final Distance kLedSpacing = Meters.of(1 / 60.0);
 
 
   public static enum State {
@@ -86,10 +86,10 @@ public static Command setStateCommand(State state) {
   }
 
   private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
-    //LEDPattern = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
-    LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+    LEDPattern m_rainbow = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, ColorFrom, ColorTo);
+    //LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
     LEDPattern blink = m_rainbow.blink(Seconds.of(Blink));
-    LEDPattern scroll = m_rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(1));
+    LEDPattern scroll = m_rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
     //LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
 
     LEDPattern pattern = blink.overlayOn(scroll);
@@ -123,8 +123,7 @@ public static Command setStateCommand(State state) {
         apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
-        apply(createColor(BLUE, ANTARES_BLUE, 10.0, 10.0));
-    
+        apply(createColor(BLUE, CYAN, 10.0, 50.0));
         break;
       case HAS_ALGAE:
         apply(createColor(RED, ANTARES_YELLOW, 0.0, 50.0));
