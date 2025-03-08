@@ -103,7 +103,7 @@ public class RobotContainer {
 
     LiveWindow.disableAllTelemetry();
 
-    DriverStation.silenceJoystickConnectionWarning(false);
+    DriverStation.silenceJoystickConnectionWarning(true);
 
     StatusChecks.Category statusChecks = StatusChecks.under("General");
 
