@@ -53,7 +53,6 @@ public final class Constants {
   public static final class ENABLED_SYSTEMS {
     public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
-    public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;

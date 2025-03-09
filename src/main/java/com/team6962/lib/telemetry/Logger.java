@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
@@ -476,5 +477,14 @@ public class Logger extends SubsystemBase {
         }
       }
     }
+  }
+
+  public static void logEnabledSystems() {
+    log("Enabled Systems/Dashboard", ENABLED_SYSTEMS.DASHBOARD);
+    log("Enabled Systems/Drive", ENABLED_SYSTEMS.DRIVE);
+    log("Enabled Systems/Elevator", ENABLED_SYSTEMS.ELEVATOR);
+    log("Enabled Systems/Funnel", ENABLED_SYSTEMS.FUNNEL);
+    log("Enabled Systems/Hang", ENABLED_SYSTEMS.HANG);
+    log("Enabled Systems/Manipulator", ENABLED_SYSTEMS.MANIPULATOR);
   }
 }
