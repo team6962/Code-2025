@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,6 +18,7 @@ import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.intake.CoralIntake;
 import frc.robot.subsystems.manipulator.Manipulator;
 
 public class Controls {
@@ -33,7 +34,8 @@ public class Controls {
       Manipulator manipulator,
       Hang hang,
       Autonomous autonomous,
-      PieceCombos pieceCombos) {
+      PieceCombos pieceCombos,
+      CoralIntake coralIntake) {
 
     // Driver
     // Move swerve chassis
@@ -104,10 +106,14 @@ public class Controls {
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
     operator.leftStick().onTrue(pieceCombos.algaeBarge());
-    operator.rightStick().onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+    operator.rightStick().onTrue(pieceCombos.intakeCoral().alongWith(coralIntake.intake()).andThen(rumbleBoth())); // big right paddle
 
-    operator.rightBumper().whileTrue(manipulator.coral.backwards());
-    operator.rightTrigger().whileTrue(manipulator.coral.magicButton().andThen(rumbleBoth()));
+    operator.rightBumper().whileTrue(manipulator.coral.fineControl(1.0));
+    operator.rightTrigger().whileTrue(
+      Commands.defer(() -> manipulator.coral.hasGamePiece() ? manipulator.coral.drop() : coralIntake.intake(), coralIntake.getSubsystems())
+        .andThen(rumbleBoth())
+    );
+    
     operator.leftBumper().whileTrue(manipulator.algae.intake().andThen(rumbleBoth()));
     operator.leftTrigger().whileTrue(manipulator.algae.drop());
 

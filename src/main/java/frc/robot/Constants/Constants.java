@@ -57,6 +57,7 @@ public final class Constants {
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;
+    public static final boolean FUNNEL = false;
   }
 
   public static final class LOGGING {
@@ -188,6 +189,7 @@ public final class Constants {
     public static final int MANIPULATOR_ALGAE_RIGHT = 5;
     public static final int MANIPULATOR_ALGAE_LEFT = 6;
     public static final int MANIPULATOR_CORAL = 7;
+    public static final int FUNNEL = 30;
   }
 
   public static final class DIO {
@@ -196,6 +198,7 @@ public final class Constants {
     public static final int CORAL_BEAM_BREAK = 3;
     public static final int ELEVATOR_CEIL_LIMIT = 4;
     public static final int ELEVATOR_FLOOR_LIMIT = 5;
+    public static final int FUNNEL_BEAM_BREAK = 6;
   }
 
   public static final class PWM {
@@ -418,6 +421,12 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+  }
+
+  public static final class FUNNEL {
+    public static final boolean MOTOR_INVERTED = false;
+    public static final double INTAKE_SPEED = 0.2;
+    public static final Time INTAKE_TIME = Seconds.of(0.5);
   }
 
   public static final class VOLTAGE_LADDER {

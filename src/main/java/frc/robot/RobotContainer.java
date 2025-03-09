@@ -40,6 +40,7 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.intake.CoralIntake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
@@ -77,6 +78,7 @@ public class RobotContainer {
   // public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
+  public final CoralIntake coralIntake;
   // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
@@ -135,7 +137,8 @@ public class RobotContainer {
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
-    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
+    coralIntake = CoralIntake.get(manipulator.coral);
+    autonomous = new Autonomous(swerveDrive, manipulator, elevator, pieceCombos, coralIntake);
     // algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
@@ -144,7 +147,7 @@ public class RobotContainer {
 
     // // Configure the trigger bindings
     Controls.configureBindings(
-        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos, coralIntake);
 
     // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
 
@@ -192,11 +195,13 @@ public class RobotContainer {
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return swerveDrive.driveSpeeds(
-      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
-      Coordinates.MovementSystem.ROBOT
-    )
-      .withTimeout(2.0);
+    return coralIntake.intake();
+
+    // return swerveDrive.driveSpeeds(
+    //   () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
+    //   Coordinates.MovementSystem.ROBOT
+    // )
+    //   .withTimeout(2.0);
 
   }
 

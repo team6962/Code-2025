@@ -62,12 +62,8 @@ public class RealCoralGrabber extends CoralGrabber {
                 Commands.waitUntil(() -> !hasGamePiece())));
   }
 
-  public Command forwards() {
-    return runSpeed(MANIPULATOR.CORAL_IN_SPEED);
-  }
-
-  public Command backwards() {
-    return runSpeed(-MANIPULATOR.CORAL_IN_SPEED);
+  public Command fineControl(double power) {
+    return runSpeed(power * MANIPULATOR.CORAL_IN_SPEED);
   }
 
   public Command hold() {

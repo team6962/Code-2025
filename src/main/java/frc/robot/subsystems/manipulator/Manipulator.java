@@ -38,7 +38,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.coralIntake().alongWith(coral.intake());
+    return pivot.coralIntake();
   }
 
   public Command pickupGroundAlgae() {

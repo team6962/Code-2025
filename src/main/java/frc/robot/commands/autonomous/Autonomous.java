@@ -30,28 +30,29 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.commands.autonomous.CoralSequences.CoralPosition;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.CoralIntake;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 
 public class Autonomous {
-  private RobotStateController controller;
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
   private Elevator elevator;
   private PieceCombos pieceCombos;
+  private CoralIntake coralIntake;
 
   public Autonomous(
-      RobotStateController controller,
       SwerveDrive swerveDrive,
       Manipulator manipulator,
       Elevator elevator,
-      PieceCombos pieceCombos
+      PieceCombos pieceCombos,
+      CoralIntake coralIntake
     ) {
-    this.controller = controller;
     this.swerveDrive = swerveDrive;
     this.manipulator = manipulator;
     this.elevator = elevator;
     this.pieceCombos = pieceCombos;
+    this.coralIntake = coralIntake;
   }
 
   public static enum PolePattern {
@@ -110,7 +111,7 @@ public class Autonomous {
         CommandUtils.selectByMode(pieceCombos.intakeCoral(), CommandUtils.printAndWait("Moving elevator and manipulator for coral intaking", 0.5))
       ),
       swerveDrive.alignTo(intake),
-      CommandUtils.selectByMode(manipulator.coral.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
+      CommandUtils.selectByMode(coralIntake.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
       Commands.print("Done intaking")
     );
   }
