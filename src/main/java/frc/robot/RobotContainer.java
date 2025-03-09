@@ -195,13 +195,11 @@ public class RobotContainer {
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return coralIntake.intake();
-
-    // return swerveDrive.driveSpeeds(
-    //   () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
-    //   Coordinates.MovementSystem.ROBOT
-    // )
-    //   .withTimeout(2.0);
+    return swerveDrive.driveSpeeds(
+      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
+      Coordinates.MovementSystem.ROBOT
+    )
+      .withTimeout(2.0);
 
   }
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.RobotVersion;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.subsystems.manipulator.coral.CoralGrabber;
 
 /**
@@ -45,7 +46,7 @@ public interface CoralIntake {
      * {@link FunnelIntake}, if the robot is version 2.
      */
     public static CoralIntake get(CoralGrabber coralGrabber) {
-        if (RobotVersion.isV2()) return new FunnelIntake();
-        else return new GrabberIntake(coralGrabber);
+        if (RobotVersion.isV2()) return ENABLED_SYSTEMS.FUNNEL ? new FunnelIntake() : new DisabledIntake();
+        else return ENABLED_SYSTEMS.MANIPULATOR ? new GrabberIntake(coralGrabber) : new DisabledIntake();
     }
 }

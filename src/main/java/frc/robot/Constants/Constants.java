@@ -57,7 +57,7 @@ public final class Constants {
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;
-    public static final boolean FUNNEL = false;
+    public static final boolean FUNNEL = true;
   }
 
   public static final class LOGGING {
