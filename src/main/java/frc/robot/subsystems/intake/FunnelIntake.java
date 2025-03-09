@@ -15,9 +15,16 @@ import frc.robot.subsystems.funnel.FunnelMotor;
  * robot's implementation of {@link CoralIntake}.
  */
 public class FunnelIntake implements CoralIntake {
-    private FunnelMotor motor = FunnelMotor.get();
-    private FunnelBeamBreak beamBreak = FunnelBeamBreak.get(motor);
+    private FunnelMotor motor;
+    private FunnelBeamBreak beamBreak;
     private boolean unsafe = false;
+
+    public FunnelIntake() {
+        if (ENABLED_SYSTEMS.FUNNEL) {
+            motor = FunnelMotor.get();
+            beamBreak = FunnelBeamBreak.get(motor);
+        }
+    }
 
     @Override
     public Command intake() {
@@ -35,6 +42,10 @@ public class FunnelIntake implements CoralIntake {
 
     @Override
     public Set<Subsystem> getSubsystems() {
+        if (!ENABLED_SYSTEMS.FUNNEL) {
+            return Set.of();
+        }
+
         return Set.of(motor);
     }
 
@@ -45,6 +56,10 @@ public class FunnelIntake implements CoralIntake {
 
     @Override
     public Command fineControl(double power) {
+        if (!ENABLED_SYSTEMS.FUNNEL) {
+            return Commands.none();
+        }
+
         return motor.fineControl(power);
     }
 }

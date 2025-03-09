@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.DIO;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.RobotVersion;
 
 public abstract class FunnelBeamBreak extends SubsystemBase {
@@ -31,11 +30,7 @@ public abstract class FunnelBeamBreak extends SubsystemBase {
             throw new IllegalStateException("Funnel is not supported on version 1 robot");
         }
 
-        if (ENABLED_SYSTEMS.FUNNEL) {
-            return RobotBase.isReal() ? new Real() : new Simulated((FunnelMotor.SimulatedOrDisabled) motor);
-        } else {
-            return new Disabled((FunnelMotor.SimulatedOrDisabled) motor);
-        }
+        return RobotBase.isReal() ? new Real() : new Simulated((FunnelMotor.Simulated) motor);
     }
 
     static class Real extends FunnelBeamBreak {
@@ -60,13 +55,13 @@ public abstract class FunnelBeamBreak extends SubsystemBase {
     }
 
     static class Simulated extends FunnelBeamBreak {
-        private FunnelMotor.SimulatedOrDisabled motor;
+        private FunnelMotor.Simulated motor;
         private Time dropStart;
         private boolean detected = false;
 
         private static final Time DROP_TIME = Seconds.of(0.25);
 
-        public Simulated(FunnelMotor.SimulatedOrDisabled motor) {
+        public Simulated(FunnelMotor.Simulated motor) {
             this.motor = motor;
         }
 
@@ -100,10 +95,10 @@ public abstract class FunnelBeamBreak extends SubsystemBase {
     }
 
     static class Disabled extends FunnelBeamBreak {
-        private FunnelMotor.SimulatedOrDisabled motor;
+        private FunnelMotor.Simulated motor;
         private boolean detected = false;
 
-        public Disabled(FunnelMotor.SimulatedOrDisabled motor) {
+        public Disabled(FunnelMotor.Simulated motor) {
             this.motor = motor;
         }
 

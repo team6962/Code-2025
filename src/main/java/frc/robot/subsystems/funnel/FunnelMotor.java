@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.FUNNEL;
 import frc.robot.Constants.RobotVersion;
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -38,18 +37,14 @@ public abstract class FunnelMotor extends SubsystemBase {
             throw new IllegalStateException("Funnel is not supported on version 1 robot");
         }
 
-        if (ENABLED_SYSTEMS.FUNNEL) {
-            return RobotBase.isReal() ? new RealEnabled() : new SimulatedOrDisabled(false);
-        } else {
-            return new SimulatedOrDisabled(true);
-        }
+        return RobotBase.isReal() ? new Real() : new Simulated();
     }
 
-    static class RealEnabled extends FunnelMotor {
+    static class Real extends FunnelMotor {
         private SparkMax motor;
         private boolean intaking;
 
-        public RealEnabled() {
+        public Real() {
             this.motor = new SparkMax(CAN.FUNNEL, MotorType.kBrushless);
             
             SparkMaxConfig config = new SparkMaxConfig();
@@ -89,13 +84,10 @@ public abstract class FunnelMotor extends SubsystemBase {
         }
     }
 
-    static class SimulatedOrDisabled extends FunnelMotor {
+    static class Simulated extends FunnelMotor {
         private boolean intaking;
-        private boolean disabled;
 
-        public SimulatedOrDisabled(boolean disabled) {
-            this.disabled = disabled;
-
+        public Simulated() {
             setDefaultCommand(stop());
         }
 
@@ -119,11 +111,6 @@ public abstract class FunnelMotor extends SubsystemBase {
         @Override
         protected boolean isIntaking() {
             return intaking;
-        }
-
-        @Override
-        public boolean isDisabled() {
-            return disabled;
         }
     }
 }
