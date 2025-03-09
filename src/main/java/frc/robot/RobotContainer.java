@@ -137,7 +137,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new AutoGeneration(autonomous);
+    autoGen = new AutoGeneration(autonomous, Milliseconds.of(20), Milliseconds.of(5));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =

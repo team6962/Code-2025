@@ -572,7 +572,7 @@ public class SwerveDrive extends SwerveCore {
   public Command moveTowards(Translation2d target, LinearVelocity speed, Distance distance) {
     return Commands.defer(
         () -> {
-          Translation2d offset = target.minus(getEstimatedPose().getTranslation());
+          Translation2d offset = allianceToAbsoluteVelocity(target.minus(getEstimatedPose().getTranslation()));
 
           if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
             return Commands.waitTime(distance.div(speed));

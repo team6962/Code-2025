@@ -1,21 +1,28 @@
 package frc.robot.auto.pipeline;
 
+import java.lang.Thread.State;
+
 import com.team6962.lib.telemetry.Logger;
+
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
-import java.lang.Thread.State;
 
 public class AutoGeneration {
   private AutoThread currentThread;
   private AutonomousCommands autonomous;
+  private Time workDelay;
+  private Time workTime;
 
-  public AutoGeneration(AutonomousCommands autonomous) {
+  public AutoGeneration(AutonomousCommands autonomous, Time workDelay, Time workTime) {
     this.autonomous = autonomous;
-    currentThread = new AutoThread(autonomous);
+    this.workDelay = workDelay;
+    this.workTime = workTime;
+    currentThread = new AutoThread(autonomous, workDelay, workTime);
   }
 
   private void logState() {
@@ -35,7 +42,7 @@ public class AutoGeneration {
     if (currentThread == null || currentThread.isFinished()) {
       Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", true);
 
-      currentThread = new AutoThread(autonomous);
+      currentThread = new AutoThread(autonomous, workDelay, workTime);
       currentThread.setParameters(parameters);
       currentThread.start();
     } else if (currentThread.getState() == State.NEW) {

@@ -43,6 +43,10 @@ public class PathOutlineFactory implements Iterator<List<AutoPaths.CoralMovement
     return count;
   }
 
+  public int getCurrentIndex() {
+    return index;
+  }
+
   private int computePathCount() {
     int count = 1;
 

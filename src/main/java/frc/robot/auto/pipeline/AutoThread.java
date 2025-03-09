@@ -1,8 +1,12 @@
 package frc.robot.auto.pipeline;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
@@ -10,19 +14,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
-import java.util.function.BooleanSupplier;
 
 public class AutoThread extends Thread {
   private CommandBuilder commandBuilder;
   private AutoPaths.PlanParameters parameters;
+  private final long workDelayMilliseconds;
+  private final double workTimeSeconds;
+  private double lastPauseTimestampSeconds;
 
-  private static final Time WORK_DELAY = Milliseconds.of(20);
-
-  public AutoThread(AutonomousCommands autonomous) {
+  public AutoThread(AutonomousCommands autonomous, Time workDelay, Time workTime) {
     this.commandBuilder = new CommandBuilder(autonomous);
+    this.workDelayMilliseconds = (long) workDelay.in(Milliseconds);
+    this.workTimeSeconds = workTime.in(Seconds);
+    lastPauseTimestampSeconds = Timer.getFPGATimestamp();
 
     Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", "null");
     Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
+
+    logWorkState(WorkState.NEW);
   }
 
   public static boolean shouldWorkInBackground() {
@@ -71,31 +80,35 @@ public class AutoThread extends Thread {
     while (true) {
       // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/loopTimestamp", Timer.getFPGATimestamp());
 
-      if (!shouldWorkInBackground()) {
-        // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/sleeping", true);
-
-        try {
-          Thread.sleep((long) WORK_DELAY.in(Milliseconds));
-        } catch (InterruptedException e) {
-          Logger.log(AutoPaths.Logging.AUTO_THREAD + "/interruptTime", Timer.getFPGATimestamp());
-
-          System.out.println("Auto thread stopped");
-
-          return;
-        }
-
-        continue;
-      }
-
-      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/sleeping", false);
-
       CommandBuilder builder;
 
       synchronized (this) {
         builder = commandBuilder;
       }
 
-      if (builder != null && !builder.isDone()) builder.work();
+      if (!shouldWorkInBackground() || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds || builder == null || builder.isDone()) {
+        logWorkState(WorkState.SLEEPING);
+
+        try {
+          Thread.sleep((long) workDelayMilliseconds);
+        } catch (InterruptedException e) {
+          Logger.log(AutoPaths.Logging.AUTO_THREAD + "/interruptTime", Timer.getFPGATimestamp());
+
+          logWorkState(WorkState.DEAD);
+
+          System.out.println("Auto thread stopped");
+
+          return;
+        }
+        
+        lastPauseTimestampSeconds = Timer.getFPGATimestamp();
+
+        continue;
+      }
+
+      logWorkState(WorkState.WORKING);
+
+      builder.work();
     }
   }
 
@@ -146,4 +159,17 @@ public class AutoThread extends Thread {
   public boolean isFinished() {
     return getState() == State.TERMINATED;
   }
+
+  private static WorkState state;
+
+  private static void logWorkState(WorkState state) {
+    if (AutoThread.state != state) {
+      AutoThread.state = state;
+
+      Logger.log(AutoPaths.Logging.AUTO_THREAD + "/state", state.toString());
+    }
+  }
+
+
+  public static enum WorkState { NEW, SLEEPING, WORKING, DEAD }
 }

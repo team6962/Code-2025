@@ -22,6 +22,7 @@ public class SequenceChooser {
     bestPath = null;
     bestTime = Seconds.of(Double.POSITIVE_INFINITY);
     Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/isDone", false);
+    Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathCount", pathFactory.getPathCount());
   }
 
   public boolean isDone() {
@@ -30,8 +31,6 @@ public class SequenceChooser {
 
   public void work() {
     if (isDone()) return;
-
-    // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/workTimestamp", Timer.getFPGATimestamp());
 
     List<AutoPaths.CoralMovement> path = pathFactory.next();
     Time time = PathTiming.getPathTime(path, startPose);
@@ -46,6 +45,12 @@ public class SequenceChooser {
 
       Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestTime", bestTime);
       Logger.logObject(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestPath", bestPath);
+    }
+
+    int pathIndex = pathFactory.getCurrentIndex();
+
+    if (Math.abs(((double) pathIndex * 1000 / pathFactory.getPathCount()) % 1) < 1e-6) {
+      Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathIndex", pathIndex);
     }
   }
 
