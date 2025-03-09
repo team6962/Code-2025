@@ -51,7 +51,6 @@ public final class Constants {
   public static final class ENABLED_SYSTEMS {
     public static final boolean DRIVE = true;
     public static final boolean DASHBOARD = true;
-    public static final boolean INTAKE = false;
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;
@@ -197,8 +196,6 @@ public final class Constants {
   public static final class CAN {
     // In order of: front left, front right, back left, back right, where the battery is in the back
     public static final int PDH = 1;
-    public static final int INTAKE_WHEELS = 28;
-    public static final int INTAKE_PIVOT = 29;
     public static final int HANG = 34;
     public static final int ELEVATOR_LEFT = 2;
     public static final int ELEVATOR_RIGHT = 3;
@@ -403,21 +400,6 @@ public final class Constants {
     public static final double FUNNEL_IN_SPEED = 0.5;
   }
 
-  public static final class INTAKE {
-    public static final double GEARING = 10.0;
-    public static final Distance LENGTH = Inches.of(16.5);
-    public static final Mass MASS = Kilograms.of(1.85);
-    public static final PIDConstants PID = new PIDConstants(10.0, 0.0, 0.0);
-    public static final double IN_POWER = 0.5;
-    public static final double OUT_POWER = 0.5; // Placeholder value
-
-    public static final Angle PIVOT_DOWN = Degrees.of(0.0);
-    public static final Angle PIVOT_UP = Degrees.of(90.0);
-
-    public static final double TO_SHOOTER_POWER = 0.3;
-    public static final double SLOW_OUT_POWER = 0.4;
-  }
-
   public static final class HANG_PIVOT {
     public static final double GEARING = (9.0 / 1.0) * (9.0 / 1.0) * (3.0 / 1.0) * (26.0 / 12.0);
     public static final Angle ENCODER_OFFSET = Rotations.of(0.085);
@@ -449,7 +431,6 @@ public final class Constants {
     public static final double SWERVE_DRIVE = 7.0;
     public static final double ELEVATOR = 7.5;
     public static final double MANIPULATOR = 8.0;
-    public static final double INTAKE = 8.5;
     public static final double HANG = 9.0;
   }
 
