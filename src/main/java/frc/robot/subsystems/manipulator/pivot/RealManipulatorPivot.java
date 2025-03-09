@@ -155,6 +155,16 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     return run(this::stopMotor);
   }
 
+  @Override
+  public Command pivotSpeed(double speed) {
+      return Commands.run(() -> moveSpeed(speed));
+  }
+
+  @Override
+  public Angle getAngle() {
+    return getRelativePosition();
+  }
+
   public Command calibrate() {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(

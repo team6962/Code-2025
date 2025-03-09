@@ -41,6 +41,10 @@ public interface ManipulatorPivot extends Subsystem {
 
   public Command down();
 
+  public Command pivotSpeed(double speed);
+
+  public Angle getAngle();
+
   public void setMinMaxAngle(Angle min, Angle max);
 
   public static ManipulatorPivot create() {

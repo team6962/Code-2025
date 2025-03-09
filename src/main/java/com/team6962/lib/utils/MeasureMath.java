@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
@@ -120,5 +122,13 @@ public final class MeasureMath {
 
   public static Rotation2d fromMeasure(AngularVelocity velocity) {
     return Rotation2d.fromRadians(velocity.in(RadiansPerSecond));
+  }
+
+  public static Angle castAngle(Measure<AngleUnit> measure) {
+    return Radians.of(measure.in(Radians));
+  }
+
+  public static Distance castDistance(Measure<DistanceUnit> measure) {
+    return Meters.of(measure.in(Meters));
   }
 }

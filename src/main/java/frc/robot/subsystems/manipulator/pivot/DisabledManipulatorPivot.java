@@ -74,5 +74,15 @@ public class DisabledManipulatorPivot implements ManipulatorPivot {
     return CommandUtils.noneWithRequirements(this);
   }
 
+  @Override
+  public Command pivotSpeed(double speed) {
+    return CommandUtils.noneWithRequirements(this);
+  }
+
+  @Override
+  public Angle getAngle() {
+    throw new UnsupportedOperationException("DisabledManipulatorPivot does not support getAngle()");
+  }
+
   public void setMinMaxAngle(Angle min, Angle max) {}
 }
