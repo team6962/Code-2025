@@ -4,6 +4,7 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.util.CachedRobotState;
 
 // This class is a subsystem that controls the state of the robot. It is used to coordinate the

@@ -32,6 +32,7 @@ import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.RobotStateController;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -40,7 +41,7 @@ import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
 import java.io.InputStream;
 import java.util.Properties;
-
+ 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -63,7 +64,7 @@ public class RobotContainer {
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
-  // public final LEDs ledStrip;
+  public final LEDs ledStrip;
   // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -120,12 +121,9 @@ public class RobotContainer {
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
     swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
-    stateController = new RobotStateController(swerveDrive);
-    // ledStrip =
-    //     new LEDs(
-    //         stateController,
-    //         () -> 1.0 +
-    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    stateController = new RobotStateController(swerveDrive); 
+    ledStrip = new LEDs(stateController);
+    
     // intake = new Intake();
     manipulator = new Manipulator();
     elevator = Elevator.create();

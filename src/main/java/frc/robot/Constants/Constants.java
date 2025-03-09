@@ -435,7 +435,8 @@ public final class Constants {
 
   // LED
   public static final class LED {
-    public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+    public static final int port = 9; // PWN port
+    public static final int length = 31; // Number of LEDs on side strip
   }
 
   public static final class VOLTAGE_LADDER {
