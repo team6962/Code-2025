@@ -6,13 +6,11 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
@@ -48,7 +46,7 @@ public class PivotController extends SubsystemBase {
   // Built-in relative NEO encoder
   protected RelativeEncoder encoder;
   // Rev absolute through-bore encoder
-  protected SparkAbsoluteEncoder absoluteEncoder;
+  protected DutyCycleEncoder absoluteEncoder;
 
   private Angle minAngle, maxAngle;
 
@@ -88,11 +86,13 @@ public class PivotController extends SubsystemBase {
     encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
 
-    motor.getAbsoluteEncoder();
+    // motor.getAbsoluteEncoder();
 
-    absoluteEncoder = motor.getAbsoluteEncoder();
-    // motorConfig.absoluteEncoder.zeroCentered(true);
-    motorConfig.absoluteEncoder.zeroOffset(absolutePositionOffset);
+    absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, absolutePositionOffset);
+
+    // absoluteEncoder = motor.getAbsoluteEncoder();
+    // motorConfig.absoluteEncoder.zeroCentered(false);
+    // motorConfig.absoluteEncoder.zeroOffset(absolutePositionOffset);
 
 
     this.kS = kS;
@@ -109,8 +109,8 @@ public class PivotController extends SubsystemBase {
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
-    // statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.);
-    statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.getPosition() != 0.0);
+    statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
+    statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.get() != 0.0);
     statusChecks.add("motor", motor);
 
     sim =
@@ -137,7 +137,7 @@ public class PivotController extends SubsystemBase {
     Logger.logNumber(this.getName() + "/angle/min", () -> getMinAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/max", () -> getMaxAngle().in(Rotations));
 
-    // Logger.logBoolean(this.getName() + "/encoderConnected", absoluteEncoder::isConnected);
+    Logger.logBoolean(this.getName() + "/encoderConnected", absoluteEncoder::isConnected);
 
     RobotContainer.disabledPeriodic.subscribe(this::disabledPeriodic);
   }
@@ -155,10 +155,10 @@ public class PivotController extends SubsystemBase {
     if (requestedAngle == null) return; // If we havent set a target angle yet, do nothing
     targetAngle = clampAngle(requestedAngle);
 
-    // if (!absoluteEncoder.isConnected()) {
-    //   motor.stopMotor();
-    //   return;
-    // }
+    if (!absoluteEncoder.isConnected()) {
+      motor.stopMotor();
+      return;
+    }
 
     // encoder.setPosition(getPosition().in(Rotations));
 
@@ -279,7 +279,7 @@ public class PivotController extends SubsystemBase {
   }
 
   public Angle getRawAbsolutePosition() {
-    return Rotations.of(absoluteEncoder.getPosition());
+    return Rotations.of(absoluteEncoder.get());
   }
 
   public Angle getAbsolutePosition() {
