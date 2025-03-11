@@ -2,12 +2,9 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.Supplier;
-
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.subsystems.vision.AprilTags;
+import java.util.function.Supplier;
 
 /**
  * {@code PoseEstimator} is a class that estimates the pose of a swerve drive robot using a
@@ -89,10 +87,9 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
-      RobotCoordinates.visionToFieldPose(visionRobotPoseMeters),
-      timestamp.in(Seconds),
-      visionMeasurementStdDevs
-    );
+        RobotCoordinates.visionToFieldPose(visionRobotPoseMeters),
+        timestamp.in(Seconds),
+        visionMeasurementStdDevs);
 
     Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
     Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
@@ -106,17 +103,14 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   }
 
   public void addVisionHeading(Rotation2d expectedAbsoluteHeading) {
-    resetPoseEstimate(new Pose2d(
-      getEstimatedPose().getTranslation(),
-      RobotCoordinates.visionToFieldRotation(expectedAbsoluteHeading)
-    ));
+    resetPoseEstimate(
+        new Pose2d(
+            getEstimatedPose().getTranslation(),
+            RobotCoordinates.visionToFieldRotation(expectedAbsoluteHeading)));
   }
 
   public void resetHeadingEstimate(Rotation2d expectedFieldHeading) {
-    resetPoseEstimate(new Pose2d(
-      getEstimatedPose().getTranslation(),
-      expectedFieldHeading
-    ));
+    resetPoseEstimate(new Pose2d(getEstimatedPose().getTranslation(), expectedFieldHeading));
   }
 
   @Override

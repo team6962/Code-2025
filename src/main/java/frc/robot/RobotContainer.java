@@ -9,7 +9,6 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -138,10 +137,14 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new AutoGeneration(
-      autonomous, Milliseconds.of(20), Milliseconds.of(5),
-      () -> AutoPaths.PlanParameters.fromAutoChooser(
-        manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
+    autoGen =
+        new AutoGeneration(
+            autonomous,
+            Milliseconds.of(20),
+            Milliseconds.of(5),
+            () ->
+                AutoPaths.PlanParameters.fromAutoChooser(
+                    manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =

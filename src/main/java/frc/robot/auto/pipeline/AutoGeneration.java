@@ -1,10 +1,6 @@
 package frc.robot.auto.pipeline;
 
-import java.lang.Thread.State;
-import java.util.function.Supplier;
-
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
+import java.lang.Thread.State;
+import java.util.function.Supplier;
 
 public class AutoGeneration extends SubsystemBase {
   private AutoThread currentThread;
@@ -21,7 +19,10 @@ public class AutoGeneration extends SubsystemBase {
   private Time workTime;
   private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
-  public AutoGeneration(AutonomousCommands autonomous, Time workDelay, Time workTime, 
+  public AutoGeneration(
+      AutonomousCommands autonomous,
+      Time workDelay,
+      Time workTime,
       Supplier<AutoPaths.PlanParameters> parametersSupplier) {
     this.autonomous = autonomous;
     this.workDelay = workDelay;
@@ -37,7 +38,7 @@ public class AutoGeneration extends SubsystemBase {
 
   @Override
   public void periodic() {
-      setParameters(parametersSupplier.get());
+    setParameters(parametersSupplier.get());
   }
 
   private void setParameters(AutoPaths.PlanParameters parameters) {

@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Consumer;
-
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -27,7 +25,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -46,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -94,7 +92,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
     CTREUtils.check(
-        driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
+        driveConfig.apply(
+            new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
 
     // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
@@ -132,7 +131,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withNeutralMode(NeutralModeValue.Brake)));
 
     CTREUtils.check(
-        steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.steerMotor().maxCurrent())));
+        steerConfig.apply(
+            new CurrentLimitsConfigs().withSupplyCurrentLimit(config.steerMotor().maxCurrent())));
 
     // Configure the fusing of the absolute steer encoder's reported position
     // with the motor's internal relative encoder, and set the steer motor

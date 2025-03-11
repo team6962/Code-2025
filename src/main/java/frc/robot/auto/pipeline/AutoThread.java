@@ -3,10 +3,7 @@ package frc.robot.auto.pipeline;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
@@ -14,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
+import java.util.function.BooleanSupplier;
 
 public class AutoThread extends Thread {
   private CommandBuilder commandBuilder;
@@ -86,7 +84,10 @@ public class AutoThread extends Thread {
         builder = commandBuilder;
       }
 
-      if (!shouldWorkInBackground() || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds || builder == null || builder.isDone()) {
+      if (!shouldWorkInBackground()
+          || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds
+          || builder == null
+          || builder.isDone()) {
         logWorkState(WorkState.SLEEPING);
 
         try {
@@ -100,7 +101,7 @@ public class AutoThread extends Thread {
 
           return;
         }
-        
+
         lastPauseTimestampSeconds = Timer.getFPGATimestamp();
 
         continue;
@@ -170,6 +171,10 @@ public class AutoThread extends Thread {
     }
   }
 
-
-  public static enum WorkState { NEW, SLEEPING, WORKING, DEAD }
+  public static enum WorkState {
+    NEW,
+    SLEEPING,
+    WORKING,
+    DEAD
+  }
 }
