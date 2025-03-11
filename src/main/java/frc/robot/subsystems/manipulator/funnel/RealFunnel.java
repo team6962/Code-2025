@@ -21,7 +21,7 @@ public class RealFunnel extends Funnel {
 
     SparkMaxConfig config = new SparkMaxConfig();
 
-    SparkMaxUtil.configure(config, false, IdleMode.kBrake);
+    SparkMaxUtil.configure(config, true, IdleMode.kBrake);
     SparkMaxUtil.saveAndLog(this, motor, config);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

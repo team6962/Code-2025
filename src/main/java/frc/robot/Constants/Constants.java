@@ -282,32 +282,28 @@ public final class Constants {
   }
 
   public static final class ELEVATOR {
-    public static final double GEARING =
-        (4.0 / 1.0)
-            * (5.0 / 1.0)
-            * (3.0 / 2.0)
-            / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
+    public static final double GEARING = (7.5);
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.1);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final class PROFILE {
-      public static final double kP = 4.0;
+      public static final double kP = 16.0;
       public static final double kS = 2.0;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
-    public static final Distance BASE_HEIGHT = Inches.of(35.50);
-    public static final Distance MAX_HEIGHT = Inches.of(82.0);
+    public static final Distance BASE_HEIGHT = Inches.of(41.50);
+    public static final Distance MAX_HEIGHT = Inches.of(71.0);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(38.0);
-      public static final Distance L2_HEIGHT = Inches.of(47.60);
-      public static final Distance L3_HEIGHT = Inches.of(58.0);
-      public static final Distance L4_HEIGHT = Inches.of(77.20);
+      public static final Distance L1_HEIGHT = Inches.of(46.0); //change
+      public static final Distance L2_HEIGHT = Inches.of(48.50);
+      public static final Distance L3_HEIGHT = Inches.of(56.5);
+      public static final Distance L4_HEIGHT = Inches.of(71.0);
       public static final Distance INTAKE_HEIGHT = Inches.of(58.80);
     }
 
@@ -316,12 +312,12 @@ public final class Constants {
       public static final Distance L3_HEIGHT = Inches.of(64.0);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
-      public static final Distance PROCESSOR_HEIGHT = Inches.of(35.50);
+      public static final Distance PROCESSOR_HEIGHT = Inches.of(41.50);
     }
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = 5 * 5 * 5;
+    public static final double GEARING = (36.0/16.0)*(4.0)*(4.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.0);
