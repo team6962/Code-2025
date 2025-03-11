@@ -330,8 +330,7 @@ public class SwerveConfig {
       return this;
     }
 
-    public DriveGains withFineGains(
-        PIDConstants fineTranslation, PIDConstants fineRotation) {
+    public DriveGains withFineGains(PIDConstants fineTranslation, PIDConstants fineRotation) {
       this.fineTranslation = fineTranslation;
       this.fineRotation = fineRotation;
 
@@ -399,8 +398,10 @@ public class SwerveConfig {
   }
 
   public AngularVelocity maxRotationSpeed() {
-    return maxRotation != null ? maxRotation : RadiansPerSecond.of(
-        maxDriveSpeed().in(MetersPerSecond) / chassis.driveRadius().in(Meters));
+    return maxRotation != null
+        ? maxRotation
+        : RadiansPerSecond.of(
+            maxDriveSpeed().in(MetersPerSecond) / chassis.driveRadius().in(Meters));
   }
 
   public AngularAcceleration maxAngularAcceleration(Current driveCurrent) {

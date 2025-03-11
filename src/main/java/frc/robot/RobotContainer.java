@@ -7,18 +7,16 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.Set;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -27,24 +25,21 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.LED;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
-import frc.robot.commands.autonomous.AutoGeneration.Generator;
 import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
-import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -74,7 +69,7 @@ public class RobotContainer {
   public final Elevator elevator;
   public final Hang hang;
   public final Autonomous autonomous;
-  public final Algae algaeDetector;
+  // public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -99,11 +94,11 @@ public class RobotContainer {
     instance = this;
 
     DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog(), true);
-    // Logger.autoLog("PDH", PDH);
+    var log = DataLogManager.getLog();
+    DriverStation.startDataLog(log, true);
+    logGitProperties(log);
 
     CachedRobotState.init();
-
     AutonChooser.init();
 
     LiveWindow.disableAllTelemetry();
@@ -133,11 +128,11 @@ public class RobotContainer {
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
-    elevator = new Elevator();
+    elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
-    algaeDetector = new Algae();
+    // algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
 
@@ -147,7 +142,8 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece,
+    // autonomous);
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -156,27 +152,6 @@ public class RobotContainer {
     statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
-
-    // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
-
-    // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
-
-    // Pathfinding.ensureInitialized();
-
-    // swerveModuleTest = new SwerveModuleTest();
-
-    // new Talon10Test();
-
-    // steerModuleTest = new SteerModuleTest();
-
-    // test = new DriveModuleTest();
-
-    // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
-
-    // Logger.log("conversionTest/speeds", testSpeeds);
-    // Logger.log("conversionTest/states",
-    // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
-
     Logger.start(Milliseconds.of(20));
   }
 
@@ -187,14 +162,14 @@ public class RobotContainer {
 
     //   // return autoGen.generate();
 
-    //   GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+    //   GeneratedAuto auto = new GeneratedAuto(autonomous,
+    // AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
     //   auto.setup();
 
     //   return auto.getCommand();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     // return autonomous.createAutonomousCommand();
-
 
     // REMOVE MAIN AUTON
     // return Commands.defer(() -> {
@@ -209,17 +184,20 @@ public class RobotContainer {
     // );
 
     // return Commands.sequence(
-        // elevator.calibrate()
-        // manipulator.pivot.calibrate());
+    // elevator.calibrate()
+    // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return swerveDrive.driveSpeeds(
-      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
-      Coordinates.MovementSystem.ROBOT
-    )
-      .withTimeout(2.0);
-
+    return swerveDrive
+        .driveSpeeds(
+            () ->
+                new ChassisSpeeds(
+                    swerveDrive.getConstants().maxDriveSpeed().times(-0.5),
+                    MetersPerSecond.of(0),
+                    RotationsPerSecond.of(0)),
+            Coordinates.MovementSystem.ROBOT)
+        .withTimeout(2.0);
   }
 
   public static double getVoltage() {
@@ -274,9 +252,34 @@ public class RobotContainer {
     // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
     // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    //checks.schedule();
+    // checks.schedule();
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+  }
+
+  private final void logGitProperties(DataLog log) {
+    // Load git properties from classpath
+    Properties gitProps = new Properties();
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream("git.properties")) {
+      if (is != null) {
+        gitProps.load(is);
+
+        // Log all git properties
+        gitProps.forEach(
+            (key, value) -> {
+              String propertyPath = "/Metadata/" + key.toString();
+              StringLogEntry entry = new StringLogEntry(log, propertyPath);
+              entry.append(value.toString());
+
+              // Also print to console for debugging
+              System.out.println(key + ": " + value);
+            });
+      } else {
+        System.err.println("git.properties not found in classpath");
+      }
+    } catch (Exception e) {
+      System.err.println("Failed to load git properties: " + e.getMessage());
+    }
   }
 }
