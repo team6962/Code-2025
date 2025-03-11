@@ -12,10 +12,16 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -27,10 +33,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -247,6 +249,7 @@ public final class Constants {
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
+    public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
@@ -260,8 +263,8 @@ public final class Constants {
     }
 
     public static final class PROFILE {
-      public static final double kP = 25.0;
-      public static final double kS = 1.0;
+      public static final double kP = 4.5;
+      public static final double kS = 2.0;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
