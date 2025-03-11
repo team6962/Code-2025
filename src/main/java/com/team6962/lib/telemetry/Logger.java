@@ -440,6 +440,7 @@ public class Logger extends SubsystemBase {
     else if (object instanceof PowerDistribution) log(key, (PowerDistribution) object);
     else if (object instanceof PowerDistributionFaults) log(key, (PowerDistributionFaults) object);
     else if (object instanceof Supplier) logObjectRecurring(key, (Supplier<?>) object);
+    else if (object instanceof Enum) log(key, object.toString());
     else if (object instanceof Object[]) {
       for (int i = 0; i < ((Object[]) object).length; i++) {
         logObject(key + "/" + i, ((Object[]) object)[i]);
@@ -465,7 +466,7 @@ public class Logger extends SubsystemBase {
             String subpath = key + "/" + field.getName();
 
             try {
-              logObject(key, field.get(object));
+              logObject(subpath, field.get(object));
             } catch (IllegalAccessException accessException) {
               log(subpath, accessException.getMessage());
             }

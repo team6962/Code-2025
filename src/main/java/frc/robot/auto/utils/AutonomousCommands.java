@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.auto.utils;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -22,28 +22,24 @@ import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
+import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.autonomous.CoralSequences.CoralPosition;
-import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 import java.util.Set;
 
-public class Autonomous {
-  private RobotStateController controller;
+public class AutonomousCommands {
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
   private Elevator elevator;
   private PieceCombos pieceCombos;
 
-  public Autonomous(
-      RobotStateController controller,
+  public AutonomousCommands(
       SwerveDrive swerveDrive,
       Manipulator manipulator,
       Elevator elevator,
       PieceCombos pieceCombos) {
-    this.controller = controller;
     this.swerveDrive = swerveDrive;
     this.manipulator = manipulator;
     this.elevator = elevator;
@@ -205,23 +201,21 @@ public class Autonomous {
     return Commands.sequence(
         CommandUtils.selectByMode(
                 pieceCombos.stow(),
-                CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
-            .withDeadline(
-                swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole()))),
+                CommandUtils.printAndWait("Stowing elevator", position.level * 0.5))
+            .withDeadline(swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole))),
         CommandUtils.selectByMode(
-            pieceCombos.coral(position.level()),
-            CommandUtils.printAndWait(
-                "Moving to level " + position.level(), position.level() * 0.5)),
-        swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole())),
+            pieceCombos.coral(position.level),
+            CommandUtils.printAndWait("Moving to level " + position.level, position.level * 0.5)),
+        swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole)),
         CommandUtils.selectByMode(
             manipulator.coral.drop(), CommandUtils.printAndWait("Dropping coral", 0.25)),
         swerveDrive.moveTowards(
-            ReefPositioning.getCoralAlignPose(position.pole()).getTranslation(),
+            ReefPositioning.getCoralAlignPose(position.pole).getTranslation(),
             MetersPerSecond.of(0.5),
             Inches.of(12.0)),
         CommandUtils.selectByMode(
                 pieceCombos.stow(),
-                CommandUtils.printAndWait("Stowing elevator", position.level() * 0.5))
+                CommandUtils.printAndWait("Stowing elevator", position.level * 0.5))
             .raceWith(
                 CommandUtils.selectByMode(
                     Commands.waitUntil(

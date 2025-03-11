@@ -3,23 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import java.io.InputStream;
-import java.util.Properties;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -30,14 +22,17 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.auto.pipeline.AutoGeneration;
+import frc.robot.auto.utils.AutoPaths;
+import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
-import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
@@ -69,8 +64,8 @@ public class RobotContainer {
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
-  public final Autonomous autonomous;
-  // public final Algae algaeDetector;
+  public final AutonomousCommands autonomous;
+  public final Algae algaeDetector;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -78,7 +73,7 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  // private final Generator autoGen;
+  private final AutoGeneration autoGen;
 
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
@@ -95,11 +90,11 @@ public class RobotContainer {
     instance = this;
 
     DataLogManager.start();
-    var log = DataLogManager.getLog();
-    DriverStation.startDataLog(log, true);
-    logGitProperties(log);
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
+    // Logger.autoLog("PDH", PDH);
 
     CachedRobotState.init();
+
     AutonChooser.init();
 
     LiveWindow.disableAllTelemetry();
@@ -129,11 +124,11 @@ public class RobotContainer {
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     // intake = new Intake();
     manipulator = new Manipulator();
-    elevator = Elevator.create();
+    elevator = new Elevator();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
-    autonomous = new Autonomous(stateController, swerveDrive, manipulator, elevator, pieceCombos);
-    // algaeDetector = new Algae();
+    autonomous = new AutonomousCommands(swerveDrive, manipulator, elevator, pieceCombos);
+    algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
 
@@ -143,8 +138,7 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece,
-    // autonomous);
+    autoGen = new AutoGeneration(autonomous, Milliseconds.of(20), Milliseconds.of(5));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -153,6 +147,27 @@ public class RobotContainer {
     statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
+
+    // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
+
+    // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
+
+    // Pathfinding.ensureInitialized();
+
+    // swerveModuleTest = new SwerveModuleTest();
+
+    // new Talon10Test();
+
+    // steerModuleTest = new SteerModuleTest();
+
+    // test = new DriveModuleTest();
+
+    // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
+
+    // Logger.log("conversionTest/speeds", testSpeeds);
+    // Logger.log("conversionTest/states",
+    // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
+
     Logger.start(Milliseconds.of(20));
   }
 
@@ -172,12 +187,7 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    // REMOVE MAIN AUTON
-    // return Commands.defer(() -> {
-    //   System.out.println("Generating autonomous command");
-
-    //   return autoGen.generate();
-    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+    return autoGen.getCommand();
 
     // return Commands.sequence(
     //   // elevator.calibrate()
@@ -189,13 +199,6 @@ public class RobotContainer {
     // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
-
-    return swerveDrive.drive(
-      swerveDrive.robotToField(new ChassisSpeeds(
-        swerveDrive.getConstants().maxDriveSpeed().times(-0.5),
-        MetersPerSecond.of(0),
-        RotationsPerSecond.of(0))
-      )).withTimeout(2.0);
   }
 
   public static double getVoltage() {
@@ -213,9 +216,9 @@ public class RobotContainer {
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
 
-    // double autoWorkTimestamp = Timer.getFPGATimestamp();
-    // autoGen.work();
-    // Logger.log("autoWorkCallTime", Timer.getFPGATimestamp() - autoWorkTimestamp);
+    autoGen.setParameters(
+        AutoPaths.PlanParameters.fromAutoChooser(
+            manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // Pose2d[] poses;
 
@@ -254,30 +257,5 @@ public class RobotContainer {
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
-  }
-
-  private final void logGitProperties(DataLog log) {
-    // Load git properties from classpath
-    Properties gitProps = new Properties();
-    try (InputStream is = getClass().getClassLoader().getResourceAsStream("git.properties")) {
-      if (is != null) {
-        gitProps.load(is);
-
-        // Log all git properties
-        gitProps.forEach(
-            (key, value) -> {
-              String propertyPath = "/Metadata/" + key.toString();
-              StringLogEntry entry = new StringLogEntry(log, propertyPath);
-              entry.append(value.toString());
-
-              // Also print to console for debugging
-              System.out.println(key + ": " + value);
-            });
-      } else {
-        System.err.println("git.properties not found in classpath");
-      }
-    } catch (Exception e) {
-      System.err.println("Failed to load git properties: " + e.getMessage());
-    }
   }
 }

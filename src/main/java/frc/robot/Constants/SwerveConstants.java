@@ -66,7 +66,7 @@ public final class SwerveConstants {
       case COMPETITION -> new Chassis(
           Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
       case TEST -> new Chassis(
-          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(50));
+          Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
     };
   }
 
@@ -102,10 +102,10 @@ public final class SwerveConstants {
         Constants.SWERVE.MODULE_CONFIGS[6]
       };
       case TEST -> new Module[] {
-        Constants.SWERVE.MODULE_CONFIGS[1],
         Constants.SWERVE.MODULE_CONFIGS[0],
-        Constants.SWERVE.MODULE_CONFIGS[2],
-        Constants.SWERVE.MODULE_CONFIGS[3]
+        Constants.SWERVE.MODULE_CONFIGS[3],
+        Constants.SWERVE.MODULE_CONFIGS[1],
+        Constants.SWERVE.MODULE_CONFIGS[2]
       };
     };
   }

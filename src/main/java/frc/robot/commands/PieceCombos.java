@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
@@ -62,11 +60,11 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return safeSubsystems.parallelSafeCommand(elevator.algaeL2(), manipulator.pivot.algaeReef());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL2(), manipulator.pickupReefAlgae());
   }
 
   public Command algaeL3() {
-    return safeSubsystems.parallelSafeCommand(elevator.algaeL3(), manipulator.pivot.algaeReef());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL3(), manipulator.pickupReefAlgae());
   }
 
   public Command algaeBarge() {
@@ -74,15 +72,13 @@ public class PieceCombos {
   }
 
   public Command algaeProcessor() {
-    return safeSubsystems.parallelSafeCommand(
-        elevator.algaeProcessor(), manipulator.placeProcessorAlgae());
+    return manipulator
+        .pivot
+        .safe()
+        .andThen(elevator.algaeProcessor().alongWith(manipulator.pivot.algaeProcessor()));
   }
 
   public Command stow() {
     return manipulator.pivot.safe().andThen(elevator.stow()).andThen(manipulator.stow());
-  }
-
-  public Command safeRaise() {
-    return manipulator.pivot.pivotTo(() -> Degrees.of(-25.0)).andThen(elevator.coralL1());
   }
 }

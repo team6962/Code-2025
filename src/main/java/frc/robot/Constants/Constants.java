@@ -125,57 +125,25 @@ public final class Constants {
   public static final class SWERVE {
     public static final Angle ALL_OFFSET = Degrees.of(135);
 
-    // Offset included
-    // Front left: 0.195 radians
-    // Front right: 3.425 radians = 0.283 radians
-    // Back left: 3.373 radians =
-    // Back right: -2.824 radians
-
-    // (4) Back left: 2.85 radians - 0.5 rots + x = 0 (x = 0.5 rots - 2.85 radians)
-    // (3) Back right: -11.982 radians - 0.25 rots + x = 0 (x = 0.25 rots + 11.982 radians)
-    // (2) Front left: -4.077 radians - 0 rots + x = 0 (x = 4.077 radians)
-    // (1) Front right: 4.292 radians - 0.75 rots + x = 0 (x = -4.292 radians + 0.75 rots)
-
-    // Test Chassis
-    // Front Left: 11,21,31
-    // Front Right: 10,20,30
-    // Back Left: 12,22,32
-    // Back Right: 13,23,33
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module( // Front right
-          14,
-          24,
-          34,
-          Radians.of(-4.292)
-              .minus(Rotations.of(0.25))
-              .minus(
-                  Degrees.of(90))), // Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
-      new SwerveConfig.Module( // Front left
-          15,
-          25,
-          35,
-          Radians.of(
-              4.077)), // Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), //
-      // -0.440
-      new SwerveConfig.Module( // Back right
+      new SwerveConfig.Module(
+          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+      new SwerveConfig.Module(
+          15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
+      new SwerveConfig.Module(
           16,
           26,
           36,
-          Radians.of(11.982)
-              .minus(Rotations.of(0.5))), // Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 *
-      // Math.PI).plus(ALL_OFFSET)), // -1.842
-      new SwerveConfig.Module( // Back left
+          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
+      new SwerveConfig.Module(
           17,
           27,
           37,
-          Rotations.of(-0.75)
-              .minus(Radians.of(2.85))
-              .plus(Degrees.of(90))), // Radians.of(-1.049 - Math.PI + 3.0 / 4.0 *
-      // Math.PI).plus(ALL_OFFSET)), // -1.049
+          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -275,13 +243,24 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING =
-        (4.0 / 1.0)
+        (3.0 / 1.0)
+            * (3.0 / 1.0)
             * (5.0 / 1.0)
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
+
+    public static final NavigableMap<Double, AngleRange> HEIGHT_TO_ANGLE_MAP = new TreeMap<>();
+
+    static {
+      HEIGHT_TO_ANGLE_MAP.put(0.0, new AngleRange(Degrees.of(0.0), Degrees.of(45.0)));
+      HEIGHT_TO_ANGLE_MAP.put(1.0, new AngleRange(Degrees.of(10.0), Degrees.of(40.0)));
+      HEIGHT_TO_ANGLE_MAP.put(2.0, new AngleRange(Degrees.of(20.0), Degrees.of(35.0)));
+      HEIGHT_TO_ANGLE_MAP.put(3.0, new AngleRange(Degrees.of(30.0), Degrees.of(30.0)));
+      HEIGHT_TO_ANGLE_MAP.put(4.0, new AngleRange(Degrees.of(40.0), Degrees.of(25.0)));
+    }
 
     public static final class PROFILE {
       public static final double kP = 4.5;
@@ -290,7 +269,7 @@ public final class Constants {
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(35.5);
-    public static final Distance MAX_HEIGHT = Inches.of(84.5);
+    public static final Distance MAX_HEIGHT = Inches.of(83.6);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
@@ -308,7 +287,7 @@ public final class Constants {
       public static final Distance L3_HEIGHT = Inches.of(64.0);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
-      public static final Distance PROCESSOR_HEIGHT = Inches.of(41.5);
+      public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
     }
   }
 
@@ -331,7 +310,7 @@ public final class Constants {
     public static final Angle MIN_ANGLE = Degrees.of(-135.5);
 
     public static final Angle STOW_ANGLE = Degrees.of(35.0);
-    public static final Angle SAFE_ANGLE = Degrees.of(-30.0);
+    public static final Angle SAFE_ANGLE = Degrees.of(-34.5);
 
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
     public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
@@ -373,7 +352,7 @@ public final class Constants {
       public static final Angle BARGE_ANGLE = Degrees.of(21.90);
       public static final Angle REEF_ANGLE = Degrees.of(-23.0);
       public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
-      public static final Angle PROCESSOR_ANGLE = SAFE_ANGLE; // Degrees.of(0.0);
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(0.0);
     }
   }
 
@@ -383,7 +362,7 @@ public final class Constants {
 
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
-    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
 
     public static final double ALGAE_OUT_SPEED = -1.0;

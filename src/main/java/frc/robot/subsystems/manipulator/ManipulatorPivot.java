@@ -1,4 +1,4 @@
-package frc.robot.subsystems.manipulator.pivot;
+package frc.robot.subsystems.manipulator;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -21,9 +21,9 @@ import frc.robot.util.hardware.motion.PivotController;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class RealManipulatorPivot extends PivotController implements ManipulatorPivot {
+public class ManipulatorPivot extends PivotController {
 
-  public RealManipulatorPivot() {
+  public ManipulatorPivot() {
     super(
         "Manipulator Pivot",
         CAN.MANIPULATOR_PIVOT,
@@ -126,13 +126,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     //     return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_MAX_ANGLE, tolerance);
     // }
     // Logger.log("GRUB", "within" + Timer.getFPGATimestamp());
-    // return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
-
-    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance)
-        .until(
-            () ->
-                getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)
-                    && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
+    return pivotTo(() -> MANIPULATOR_PIVOT.SAFE_ANGLE, tolerance);
   }
 
   public Command safe() {

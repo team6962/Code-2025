@@ -516,14 +516,17 @@ public class SwerveDrive extends SwerveCore {
   // }
 
   public Command moveTowards(Translation2d target, LinearVelocity speed, Distance distance) {
-    Translation2d offset = target.minus(getEstimatedPose().getTranslation());
+    return Commands.defer(
+        () -> {
+          Translation2d offset = target.minus(getEstimatedPose().getTranslation());
 
-    if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
-      return CommandUtils.noneWithRequirements(useTranslation())
-          .withDeadline(Commands.waitTime(distance.div(speed)));
-    } else {
-      return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
-          .withDeadline(Commands.waitTime(distance.div(speed)));
-    }
+          if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
+            return Commands.waitTime(distance.div(speed));
+          } else {
+            return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
+                .withTimeout(distance.div(speed));
+          }
+        },
+        Set.of(useTranslation()));
   }
 }

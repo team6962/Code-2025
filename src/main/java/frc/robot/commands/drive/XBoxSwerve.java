@@ -96,8 +96,10 @@ public class XBoxSwerve extends Command {
 
     double leftTrigger = controller.getLeftTriggerAxis();
     double rightTrigger = controller.getRightTriggerAxis();
-    Translation2d leftStick = new Translation2d(-controller.getLeftY(), -controller.getLeftX());
-    Translation2d rightStick = new Translation2d(controller.getRightX(), -controller.getRightY());
+    Translation2d leftStick =
+        new Translation2d(-controller.getLeftY(), -controller.getLeftX()).times(2);
+    Translation2d rightStick =
+        new Translation2d(controller.getRightX(), -controller.getRightY()).times(2);
 
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));

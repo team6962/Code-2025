@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
+import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
-import frc.robot.commands.autonomous.Autonomous;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
@@ -29,7 +29,7 @@ public class Controls {
       Elevator elevator,
       Manipulator manipulator,
       Hang hang,
-      Autonomous autonomous,
+      AutonomousCommands autonomous,
       PieceCombos pieceCombos) {
 
     // Driver
@@ -44,8 +44,8 @@ public class Controls {
     // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
-    driver.b().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
-    driver.x().whileTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
+    driver.b().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT));
+    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
@@ -63,8 +63,8 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    driver.x().onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.LEFT));
-    driver.b().onTrue(autonomous.alignToClosestPole(Autonomous.PolePattern.RIGHT));
+    driver.x().onTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT));
+    driver.b().onTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT));
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
     // Operator
@@ -78,7 +78,7 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(pieceCombos.safeRaise());
+    operator.a().onTrue(pieceCombos.coralL1());
     operator.b().onTrue(pieceCombos.coralL2());
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(pieceCombos.coralL4());
