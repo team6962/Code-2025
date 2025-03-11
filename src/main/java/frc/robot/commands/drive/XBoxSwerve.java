@@ -8,7 +8,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.swerve.auto.RobotCoordinates;
 import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -100,6 +102,12 @@ public class XBoxSwerve extends Command {
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));
       rightStick = new Translation2d(controller.getRawAxis(2), -controller.getRawAxis(3));
+
+      if (RobotCoordinates.isAllianceInverted().orElse(false)) {
+        leftStick = leftStick.unaryMinus();
+        rightStick = rightStick.unaryMinus();
+      }
+
       leftTrigger = controller.getRawAxis(5);
       rightTrigger = controller.getRawAxis(4);
     }
@@ -134,13 +142,7 @@ public class XBoxSwerve extends Command {
 
     // Zero heading when Y is pressed
     if (controller.getYButton()) {
-      Rotation2d newHeading = new Rotation2d();
-      if (!TEAM_COLOR.IS_BLUE_TEAM.get()) {
-        newHeading = Rotation2d.fromDegrees(180.0);
-      } else if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
-        newHeading = Rotation2d.fromDegrees(0);
-      }
-      swerveDrive.getGyroscope().setHeading(newHeading.getMeasure());
+      swerveDrive.resetHeadingEstimate(Rotation2d.fromDegrees(0));
     }
 
     if (controller.getAButton()) {

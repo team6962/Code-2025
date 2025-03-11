@@ -7,11 +7,14 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.team6962.lib.swerve.SwerveDrive;
-import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,8 +41,6 @@ import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -189,15 +190,12 @@ public class RobotContainer {
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return swerveDrive
-        .driveSpeeds(
-            () ->
-                new ChassisSpeeds(
-                    swerveDrive.getConstants().maxDriveSpeed().times(-0.5),
-                    MetersPerSecond.of(0),
-                    RotationsPerSecond.of(0)),
-            Coordinates.MovementSystem.ROBOT)
-        .withTimeout(2.0);
+    return swerveDrive.drive(
+      swerveDrive.robotToField(new ChassisSpeeds(
+        swerveDrive.getConstants().maxDriveSpeed().times(-0.5),
+        MetersPerSecond.of(0),
+        RotationsPerSecond.of(0))
+      )).withTimeout(2.0);
   }
 
   public static double getVoltage() {
