@@ -6,7 +6,6 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -201,14 +199,14 @@ public final class Constants {
     public static final int ELEVATOR_RIGHT = 3;
     public static final int MANIPULATOR_PIVOT = 4;
     public static final int MANIPULATOR_GRABBER = 5;
-    public static final int MANIPULATOR_FUNNEL = 6; // CONFIRM
+    public static final int MANIPULATOR_FUNNEL = 6;
   }
 
   public static final class DIO {
     public static final int HANG_ENCODER = 0;
-    public static final int MANIPULATOR_ENCODER = 2;
     public static final int CORAL_BEAM_BREAK = 3;
-    public static final int ELEVATOR_CEIL_LIMIT = 0;
+    public static final int MANIPULATOR_ENCODER = 4;
+    public static final int ELEVATOR_CEIL_LIMIT = 2;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
   }
 
@@ -326,7 +324,7 @@ public final class Constants {
     public static final double GEARING = 5 * 5 * 5;
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.512);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.0);
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
@@ -397,13 +395,13 @@ public final class Constants {
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
 
-    public static final double ALGAE_OUT_SPEED = -1.0;
-    public static final double ALGAE_IN_SPEED = 0.5;
-    public static final double ALGAE_HOLD_SPEED = 0.1;
+    public static final double ALGAE_OUT_SPEED = 1.0;
+    public static final double ALGAE_IN_SPEED = -0.5;
+    public static final double ALGAE_HOLD_SPEED = -0.1;
 
     public static final double CORAL_OUT_SPEED = 0.7;
     public static final double CORAL_IN_SPEED = 0.2;
-    public static final double CORAL_ADJUST_SPEED = 0.2;
+    public static final double CORAL_ADJUST_SPEED = -0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
 
@@ -447,23 +445,5 @@ public final class Constants {
     public static final Time AUTO_LENGTH = MeasureMath.time(0, 15);
     public static final Time ENDGAME_LENGTH = MeasureMath.time(0, 20);
     public static final Time ENDGAME_START = MATCH_LENGTH.minus(ENDGAME_LENGTH);
-  }
-
-  public static class AngleRange {
-    private final Angle minAngle;
-    private final Angle maxAngle;
-
-    public AngleRange(Angle minAngle, Angle maxAngle) {
-      this.minAngle = minAngle;
-      this.maxAngle = maxAngle;
-    }
-
-    public Angle getMinAngle() {
-      return minAngle;
-    }
-
-    public Angle getMaxAngle() {
-      return maxAngle;
-    }
   }
 }

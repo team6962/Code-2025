@@ -235,11 +235,11 @@ public class DualLinearActuator extends SubsystemBase {
     if (!zeroed) {
       return true;
     }
-    return !ceilingLimit.get();
+    return ceilingLimit.get();
   }
 
   public boolean triggeredFloorLimit() {
-    if (!floorLimit.get()) {
+    if (floorLimit.get()) {
       zeroed = true;
       return true;
     }
