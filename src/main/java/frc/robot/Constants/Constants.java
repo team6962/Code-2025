@@ -278,11 +278,11 @@ public final class Constants {
             * (3.0 / 2.0)
             / 2.0; // CALCULATE LAST VALUE FOR STAGES IN THE ELEVATOR
     public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
-    public static final Distance TOLERANCE = Inches.of(0.1);
+    public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final class PROFILE {
-      public static final double kP = 4.0;
+      public static final double kP = 4.5;
       public static final double kS = 2.0;
     }
 
