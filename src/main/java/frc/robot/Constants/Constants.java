@@ -208,8 +208,8 @@ public final class Constants {
     public static final int HANG_ENCODER = 0;
     public static final int MANIPULATOR_ENCODER = 2;
     public static final int CORAL_BEAM_BREAK = 3;
-    public static final int ELEVATOR_CEIL_LIMIT = 4;
-    public static final int ELEVATOR_FLOOR_LIMIT = 5;
+    public static final int ELEVATOR_CEIL_LIMIT = 0;
+    public static final int ELEVATOR_FLOOR_LIMIT = 1;
   }
 
   public static final class PWM {
@@ -270,6 +270,18 @@ public final class Constants {
   //       );
   //   }
   // }
+
+  public static final class HANG { // Adjust these as needed
+    public static final Current MAX_CURRENT = Amps.of(80);
+    public static final PIDConstants DEPLOY_PROFILE = new PIDConstants(1.0, 0.0, 0.0);
+
+    public static final Angle ENCODER_OFFSET = Radians.of(0.0);
+
+    public static final Angle HANG_ANGLE = Degrees.of(180.0);
+    public static final Angle SWAP_ANGLE = Degrees.of(80.0);
+    public static final Angle DEPLOY_ANGLE = Degrees.of(0.0);
+    public static final Angle STOW_ANGLE = Degrees.of(110.0);
+  }
 
   public static final class ELEVATOR {
     public static final double GEARING =
@@ -417,10 +429,6 @@ public final class Constants {
     }
   }
 
-  public static final class HANG { // Adjust these as needed
-    public static final double CLIMB_POWER = 0.5;
-    public static final double REVERSE_POWER = 0.5;
-  }
 
   // LED
   public static final class LED {

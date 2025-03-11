@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
-import frc.robot.Constants.Preferences.HANG;
+import frc.robot.Constants.Constants.HANG;
 
 public class RealHang extends SubsystemBase implements Hang {
   protected TalonFX motor;
