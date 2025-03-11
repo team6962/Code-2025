@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -72,7 +71,6 @@ public class XBoxSwerve extends Command {
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_BOOST_POWER)
             .in(RadiansPerSecond);
 
-
     Logger.logNumber("XBoxSwerve/nomVel", () -> NOMINAL_DRIVE_VELOCITY);
     Logger.logNumber("XBoxSwerve/maxVel", () -> MAX_DRIVE_VELOCITY);
   }
@@ -126,7 +124,8 @@ public class XBoxSwerve extends Command {
     if (controller.getPOV() != -1) {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
 
-      Translation2d povVelocity = new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0).rotateBy(povDirection);
+      Translation2d povVelocity =
+          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0).rotateBy(povDirection);
 
       povVelocity = povVelocity.rotateBy(swerveDrive.getEstimatedPose().getRotation());
 
@@ -169,7 +168,9 @@ public class XBoxSwerve extends Command {
     Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
     Logger.logObject("XBoxSwerve/currentTranslateCommand", currentTranslateCommand);
 
-    if (currentTranslateCommand == translateCommand || currentTranslateCommand == null || movingTranslation) {
+    if (currentTranslateCommand == translateCommand
+        || currentTranslateCommand == null
+        || movingTranslation) {
       if (translateCommand != null) translateCommand.cancel();
 
       translateCommand = swerveDrive.drive(velocity);

@@ -7,6 +7,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.swerve.module.SwerveModule;
@@ -16,6 +19,8 @@ import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -93,15 +98,16 @@ public class RobotContainer {
     instance = this;
 
     DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog(), true);
-    // Logger.autoLog("PDH", PDH);
+    var log = DataLogManager.getLog();
+    DriverStation.startDataLog(log, true);
+    logGitProperties(log);
 
     CachedRobotState.init();
     AutonChooser.init();
 
     LiveWindow.disableAllTelemetry();
 
-    DriverStation.silenceJoystickConnectionWarning(false);
+    DriverStation.silenceJoystickConnectionWarning(true);
 
     StatusChecks.Category statusChecks = StatusChecks.under("General");
 
@@ -143,7 +149,8 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos, coralIntake);
 
-    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece, autonomous);
+    // autoGen = new Generator(swerveDrive::getEstimatedPose, manipulator.coral::hasGamePiece,
+    // autonomous);
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -162,14 +169,14 @@ public class RobotContainer {
 
     //   // return autoGen.generate();
 
-    //   GeneratedAuto auto = new GeneratedAuto(autonomous, AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
+    //   GeneratedAuto auto = new GeneratedAuto(autonomous,
+    // AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
     //   auto.setup();
 
     //   return auto.getCommand();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
     // return autonomous.createAutonomousCommand();
-
 
     // REMOVE MAIN AUTON
     // return Commands.defer(() -> {
@@ -184,17 +191,20 @@ public class RobotContainer {
     // );
 
     // return Commands.sequence(
-        // elevator.calibrate()
-        // manipulator.pivot.calibrate());
+    // elevator.calibrate()
+    // manipulator.pivot.calibrate());
     // return hang.stow();
     // return Commands.run(() -> {});
 
-    return swerveDrive.driveSpeeds(
-      () -> new ChassisSpeeds(swerveDrive.getConstants().maxDriveSpeed().times(-0.5), MetersPerSecond.of(0), RotationsPerSecond.of(0)),
-      Coordinates.MovementSystem.ROBOT
-    )
-      .withTimeout(2.0);
-
+    return swerveDrive
+        .driveSpeeds(
+            () ->
+                new ChassisSpeeds(
+                    swerveDrive.getConstants().maxDriveSpeed().times(-0.5),
+                    MetersPerSecond.of(0),
+                    RotationsPerSecond.of(0)),
+            Coordinates.MovementSystem.ROBOT)
+        .withTimeout(2.0);
   }
 
   public static double getVoltage() {
@@ -249,9 +259,34 @@ public class RobotContainer {
     // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
 
     // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    //checks.schedule();
+    // checks.schedule();
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+  }
+
+  private final void logGitProperties(DataLog log) {
+    // Load git properties from classpath
+    Properties gitProps = new Properties();
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream("git.properties")) {
+      if (is != null) {
+        gitProps.load(is);
+
+        // Log all git properties
+        gitProps.forEach(
+            (key, value) -> {
+              String propertyPath = "/Metadata/" + key.toString();
+              StringLogEntry entry = new StringLogEntry(log, propertyPath);
+              entry.append(value.toString());
+
+              // Also print to console for debugging
+              System.out.println(key + ": " + value);
+            });
+      } else {
+        System.err.println("git.properties not found in classpath");
+      }
+    } catch (Exception e) {
+      System.err.println("Failed to load git properties: " + e.getMessage());
+    }
   }
 }

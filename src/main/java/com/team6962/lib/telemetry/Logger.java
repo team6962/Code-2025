@@ -203,7 +203,8 @@ public class Logger extends SubsystemBase {
 
   public static void log(String key, Translation2d value) {
     addUpdate(
-        key, () -> {
+        key,
+        () -> {
           if (value == null) table.getEntry(key).setString("null");
           else table.getEntry(key).setDoubleArray(new double[] {value.getX(), value.getY()});
         });

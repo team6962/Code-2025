@@ -5,15 +5,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -28,6 +21,11 @@ import frc.robot.Constants.Field;
 import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -112,7 +110,6 @@ public class AprilTags extends SubsystemBase {
       } else {
         LimelightHelpers.setLEDMode_ForceOff("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceOff("limelight-btag");
-        
       }
       Logger.log("vision/canChangeHeding", canChangeHeading);
 
@@ -148,9 +145,11 @@ public class AprilTags extends SubsystemBase {
   private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
       Map<String, Pose3d> cameraPoses) {
     return cameraPoses.keySet().stream()
-        .map(name -> CachedRobotState.isRed().orElse(false) ?
-          LimelightHelpers.getBotPoseEstimate_wpiRed(name) :
-          LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
+        .map(
+            name ->
+                CachedRobotState.isRed().orElse(false)
+                    ? LimelightHelpers.getBotPoseEstimate_wpiRed(name)
+                    : LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
         .filter((estimate) -> estimate != null)
         .collect(Collectors.toList());
   }
@@ -227,7 +226,7 @@ public class AprilTags extends SubsystemBase {
   }
 
   public static int findClosestReefTagID() {
-  
+
     int ftagID =
         (int)
             LimelightHelpers.getFiducialID(

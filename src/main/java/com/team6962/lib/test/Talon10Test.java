@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team6962.lib.utils.CTREUtils;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.CachedRobotState;
 

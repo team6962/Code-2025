@@ -36,7 +36,7 @@ public class SimCoralGrabber extends CoralGrabber {
 
   @Override
   public boolean hasGamePiece() {
-      return hasGamePiece;
+    return hasGamePiece;
   }
 
   public void expectGamePiece(boolean value) {

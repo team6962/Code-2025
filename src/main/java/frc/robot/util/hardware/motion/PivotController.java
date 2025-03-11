@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Robot;
@@ -75,7 +74,7 @@ public class PivotController extends SubsystemBase {
       Angle maxAngle,
       Angle tolerance,
       boolean reversed) {
-    
+
     setName(name);
     // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
     // profile = new TrapezoidProfile(
@@ -98,7 +97,8 @@ public class PivotController extends SubsystemBase {
 
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
-    SparkMaxUtil.configurePID(motorConfig, kP, kI, kD, 0.0, minAngle.in(Rotations), maxAngle.in(Rotations), false);
+    SparkMaxUtil.configurePID(
+        motorConfig, kP, kI, kD, 0.0, minAngle.in(Rotations), maxAngle.in(Rotations), false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
@@ -118,7 +118,6 @@ public class PivotController extends SubsystemBase {
             0.0);
     simPID = new PIDController(kP, 0, 0);
 
-    
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
     Logger.logBoolean(this.getName() + "/safety/forward", this::triggeredForwardSafety);
     Logger.logBoolean(this.getName() + "/safety/reverse", this::triggeredReverseSafety);
@@ -131,7 +130,7 @@ public class PivotController extends SubsystemBase {
     Logger.logNumber(this.getName() + "/angle/min", () -> getMinAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/max", () -> getMaxAngle().in(Rotations));
 
-    Logger.logBoolean(this.getName() + "/encoderConnected",  absoluteEncoder::isConnected);
+    Logger.logBoolean(this.getName() + "/encoderConnected", absoluteEncoder::isConnected);
 
     RobotContainer.disabledPeriodic.subscribe(this::disabledPeriodic);
   }
@@ -176,8 +175,7 @@ public class PivotController extends SubsystemBase {
           targetAngle.in(Rotations),
           ControlType.kPosition,
           ClosedLoopSlot.kSlot0,
-          calculateKS(getAbsolutePosition())
-      );
+          calculateKS(getAbsolutePosition()));
     } else {
       motor.stopMotor();
     }
@@ -244,7 +242,8 @@ public class PivotController extends SubsystemBase {
   }
 
   public double calculateKS(Angle currentAngle) {
-    return kS * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
+    return kS
+        * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
   }
 
   private Angle wrapAngle(Angle angle) {

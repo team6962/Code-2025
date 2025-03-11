@@ -2,7 +2,6 @@ package com.team6962.lib.swerve;
 
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -88,14 +87,15 @@ public class SwerveMovement {
     if (speeds != null) {
       Pose2d origin = new Pose2d();
 
-      Pose2d relativeTarget = new Pose2d(
-        speeds.vxMetersPerSecond * 0.02,
-        speeds.vyMetersPerSecond * 0.02,
-        Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * 0.02)
-      );
+      Pose2d relativeTarget =
+          new Pose2d(
+              speeds.vxMetersPerSecond * 0.02,
+              speeds.vyMetersPerSecond * 0.02,
+              Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * 0.02));
 
       Twist2d twist = origin.log(relativeTarget);
-      ChassisSpeeds adjustedSpeeds = new ChassisSpeeds(twist.dx / 0.02, twist.dy / 0.02, twist.dtheta / 0.02);
+      ChassisSpeeds adjustedSpeeds =
+          new ChassisSpeeds(twist.dx / 0.02, twist.dy / 0.02, twist.dtheta / 0.02);
 
       Logger.log("SwerveMovement/normalSpeeds", speeds);
       Logger.log("SwerveMovement/adjustedSpeeds", adjustedSpeeds);

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -56,11 +55,11 @@ public class Controls {
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
-    driver
-        .rightStick()
-        .onTrue(pieceCombos.pickupGroundAlgae());
+    driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
-    driver.leftStick().onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
+    driver
+        .leftStick()
+        .onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -126,19 +125,20 @@ public class Controls {
 
     ShuffleboardTab driverTab = DriverDashboard.getTab();
 
-    driverTab.addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+    driverTab
+        .addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(0, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
-    driverTab.addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+    driverTab
+        .addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(2, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
-      
     // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
     // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
     // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /

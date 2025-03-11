@@ -7,7 +7,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,7 +39,7 @@ public class RealCoralGrabber extends CoralGrabber {
 
   @Override
   public boolean hasGamePiece() {
-      return detectsGamePiece;
+    return detectsGamePiece;
   }
 
   public Command runSpeed(double speed) {
@@ -48,18 +47,16 @@ public class RealCoralGrabber extends CoralGrabber {
   }
 
   public Command intake() {
-    return runSpeed(MANIPULATOR.CORAL_IN_SPEED)
-        .until(this::hasGamePiece);
-        // .andThen(runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED)
-        //   .withDeadline(Commands.waitTime(MANIPULATOR.CORAL_ADJUST_TIME)));
+    return runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasGamePiece);
+    // .andThen(runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED)
+    //   .withDeadline(Commands.waitTime(MANIPULATOR.CORAL_ADJUST_TIME)));
   }
 
   public Command drop() {
     return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
         .withDeadline(
             Commands.sequence(
-                Commands.waitUntil(this::hasGamePiece),
-                Commands.waitUntil(() -> !hasGamePiece())));
+                Commands.waitUntil(this::hasGamePiece), Commands.waitUntil(() -> !hasGamePiece())));
   }
 
   public Command fineControl(double power) {
