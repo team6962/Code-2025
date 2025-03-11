@@ -131,7 +131,7 @@ public class AutoThread extends Thread {
 
     Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/isDone", done);
 
-    if (!done) {
+    if (done) {
       synchronized (this) {
         return commandBuilder.getPathCommand();
       }

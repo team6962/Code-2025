@@ -138,7 +138,10 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new AutoGeneration(autonomous, Milliseconds.of(20), Milliseconds.of(5));
+    autoGen = new AutoGeneration(
+      autonomous, Milliseconds.of(20), Milliseconds.of(5),
+      () -> AutoPaths.PlanParameters.fromAutoChooser(
+        manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
@@ -215,10 +218,6 @@ public class RobotContainer {
 
   public void latePeriodic() {
     swerveDrive.latePeriodic(); // TODO: Uncomment before use
-
-    autoGen.setParameters(
-        AutoPaths.PlanParameters.fromAutoChooser(
-            manipulator.coral.hasGamePiece(), swerveDrive.getEstimatedPose()));
 
     // Pose2d[] poses;
 

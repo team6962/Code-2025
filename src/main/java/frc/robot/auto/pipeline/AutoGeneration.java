@@ -1,6 +1,7 @@
 package frc.robot.auto.pipeline;
 
 import java.lang.Thread.State;
+import java.util.function.Supplier;
 
 import com.team6962.lib.telemetry.Logger;
 
@@ -9,19 +10,23 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
 
-public class AutoGeneration {
+public class AutoGeneration extends SubsystemBase {
   private AutoThread currentThread;
   private AutonomousCommands autonomous;
   private Time workDelay;
   private Time workTime;
+  private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
-  public AutoGeneration(AutonomousCommands autonomous, Time workDelay, Time workTime) {
+  public AutoGeneration(AutonomousCommands autonomous, Time workDelay, Time workTime, 
+      Supplier<AutoPaths.PlanParameters> parametersSupplier) {
     this.autonomous = autonomous;
     this.workDelay = workDelay;
     this.workTime = workTime;
+    this.parametersSupplier = parametersSupplier;
     currentThread = new AutoThread(autonomous, workDelay, workTime);
   }
 
@@ -30,7 +35,12 @@ public class AutoGeneration {
     Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished", currentThread.isFinished());
   }
 
-  public void setParameters(AutoPaths.PlanParameters parameters) {
+  @Override
+  public void periodic() {
+      setParameters(parametersSupplier.get());
+  }
+
+  private void setParameters(AutoPaths.PlanParameters parameters) {
     Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
 
     if (!parameters.constraints.pathExists() || !AutoThread.shouldWorkInBackground()) {
@@ -58,6 +68,8 @@ public class AutoGeneration {
   }
 
   public Command getCommand() {
+    setParameters(parametersSupplier.get());
+
     Command command = currentThread.getCommand(RobotState::isAutonomous);
 
     System.out.print("Auto command: ");

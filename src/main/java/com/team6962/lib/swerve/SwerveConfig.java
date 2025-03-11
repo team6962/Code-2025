@@ -27,6 +27,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.module.SwerveModule.Corner;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -348,9 +349,9 @@ public class SwerveConfig {
   public PathConstraints pathConstraints() {
     return new PathConstraints(
         driveGains.maxAutoSpeed == null ? maxDriveSpeed() : driveGains.maxAutoSpeed,
-        maxLinearAcceleration(Amps.of(60)),
+        maxLinearAcceleration(),
         maxRotationSpeed(),
-        maxAngularAcceleration(Amps.of(60)));
+        maxAngularAcceleration());
   }
 
   public MomentOfInertia momentOfInertia() {
@@ -378,8 +379,8 @@ public class SwerveConfig {
     return rotorFriction;
   }
 
-  public LinearAcceleration maxLinearAcceleration(Current drivenCurrent) {
-    return MeasureMath.min(driveTorque(drivenCurrent).div(wheel.radius()), staticFriction())
+  public LinearAcceleration maxLinearAcceleration() {
+    return MeasureMath.min(driveTorque(driveMotor.maxCurrent()).div(wheel.radius()), staticFriction())
         .div(chassis.mass);
   }
 
@@ -390,13 +391,13 @@ public class SwerveConfig {
             maxDriveSpeed().in(MetersPerSecond) / chassis.driveRadius().in(Meters));
   }
 
-  public AngularAcceleration maxAngularAcceleration(Current driveCurrent) {
+  public AngularAcceleration maxAngularAcceleration() {
     double frictionLimitedRps =
         staticFriction().in(Newtons)
             / chassis.driveRadius().in(Meters)
             / chassis.mass.in(Kilograms);
     double torqueLimitedRps =
-        driveTorque(driveCurrent).in(NewtonMeters)
+        driveTorque(driveMotor.maxCurrent()).in(NewtonMeters)
             / chassis.driveRadius().in(Meters)
             / momentOfInertia().in(KilogramSquareMeters);
 
