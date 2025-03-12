@@ -7,9 +7,9 @@ package frc.robot.subsystems.LEDs;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
 import frc.robot.subsystems.RobotStateController;
-import edu.wpi.first.units.measure.Distance;
-import java.util.Locale;
 
 import com.team6962.lib.telemetry.Logger;
 
@@ -26,9 +24,7 @@ public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static State state = State.DOUBLE_APRILTAG;
-  //private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-  private static final Distance kLedSpacing = Meters.of(1 / 60.0);
+  private static State state = State.DRIVING_AUTO;
 
 
   public static enum State {
@@ -40,6 +36,14 @@ public class LEDs extends SubsystemBase {
     DOUBLE_APRILTAG,
     AIMING
   }
+
+  LEDPattern DRIVING_AUTO = createColor(RED, DARK_RED, 0.0, 50.0);
+  LEDPattern DRIVING_TELEOP = createColor(BLUE, DARK_BLUE, 0.0, 50.0);
+  LEDPattern DISABLED = LEDPattern.solid(MAGENTA);
+  LEDPattern HAS_ALGAE = createColor(CYAN, CYAN, 0.5, 0.0);
+  LEDPattern HAS_CORAL = createColor(MAGENTA, MAGENTA, 0.5, 0.0);
+  LEDPattern DOUBLE_APRILTAG = LEDPattern.rainbow(255, 128).scrollAtRelativeSpeed(Percent.per(Second).of(30));
+  LEDPattern AIMING = createColor(RED, WHITE, 0.0, 50.0);
 
   public static final Color WHITE = new Color(255, 255, 255);
   public static final Color RED = new Color(0,255 , 0);
@@ -59,6 +63,14 @@ public class LEDs extends SubsystemBase {
 
     strip.setData(buffer);
     strip.start();
+
+    if (DriverStation.getAlliance().equals(RED)) {
+      DRIVING_AUTO = createColor(RED, DARK_RED, 0.0, 50.0);
+      DRIVING_TELEOP = createColor(RED, WHITE, 0.0, 50.0);
+    } else {
+      DRIVING_AUTO = createColor(BLUE, DARK_BLUE, 0.0, 50.0);
+      DRIVING_TELEOP = createColor(BLUE, WHITE, 0.0, 50.0);
+    }
   }
 
   public LEDs(RobotStateController stateController2, Object object) {
@@ -95,25 +107,25 @@ public static Command setStateCommand(State state) {
       Logger.log("LED", state.toString());
         switch (state) {
       case DISABLED:
-        apply(LEDPattern.solid(MAGENTA));
+        apply(DISABLED);
         break;
       case DRIVING_AUTO:
-        apply(createColor(WHITE, WHITE, 0.0, 50.0));
+        apply(DRIVING_AUTO);
         break;
       case DRIVING_TELEOP:
-        apply(createColor(RED, WHITE, 0.0, 50.0));
+        apply(DRIVING_TELEOP);
         break;
       case AIMING:
-        apply(createColor(RED, WHITE, 0.0, 50.0));
+        apply(AIMING);
         break;
       case DOUBLE_APRILTAG:
-        apply(LEDPattern.rainbow(255, 128).scrollAtRelativeSpeed(Percent.per(Second).of(30)));
+        apply(DOUBLE_APRILTAG);
         break;
       case HAS_ALGAE:
-        apply(createColor(CYAN, CYAN, 0.5, 0.0));
+        apply(HAS_ALGAE);
         break;
       case HAS_CORAL:
-        apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
+        apply(HAS_CORAL);
         break;
     }
   }
