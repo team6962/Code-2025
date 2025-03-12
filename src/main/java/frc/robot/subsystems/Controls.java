@@ -78,16 +78,22 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(pieceCombos.safeRaise());
+    operator.a().onTrue(pieceCombos.coralL1());
     operator.b().onTrue(pieceCombos.coralL2());
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(pieceCombos.coralL4());
+
+    // operator.a().onTrue(elevator.coralL1());
+    // operator.b().onTrue(elevator.coralL2());
+    // operator.x().onTrue(elevator.coralL3());
+    // operator.y().onTrue(elevator.coralL4());
+
     // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
 
     // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
-    // operator.a().onTrue(manipulator.pivot.coralL23());
-    // operator.b().onTrue(manipulator.pivot.algaeReef());
-    // operator.x().onTrue(manipulator.pivot.coralIntake());
+    // operator.a().onTrue(manipulator.pivot.coralL1());
+    // operator.b().onTrue(manipulator.pivot.coralL23());
+    // operator.x().onTrue(manipulator.pivot.coralL4());
     // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());

@@ -283,13 +283,13 @@ public final class Constants {
 
   public static final class ELEVATOR {
     public static final double GEARING = (7.5);
-    public static final Distance CYCLE_HEIGHT = Inches.of(2.15 * Math.PI); // CALCULATE
+    public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.1);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final class PROFILE {
-      public static final double kP = 16.0;
-      public static final double kS = 2.0;
+      public static final double kP = 4.5;
+      public static final double kS = 0.1;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
@@ -303,7 +303,7 @@ public final class Constants {
       public static final Distance L1_HEIGHT = Inches.of(46.0); //change
       public static final Distance L2_HEIGHT = Inches.of(48.50);
       public static final Distance L3_HEIGHT = Inches.of(56.5);
-      public static final Distance L4_HEIGHT = Inches.of(71.0);
+      public static final Distance L4_HEIGHT = Inches.of(60.0);
       public static final Distance INTAKE_HEIGHT = Inches.of(58.80);
     }
 
@@ -320,7 +320,7 @@ public final class Constants {
     public static final double GEARING = (36.0/16.0)*(4.0)*(4.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
-    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.0);
+    public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.652);
     public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
 
     public static final class PROFILE {
@@ -331,10 +331,10 @@ public final class Constants {
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
-    public static final Angle MAX_ANGLE = Degrees.of(36.0); // RESET TO 40.0
-    public static final Angle MIN_ANGLE = Degrees.of(-135.5);
+    public static final Angle MAX_ANGLE = Degrees.of(0.0); // RESET TO 40.0
+    public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
-    public static final Angle STOW_ANGLE = Degrees.of(38.5);
+    public static final Angle STOW_ANGLE = Degrees.of(-5.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-30.0);
 
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
@@ -343,13 +343,14 @@ public final class Constants {
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
     public static final Angle PID_MAX_ANGLE = Degrees.of(0.0);
-    public static final Angle TOLERANCE = Degrees.of(2.0);
+    public static final Angle TOLERANCE = Degrees.of(1.0);
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
+    public static final boolean INVERTED = true;
     
     public static final class CORAL {
-      public static final Angle L1_ANGLE = Degrees.of(22.5);
-      public static final Angle L23_ANGLE = Degrees.of(-34.5);
-      public static final Angle L4_ANGLE = Degrees.of(-57);
+      public static final Angle L1_ANGLE = Degrees.of(-10.0);
+      public static final Angle L23_ANGLE = Degrees.of(-20.0);
+      public static final Angle L4_ANGLE = Degrees.of(-30.0);
       public static final Angle INTAKE_ANGLE = Degrees.of(-27.992817);
     }
 
@@ -382,9 +383,6 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR {
-    public static final boolean INVERT_ALGAE_LEFT = true;
-    public static final boolean INVERT_ALGAE_RIGHT = true;
-
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
     public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
