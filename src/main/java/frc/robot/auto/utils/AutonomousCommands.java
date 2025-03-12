@@ -101,21 +101,19 @@ public class AutonomousCommands {
   }
 
   public Command intakeCoral(CoralStation station) {
-    Pose2d align = StationPositioning.getNearestAlignPose(station, swerveDrive.getEstimatedPose());
     Pose2d intake =
         StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
 
     return Commands.sequence(
         Commands.parallel(
-            swerveDrive.pathfindTo(align),
+            swerveDrive.pathfindTo(intake),
             CommandUtils.selectByMode(
                 pieceCombos.intakeCoral(),
                 CommandUtils.simulationMessage(
                     "Moving elevator and manipulator for coral intaking", 0.5))),
-        swerveDrive.alignTo(intake),
         CommandUtils.selectByMode(
-            manipulator.runCoralIntake(), CommandUtils.simulationMessage("Intaking coral", 0.25)),
-        Commands.print("Done intaking"));
+          manipulator.funnel.intake(manipulator.grabber), CommandUtils.simulationMessage("Intaking coral", 0.25))
+          .alongWith(swerveDrive.alignTo(intake)));
   }
 
   public Command processAlgae() {
