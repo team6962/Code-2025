@@ -25,8 +25,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Constants;
+import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.autonomous.Autonomous;
@@ -119,7 +120,7 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
+    swerveDrive = new SwerveDrive(SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
     // ledStrip =
     //     new LEDs(
@@ -153,6 +154,8 @@ public class RobotContainer {
 
     refreshButtonEntry.setBoolean(false);
     Logger.start(Milliseconds.of(20));
+
+    Logger.log("isRedAlliance", !TEAM_COLOR.IS_BLUE_TEAM.get());
   }
 
   public Command getAutonomousCommand() {
