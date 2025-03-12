@@ -338,11 +338,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateSteerMotor(Voltage averageBusVoltage, Current maxCurrent) {
+  public Command calibrateSteerMotor(Current maxCurrent) {
     return calibrateMotor(
         "steer",
         getSteerMotor(),
-        averageBusVoltage,
         maxCurrent,
         log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
   }
@@ -354,11 +353,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateDriveMotor(Voltage averageBusVoltage, Current maxCurrent) {
+  public Command calibrateDriveMotor(Current maxCurrent) {
     return calibrateMotor(
         "drive",
         getDriveMotor(),
-        averageBusVoltage,
         maxCurrent,
         log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
   }
@@ -366,7 +364,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Command calibrateMotor(
       String motorName,
       TalonFX motor,
-      Voltage averageBusVoltage,
       Current maxCurrent,
       Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =

@@ -4,6 +4,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -257,6 +258,8 @@ public class RobotContainer {
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+
+    swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
   }
 
   private final void logGitProperties(DataLog log) {
