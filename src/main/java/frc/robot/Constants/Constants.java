@@ -281,6 +281,7 @@ public final class Constants {
     public static final Angle STOW_ANGLE = Degrees.of(110.0);
   }
 
+  public static final boolean SAFETIES_ENABLED = true;
   public static final class ELEVATOR {
     public static final double GEARING = (7.5);
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
