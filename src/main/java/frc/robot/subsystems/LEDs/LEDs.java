@@ -26,40 +26,28 @@ public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static State state = State.AIMING_BARGE;
+  private static State state = State.DOUBLE_APRILTAG;
   //private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private static final Distance kLedSpacing = Meters.of(1 / 60.0);
 
 
   public static enum State {
-    OFF,
     DISABLED,
-    ENABLED,
     DRIVING_AUTO,
-     DRIVING_TELEOP_RED,
-     DRIVING_TELEOP_BLUE,
-     HAS_ALGAE,
-     HAS_CORAL,
-     CAN_SEE_ALGAE,
-     AIMING_PROCESSOR,
-     SCORING_PROCESSOR,
-     AIMING_BARGE,
-     SCORING_BARGE,
-     AIMING_REEF,
-     SCORING_REEF,
-     HANG
+    DRIVING_TELEOP,
+    HAS_ALGAE,
+    HAS_CORAL,
+    DOUBLE_APRILTAG,
+    AIMING
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
   public static final Color RED = new Color(0,255 , 0);
+  public static final Color DARK_RED = new Color(0,50 , 0);
   public static final Color GREEN = new Color(255, 0, 0);
   public static final Color BLUE = new Color(0, 0, 255);
-  public static final Color RSL_ORANGE = new Color(100, 255, 0);
-  public static final Color LIGHT_BLUE = new Color(216, 173, 230);
-  public static final Color YELLOW = new Color(255, 255, 0);
+  public static final Color DARK_BLUE = new Color(0, 0, 50);
   public static final Color CYAN = new Color(255, 0, 255);
-  public static final Color DARK_GREEN = new Color(50, 0, 0);
-  public static final Color PURPLE = new Color(59, 108, 170);
   public static final Color MAGENTA = new Color(0, 255, 255);
   
   public LEDs(RobotStateController stateController) {
@@ -87,15 +75,11 @@ public static Command setStateCommand(State state) {
 
   private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
    
-    LEDPattern m_rainbow = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, ColorFrom, ColorTo);
-    //LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-    LEDPattern blink = LEDPattern.solid(WHITE).blink(Seconds.of(Blink));
-    LEDPattern scroll = m_rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
-    //LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
+    LEDPattern pattern = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, ColorFrom, ColorTo);
+    LEDPattern l_blink = LEDPattern.solid(WHITE).blink(Seconds.of(Blink));
+    LEDPattern l_scroll = pattern.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
 
-    LEDPattern pattern = scroll.mask(blink);
-
-    return pattern;
+    return l_scroll.mask(l_blink);
   }
   
   private static void apply(LEDPattern pattern) {
@@ -110,54 +94,27 @@ public static Command setStateCommand(State state) {
   public void periodic() {
       Logger.log("LED", state.toString());
         switch (state) {
-      case OFF:
-        apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 0.0, 0.0));
-        break;
       case DISABLED:
-        break;
-      case ENABLED:
-        apply(createColor(GREEN, DARK_GREEN, 0.0, 50.0));
+        apply(LEDPattern.solid(MAGENTA));
         break;
       case DRIVING_AUTO:
         apply(createColor(WHITE, WHITE, 0.0, 50.0));
         break;
-      case DRIVING_TELEOP_RED:
-        apply(createColor(RED, YELLOW, 0.0, 50.0));
+      case DRIVING_TELEOP:
+        apply(createColor(RED, WHITE, 0.0, 50.0));
         break;
-      case DRIVING_TELEOP_BLUE:
-        apply(createColor(BLUE, LIGHT_BLUE, 0.0, 50.0));
+      case AIMING:
+        apply(createColor(RED, WHITE, 0.0, 50.0));
+        break;
+      case DOUBLE_APRILTAG:
+        apply(LEDPattern.rainbow(255, 128).scrollAtRelativeSpeed(Percent.per(Second).of(30)));
         break;
       case HAS_ALGAE:
-        apply(createColor(RED, YELLOW, 0.0, 0.0));
+        apply(createColor(CYAN, CYAN, 0.5, 0.0));
         break;
       case HAS_CORAL:
-        break;
-      case CAN_SEE_ALGAE:
-        apply(createColor(CYAN, CYAN, 0.0, 0.0));
-        break;
-      case AIMING_PROCESSOR:
-        apply(createColor(DARK_GREEN, DARK_GREEN, 0.5, 0.0));
-        break;
-      case SCORING_PROCESSOR:
-        apply(createColor(DARK_GREEN, DARK_GREEN, 0.0, 0.0));
-        break;
-      case AIMING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
-        break;
-      case SCORING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 0.0, 0.0));
-        break;
-      case AIMING_REEF:
         apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
         break;
-      case SCORING_REEF:
-        apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
-        break;
-      case HANG:
-        apply(createColor(RSL_ORANGE, RSL_ORANGE, 0.0, 0.0));
-        break;
-
-
     }
   }
 }
