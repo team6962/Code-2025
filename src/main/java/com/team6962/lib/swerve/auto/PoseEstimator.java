@@ -2,9 +2,12 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.function.Supplier;
+
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,7 +24,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.subsystems.vision.AprilTags;
-import java.util.function.Supplier;
 
 /**
  * {@code PoseEstimator} is a class that estimates the pose of a swerve drive robot using a
@@ -31,7 +33,7 @@ import java.util.function.Supplier;
  *
  * <p>Vision data can be added with {@link #addVisionMeasurement(Pose2d, Time)}.
  */
-public class PoseEstimator extends SubsystemBase {
+public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   private SwerveDriveKinematics kinematics;
   private SwerveGyroscope gyroscope;
   private SwerveDrivePoseEstimator poseEstimator;
@@ -84,33 +86,40 @@ public class PoseEstimator extends SubsystemBase {
     lastPositions = modulePositions;
   }
 
-  public SwerveGyroscope getGyroscope() {
-    return gyroscope;
-  }
-
-  public void addVisionMeasurement(Pose2d visionMeasurement, Time timestamp) {
-    poseEstimator.addVisionMeasurement(visionMeasurement, timestamp.in(Seconds));
-
-    Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionMeasurement);
-    Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
-  }
-
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
-        visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
+      RobotCoordinates.visionToFieldPose(visionRobotPoseMeters),
+      timestamp.in(Seconds),
+      visionMeasurementStdDevs
+    );
 
     Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
     Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }
 
-  public void resetPosition(Pose2d expectedPose) {
+  public void resetPoseEstimate(Pose2d expectedFieldPose) {
     poseEstimator.resetPosition(
         RotationUtils.fromAngle(gyroscope.getHeading()),
         modulePositionsSupplier.get(),
-        expectedPose);
+        expectedFieldPose);
   }
 
+  public void addVisionHeading(Rotation2d expectedAbsoluteHeading) {
+    resetPoseEstimate(new Pose2d(
+      getEstimatedPose().getTranslation(),
+      RobotCoordinates.visionToFieldRotation(expectedAbsoluteHeading)
+    ));
+  }
+
+  public void resetHeadingEstimate(Rotation2d expectedFieldHeading) {
+    resetPoseEstimate(new Pose2d(
+      getEstimatedPose().getTranslation(),
+      expectedFieldHeading
+    ));
+  }
+
+  @Override
   public Pose2d getEstimatedPose() {
     return poseEstimator.getEstimatedPosition();
   }
@@ -135,6 +144,6 @@ public class PoseEstimator extends SubsystemBase {
   }
 
   public ChassisSpeeds getEstimatedSpeeds() {
-    return kinematics.toChassisSpeeds(moduleStatesSupplier.get());
+    return robotToField(kinematics.toChassisSpeeds(moduleStatesSupplier.get()));
   }
 }

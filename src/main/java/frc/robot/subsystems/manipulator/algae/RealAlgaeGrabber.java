@@ -156,7 +156,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
     /** Sets the duty cycle of the motor. */
     @Override
     public void setDutyCycle(double dutyCycle) {
-      motor.setVoltage(12.0 * dutyCycle);
+      motor.set(dutyCycle);
     }
 
     /** Returns the output current of the motor. */
@@ -231,6 +231,7 @@ public class RealAlgaeGrabber extends AlgaeGrabber {
 
   public Command drop() {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED)
+        .alongWith(Commands.waitSeconds(0.25))
         .finallyDo(
             () -> {
               expectGamePiece(false);
