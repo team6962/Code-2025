@@ -107,7 +107,6 @@ public class XBoxSwerve extends Command {
 
       if (RobotCoordinates.isAllianceInverted().orElse(false)) {
         leftStick = leftStick.unaryMinus();
-        rightStick = rightStick.unaryMinus();
       }
 
       leftTrigger = controller.getRawAxis(5);
