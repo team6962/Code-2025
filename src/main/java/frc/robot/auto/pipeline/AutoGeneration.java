@@ -4,12 +4,12 @@ import java.lang.Thread.State;
 import java.util.function.Supplier;
 
 import com.team6962.lib.telemetry.Logger;
+import com.team6962.lib.utils.CommandUtils;
 
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
@@ -37,13 +37,13 @@ public class AutoGeneration extends SubsystemBase {
 
   @Override
   public void periodic() {
-      setParameters(parametersSupplier.get());
+      setParameters(parametersSupplier.get(), false);
   }
 
-  private void setParameters(AutoPaths.PlanParameters parameters) {
+  private void setParameters(AutoPaths.PlanParameters parameters, boolean forceWork) {
     Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
 
-    if (!parameters.constraints.pathExists() || !AutoThread.shouldWorkInBackground()) {
+    if (!parameters.constraints.pathExists() || (!AutoThread.shouldWorkInBackground() && !forceWork)) {
       if (currentThread != null && !currentThread.isFinished()) currentThread.interrupt();
 
       return;
@@ -68,7 +68,13 @@ public class AutoGeneration extends SubsystemBase {
   }
 
   public Command getCommand() {
-    setParameters(parametersSupplier.get());
+    AutoPaths.PlanParameters parameters = parametersSupplier.get();
+
+    if (!parameters.constraints.pathExists()) {
+      return CommandUtils.warnWithRequirements("No valid autonomous selected", autonomous.getRequirements());
+    }
+
+    setParameters(parameters, true);
 
     Command command = currentThread.getCommand(RobotState::isAutonomous);
 
@@ -78,7 +84,7 @@ public class AutoGeneration extends SubsystemBase {
     Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
     Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
 
-    if (command == null) return Commands.none();
+    if (command == null) return CommandUtils.warnWithRequirements("Failed to generate autonomous command", autonomous.getRequirements());
     else return command;
   }
 }
