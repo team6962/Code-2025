@@ -1,24 +1,28 @@
 package com.team6962.lib.swerve;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Set;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
-import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -32,15 +36,15 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -70,8 +74,8 @@ public class SwerveDrive extends SwerveCore {
 
     autoBuilder.configure(
         this::getEstimatedPose,
-        this.getPoseEstimator()::resetPosition,
-        this.getPoseEstimator()::getEstimatedSpeeds,
+        this::resetPoseEstimate,
+        () -> fieldToRobot(getEstimatedSpeeds()),
         getConstants().driveGains().pathController(),
         getConstants().pathRobotConfig(),
         () -> false);
@@ -88,29 +92,6 @@ public class SwerveDrive extends SwerveCore {
     FieldObject2d modules = field.getObject("Swerve Modules");
 
     modules.setPoses(getModulePoses());
-  }
-
-  public Pose2d getFuturePose(Time time) {
-    return getPoseEstimator().getFuturePose(time);
-  }
-
-  /**
-   * Returns the estimated chassis speeds of the robot in the given coordinate system.
-   *
-   * @return The estimated speeds as a ChassisSpeeds object
-   */
-  public ChassisSpeeds getEstimatedSpeeds(Coordinates.MovementSystem system) {
-    return convertSpeeds(
-        getPoseEstimator().getEstimatedSpeeds(), Coordinates.MovementSystem.ROBOT, system);
-  }
-
-  /**
-   * Returns the estimated alliance-relative chassis speeds of the robot.
-   *
-   * @return The estimated speeds as a ChassisSpeeds object
-   */
-  public ChassisSpeeds getEstimatedSpeeds() {
-    return getEstimatedSpeeds(Coordinates.MovementSystem.ALLIANCE);
   }
 
   public SubsystemBase useTranslation() {
@@ -146,52 +127,31 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command driveModules(Supplier<SwerveModuleState[]> states) {
-    return Commands.run(() -> setMovement(states.get()), useMotion());
+    return Commands.run(() -> moveRobotRelative(states.get()), useMotion());
   }
 
   public Command drive(SwerveModuleState[] states) {
     return driveModules(() -> states);
   }
 
-  public Command driveSpeeds(Supplier<ChassisSpeeds> speeds, Coordinates.MovementSystem system) {
-    Logger.log("Swerve Drive/driveSpeeds", speeds.get());
-
-    return Commands.run(
-        () -> setMovement(convertSpeeds(speeds.get(), system, Coordinates.MovementSystem.ROBOT)),
-        useMotion());
-  }
-
   public Command driveSpeeds(Supplier<ChassisSpeeds> speeds) {
-    return driveSpeeds(speeds, Coordinates.MovementSystem.ALLIANCE);
+    return Commands.run(() -> moveFieldRelative(speeds.get()), useMotion());
   }
 
   public Command drive(ChassisSpeeds speeds) {
     return driveSpeeds(() -> speeds);
   }
 
-  public Command driveTranslation(
-      Supplier<Translation2d> translation, Coordinates.MovementSystem system) {
-    return Commands.run(
-        () -> {
-          setMovement(convertVelocity(translation.get(), system, Coordinates.MovementSystem.ROBOT));
-        },
-        useTranslation());
-  }
-
   public Command driveTranslation(Supplier<Translation2d> translation) {
-    return driveTranslation(translation, Coordinates.MovementSystem.ALLIANCE);
+    return Commands.run(() -> moveFieldRelative(translation.get()), useTranslation());
   }
 
   public Command drive(Translation2d translation) {
     return driveTranslation(() -> translation);
   }
 
-  public Command driveRotation(Supplier<Rotation2d> rotation, Coordinates.MovementSystem system) {
-    return Commands.run(() -> setMovement(rotation.get()), useRotation());
-  }
-
   public Command driveRotation(Supplier<Rotation2d> rotation) {
-    return driveRotation(rotation, Coordinates.MovementSystem.ALLIANCE);
+    return Commands.run(() -> moveRobotRelative(rotation.get()), useRotation());
   }
 
   public Command drive(Rotation2d rotation) {
@@ -201,11 +161,9 @@ public class SwerveDrive extends SwerveCore {
   private class HeadingCommand extends Command {
     private PIDController pid;
     private Supplier<Rotation2d> heading;
-    private Coordinates.PoseSystem system;
 
-    public HeadingCommand(Supplier<Rotation2d> heading, Coordinates.PoseSystem system) {
+    public HeadingCommand(Supplier<Rotation2d> heading) {
       this.heading = heading;
-      this.system = system;
 
       addRequirements(useRotation());
     }
@@ -220,8 +178,7 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void execute() {
-      Rotation2d targetHeading =
-          convertAngle(heading.get(), system, Coordinates.PoseSystem.ALLIANCE);
+      Rotation2d targetHeading = heading.get();
       Rotation2d currentHeading = getEstimatedPose().getRotation();
 
       if (targetHeading == null) return;
@@ -230,7 +187,7 @@ public class SwerveDrive extends SwerveCore {
 
       output = MathUtil.clamp(output, -1, 1);
 
-      setMovement(MeasureMath.fromMeasure(getAngularDriveVelocity(output)));
+      moveRobotRelative(getAngularDriveVelocity(output));
     }
 
     @Override
@@ -239,12 +196,8 @@ public class SwerveDrive extends SwerveCore {
     }
   }
 
-  public Command driveHeading(Supplier<Rotation2d> heading, Coordinates.PoseSystem system) {
-    return new HeadingCommand(heading, system);
-  }
-
   public Command driveHeading(Supplier<Rotation2d> heading) {
-    return driveHeading(heading, Coordinates.PoseSystem.ALLIANCE);
+    return new HeadingCommand(heading);
   }
 
   public Command driveHeading(Rotation2d heading) {
@@ -285,7 +238,7 @@ public class SwerveDrive extends SwerveCore {
   public Command pathfindTo(Pose2d target) {
     return Commands.defer(
         () -> {
-          autoBuilder.setOutput(speeds -> setMovement(speeds));
+          autoBuilder.setOutput(this::moveRobotRelative);
 
           return CommandUtils.withRequirements(
               AutoBuilder.pathfindToPose(target, getConstants().pathConstraints()), useMotion());
@@ -294,7 +247,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command pathfindTo(Pose2d target, LinearVelocity goalEndVelocity) {
-    autoBuilder.setOutput(speeds -> setMovement(speeds));
+    autoBuilder.setOutput(this::moveRobotRelative);
 
     return CommandUtils.withRequirements(
         AutoBuilder.pathfindToPose(target, getConstants().pathConstraints(), goalEndVelocity),
@@ -302,7 +255,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command pathfindTo(Translation2d target) {
-    autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
+    autoBuilder.setOutput(this::moveRobotRelative);
 
     return CommandUtils.withRequirements(
         AutoBuilder.pathfindToPose(
@@ -311,7 +264,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command pathfindTo(Translation2d target, LinearVelocity goalEndVelocity) {
-    autoBuilder.setOutput(speeds -> setMovement(KinematicsUtils.getTranslation(speeds)));
+    autoBuilder.setOutput(this::moveRobotRelative);
 
     return CommandUtils.withRequirements(
         AutoBuilder.pathfindToPose(
@@ -388,7 +341,7 @@ public class SwerveDrive extends SwerveCore {
               new TrapezoidProfile.Constraints(
                   getConstants().maxRotationSpeed().in(RadiansPerSecond),
                   getConstants()
-                      .maxAngularAcceleration(Amps.of(60))
+                      .maxAngularAcceleration()
                       .in(RadiansPerSecondPerSecond)));
       rotationPID.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -492,9 +445,6 @@ public class SwerveDrive extends SwerveCore {
         Translation2d translationOutput = new Translation2d(0, 0);
         translationOutput = getTranslationOutput(translationError);
         speeds = new ChassisSpeeds(translationOutput.getX(), translationOutput.getY(), 0);
-
-        Logger.log("AlignCommand/absoluteSpeeds", speeds);
-        speeds = absoluteToRobotSpeeds(speeds);
       } else if (state == State.ROTATING) {
         Rotation2d rotationOutput = getRotationOutput(rotationError);
         speeds = new ChassisSpeeds(0, 0, rotationOutput.getRadians());
@@ -502,7 +452,7 @@ public class SwerveDrive extends SwerveCore {
         speeds = new ChassisSpeeds(0, 0, 0);
       }
 
-      setMovement(speeds);
+      moveFieldRelative(speeds);
     }
 
     @Override
@@ -570,14 +520,154 @@ public class SwerveDrive extends SwerveCore {
   // }
 
   public Command moveTowards(Translation2d target, LinearVelocity speed, Distance distance) {
-    Translation2d offset = target.minus(getEstimatedPose().getTranslation());
+    return Commands.defer(
+        () -> {
+          Translation2d offset = target.minus(getEstimatedPose().getTranslation());
 
-    if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
-      return CommandUtils.noneWithRequirements(useTranslation())
-          .withDeadline(Commands.waitTime(distance.div(speed)));
-    } else {
-      return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
-          .withDeadline(Commands.waitTime(distance.div(speed)));
+          if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
+            return Commands.waitTime(distance.div(speed));
+          } else {
+            return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
+                .withTimeout(distance.div(speed));
+          }
+        },
+        Set.of(useTranslation()));
+  }
+
+  public Command driveTrapezoidalTo(
+    Translation2d target, LinearVelocity maxVelocity,
+    LinearAcceleration maxAcceleration, LinearVelocity targetEndVelocity,
+    Distance positionTolerance, boolean timeLimit
+  ) {
+    return new TrapezoidalTranslationCommand(
+      () -> target, maxVelocity, maxAcceleration,
+      targetEndVelocity, positionTolerance, timeLimit
+    );
+  }
+
+  public TrapezoidalTranslationCommand driveTrapezoidalTo(
+      Translation2d target
+  ) {
+    SwerveConfig config = getConstants();
+
+    return new TrapezoidalTranslationCommand(
+      () -> target,
+      config.maxDriveSpeed(),
+      config.maxLinearAcceleration(),
+      config.maxDriveSpeed(),
+      Inches.of(4),
+      true
+    );
+  }
+
+  public class TrapezoidalTranslationCommand extends Command {
+    private Supplier<Translation2d> targetSupplier;
+    private Translation2d targetTranslation;
+
+    public LinearVelocity maxVelocity;
+    public LinearAcceleration maxAcceleration;
+
+    public Distance positionTolerance;
+    public LinearVelocity targetEndVelocity;
+
+    public boolean timeLimit;
+
+    private TrapezoidProfile profile;
+    private Timer timer = new Timer();
+    private Time endTime;
+
+    public TrapezoidalTranslationCommand(
+      Supplier<Translation2d> targetSupplier,
+      LinearVelocity maxVelocity, LinearAcceleration maxAcceleration,
+      LinearVelocity targetEndVelocity, Distance positionTolerance,
+      boolean timeLimit
+    ) {
+      this.targetSupplier = targetSupplier;
+      this.maxVelocity = maxVelocity;
+      this.maxAcceleration = maxAcceleration;
+      this.positionTolerance = positionTolerance;
+      this.targetEndVelocity = targetEndVelocity;
+      this.timeLimit = timeLimit;
+
+      addRequirements(useTranslation());
+    }
+
+    public TrapezoidalTranslationCommand withMaxVelocity(LinearVelocity maxVelocity) {
+      this.maxVelocity = maxVelocity;
+      return this;
+    }
+
+    public TrapezoidalTranslationCommand withMaxAcceleration(LinearAcceleration maxAcceleration) {
+      this.maxAcceleration = maxAcceleration;
+      return this;
+    }
+
+    public TrapezoidalTranslationCommand withPositionTolerance(Distance positionTolerance) {
+      this.positionTolerance = positionTolerance;
+      return this;
+    }
+
+    public TrapezoidalTranslationCommand withTargetEndVelocity(LinearVelocity targetEndVelocity) {
+      this.targetEndVelocity = targetEndVelocity;
+      return this;
+    }
+
+    public TrapezoidalTranslationCommand withTimeLimit(boolean timeLimit) {
+      this.timeLimit = timeLimit;
+      return this;
+    }
+
+    @Override
+    public void initialize() {
+      this.profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+        maxVelocity.in(MetersPerSecond),
+        maxAcceleration.in(MetersPerSecondPerSecond)
+      ));
+
+      targetTranslation = targetSupplier.get();
+
+      timer.restart();
+
+      endTime = null;
+    }
+
+    @Override
+    public void execute() {
+      Translation2d currentTranslation = getEstimatedPose().getTranslation();
+      Translation2d error = targetTranslation.minus(currentTranslation);
+      Translation2d errorUnit = error.div(error.getNorm());
+
+      double currentScalarDistance = error.getNorm();
+      double targetScalarDistance = 0;
+
+      Translation2d currentSpeeds = KinematicsUtils.getTranslation(getEstimatedSpeeds());
+      double currentScalarSpeed = currentSpeeds.getX() * errorUnit.getX() + currentSpeeds.getY() * errorUnit.getY();
+
+      TrapezoidProfile.State state = profile.calculate(timer.get(), new TrapezoidProfile.State(
+        currentScalarDistance,
+        -currentScalarSpeed
+      ), new TrapezoidProfile.State(
+        targetScalarDistance,
+        -targetEndVelocity.in(MetersPerSecond)
+      ));
+
+      if (timeLimit && endTime == null) {
+        endTime = Seconds.of(profile.timeLeftUntil(0));
+      }
+
+      Logger.log("Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
+      Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
+      Logger.log("Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
+      Logger.log("Swerve Drive/Trapezoidal Translation Command/targetSpeed", -targetEndVelocity.in(MetersPerSecond));
+      Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
+
+      moveFieldRelative(errorUnit.times(-state.velocity));
+    }
+
+    @Override
+    public boolean isFinished() {
+      return ((endTime != null) && Seconds.of(timer.get()).gt(endTime)) ||
+        getEstimatedPose().getTranslation().getDistance(targetTranslation) < positionTolerance.in(Meters);
     }
   }
 }

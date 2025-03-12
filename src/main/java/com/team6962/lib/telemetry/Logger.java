@@ -8,9 +8,17 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.studica.frc.AHRS;
+
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,12 +45,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
@@ -440,6 +443,7 @@ public class Logger extends SubsystemBase {
     else if (object instanceof PowerDistribution) log(key, (PowerDistribution) object);
     else if (object instanceof PowerDistributionFaults) log(key, (PowerDistributionFaults) object);
     else if (object instanceof Supplier) logObjectRecurring(key, (Supplier<?>) object);
+    else if (object instanceof Enum) log(key, object.toString());
     else if (object instanceof Object[]) {
       for (int i = 0; i < ((Object[]) object).length; i++) {
         logObject(key + "/" + i, ((Object[]) object)[i]);
@@ -465,7 +469,7 @@ public class Logger extends SubsystemBase {
             String subpath = key + "/" + field.getName();
 
             try {
-              logObject(key, field.get(object));
+              logObject(subpath, field.get(object));
             } catch (IllegalAccessException accessException) {
               log(subpath, accessException.getMessage());
             }
@@ -475,5 +479,14 @@ public class Logger extends SubsystemBase {
         }
       }
     }
+  }
+
+  public static void logEnabledSystems() {
+    log("Enabled Systems/Dashboard", ENABLED_SYSTEMS.DASHBOARD);
+    log("Enabled Systems/Drive", ENABLED_SYSTEMS.DRIVE);
+    log("Enabled Systems/Elevator", ENABLED_SYSTEMS.ELEVATOR);
+    log("Enabled Systems/Funnel", ENABLED_SYSTEMS.FUNNEL);
+    log("Enabled Systems/Hang", ENABLED_SYSTEMS.HANG);
+    log("Enabled Systems/Manipulator", ENABLED_SYSTEMS.MANIPULATOR);
   }
 }
