@@ -189,7 +189,7 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public Command down() {
-    return move(-0.2);
+    return move(-0.1);
   }
 
   public boolean unsafeMoveDown() {

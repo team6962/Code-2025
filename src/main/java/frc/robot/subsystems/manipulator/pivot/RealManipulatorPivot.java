@@ -37,7 +37,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
         MANIPULATOR_PIVOT.MIN_ANGLE,
         MANIPULATOR_PIVOT.MAX_ANGLE,
         MANIPULATOR_PIVOT.TOLERANCE,
-        false);
+        MANIPULATOR_PIVOT.INVERTED);
     // setDefaultCommand(stow());
 
     // setDefaultCommand(pivotTo(() -> stopAngle));
