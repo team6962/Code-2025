@@ -51,16 +51,16 @@ public class LEDs extends SubsystemBase {
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
-  public static final Color RED = new Color(255, 0, 0);
-  public static final Color GREEN = new Color(0, 255, 0);
-  public static final Color BLUE = new Color(0, 20, 255);
-  public static final Color RSL_ORANGE = new Color(255, 100, 0);
-  public static final Color LIGHT_BLUE = new Color(173, 216, 230);
+  public static final Color RED = new Color(0,255 , 0);
+  public static final Color GREEN = new Color(255, 0, 0);
+  public static final Color BLUE = new Color(0, 0, 255);
+  public static final Color RSL_ORANGE = new Color(100, 255, 0);
+  public static final Color LIGHT_BLUE = new Color(216, 173, 230);
   public static final Color YELLOW = new Color(255, 255, 0);
-  public static final Color CYAN = new Color(0, 255, 255);
-  public static final Color DARK_GREEN = new Color(0, 100, 0);
-  public static final Color PURPLE = new Color(108, 59, 170);
-  public static final Color MAGENTA = new Color(255, 0, 255);
+  public static final Color CYAN = new Color(255, 0, 255);
+  public static final Color DARK_GREEN = new Color(50, 0, 0);
+  public static final Color PURPLE = new Color(59, 108, 170);
+  public static final Color MAGENTA = new Color(0, 255, 255);
   
   public LEDs(RobotStateController stateController) {
     this.stateController = stateController;
@@ -86,15 +86,16 @@ public static Command setStateCommand(State state) {
   }
 
   private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
+   
     LEDPattern m_rainbow = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, ColorFrom, ColorTo);
     //LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-    LEDPattern blink = m_rainbow.blink(Seconds.of(Blink));
+    LEDPattern blink = LEDPattern.solid(WHITE).blink(Seconds.of(Blink));
     LEDPattern scroll = m_rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
     //LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
 
-    LEDPattern pattern = blink.overlayOn(scroll);
+    LEDPattern pattern = scroll.mask(blink);
 
-    return scroll;
+    return pattern;
   }
   
   private static void apply(LEDPattern pattern) {
@@ -115,7 +116,7 @@ public static Command setStateCommand(State state) {
       case DISABLED:
         break;
       case ENABLED:
-        apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 0.0, 0.0));
+        apply(createColor(GREEN, DARK_GREEN, 0.0, 50.0));
         break;
       case DRIVING_AUTO:
         apply(createColor(WHITE, WHITE, 0.0, 50.0));
@@ -124,7 +125,7 @@ public static Command setStateCommand(State state) {
         apply(createColor(RED, YELLOW, 0.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
-        apply(createColor(BLUE, CYAN, 0.0, 50.0));
+        apply(createColor(BLUE, LIGHT_BLUE, 0.0, 50.0));
         break;
       case HAS_ALGAE:
         apply(createColor(RED, YELLOW, 0.0, 0.0));
@@ -141,7 +142,7 @@ public static Command setStateCommand(State state) {
         apply(createColor(DARK_GREEN, DARK_GREEN, 0.0, 0.0));
         break;
       case AIMING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 1.0, 0.0));
+        apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
         break;
       case SCORING_BARGE:
         apply(createColor(YELLOW, YELLOW, 0.0, 0.0));
