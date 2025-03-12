@@ -1086,57 +1086,6 @@
             }
           },
           {
-            "title": "hasCoral",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Logs/Coral Grabber/hasGamePiece",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "hasAlgae",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Logs/Algae Grabber/hasGamePiece",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "isRedAllianceCode",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Logs/isRedAlliance",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "IsRedAllianceFMS",
             "x": 256.0,
             "y": 0.0,
@@ -1193,6 +1142,57 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/StatusChecks/General/Joystick 1",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "hasCoral",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Grabber/hasCoral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "hasAlgae",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Grabber/hasAlgae",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Has Coral",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Driver Dashboard/Has Coral",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,

@@ -38,7 +38,7 @@ public class DualLinearActuator extends SubsystemBase {
 
   private Debouncer debouncer = new Debouncer(0.1);
 
-  private Distance cycleHeight;
+  private Distance spoolHeight;
 
   private boolean zeroed = false;
 
@@ -52,7 +52,7 @@ public class DualLinearActuator extends SubsystemBase {
    * @param kP The proportional gain for the PID controller.
    * @param kS The static gain for the PID controller.
    * @param sensorToMotorRatio The ratio of the sensor to motor.
-   * @param mechanismToSensor The ratio of the mechanism to sensor.
+   * @param spoolHeight The ratio of the mechanism to sensor.
    * @param baseHeight The base height of the mechanism.
    * @param minHeight The minimum height the mechanism can achieve.
    * @param maxHeight The maximum height the mechanism can achieve.
@@ -67,7 +67,7 @@ public class DualLinearActuator extends SubsystemBase {
       double kP,
       double kS,
       double gearing,
-      Distance mechanismToSensor,
+      Distance spoolHeight,
       Distance baseHeight,
       Distance minHeight,
       Distance maxHeight,
@@ -79,7 +79,7 @@ public class DualLinearActuator extends SubsystemBase {
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
     this.tolerance = tolerance;
-    this.cycleHeight = mechanismToSensor;
+    this.spoolHeight = spoolHeight;
 
     leftMotor = new SparkMax(leftCAN, MotorType.kBrushless);
     rightMotor = new SparkMax(rightCAN, MotorType.kBrushless);
@@ -90,14 +90,14 @@ public class DualLinearActuator extends SubsystemBase {
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
         motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
-    SparkMaxUtil.configureEncoder(motorConfig, cycleHeight.in(Meters) / gearing);
+    SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
         motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
@@ -235,11 +235,11 @@ public class DualLinearActuator extends SubsystemBase {
     if (!zeroed) {
       return true;
     }
-    return !ceilingLimit.get();
+    return ceilingLimit.get();
   }
 
   public boolean triggeredFloorLimit() {
-    if (!floorLimit.get()) {
+    if (floorLimit.get()) {
       zeroed = true;
       return true;
     }

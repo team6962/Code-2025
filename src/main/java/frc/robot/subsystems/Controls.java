@@ -105,10 +105,10 @@ public class Controls {
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    operator.rightBumper().whileTrue(manipulator.coral.backwards());
-    operator.rightTrigger().whileTrue(manipulator.coral.magicButton().andThen(rumbleBoth()));
-    operator.leftBumper().whileTrue(manipulator.algae.intake().andThen(rumbleBoth()));
-    operator.leftTrigger().whileTrue(manipulator.algae.drop());
+    operator.rightBumper().whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth()));
+    operator.rightTrigger().whileTrue(manipulator.grabber.dropCoral().andThen(rumbleBoth()));
+    operator.leftBumper().whileTrue(manipulator.grabber.intakeAlgae().andThen(rumbleBoth()));
+    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae());
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
@@ -120,14 +120,14 @@ public class Controls {
     ShuffleboardTab driverTab = DriverDashboard.getTab();
 
     driverTab
-        .addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+        .addBoolean("Has Coral", () -> manipulator.grabber.hasCoral())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(0, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
     driverTab
-        .addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+        .addBoolean("Has Algae", () -> manipulator.grabber.hasAlgae())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(2, 0)
         .withSize(2, 2)

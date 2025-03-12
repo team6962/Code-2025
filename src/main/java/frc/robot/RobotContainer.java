@@ -65,7 +65,6 @@ public class RobotContainer {
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
   // public final LEDs ledStrip;
-  // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
@@ -127,7 +126,6 @@ public class RobotContainer {
     //         stateController,
     //         () -> 1.0 +
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
-    // intake = new Intake();
     manipulator = new Manipulator();
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);

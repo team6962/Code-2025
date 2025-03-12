@@ -86,7 +86,14 @@ public class PivotController extends SubsystemBase {
     encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
 
+    // motor.getAbsoluteEncoder();
+
     absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, absolutePositionOffset);
+
+    // absoluteEncoder = motor.getAbsoluteEncoder();
+    // motorConfig.absoluteEncoder.zeroCentered(false);
+    // motorConfig.absoluteEncoder.zeroOffset(absolutePositionOffset);
+
 
     this.kS = kS;
     this.minAngle = minAngle;
