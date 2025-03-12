@@ -125,7 +125,7 @@ public class RobotContainer {
     //         () -> 1.0 +
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
     manipulator = new Manipulator();
-    elevator = new Elevator();
+    elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new AutonomousCommands(swerveDrive, manipulator, elevator, pieceCombos);
