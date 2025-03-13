@@ -205,10 +205,10 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int HANG_ENCODER = 0;
+    public static final int HANG_ENCODER = 10;
+    public static final int CORAL_BEAM_BREAK = 0;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
     public static final int ELEVATOR_CEIL_LIMIT = 2;
-    public static final int CORAL_BEAM_BREAK = 3;
     public static final int MANIPULATOR_ENCODER = 4;
   }
 
@@ -285,13 +285,13 @@ public final class Constants {
 
   public static final boolean SAFETIES_ENABLED = true;
   public static final class ELEVATOR {
-    public static final double GEARING = (7.5);
+    public static final double GEARING = 6.3;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final class PROFILE {
-      public static final double kP = 4.5;
+      public static final double kP = 9.0;
       public static final double kS = 0.1;
     }
 
