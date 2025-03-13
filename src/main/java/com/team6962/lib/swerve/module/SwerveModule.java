@@ -224,7 +224,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    *
    * @return The current {@link SwerveModulePosition}
    */
-  public Distance getDrivePositionIn() {
+  public Distance getDrivePosition() {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(drivePositionIn));
   }
 
@@ -233,7 +233,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    *
    * @return The current {@link LinearVelocity}
    */
-  public LinearVelocity getDriveSpeedIn() {
+  public LinearVelocity getDriveSpeed() {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveSpeedIn));
   }
 
@@ -242,7 +242,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    *
    * @return The current {@link Angle}
    */
-  public Angle getSteerAngleIn() {
+  public Angle getSteerAngle() {
     return CTREUtils.unwrap(steerAngleIn);
   }
 
@@ -251,7 +251,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    *
    * @return The current {@link AngularVelocity}
    */
-  public AngularVelocity getSteerVelocityIn() {
+  public AngularVelocity getSteerVelocity() {
     return CTREUtils.unwrap(steerVelocityIn);
   }
 
@@ -298,7 +298,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
       isNeutralCoast = false;
     }
 
-    targetState = optimizeStateForTalon(targetState, getSteerAngleIn());
+    targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
     if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
       targetState = new SwerveModuleState(0, targetState.angle);
@@ -319,7 +319,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @return The measured {@link SwerveModuleState}
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveSpeedIn(), new Rotation2d(getSteerAngleIn()));
+    return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
   }
 
   /**
@@ -328,7 +328,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @return The measured {@link SwerveModulePosition}
    */
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(getDrivePositionIn(), new Rotation2d(getSteerAngleIn()));
+    return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerAngle()));
   }
 
   /**
@@ -339,7 +339,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   public Transform2d getRelativeTransform() {
     return new Transform2d(
         calculateRelativeTranslation(corner.index, constants.chassis()),
-        new Rotation2d(getSteerAngleIn()));
+        new Rotation2d(getSteerAngle()));
   }
 
   /**
@@ -354,7 +354,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         "steer",
         getSteerMotor(),
         maxCurrent,
-        log -> log.angularPosition(getSteerAngleIn()).angularVelocity(getSteerVelocityIn()));
+        log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
   }
 
   /**
@@ -369,7 +369,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         "drive",
         getDriveMotor(),
         maxCurrent,
-        log -> log.linearPosition(getDrivePositionIn()).linearVelocity(getDriveSpeedIn()));
+        log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
   }
 
   private Command calibrateMotor(
