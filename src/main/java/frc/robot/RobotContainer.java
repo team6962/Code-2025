@@ -3,9 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
+
+import java.io.InputStream;
+import java.util.Properties;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
@@ -14,6 +16,8 @@ import com.team6962.lib.telemetry.StatusChecks;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -22,8 +26,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.auto.pipeline.AutoGeneration;
 import frc.robot.auto.utils.AutoPaths;
@@ -91,8 +95,9 @@ public class RobotContainer {
   public RobotContainer() {
     instance = this;
 
-    DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog(), true);
+    var log = DataLogManager.getLog();
+    DriverStation.startDataLog(log, true);
+    logGitProperties(log);
     // Logger.autoLog("PDH", PDH);
 
     CachedRobotState.init();
@@ -263,5 +268,30 @@ public class RobotContainer {
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
 
     swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
+  }
+
+  private final void logGitProperties(DataLog log) {
+    // Load git properties from classpath
+    Properties gitProps = new Properties();
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream("git.properties")) {
+      if (is != null) {
+        gitProps.load(is);
+
+        // Log all git properties
+        gitProps.forEach(
+            (key, value) -> {
+              String propertyPath = "/Metadata/" + key.toString();
+              StringLogEntry entry = new StringLogEntry(log, propertyPath);
+              entry.append(value.toString());
+
+              // Also print to console for debugging
+              System.out.println(key + ": " + value);
+            });
+      } else {
+        System.err.println("git.properties not found in classpath");
+      }
+    } catch (Exception e) {
+      System.err.println("Failed to load git properties: " + e.getMessage());
+    }
   }
 }

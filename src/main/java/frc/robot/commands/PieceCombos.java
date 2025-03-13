@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -60,11 +61,11 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return safeSubsystems.parallelSafeCommand(elevator.algaeL2(), manipulator.pickupReefAlgae());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL2(), manipulator.pivot.algaeReef());
   }
 
   public Command algaeL3() {
-    return safeSubsystems.parallelSafeCommand(elevator.algaeL3(), manipulator.pickupReefAlgae());
+    return safeSubsystems.parallelSafeCommand(elevator.algaeL3(), manipulator.pivot.algaeReef());
   }
 
   public Command algaeBarge() {
