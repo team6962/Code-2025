@@ -4,8 +4,12 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Consumer;
+
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -26,6 +30,7 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -37,7 +42,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,7 +49,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Constants.CANBUS;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
-import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -64,6 +67,16 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private SwerveConfig constants;
   private SwerveModule.Corner corner;
 
+  private StatusSignal<Angle> drivePositionIn;
+  private StatusSignal<Angle> steerAngleIn;
+  private StatusSignal<AngularVelocity> driveSpeedIn;
+  private StatusSignal<AngularVelocity> steerVelocityIn;
+  private StatusSignal<Current> driveCurrentIn;
+  private StatusSignal<Current> steerCurrentIn;
+
+  private VelocityVoltage driveSpeedOut = new VelocityVoltage(RotationsPerSecond.of(0));
+  private PositionVoltage steerAngleOut = new PositionVoltage(Rotations.of(0));
+
   private boolean isNeutralCoast = false;
   protected boolean isCalibrating = false;
 
@@ -71,21 +84,14 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     this.constants = config;
     this.corner = corner;
 
-    // Get this swerve module's configuration
     SwerveConfig.Module moduleConstants = getModuleConstants();
 
-    // Connect to the module's drive motor
     driveMotor = new TalonFX(moduleConstants.driveMotorId(), CANBUS.DRIVETRAIN_CANBUS);
 
-    // Get the 'configurator' for the drive motor, which allows us to
-    // configure the motor's settings
     TalonFXConfigurator driveConfig = driveMotor.getConfigurator();
 
-    // Apply the PID/feedforward/Motion Magic configuration given in the
-    // swerve drive configuration to the drive motor
     CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
-    // Configure the drive motor to brake automatically when not driven
     CTREUtils.check(
         driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
 
@@ -96,35 +102,24 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(
         driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
 
-    // Connect to the module's steer encoder
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), CANBUS.DRIVETRAIN_CANBUS);
 
-    // Get the 'configurator' for the steer encoder, which allows us to
-    // configure the encoder's settings
     CANcoderConfigurator steerEncoderConfig = steerEncoder.getConfigurator();
 
-    // Set the absolute steer encoder offset to the value given in the
-    // swerve module's configuration
     CTREUtils.check(
         steerEncoderConfig.apply(
             new MagnetSensorConfigs()
                 .withMagnetOffset(
                     moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
-    // Connect to the module's steer motor
     steerMotor = new TalonFX(moduleConstants.steerMotorId(), CANBUS.DRIVETRAIN_CANBUS);
 
-    // Get the 'configurator' for the steer motor, which allows us to
-    // configure the motor's settings
     TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 
     CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
 
-    // Apply the PID/feedforward/Motion Magic configuration given in the
-    // swerve drive configuration to the steer motor
     CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
 
-    // Configure the steer motor to brake automatically when not driven
     CTREUtils.check(
         steerConfig.apply(
             new MotorOutputConfigs()
@@ -134,9 +129,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(
         steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
 
-    // Configure the fusing of the absolute steer encoder's reported position
-    // with the motor's internal relative encoder, and set the steer motor
-    // gear ratio to the value given in the swerve drive configuration
     CTREUtils.check(
         steerConfig.apply(
             new FeedbackConfigs()
@@ -151,33 +143,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     StatusChecks.under(this).add("Drive Motor", driveMotor);
     StatusChecks.under(this).add("Steer Motor", steerMotor);
     StatusChecks.under(this).add("Steer Encoder", steerEncoder);
-  }
 
-  /**
-   * Gets the drive motor for this module.
-   *
-   * @return The TalonFX drive motor controller
-   */
-  public TalonFX getDriveMotor() {
-    return driveMotor;
-  }
-
-  /**
-   * Gets the steer motor for this module.
-   *
-   * @return The TalonFX steer motor controller
-   */
-  public TalonFX getSteerMotor() {
-    return steerMotor;
-  }
-
-  /**
-   * Gets the steer encoder for this module.
-   *
-   * @return The steer CANcoder
-   */
-  public CANcoder getSteerEncoder() {
-    return steerEncoder;
+    setupStatusSignals();
   }
 
   /**
@@ -207,9 +174,101 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return corner;
   }
 
+  /**
+   * Gets the drive motor for this module.
+   *
+   * @return The TalonFX drive motor controller
+   */
+  public TalonFX getDriveMotor() {
+    return driveMotor;
+  }
+
+  /**
+   * Gets the steer motor for this module.
+   *
+   * @return The TalonFX steer motor controller
+   */
+  public TalonFX getSteerMotor() {
+    return steerMotor;
+  }
+
+  /**
+   * Gets the steer encoder for this module.
+   *
+   * @return The steer CANcoder
+   */
+  public CANcoder getSteerEncoder() {
+    return steerEncoder;
+  }
+
+  private void setupStatusSignals() {
+    drivePositionIn = driveMotor.getPosition();
+    steerAngleIn = steerMotor.getPosition();
+    driveSpeedIn = driveMotor.getVelocity();
+    steerVelocityIn = steerMotor.getVelocity();
+    driveCurrentIn = driveMotor.getSupplyCurrent();
+    steerCurrentIn = steerMotor.getSupplyCurrent();
+  }
+
+  private void refreshStatusSignals() {
+    drivePositionIn.refresh();
+    steerAngleIn.refresh();
+    driveSpeedIn.refresh();
+    steerVelocityIn.refresh();
+    driveCurrentIn.refresh();
+    steerCurrentIn.refresh();
+  }
+
+  /**
+   * Gets the current position of the drive and steer motors.
+   *
+   * @return The current {@link SwerveModulePosition}
+   */
+  public Distance getDrivePositionIn() {
+    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(drivePositionIn));
+  }
+
+  /**
+   * Gets the current speed of the drive motor.
+   *
+   * @return The current {@link LinearVelocity}
+   */
+  public LinearVelocity getDriveSpeedIn() {
+    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveSpeedIn));
+  }
+
+  /**
+   * Gets the current angle of the steer motor.
+   *
+   * @return The current {@link Angle}
+   */
+  public Angle getSteerAngleIn() {
+    return CTREUtils.unwrap(steerAngleIn);
+  }
+
+  /**
+   * Gets the current velocity of the steer motor.
+   *
+   * @return The current {@link AngularVelocity}
+   */
+  public AngularVelocity getSteerVelocityIn() {
+    return CTREUtils.unwrap(steerVelocityIn);
+  }
+
+  /**
+   * Gets the current current consumed by the module.
+   *
+   * @return The measured {@link Current}
+   */
+  public Current getConsumedCurrent() {
+    return CTREUtils.unwrap(driveCurrentIn).plus(CTREUtils.unwrap(steerCurrentIn));
+  }
+
   @Override
   public void periodic() {
-    Logger.log(getName() + "/consumedCurrent", driveMotor.getStatorCurrent().getValue());
+    refreshStatusSignals();
+
+    Logger.log(getName() + "/consumedCurrent", getConsumedCurrent());
   }
 
   /**
@@ -239,7 +298,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
       isNeutralCoast = false;
     }
 
-    targetState = optimizeStateForTalon(targetState, getSteerAngle());
+    targetState = optimizeStateForTalon(targetState, getSteerAngleIn());
 
     if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
       targetState = new SwerveModuleState(0, targetState.angle);
@@ -247,49 +306,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     Logger.log(getName() + "/targetState", targetState);
 
-    CTREUtils.check(
-        driveMotor.setControl(
-            new VelocityVoltage(
-                constants.driveMotorMechanismToRotor(
-                    MetersPerSecond.of(targetState.speedMetersPerSecond)))));
+    CTREUtils.check(driveMotor.setControl(driveSpeedOut.withVelocity(
+      constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
+    )));
 
-    CTREUtils.check(steerMotor.setControl(new PositionVoltage(targetState.angle.getRotations())));
-  }
-
-  /**
-   * Gets the current position of the drive and steer motors.
-   *
-   * @return The current {@link SwerveModulePosition}
-   */
-  public Distance getDrivePosition() {
-    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getPosition()));
-  }
-
-  /**
-   * Gets the current speed of the drive motor.
-   *
-   * @return The current {@link LinearVelocity}
-   */
-  public LinearVelocity getDriveSpeed() {
-    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveMotor.getVelocity()));
-  }
-
-  /**
-   * Gets the current angle of the steer motor.
-   *
-   * @return The current {@link Angle}
-   */
-  public Angle getSteerAngle() {
-    return CTREUtils.unwrap(steerEncoder.getPosition());
-  }
-
-  /**
-   * Gets the current velocity of the steer motor.
-   *
-   * @return The current {@link AngularVelocity}
-   */
-  public AngularVelocity getSteerVelocity() {
-    return CTREUtils.unwrap(steerEncoder.getVelocity());
+    CTREUtils.check(steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
   }
 
   /**
@@ -298,7 +319,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @return The measured {@link SwerveModuleState}
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
+    return new SwerveModuleState(getDriveSpeedIn(), new Rotation2d(getSteerAngleIn()));
   }
 
   /**
@@ -307,17 +328,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @return The measured {@link SwerveModulePosition}
    */
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerAngle()));
-  }
-
-  /**
-   * Gets the current current consumed by the module.
-   *
-   * @return The measured {@link Current}
-   */
-  public Current getConsumedCurrent() {
-    return CTREUtils.unwrap(driveMotor.getSupplyCurrent())
-        .plus(CTREUtils.unwrap(steerMotor.getSupplyCurrent()));
+    return new SwerveModulePosition(getDrivePositionIn(), new Rotation2d(getSteerAngleIn()));
   }
 
   /**
@@ -328,7 +339,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   public Transform2d getRelativeTransform() {
     return new Transform2d(
         calculateRelativeTranslation(corner.index, constants.chassis()),
-        new Rotation2d(getSteerAngle()));
+        new Rotation2d(getSteerAngleIn()));
   }
 
   /**
@@ -343,7 +354,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         "steer",
         getSteerMotor(),
         maxCurrent,
-        log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
+        log -> log.angularPosition(getSteerAngleIn()).angularVelocity(getSteerVelocityIn()));
   }
 
   /**
@@ -358,7 +369,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         "drive",
         getDriveMotor(),
         maxCurrent,
-        log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
+        log -> log.linearPosition(getDrivePositionIn()).linearVelocity(getDriveSpeedIn()));
   }
 
   private Command calibrateMotor(
