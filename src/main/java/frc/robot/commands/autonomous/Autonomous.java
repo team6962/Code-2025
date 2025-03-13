@@ -110,7 +110,7 @@ public class Autonomous {
                     "Moving elevator and manipulator for coral intaking", 0.5))),
         swerveDrive.alignTo(intake),
         CommandUtils.selectByMode(
-            manipulator.coral.intake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
+            manipulator.runCoralIntake(), CommandUtils.printAndWait("Intaking coral", 0.25)),
         Commands.print("Done intaking"));
   }
 
@@ -147,7 +147,7 @@ public class Autonomous {
             swerveDrive.pathfindTo(processorNewPose)),
         swerveDrive.alignTo(processorNewPose),
         CommandUtils.selectByMode(
-            manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.5)),
+            manipulator.grabber.dropAlgae(), CommandUtils.printAndWait("Dropping algae", 0.5)),
         swerveDrive.alignTo(
             new Pose2d(
                 Units.inchesToMeters(235.726104),
@@ -168,7 +168,7 @@ public class Autonomous {
                 SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
                 Rotation2d.fromDegrees(-90))),
         CommandUtils.selectByMode(
-            manipulator.algae.drop(), CommandUtils.printAndWait("Dropping algae", 0.25)));
+            manipulator.grabber.dropAlgae(), CommandUtils.printAndWait("Dropping algae", 0.25)));
   }
 
   public Command alignCoral(int pole) {
@@ -214,7 +214,7 @@ public class Autonomous {
                 "Moving to level " + position.level(), position.level() * 0.5)),
         swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole())),
         CommandUtils.selectByMode(
-            manipulator.coral.drop(), CommandUtils.printAndWait("Dropping coral", 0.25)),
+            manipulator.grabber.dropCoral(), CommandUtils.printAndWait("Dropping coral", 0.25)),
         swerveDrive.moveTowards(
             ReefPositioning.getCoralAlignPose(position.pole()).getTranslation(),
             MetersPerSecond.of(0.5),
@@ -243,7 +243,7 @@ public class Autonomous {
             CommandUtils.printAndWait("Moving to level " + level, level * 0.5)),
         swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)),
         CommandUtils.selectByMode(
-            manipulator.algae.intake(), CommandUtils.printAndWait("Intaking algae", 0.5)),
+            manipulator.grabber.intakeAlgae(), CommandUtils.printAndWait("Intaking algae", 0.5)),
         swerveDrive.alignTo(ReefPositioning.getAlgaeLeavePose(face), Inches.of(3), Degrees.of(45)),
         CommandUtils.selectByMode(
             pieceCombos.stow(), CommandUtils.printAndWait("Stowing elevator", level * 0.5)));

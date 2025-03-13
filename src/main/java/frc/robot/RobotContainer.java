@@ -4,6 +4,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -25,8 +26,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Constants;
+import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Constants.CAN;
+import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.autonomous.Autonomous;
@@ -64,7 +66,6 @@ public class RobotContainer {
   public final SwerveDrive swerveDrive;
   public final RobotStateController stateController;
   // public final LEDs ledStrip;
-  // public final Intake intake;
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
@@ -119,14 +120,13 @@ public class RobotContainer {
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
 
-    swerveDrive = new SwerveDrive(Constants.SWERVE.CONFIG);
+    swerveDrive = new SwerveDrive(SWERVE.CONFIG);
     stateController = new RobotStateController(swerveDrive);
     // ledStrip =
     //     new LEDs(
     //         stateController,
     //         () -> 1.0 +
     // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
-    // intake = new Intake();
     manipulator = new Manipulator();
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
@@ -153,6 +153,8 @@ public class RobotContainer {
 
     refreshButtonEntry.setBoolean(false);
     Logger.start(Milliseconds.of(20));
+
+    Logger.log("isRedAlliance", !TEAM_COLOR.IS_BLUE_TEAM.get());
   }
 
   public Command getAutonomousCommand() {
@@ -256,6 +258,8 @@ public class RobotContainer {
 
     // elevator.rezeroAtBottom().schedule();
     // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+
+    swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
   }
 
   private final void logGitProperties(DataLog log) {

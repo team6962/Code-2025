@@ -78,7 +78,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
         () -> {
           Distance position = getAverageHeight();
 
-          return run(() -> setHeight(position));
+          return setHeight(position);
         },
         Set.of(this));
   }

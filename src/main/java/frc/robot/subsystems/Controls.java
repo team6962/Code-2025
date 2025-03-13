@@ -78,16 +78,22 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(pieceCombos.safeRaise());
+    operator.a().onTrue(pieceCombos.coralL1());
     operator.b().onTrue(pieceCombos.coralL2());
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(pieceCombos.coralL4());
+
+    // operator.a().onTrue(elevator.coralL1());
+    // operator.b().onTrue(elevator.coralL2());
+    // operator.x().onTrue(elevator.coralL3());
+    // operator.y().onTrue(elevator.coralL4());
+
     // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
 
     // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
-    // operator.a().onTrue(manipulator.pivot.coralL23());
-    // operator.b().onTrue(manipulator.pivot.algaeReef());
-    // operator.x().onTrue(manipulator.pivot.coralIntake());
+    // operator.a().onTrue(manipulator.pivot.coralL1());
+    // operator.b().onTrue(manipulator.pivot.coralL23());
+    // operator.x().onTrue(manipulator.pivot.coralL4());
     // operator.y().onTrue(manipulator.pivot.stow());
     // operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
     // operator.back().onTrue(elevator.algaeGround());
@@ -105,10 +111,10 @@ public class Controls {
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    operator.rightBumper().whileTrue(manipulator.coral.backwards());
-    operator.rightTrigger().whileTrue(manipulator.coral.magicButton().andThen(rumbleBoth()));
-    operator.leftBumper().whileTrue(manipulator.algae.intake().andThen(rumbleBoth()));
-    operator.leftTrigger().whileTrue(manipulator.algae.drop());
+    operator.rightBumper().whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth()));
+    operator.rightTrigger().whileTrue(manipulator.grabber.dropCoral().andThen(rumbleBoth()));
+    operator.leftBumper().whileTrue(manipulator.grabber.intakeAlgae().andThen(rumbleBoth()));
+    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae());
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
@@ -120,14 +126,14 @@ public class Controls {
     ShuffleboardTab driverTab = DriverDashboard.getTab();
 
     driverTab
-        .addBoolean("Has Coral", () -> manipulator.coral.hasGamePiece())
+        .addBoolean("Has Coral", () -> manipulator.grabber.hasCoral())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(0, 0)
         .withSize(2, 2)
         .withProperties(Map.of("min", 0, "max", 100));
 
     driverTab
-        .addBoolean("Has Algae", () -> manipulator.algae.hasGamePiece())
+        .addBoolean("Has Algae", () -> manipulator.grabber.hasAlgae())
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(2, 0)
         .withSize(2, 2)

@@ -96,16 +96,16 @@ public final class SwerveConstants {
   private static Module[] getModules(ChassisType chassisType) {
     return switch (chassisType) {
       case COMPETITION -> new Module[] {
-        Constants.SWERVE.MODULE_CONFIGS[5],
-        Constants.SWERVE.MODULE_CONFIGS[4],
-        Constants.SWERVE.MODULE_CONFIGS[7],
-        Constants.SWERVE.MODULE_CONFIGS[6]
-      };
-      case TEST -> new Module[] {
         Constants.SWERVE.MODULE_CONFIGS[1],
         Constants.SWERVE.MODULE_CONFIGS[0],
         Constants.SWERVE.MODULE_CONFIGS[2],
         Constants.SWERVE.MODULE_CONFIGS[3]
+      };
+      case TEST -> new Module[] {
+        Constants.SWERVE.MODULE_CONFIGS[5],
+        Constants.SWERVE.MODULE_CONFIGS[4],
+        Constants.SWERVE.MODULE_CONFIGS[7],
+        Constants.SWERVE.MODULE_CONFIGS[6]
       };
     };
   }

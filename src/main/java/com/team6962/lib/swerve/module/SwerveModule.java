@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.Constants.CANBUS;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.function.Consumer;
 
@@ -74,7 +75,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     SwerveConfig.Module moduleConstants = getModuleConstants();
 
     // Connect to the module's drive motor
-    driveMotor = new TalonFX(moduleConstants.driveMotorId());
+    driveMotor = new TalonFX(moduleConstants.driveMotorId(), CANBUS.DRIVETRAIN_CANBUS);
 
     // Get the 'configurator' for the drive motor, which allows us to
     // configure the motor's settings
@@ -96,7 +97,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
 
     // Connect to the module's steer encoder
-    steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
+    steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), CANBUS.DRIVETRAIN_CANBUS);
 
     // Get the 'configurator' for the steer encoder, which allows us to
     // configure the encoder's settings
@@ -111,7 +112,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                     moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
     // Connect to the module's steer motor
-    steerMotor = new TalonFX(moduleConstants.steerMotorId());
+    steerMotor = new TalonFX(moduleConstants.steerMotorId(), CANBUS.DRIVETRAIN_CANBUS);
 
     // Get the 'configurator' for the steer motor, which allows us to
     // configure the motor's settings
@@ -337,11 +338,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateSteerMotor(Voltage averageBusVoltage, Current maxCurrent) {
+  public Command calibrateSteerMotor(Current maxCurrent) {
     return calibrateMotor(
         "steer",
         getSteerMotor(),
-        averageBusVoltage,
         maxCurrent,
         log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
   }
@@ -353,11 +353,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateDriveMotor(Voltage averageBusVoltage, Current maxCurrent) {
+  public Command calibrateDriveMotor(Current maxCurrent) {
     return calibrateMotor(
         "drive",
         getDriveMotor(),
-        averageBusVoltage,
         maxCurrent,
         log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
   }
@@ -365,7 +364,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Command calibrateMotor(
       String motorName,
       TalonFX motor,
-      Voltage averageBusVoltage,
       Current maxCurrent,
       Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =

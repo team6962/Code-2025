@@ -3,19 +3,19 @@ package frc.robot.subsystems.manipulator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.manipulator.algae.AlgaeGrabber;
-import frc.robot.subsystems.manipulator.coral.CoralGrabber;
+import frc.robot.subsystems.manipulator.funnel.Funnel;
+import frc.robot.subsystems.manipulator.grabber.Grabber;
 import frc.robot.subsystems.manipulator.pivot.ManipulatorPivot;
 
 public class Manipulator extends SubsystemBase {
   public final ManipulatorPivot pivot;
-  public final AlgaeGrabber algae;
-  public final CoralGrabber coral;
+  public final Grabber grabber;
+  public final Funnel funnel;
 
   public Manipulator() {
     pivot = ManipulatorPivot.create();
-    algae = AlgaeGrabber.create();
-    coral = CoralGrabber.create();
+    grabber = Grabber.create();
+    funnel = Funnel.create();
   }
 
   public Command placeCoralL1() {
@@ -31,23 +31,27 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.coralIntake().alongWith(coral.intake());
+    return pivot.coralIntake().alongWith(grabber.intakeCoral().alongWith(funnel.intake(grabber)));
+  }
+
+  public Command runCoralIntake() {
+    return grabber.intakeCoral().alongWith(funnel.intake(grabber));
   }
 
   public Command pickupGroundAlgae() {
-    return pivot.algaeGround().alongWith(algae.intake());
+    return pivot.algaeGround().alongWith(grabber.intakeAlgae());
   }
 
   public Command pickupReefAlgae() {
-    return pivot.algaeReef().alongWith(algae.intake());
+    return pivot.algaeReef().alongWith(grabber.intakeAlgae());
   }
 
   public Command dropReefAlgae() {
-    return pivot.algaeReef().alongWith(algae.drop());
+    return pivot.algaeReef().alongWith(grabber.dropAlgae());
   }
 
   public Command placeBargeAlgae() {
-    return pivot.algaeBarge().andThen(algae.drop());
+    return pivot.algaeBarge().andThen(grabber.dropAlgae());
   }
 
   public Command placeProcessorAlgae() {
@@ -59,7 +63,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command stop() {
-    return pivot.stop().alongWith(coral.stop(), algae.stop());
+    return pivot.stop().alongWith(grabber.stop());
   }
 
   public Command test() {

@@ -912,19 +912,6 @@
         ],
         "containers": [
           {
-            "title": "Refresh",
-            "x": 640.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/Shuffleboard/Status Checks/Refresh",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
             "title": "running",
             "x": 1152.0,
             "y": 128.0,
@@ -1008,6 +995,36 @@
               "true_icon": "None",
               "false_icon": "None"
             }
+          },
+          {
+            "title": "refreshButton",
+            "x": 1152.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/StatusChecks/refreshButton",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Battery Voltage",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/StatusChecks/General/Battery Voltage",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
@@ -1018,14 +1035,14 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Has Coral",
-            "x": 0.0,
+            "title": "Auto Precomputed",
+            "x": 1152.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Shuffleboard/Driver Dashboard/Has Coral",
+              "topic": "/Shuffleboard/Driver Dashboard/Auto Precomputed",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -1035,14 +1052,147 @@
             }
           },
           {
-            "title": "Has Algae",
+            "title": "ceilLimit",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Elevator/limits/ceil",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "floorLimit",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Elevator/limits/floor",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "IsRedAllianceFMS",
             "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Shuffleboard/Driver Dashboard/Has Algae",
+              "topic": "/FMSInfo/IsRedAlliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Robot",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 640.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Field/Robot",
+              "period": 0.06,
+              "data_type": "double[]",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Joystick 0",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/StatusChecks/General/Joystick 0",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Joystick 1",
+            "x": 1152.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/StatusChecks/General/Joystick 1",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "hasCoral",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Grabber/hasCoral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "hasAlgae",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Logs/Grabber/hasAlgae",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Has Coral",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Driver Dashboard/Has Coral",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
