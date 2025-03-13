@@ -123,21 +123,21 @@ public class Controls {
     // operator.leftBumper().whileTrue(manipulator.algae.action());
     // operator.leftTrigger().whileTrue(manipulator.algae.action());
 
-    ShuffleboardTab driverTab = DriverDashboard.getTab();
+    // ShuffleboardTab driverTab = DriverDashboard.getTab();
 
-    driverTab
-        .addBoolean("Has Coral", () -> manipulator.grabber.hasCoral())
-        .withWidget(BuiltInWidgets.kBooleanBox)
-        .withPosition(0, 0)
-        .withSize(2, 2)
-        .withProperties(Map.of("min", 0, "max", 100));
+    // driverTab
+    //     .addBoolean("Has Coral", () -> manipulator.grabber.hasCoral())
+    //     .withWidget(BuiltInWidgets.kBooleanBox)
+    //     .withPosition(0, 0)
+    //     .withSize(2, 2)
+    //     .withProperties(Map.of("min", 0, "max", 100));
 
-    driverTab
-        .addBoolean("Has Algae", () -> manipulator.grabber.hasAlgae())
-        .withWidget(BuiltInWidgets.kBooleanBox)
-        .withPosition(2, 0)
-        .withSize(2, 2)
-        .withProperties(Map.of("min", 0, "max", 100));
+    // driverTab
+    //     .addBoolean("Has Algae", () -> manipulator.grabber.hasAlgae())
+    //     .withWidget(BuiltInWidgets.kBooleanBox)
+    //     .withPosition(2, 0)
+    //     .withSize(2, 2)
+    //     .withProperties(Map.of("min", 0, "max", 100));
 
     // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
     // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
