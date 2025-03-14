@@ -306,7 +306,7 @@ public final class Constants {
       public static final Distance L1_HEIGHT = Inches.of(46.0); //change
       public static final Distance L2_HEIGHT = Inches.of(48.50);
       public static final Distance L3_HEIGHT = Inches.of(56.5);
-      public static final Distance L4_HEIGHT = Inches.of(60.0);
+      public static final Distance L4_HEIGHT = Inches.of(71.0);
       public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
     }
 
@@ -397,7 +397,7 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = -0.1;
 
     public static final double CORAL_OUT_SPEED = 0.7;
-    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
