@@ -174,10 +174,10 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int HANG_ENCODER = 0;
+    public static final int HANG_ENCODER = 10;
+    public static final int CORAL_BEAM_BREAK = 0;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
     public static final int ELEVATOR_CEIL_LIMIT = 2;
-    public static final int CORAL_BEAM_BREAK = 3;
     public static final int MANIPULATOR_ENCODER = 4;
   }
 
@@ -252,16 +252,16 @@ public final class Constants {
     public static final Angle STOW_ANGLE = Degrees.of(110.0);
   }
 
-  public static final boolean SAFETIES_ENABLED = true;
+  public static final boolean SAFETIES_ENABLED = false;
   public static final class ELEVATOR {
-    public static final double GEARING = (7.5);
+    public static final double GEARING = 6.3;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
 
     public static final class PROFILE {
-      public static final double kP = 4.5;
-      public static final double kS = 0.1;
+      public static final double kP = 9.0;
+      public static final double kS = 0.63;
     }
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
@@ -275,8 +275,8 @@ public final class Constants {
       public static final Distance L1_HEIGHT = Inches.of(46.0); //change
       public static final Distance L2_HEIGHT = Inches.of(48.50);
       public static final Distance L3_HEIGHT = Inches.of(56.5);
-      public static final Distance L4_HEIGHT = Inches.of(60.0);
-      public static final Distance INTAKE_HEIGHT = Inches.of(58.80);
+      public static final Distance L4_HEIGHT = Inches.of(71.0);
+      public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
     }
 
     public static final class ALGAE {
@@ -322,14 +322,14 @@ public final class Constants {
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(-10.0);
       public static final Angle L23_ANGLE = Degrees.of(-20.0);
-      public static final Angle L4_ANGLE = Degrees.of(-30.0);
-      public static final Angle INTAKE_ANGLE = Degrees.of(-27.992817);
+      public static final Angle L4_ANGLE = Degrees.of(-32.0);
+      public static final Angle INTAKE_ANGLE = Degrees.of(-22.0);
     }
 
     public static final class ALGAE {
-      public static final Angle BARGE_ANGLE = Degrees.of(32.75);
-      public static final Angle REEF_ANGLE = Degrees.of(-23.0);
-      public static final Angle GROUND_ANGLE = Degrees.of(-35.3);
+      public static final Angle BARGE_ANGLE = Degrees.of(25.0);
+      public static final Angle REEF_ANGLE = Degrees.of(-15.0);
+      public static final Angle GROUND_ANGLE = Degrees.of(-75.0);
       public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
     }
 
@@ -366,7 +366,7 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = -0.1;
 
     public static final double CORAL_OUT_SPEED = 0.7;
-    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.2;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);

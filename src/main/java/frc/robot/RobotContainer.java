@@ -180,8 +180,6 @@ public class RobotContainer {
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
 
     Logger.start(Milliseconds.of(20));
-
-    Logger.log("isRedAlliance", !TEAM_COLOR.IS_BLUE_TEAM.get());
   }
 
   public Command getAutonomousCommand() {

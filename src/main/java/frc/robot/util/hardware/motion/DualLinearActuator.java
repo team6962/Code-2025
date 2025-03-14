@@ -35,6 +35,7 @@ public class DualLinearActuator extends SubsystemBase {
   private SparkClosedLoopController leftPID, rightPID;
   private DigitalInput ceilingLimit, floorLimit;
   private Distance baseHeight, minHeight, maxHeight, tolerance;
+  private boolean moving = false;
 
   private Debouncer debouncer = new Debouncer(0.1);
 
@@ -129,6 +130,7 @@ public class DualLinearActuator extends SubsystemBase {
         this.getName() + "/motors/right/current", () -> Amps.of(rightMotor.getOutputCurrent()));
     Logger.logNumber(
         this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
+      Logger.logBoolean(this.getName() + "/moving", () -> moving);
 
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
@@ -209,7 +211,11 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public boolean doneMoving() {
-    return inRange(targetHeight);
+    if (inRange(targetHeight)) {
+      moving = false;
+      return true;
+    }
+    return false;
   }
 
   public void stopMotors() {
@@ -226,9 +232,9 @@ public class DualLinearActuator extends SubsystemBase {
       return;
     }
 
+    moving = true;
     leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-    rightPID.setReference(
-        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    rightPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
   }
 
   public boolean triggeredCeilingLimit() {
