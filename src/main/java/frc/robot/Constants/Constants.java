@@ -96,8 +96,8 @@ public final class Constants {
                 new Pose3d(
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(0),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(0.0))));
+                    Units.inchesToMeters(36.0),
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
