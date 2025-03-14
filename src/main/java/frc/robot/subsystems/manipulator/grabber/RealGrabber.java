@@ -80,6 +80,10 @@ public class RealGrabber extends Grabber {
                 Commands.waitUntil(this::hasCoral), Commands.waitUntil(() -> !hasCoral())));
   }
 
+  public Command adjustCoral(){
+    return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
+  }
+  
   public Command intakeAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::hasAlgae)
