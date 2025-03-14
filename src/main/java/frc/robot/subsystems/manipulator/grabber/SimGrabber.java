@@ -82,6 +82,9 @@ public class SimGrabber extends Grabber {
     return waitTimeCommand(coralDropTime).andThen(runOnce(() -> expectCoral(false)));
   }
 
+  public Command adjustCoral(){
+    return waitTimeCommand(Seconds.of(0.0));
+  }
   @Override
   public boolean hasAlgae() {
     return hasAlgae;
