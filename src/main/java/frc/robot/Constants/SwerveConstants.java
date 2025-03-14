@@ -66,7 +66,7 @@ public final class SwerveConstants {
       case COMPETITION -> new Chassis(
           Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
       case TEST -> new Chassis(
-          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(50));
+          Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
     };
   }
 

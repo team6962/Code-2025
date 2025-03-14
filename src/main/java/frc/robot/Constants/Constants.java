@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
-import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -31,6 +30,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.util.CachedRobotState;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -44,7 +44,7 @@ public final class Constants {
 
   public static final class TEAM_COLOR {
     public static final Supplier<Boolean> IS_BLUE_TEAM =
-        () -> !Coordinates.isAllianceInverted().orElse(false);
+        () -> CachedRobotState.isBlue().orElse(true);
   }
 
   // ENABLED SYSTEMS
@@ -54,6 +54,7 @@ public final class Constants {
     public static final boolean HANG = false;
     public static final boolean MANIPULATOR = true;
     public static final boolean ELEVATOR = true;
+    public static final boolean FUNNEL = true;
   }
 
   public static final class LOGGING {
@@ -122,57 +123,25 @@ public final class Constants {
   public static final class SWERVE {
     public static final Angle ALL_OFFSET = Degrees.of(135);
 
-    // Offset included
-    // Front left: 0.195 radians
-    // Front right: 3.425 radians = 0.283 radians
-    // Back left: 3.373 radians =
-    // Back right: -2.824 radians
-
-    // (4) Back left: 2.85 radians - 0.5 rots + x = 0 (x = 0.5 rots - 2.85 radians)
-    // (3) Back right: -11.982 radians - 0.25 rots + x = 0 (x = 0.25 rots + 11.982 radians)
-    // (2) Front left: -4.077 radians - 0 rots + x = 0 (x = 4.077 radians)
-    // (1) Front right: 4.292 radians - 0.75 rots + x = 0 (x = -4.292 radians + 0.75 rots)
-
-    // Test Chassis
-    // Front Left: 11,21,31
-    // Front Right: 10,20,30
-    // Back Left: 12,22,32
-    // Back Right: 13,23,33
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module( // Front right
-          14,
-          24,
-          34,
-          Radians.of(-4.292)
-              .minus(Rotations.of(0.25))
-              .minus(
-                  Degrees.of(90))), // Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
-      new SwerveConfig.Module( // Front left
-          15,
-          25,
-          35,
-          Radians.of(
-              4.077)), // Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), //
-      // -0.440
-      new SwerveConfig.Module( // Back right
+      new SwerveConfig.Module(
+          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
+      new SwerveConfig.Module(
+          15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
+      new SwerveConfig.Module(
           16,
           26,
           36,
-          Radians.of(11.982)
-              .minus(Rotations.of(0.5))), // Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 *
-      // Math.PI).plus(ALL_OFFSET)), // -1.842
-      new SwerveConfig.Module( // Back left
+          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
+      new SwerveConfig.Module(
           17,
           27,
           37,
-          Rotations.of(-0.75)
-              .minus(Radians.of(2.85))
-              .plus(Degrees.of(90))), // Radians.of(-1.049 - Math.PI + 3.0 / 4.0 *
-      // Math.PI).plus(ALL_OFFSET)), // -1.049
+          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -388,7 +357,7 @@ public final class Constants {
   public static final class MANIPULATOR {
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.25);
-    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(2.0);
+    public static final Time ALGAE_GRIP_CHECK_RATE = Seconds.of(5.0);
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
 
@@ -428,6 +397,12 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+  }
+
+  public static final class FUNNEL {
+    public static final boolean MOTOR_INVERTED = false;
+    public static final double INTAKE_SPEED = 0.2;
+    public static final Time INTAKE_TIME = Seconds.of(0.5);
   }
 
   public static final class VOLTAGE_LADDER {

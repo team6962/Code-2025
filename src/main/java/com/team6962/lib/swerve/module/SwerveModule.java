@@ -1,6 +1,5 @@
 package com.team6962.lib.swerve.module;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -100,7 +99,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
     CTREUtils.check(
-        driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
+        driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
 
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), CANBUS.DRIVETRAIN_CANBUS);
 
@@ -127,7 +126,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withNeutralMode(NeutralModeValue.Brake)));
 
     CTREUtils.check(
-        steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(Amps.of(80))));
+        steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.steerMotor().maxCurrent())));
 
     CTREUtils.check(
         steerConfig.apply(
