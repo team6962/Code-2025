@@ -28,18 +28,20 @@ public class RealGrabber extends Grabber {
   private final SparkMax motor;
   private final DigitalInput sensor;
 
-  private Debouncer detectedDebouncer;
+  private Debouncer algaeDebouncer;
+  private Debouncer coralDebouncer = new Debouncer(0.15);
 
   private boolean hasCoral = false;
 
-  private boolean detected = false;
+  private boolean detectedAlgae = false;
 
   private Timer gripCheckTimer = new Timer();
 
   public RealGrabber() {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
+    
 
-    Logger.logBoolean(getName() + "/motorsStalled", () -> detected);
+    Logger.logBoolean(getName() + "/motorsStalled", () -> detectedAlgae);
     Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
 
     resetDebouncer();
@@ -78,6 +80,10 @@ public class RealGrabber extends Grabber {
                 Commands.waitUntil(this::hasCoral), Commands.waitUntil(() -> !hasCoral())));
   }
 
+  public Command adjustCoral(){
+    return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
+  }
+  
   public Command intakeAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::hasAlgae)
@@ -99,13 +105,13 @@ public class RealGrabber extends Grabber {
             Commands.parallel(
                 runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
                 Commands.race(
-                    Commands.waitUntil(() -> detected).andThen(() -> expectAlgae(true)),
+                    Commands.waitUntil(() -> detectedAlgae).andThen(() -> expectAlgae(true)),
                     Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds))
                         .andThen(() -> expectAlgae(false)))));
   }
 
   private void resetDebouncer() {
-    detectedDebouncer = new Debouncer(0.5, DebounceType.kFalling);
+    algaeDebouncer = new Debouncer(0.5, DebounceType.kFalling);
   }
 
   public Command forwards() {
@@ -138,7 +144,7 @@ public class RealGrabber extends Grabber {
   public void periodic() {
     super.periodic();
 
-    detected = detectedDebouncer.calculate(Amps.of(motor.getOutputCurrent()).gt(Amps.of(40)));
-    hasCoral = !sensor.get();
+    detectedAlgae = algaeDebouncer.calculate(Amps.of(motor.getOutputCurrent()).gt(Amps.of(40)));
+    hasCoral = coralDebouncer.calculate(!sensor.get());
   }
 }

@@ -109,10 +109,10 @@ public class Controls {
     operator.leftStick().onTrue(pieceCombos.algaeBarge());
     operator.rightStick().onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    operator.rightBumper().whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth()));
-    operator.rightTrigger().whileTrue(manipulator.grabber.dropCoral().andThen(rumbleBoth()));
-    operator.leftBumper().whileTrue(manipulator.grabber.intakeAlgae().andThen(rumbleBoth()));
-    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae());
+    operator.rightBumper().whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth())); //intake coral
+    operator.rightTrigger().whileTrue(manipulator.grabber.dropCoral().andThen(rumbleBoth())); //drop coral/intake algae
+    operator.leftBumper().whileTrue(manipulator.grabber.adjustCoral()); //reverse coral
+    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); //drop algae
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
