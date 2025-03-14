@@ -254,7 +254,7 @@ public final class Constants {
 
   public static final boolean SAFETIES_ENABLED = false;
   public static final class ELEVATOR {
-    public static final double GEARING = 6.3;
+    public static final double GEARING = 6.72;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
