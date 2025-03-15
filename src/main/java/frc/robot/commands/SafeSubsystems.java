@@ -37,13 +37,13 @@ public class SafeSubsystems extends SubsystemBase {
   }
 
   public Command safeMoveCommand(Command elevatorCommand, Command manipulatorCommand) {
-    if (Constants.SAFETIES_ENABLED) {
+    // if (Constants.SAFETIES_ENABLED) {
       return Commands.sequence(
         manipulator.pivot.safe(),
         elevatorCommand,
         manipulatorCommand);
-    }
-    return Commands.sequence(elevatorCommand, manipulatorCommand);
+    // }
+    // return Commands.sequence(elevatorCommand, manipulatorCommand);
   }
 
   public Command parallelSafeCommand(Command elevatorCommand, Command manipulatorCommand) {
