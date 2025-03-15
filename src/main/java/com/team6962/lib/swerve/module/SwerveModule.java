@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -85,7 +86,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     SwerveConfig.Module moduleConstants = getModuleConstants();
 
-    driveMotor = new TalonFX(moduleConstants.driveMotorId(), CANBUS.DRIVETRAIN_CANBUS);
+    driveMotor = new TalonFX(moduleConstants.driveMotorId());
 
     TalonFXConfigurator driveConfig = driveMotor.getConfigurator();
 
@@ -101,7 +102,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(
         driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
 
-    steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), CANBUS.DRIVETRAIN_CANBUS);
+    steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
     CANcoderConfigurator steerEncoderConfig = steerEncoder.getConfigurator();
 
@@ -111,7 +112,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withMagnetOffset(
                     moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
-    steerMotor = new TalonFX(moduleConstants.steerMotorId(), CANBUS.DRIVETRAIN_CANBUS);
+    steerMotor = new TalonFX(moduleConstants.steerMotorId());
 
     TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 
@@ -210,12 +211,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void refreshStatusSignals() {
-    drivePositionIn.refresh();
-    steerAngleIn.refresh();
-    driveSpeedIn.refresh();
-    steerVelocityIn.refresh();
-    driveCurrentIn.refresh();
-    steerCurrentIn.refresh();
+    BaseStatusSignal.refreshAll(
+      drivePositionIn, steerAngleIn, driveSpeedIn,
+      steerVelocityIn, driveCurrentIn, steerCurrentIn
+    );
   }
 
   /**
