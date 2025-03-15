@@ -21,13 +21,13 @@ public class AutoGeneration extends SubsystemBase {
   private Time workTime;
   private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
-  public AutoGeneration(AutonomousCommands autonomous, Time workDelay, Time workTime, 
+  public AutoGeneration(AutonomousCommands autonomous, Time sleepTime, Time workTime, 
       Supplier<AutoPaths.PlanParameters> parametersSupplier) {
     this.autonomous = autonomous;
-    this.workDelay = workDelay;
+    this.workDelay = sleepTime;
     this.workTime = workTime;
     this.parametersSupplier = parametersSupplier;
-    currentThread = new AutoThread(autonomous, workDelay, workTime);
+    currentThread = new AutoThread(autonomous, sleepTime, workTime);
   }
 
   private void logState() {

@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.Constants.Constants.TEAM_COLOR;
@@ -147,7 +148,7 @@ public class RobotContainer {
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
     autoGen = new AutoGeneration(
-      autonomous, Milliseconds.of(20), Milliseconds.of(5),
+      autonomous, AUTO.SLEEP_TIME, AUTO.WORK_TIME,
       () -> AutoPaths.PlanParameters.fromAutoChooser(
         manipulator.grabber.hasCoral(), swerveDrive.getEstimatedPose()));
 

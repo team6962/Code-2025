@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
@@ -418,5 +419,10 @@ public final class Constants {
     public static final Time AUTO_LENGTH = MeasureMath.time(0, 15);
     public static final Time ENDGAME_LENGTH = MeasureMath.time(0, 20);
     public static final Time ENDGAME_START = MATCH_LENGTH.minus(ENDGAME_LENGTH);
+  }
+
+  public static final class AUTO {
+    public static final Time WORK_TIME = Milliseconds.of(5);
+    public static final Time SLEEP_TIME = Milliseconds.of(15);
   }
 }

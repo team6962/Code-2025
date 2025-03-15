@@ -18,13 +18,13 @@ import frc.robot.auto.utils.AutonomousCommands;
 public class AutoThread extends Thread {
   private CommandBuilder commandBuilder;
   private AutoPaths.PlanParameters parameters;
-  private final long workDelayMilliseconds;
+  private final long sleepTimeMilliseconds;
   private final double workTimeSeconds;
   private double lastPauseTimestampSeconds;
 
-  public AutoThread(AutonomousCommands autonomous, Time workDelay, Time workTime) {
+  public AutoThread(AutonomousCommands autonomous, Time sleepTime, Time workTime) {
     this.commandBuilder = new CommandBuilder(autonomous);
-    this.workDelayMilliseconds = (long) workDelay.in(Milliseconds);
+    this.sleepTimeMilliseconds = (long) sleepTime.in(Milliseconds);
     this.workTimeSeconds = workTime.in(Seconds);
     lastPauseTimestampSeconds = Timer.getFPGATimestamp();
 
@@ -90,7 +90,7 @@ public class AutoThread extends Thread {
         logWorkState(WorkState.SLEEPING);
 
         try {
-          Thread.sleep((long) workDelayMilliseconds);
+          Thread.sleep((long) sleepTimeMilliseconds);
         } catch (InterruptedException e) {
           Logger.log(AutoPaths.Logging.AUTO_THREAD + "/interruptTime", Timer.getFPGATimestamp());
 
