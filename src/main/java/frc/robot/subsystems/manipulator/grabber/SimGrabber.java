@@ -83,6 +83,11 @@ public class SimGrabber extends Grabber {
   }
 
   @Override
+  public Command adjustCoral(){
+    return waitTimeCommand(Seconds.of(0.0));
+  }
+
+  @Override
   public boolean hasAlgae() {
     return hasAlgae;
   }
