@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -211,12 +212,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void refreshStatusSignals() {
-    drivePositionIn.refresh();
-    steerAngleIn.refresh();
-    driveSpeedIn.refresh();
-    steerVelocityIn.refresh();
-    driveCurrentIn.refresh();
-    steerCurrentIn.refresh();
+    BaseStatusSignal.refreshAll(
+      drivePositionIn, steerAngleIn, driveSpeedIn,
+      steerVelocityIn, driveCurrentIn, steerCurrentIn
+    );
   }
 
   /**
