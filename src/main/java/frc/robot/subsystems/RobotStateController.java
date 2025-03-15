@@ -26,8 +26,8 @@ public class RobotStateController extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (CachedRobotState.isDisabled()) {
-      LEDs.setState(LEDs.State.DISABLED);
-    }
+    // if (CachedRobotState.isDisabled()) {
+    //   LEDs.setState(LEDs.State.DISABLED);
+    // }
   }
 }

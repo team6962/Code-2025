@@ -285,7 +285,7 @@ public final class Constants {
 
   public static final boolean SAFETIES_ENABLED = false;
   public static final class ELEVATOR {
-    public static final double GEARING = 6.72;
+    public static final double GEARING = 6.3;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
@@ -338,8 +338,9 @@ public final class Constants {
     public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
     public static final Angle STOW_ANGLE = Degrees.of(-5.0);
-    public static final Angle SAFE_ANGLE = Degrees.of(-30.0);
+    public static final Angle SAFE_ANGLE = Degrees.of(0.0);
 
+    // TODO: update for v2
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
     public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
 
