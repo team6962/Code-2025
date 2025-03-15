@@ -1,6 +1,7 @@
 package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -23,6 +24,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -209,13 +211,13 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     steerVelocityIn = steerMotor.getVelocity();
     driveCurrentIn = driveMotor.getSupplyCurrent();
     steerCurrentIn = steerMotor.getSupplyCurrent();
-  }
-
-  private void refreshStatusSignals() {
-    BaseStatusSignal.refreshAll(
-      drivePositionIn, steerAngleIn, driveSpeedIn,
+    
+    BaseStatusSignal.setUpdateFrequencyForAll(
+      Hertz.of(100), drivePositionIn, steerAngleIn, driveSpeedIn,
       steerVelocityIn, driveCurrentIn, steerCurrentIn
     );
+
+    ParentDevice.optimizeBusUtilizationForAll(driveMotor, steerMotor, steerEncoder);
   }
 
   /**
@@ -265,8 +267,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    refreshStatusSignals();
-
     Logger.log(getName() + "/consumedCurrent", getConsumedCurrent());
   }
 
