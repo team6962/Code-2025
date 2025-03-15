@@ -324,13 +324,13 @@ public final class Constants {
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.652);
-    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(69.134); // CALCULATED FROM CAD
+    public static final Angle CENTER_OF_MASS_OFFSET = Degrees.of(85); // CALCULATED FROM CAD
 
     public static final class PROFILE {
-      public static final double kP = 4.0; // 3.75;
+      public static final double kP = 4.25; // 3.75;
       public static final double kI = 0.0;
       public static final double kD = 0.0; // 10.0; // 0.1;
-      public static final double kS = 0.15;
+      public static final double kS = 0.2;
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
@@ -338,7 +338,7 @@ public final class Constants {
     public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
     public static final Angle STOW_ANGLE = Degrees.of(-5.0);
-    public static final Angle SAFE_ANGLE = Degrees.of(0.0);
+    public static final Angle SAFE_ANGLE = Degrees.of(-5.0);
 
     // TODO: update for v2
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
@@ -347,7 +347,7 @@ public final class Constants {
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
     public static final Angle PID_MAX_ANGLE = Degrees.of(0.0);
-    public static final Angle TOLERANCE = Degrees.of(1.0);
+    public static final Angle TOLERANCE = Degrees.of(2.0);
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
     public static final boolean INVERTED = true;
     
