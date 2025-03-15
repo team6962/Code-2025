@@ -1,7 +1,7 @@
 package com.team6962.lib.swerve;
 
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -97,12 +97,8 @@ public class SwerveMovement {
       ChassisSpeeds adjustedSpeeds =
           new ChassisSpeeds(twist.dx / 0.02, twist.dy / 0.02, twist.dtheta / 0.02);
 
-      Logger.log("SwerveMovement/normalSpeeds", speeds);
-      Logger.log("SwerveMovement/adjustedSpeeds", adjustedSpeeds);
 
       states = kinematics.toSwerveModuleStates(adjustedSpeeds);
-
-      Logger.log("SwerveMovement/adjustedModuleSpeeds", kinematics.toChassisSpeeds(states));
     }
 
     return states;
