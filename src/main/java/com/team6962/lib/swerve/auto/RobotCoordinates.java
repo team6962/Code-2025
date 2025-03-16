@@ -17,24 +17,6 @@ public interface RobotCoordinates {
         return CachedRobotState.isAllianceInverted();
     }
 
-    public static Pose2d visionToFieldPose(Pose2d visionPose) {
-        if (isAllianceInverted().orElse(false)) {
-            return new Pose2d(
-                visionPose.getTranslation().rotateAround(FIELD_CENTER, HALF),
-                visionPose.getRotation().plus(HALF));
-        } else {
-            return visionPose;
-        }
-    }
-
-    public static Rotation2d visionToFieldRotation(Rotation2d visionRotation) {
-        if (isAllianceInverted().orElse(false)) {
-            return visionRotation.plus(HALF);
-        } else {
-            return visionRotation;
-        }
-    }
-
     public Pose2d getEstimatedPose();
 
     public default Rotation2d getEstimatedHeading() {

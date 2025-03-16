@@ -89,7 +89,7 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
-      RobotCoordinates.visionToFieldPose(visionRobotPoseMeters),
+      visionRobotPoseMeters,
       timestamp.in(Seconds),
       visionMeasurementStdDevs
     );
@@ -108,7 +108,7 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   public void addVisionHeading(Rotation2d expectedAbsoluteHeading) {
     resetPoseEstimate(new Pose2d(
       getEstimatedPose().getTranslation(),
-      RobotCoordinates.visionToFieldRotation(expectedAbsoluteHeading)
+      expectedAbsoluteHeading
     ));
   }
 

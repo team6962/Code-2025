@@ -149,7 +149,7 @@ public class AprilTags extends SubsystemBase {
     return cameraPoses.keySet().stream()
         .map(
             name ->
-                CachedRobotState.isRed().orElse(false)
+                CachedRobotState.isAllianceInverted().orElse(false)
                     ? LimelightHelpers.getBotPoseEstimate_wpiRed(name)
                     : LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
         .filter((estimate) -> estimate != null)
