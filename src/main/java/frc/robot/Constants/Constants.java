@@ -315,7 +315,7 @@ public final class Constants {
       public static final Distance L3_HEIGHT = Inches.of(56.75);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
-      public static final Distance PROCESSOR_HEIGHT = Inches.of(41.50);
+      public static final Distance PROCESSOR_HEIGHT = MIN_HEIGHT;
     }
   }
 
@@ -337,8 +337,9 @@ public final class Constants {
     public static final Angle MAX_ANGLE = Degrees.of(0.0); // RESET TO 40.0
     public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
-    public static final Angle STOW_ANGLE = Degrees.of(-5.0);
+    
     public static final Angle SAFE_ANGLE = Degrees.of(-5.0);
+    public static final Angle STOW_ANGLE = SAFE_ANGLE;
 
     // TODO: update for v2
     public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
@@ -362,7 +363,7 @@ public final class Constants {
       public static final Angle BARGE_ANGLE = Degrees.of(25.0);
       public static final Angle REEF_ANGLE = Degrees.of(-51.2);
       public static final Angle GROUND_ANGLE = Degrees.of(-75.0);
-      public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
+      public static final Angle PROCESSOR_ANGLE = Degrees.of(-70.0);
     }
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
@@ -405,7 +406,7 @@ public final class Constants {
 
     public static final double BASE_SPEED = 0.5;
 
-    public static final double FUNNEL_IN_SPEED = 0.5;
+    public static final double FUNNEL_IN_SPEED = 0.7;
   }
 
   public static final class HANG_PIVOT {

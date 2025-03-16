@@ -29,7 +29,7 @@ public class RealGrabber extends Grabber {
   private final DigitalInput sensor;
 
   private Debouncer algaeDebouncer;
-  private Debouncer coralDebouncer = new Debouncer(0.15);
+  private Debouncer coralDebouncer = new Debouncer(0.10);
 
   private boolean hasCoral = false;
 
