@@ -11,16 +11,10 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.swerve.auto.Coordinates;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,6 +25,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -284,6 +282,7 @@ public final class Constants {
   }
 
   public static final boolean SAFETIES_ENABLED = false;
+
   public static final class ELEVATOR {
     public static final double GEARING = 6.3;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
@@ -303,7 +302,7 @@ public final class Constants {
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(46.0); //change
+      public static final Distance L1_HEIGHT = Inches.of(46.0); // change
       public static final Distance L2_HEIGHT = Inches.of(49.2);
       public static final Distance L3_HEIGHT = Inches.of(57.2);
       public static final Distance L4_HEIGHT = Inches.of(72.5);
@@ -320,7 +319,7 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = (36.0/16.0)*(4.0)*(4.0);
+    public static final double GEARING = (36.0 / 16.0) * (4.0) * (4.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.652);
@@ -337,7 +336,6 @@ public final class Constants {
     public static final Angle MAX_ANGLE = Degrees.of(0.0); // RESET TO 40.0
     public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
-    
     public static final Angle SAFE_ANGLE = Degrees.of(-5.0);
     public static final Angle STOW_ANGLE = SAFE_ANGLE;
 
@@ -351,7 +349,7 @@ public final class Constants {
     public static final Angle TOLERANCE = Degrees.of(2.0);
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
     public static final boolean INVERTED = true;
-    
+
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(-10.0);
       public static final Angle L23_ANGLE = Degrees.of(-22.35);
@@ -425,7 +423,6 @@ public final class Constants {
       public static final double kI = 0.0;
     }
   }
-
 
   // LED
   public static final class LED {

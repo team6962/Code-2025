@@ -130,7 +130,7 @@ public class DualLinearActuator extends SubsystemBase {
         this.getName() + "/motors/right/current", () -> Amps.of(rightMotor.getOutputCurrent()));
     Logger.logNumber(
         this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
-      Logger.logBoolean(this.getName() + "/moving", () -> moving);
+    Logger.logBoolean(this.getName() + "/moving", () -> moving);
 
     // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
@@ -234,7 +234,8 @@ public class DualLinearActuator extends SubsystemBase {
 
     moving = true;
     leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
-    rightPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    rightPID.setReference(
+        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
   }
 
   public boolean triggeredCeilingLimit() {
