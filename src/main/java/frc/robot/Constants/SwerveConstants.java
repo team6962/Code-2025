@@ -64,9 +64,9 @@ public final class SwerveConstants {
   private static Chassis getChassis(ChassisType chassisType) {
     return switch (chassisType) {
       case COMPETITION -> new Chassis(
-          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
+          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(115));
       case TEST -> new Chassis(
-          Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(50));
+          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
     };
   }
 
@@ -102,10 +102,10 @@ public final class SwerveConstants {
         Constants.SWERVE.MODULE_CONFIGS[3]
       };
       case TEST -> new Module[] {
-        Constants.SWERVE.MODULE_CONFIGS[5],
-        Constants.SWERVE.MODULE_CONFIGS[4],
-        Constants.SWERVE.MODULE_CONFIGS[7],
-        Constants.SWERVE.MODULE_CONFIGS[6]
+        Constants.SWERVE.MODULE_CONFIGS[5], // Front Left
+        Constants.SWERVE.MODULE_CONFIGS[4], // Front Right
+        Constants.SWERVE.MODULE_CONFIGS[7], // Back Left
+        Constants.SWERVE.MODULE_CONFIGS[6] // Back Right
       };
     };
   }

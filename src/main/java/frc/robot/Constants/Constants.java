@@ -122,27 +122,27 @@ public final class Constants {
 
   // Competition: 5476
   public static final class SWERVE {
-    public static final Angle ALL_OFFSET = Degrees.of(135);
+    private static final Angle ALL_OFFSET = Degrees.of(135);
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
       new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
       new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
-      new SwerveConfig.Module(
-          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET)), // -2.439
-      new SwerveConfig.Module(
-          15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET)), // -0.440
-      new SwerveConfig.Module(
+      new SwerveConfig.Module( // Front Right (Test)
+          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))), // -2.439
+      new SwerveConfig.Module( // Front Left (Test)
+          15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(12.83)).plus(Degrees.of(.35))), // -0.440
+      new SwerveConfig.Module( // Back Right (Test)
           16,
           26,
           36,
-          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.842
-      new SwerveConfig.Module(
+          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET).minus(Degrees.of(15.82))), // -1.842
+      new SwerveConfig.Module( // Back Left (Test)
           17,
           27,
           37,
-          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET)), // -1.049
+          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET).minus(Degrees.of(14.41)).minus(Degrees.of(.88))), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 

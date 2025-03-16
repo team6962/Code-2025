@@ -44,8 +44,8 @@ public class Controls {
     // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
-    driver.b().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT));
-    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT));
+    driver.b().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false));
+    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
@@ -63,8 +63,6 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    driver.x().onTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT));
-    driver.b().onTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT));
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
 
     // Operator

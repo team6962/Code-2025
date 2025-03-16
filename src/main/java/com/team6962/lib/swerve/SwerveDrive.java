@@ -274,20 +274,20 @@ public class SwerveDrive extends SwerveCore {
         useMotion());
   }
 
-  public Command alignTo(
+  public AlignCommand alignTo(
       Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle) {
     return new AlignCommand(target, toleranceDistance, toleranceAngle);
   }
 
-  public Command alignTo(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
+  public AlignCommand alignTo(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
     return alignTo(() -> target, toleranceDistance, toleranceAngle);
   }
 
-  public Command alignTo(Supplier<Pose2d> target) {
+  public AlignCommand alignTo(Supplier<Pose2d> target) {
     return alignTo(target, Inches.of(0.5), Degrees.of(2));
   }
 
-  public Command alignTo(Pose2d target) {
+  public AlignCommand alignTo(Pose2d target) {
     return alignTo(() -> target);
   }
 
@@ -295,7 +295,7 @@ public class SwerveDrive extends SwerveCore {
    * A command to precisely align to a target position. This should not be used to drive to a target
    * far away, as it will not pathfind and may have unexpected behavior.
    */
-  private class AlignCommand extends Command {
+  public class AlignCommand extends Command {
     private PIDController translationXPID;
     private PIDController translationYPID;
     private ProfiledPIDController rotationPID;
@@ -306,6 +306,7 @@ public class SwerveDrive extends SwerveCore {
     private Distance toleranceDistance;
     private Angle toleranceAngle;
     private State state = State.TRANSLATING;
+    private boolean endWithinTolerance = true;
 
     private enum State {
       TRANSLATING,
@@ -319,6 +320,12 @@ public class SwerveDrive extends SwerveCore {
       this.toleranceAngle = toleranceAngle;
 
       addRequirements(useMotion());
+    }
+
+    public AlignCommand withEndWithinTolerance(boolean value) {
+      endWithinTolerance = value;
+
+      return this;
     }
 
     @Override
@@ -457,6 +464,8 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public boolean isFinished() {
+      if (!endWithinTolerance) return false;
+
       Pose2d target = targetSupplier.get();
       Pose2d current = getEstimatedPose();
 

@@ -173,10 +173,11 @@ public class AutonomousCommands {
             manipulator.grabber.dropAlgae(), CommandUtils.simulationMessage("Dropping algae", 0.25)));
   }
 
-  public Command alignCoral(int pole) {
+  public Command alignCoral(int pole, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getCoralAlignPose(pole))
-        .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
+        .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole))
+          .withEndWithinTolerance(endWithinTolerance));
   }
 
   public Command alignAlgae(int face) {
@@ -185,9 +186,9 @@ public class AutonomousCommands {
         .andThen(swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)));
   }
 
-  public Command alignToClosestPole(PolePattern pattern) {
+  public Command alignToClosestPole(PolePattern pattern, boolean endWithinTolerance) {
     return Commands.defer(
-        () -> alignCoral(getClosestReefPole(swerveDrive.getEstimatedPose(), pattern)),
+        () -> alignCoral(getClosestReefPole(swerveDrive.getEstimatedPose(), pattern), endWithinTolerance),
         Set.of(swerveDrive.useMotion()));
   }
 
