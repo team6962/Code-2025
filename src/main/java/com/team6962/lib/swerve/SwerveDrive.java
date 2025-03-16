@@ -12,9 +12,6 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
@@ -22,7 +19,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -45,6 +41,8 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -347,9 +345,7 @@ public class SwerveDrive extends SwerveCore {
               getConstants().driveGains().fineRotation().kD,
               new TrapezoidProfile.Constraints(
                   getConstants().maxRotationSpeed().in(RadiansPerSecond),
-                  getConstants()
-                      .maxAngularAcceleration()
-                      .in(RadiansPerSecondPerSecond)));
+                  getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)));
       rotationPID.enableContinuousInput(-Math.PI, Math.PI);
 
       translateFeedforward = new SimpleMotorFeedforward(0.01, 0);
@@ -544,29 +540,31 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command driveTrapezoidalTo(
-    Translation2d target, LinearVelocity maxVelocity,
-    LinearAcceleration maxAcceleration, LinearVelocity targetEndVelocity,
-    Distance positionTolerance, boolean timeLimit
-  ) {
+      Translation2d target,
+      LinearVelocity maxVelocity,
+      LinearAcceleration maxAcceleration,
+      LinearVelocity targetEndVelocity,
+      Distance positionTolerance,
+      boolean timeLimit) {
     return new TrapezoidalTranslationCommand(
-      () -> target, maxVelocity, maxAcceleration,
-      targetEndVelocity, positionTolerance, timeLimit
-    );
+        () -> target,
+        maxVelocity,
+        maxAcceleration,
+        targetEndVelocity,
+        positionTolerance,
+        timeLimit);
   }
 
-  public TrapezoidalTranslationCommand driveTrapezoidalTo(
-      Translation2d target
-  ) {
+  public TrapezoidalTranslationCommand driveTrapezoidalTo(Translation2d target) {
     SwerveConfig config = getConstants();
 
     return new TrapezoidalTranslationCommand(
-      () -> target,
-      config.maxDriveSpeed(),
-      config.maxLinearAcceleration(),
-      config.maxDriveSpeed(),
-      Inches.of(4),
-      true
-    );
+        () -> target,
+        config.maxDriveSpeed(),
+        config.maxLinearAcceleration(),
+        config.maxDriveSpeed(),
+        Inches.of(4),
+        true);
   }
 
   public class TrapezoidalTranslationCommand extends Command {
@@ -586,11 +584,12 @@ public class SwerveDrive extends SwerveCore {
     private Time endTime;
 
     public TrapezoidalTranslationCommand(
-      Supplier<Translation2d> targetSupplier,
-      LinearVelocity maxVelocity, LinearAcceleration maxAcceleration,
-      LinearVelocity targetEndVelocity, Distance positionTolerance,
-      boolean timeLimit
-    ) {
+        Supplier<Translation2d> targetSupplier,
+        LinearVelocity maxVelocity,
+        LinearAcceleration maxAcceleration,
+        LinearVelocity targetEndVelocity,
+        Distance positionTolerance,
+        boolean timeLimit) {
       this.targetSupplier = targetSupplier;
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
@@ -628,10 +627,10 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void initialize() {
-      this.profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
-        maxVelocity.in(MetersPerSecond),
-        maxAcceleration.in(MetersPerSecondPerSecond)
-      ));
+      this.profile =
+          new TrapezoidProfile(
+              new TrapezoidProfile.Constraints(
+                  maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
 
       targetTranslation = targetSupplier.get();
 
@@ -650,24 +649,28 @@ public class SwerveDrive extends SwerveCore {
       double targetScalarDistance = 0;
 
       Translation2d currentSpeeds = KinematicsUtils.getTranslation(getEstimatedSpeeds());
-      double currentScalarSpeed = currentSpeeds.getX() * errorUnit.getX() + currentSpeeds.getY() * errorUnit.getY();
+      double currentScalarSpeed =
+          currentSpeeds.getX() * errorUnit.getX() + currentSpeeds.getY() * errorUnit.getY();
 
-      TrapezoidProfile.State state = profile.calculate(timer.get(), new TrapezoidProfile.State(
-        currentScalarDistance,
-        -currentScalarSpeed
-      ), new TrapezoidProfile.State(
-        targetScalarDistance,
-        -targetEndVelocity.in(MetersPerSecond)
-      ));
+      TrapezoidProfile.State state =
+          profile.calculate(
+              timer.get(),
+              new TrapezoidProfile.State(currentScalarDistance, -currentScalarSpeed),
+              new TrapezoidProfile.State(
+                  targetScalarDistance, -targetEndVelocity.in(MetersPerSecond)));
 
       if (timeLimit && endTime == null) {
         endTime = Seconds.of(profile.timeLeftUntil(0));
       }
 
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
+      Logger.log(
+          "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
       Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/targetSpeed", -targetEndVelocity.in(MetersPerSecond));
+      Logger.log(
+          "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
+      Logger.log(
+          "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
+          -targetEndVelocity.in(MetersPerSecond));
       Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
 
       moveFieldRelative(errorUnit.times(-state.velocity));
@@ -675,8 +678,9 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public boolean isFinished() {
-      return ((endTime != null) && Seconds.of(timer.get()).gt(endTime)) ||
-        getEstimatedPose().getTranslation().getDistance(targetTranslation) < positionTolerance.in(Meters);
+      return ((endTime != null) && Seconds.of(timer.get()).gt(endTime))
+          || getEstimatedPose().getTranslation().getDistance(targetTranslation)
+              < positionTolerance.in(Meters);
     }
   }
 }

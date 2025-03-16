@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import java.util.Map;
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,6 +12,7 @@ import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -44,7 +41,9 @@ public class Controls {
     // Button for aligning to algae on the reef (dpad up)
 
     driver.a();
-    driver.b().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false));
+    driver
+        .b()
+        .whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false));
     driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
@@ -105,12 +104,19 @@ public class Controls {
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
     operator.leftStick().onTrue(pieceCombos.algaeBarge());
-    operator.rightStick().onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+    operator
+        .rightStick()
+        .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    operator.rightBumper().whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth())); //intake coral
-    operator.rightTrigger().whileTrue(manipulator.grabber.dropCoral().andThen(rumbleBoth())); //drop coral/intake algae
-    operator.leftBumper().whileTrue(manipulator.grabber.adjustCoral()); //reverse coral
-    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); //drop algae
+    operator
+        .rightBumper()
+        .whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth())); // intake coral
+    operator
+        .rightTrigger()
+        .whileTrue(
+            manipulator.grabber.dropCoral().andThen(rumbleBoth())); // drop coral/intake algae
+    operator.leftBumper().whileTrue(manipulator.grabber.adjustCoral()); // reverse coral
+    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >

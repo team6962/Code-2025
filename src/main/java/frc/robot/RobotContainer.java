@@ -6,14 +6,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -29,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
-import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.auto.pipeline.AutoGeneration;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
@@ -44,6 +39,8 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -122,7 +119,7 @@ public class RobotContainer {
     statusChecks.add("5V Enabled", () -> RobotController.getEnabled5V());
     statusChecks.add("6V Enabled", () -> RobotController.getEnabled6V());
     statusChecks.add("Sys Time Valid", () -> RobotController.isSystemTimeValid());
-    
+
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
@@ -147,10 +144,14 @@ public class RobotContainer {
     Controls.configureBindings(
         stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
 
-    autoGen = new AutoGeneration(
-      autonomous, AUTO.SLEEP_TIME, AUTO.WORK_TIME,
-      () -> AutoPaths.PlanParameters.fromAutoChooser(
-        manipulator.grabber.hasCoral(), swerveDrive.getEstimatedPose()));
+    autoGen =
+        new AutoGeneration(
+            autonomous,
+            AUTO.SLEEP_TIME,
+            AUTO.WORK_TIME,
+            () ->
+                AutoPaths.PlanParameters.fromAutoChooser(
+                    manipulator.grabber.hasCoral(), swerveDrive.getEstimatedPose()));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =

@@ -5,11 +5,8 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
-import java.util.Set;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +28,7 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import java.util.Set;
 
 public class AutonomousCommands {
   private SwerveDrive swerveDrive;
@@ -65,7 +63,9 @@ public class AutonomousCommands {
   }
 
   public Subsystem[] getRequirements() {
-    return new Subsystem[] { manipulator.pivot, manipulator.grabber, manipulator.funnel, elevator, swerveDrive };
+    return new Subsystem[] {
+      manipulator.pivot, manipulator.grabber, manipulator.funnel, elevator, swerveDrive
+    };
   }
 
   private int getClosestReefPole(Pose2d pose, PolePattern pattern) {
@@ -112,8 +112,9 @@ public class AutonomousCommands {
                 CommandUtils.simulationMessage(
                     "Moving elevator and manipulator for coral intaking", 0.5))),
         CommandUtils.selectByMode(
-          manipulator.funnel.intake(manipulator.grabber), CommandUtils.simulationMessage("Intaking coral", 0.25))
-          .alongWith(swerveDrive.alignTo(intake)));
+                manipulator.funnel.intake(manipulator.grabber),
+                CommandUtils.simulationMessage("Intaking coral", 0.25))
+            .alongWith(swerveDrive.alignTo(intake)));
   }
 
   public Command processAlgae() {
@@ -170,14 +171,17 @@ public class AutonomousCommands {
                 SWERVE.CONFIG.chassis().outerWidth().div(2).plus(Inches.of(18)).in(Meters),
                 Rotation2d.fromDegrees(-90))),
         CommandUtils.selectByMode(
-            manipulator.grabber.dropAlgae(), CommandUtils.simulationMessage("Dropping algae", 0.25)));
+            manipulator.grabber.dropAlgae(),
+            CommandUtils.simulationMessage("Dropping algae", 0.25)));
   }
 
   public Command alignCoral(int pole, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getCoralAlignPose(pole))
-        .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole))
-          .withEndWithinTolerance(endWithinTolerance));
+        .andThen(
+            swerveDrive
+                .alignTo(ReefPositioning.getCoralPlacePose(pole))
+                .withEndWithinTolerance(endWithinTolerance));
   }
 
   public Command alignAlgae(int face) {
@@ -188,7 +192,9 @@ public class AutonomousCommands {
 
   public Command alignToClosestPole(PolePattern pattern, boolean endWithinTolerance) {
     return Commands.defer(
-        () -> alignCoral(getClosestReefPole(swerveDrive.getEstimatedPose(), pattern), endWithinTolerance),
+        () ->
+            alignCoral(
+                getClosestReefPole(swerveDrive.getEstimatedPose(), pattern), endWithinTolerance),
         Set.of(swerveDrive.useMotion()));
   }
 
@@ -212,13 +218,15 @@ public class AutonomousCommands {
             .withDeadline(swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole))),
         CommandUtils.selectByMode(
             pieceCombos.coral(position.level),
-            CommandUtils.simulationMessage("Moving to level " + position.level, position.level * 0.5)),
+            CommandUtils.simulationMessage(
+                "Moving to level " + position.level, position.level * 0.5)),
         swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole)),
         CommandUtils.selectByMode(
-            manipulator.grabber.dropCoral(), CommandUtils.simulationMessage("Dropping coral", 0.25)),
-        swerveDrive.driveTrapezoidalTo(
-            ReefPositioning.getCoralAlignPose(position.pole).getTranslation())
-          .withMaxAcceleration(MetersPerSecondPerSecond.of(0.1)),
+            manipulator.grabber.dropCoral(),
+            CommandUtils.simulationMessage("Dropping coral", 0.25)),
+        swerveDrive
+            .driveTrapezoidalTo(ReefPositioning.getCoralAlignPose(position.pole).getTranslation())
+            .withMaxAcceleration(MetersPerSecondPerSecond.of(0.1)),
         CommandUtils.selectByMode(
                 pieceCombos.stow(),
                 CommandUtils.simulationMessage("Stowing elevator", position.level * 0.5))
@@ -243,7 +251,8 @@ public class AutonomousCommands {
             CommandUtils.simulationMessage("Moving to level " + level, level * 0.5)),
         swerveDrive.alignTo(ReefPositioning.getAlgaePlacePose(face)),
         CommandUtils.selectByMode(
-            manipulator.grabber.intakeAlgae(), CommandUtils.simulationMessage("Intaking algae", 0.5)),
+            manipulator.grabber.intakeAlgae(),
+            CommandUtils.simulationMessage("Intaking algae", 0.5)),
         swerveDrive.alignTo(ReefPositioning.getAlgaeLeavePose(face), Inches.of(3), Degrees.of(45)),
         CommandUtils.selectByMode(
             pieceCombos.stow(), CommandUtils.simulationMessage("Stowing elevator", level * 0.5)));

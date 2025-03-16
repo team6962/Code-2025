@@ -1,11 +1,7 @@
 package frc.robot.auto.pipeline;
 
-import java.lang.Thread.State;
-import java.util.function.Supplier;
-
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutonomousCommands;
+import java.lang.Thread.State;
+import java.util.function.Supplier;
 
 public class AutoGeneration extends SubsystemBase {
   private AutoThread currentThread;
@@ -21,7 +19,10 @@ public class AutoGeneration extends SubsystemBase {
   private Time workTime;
   private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
-  public AutoGeneration(AutonomousCommands autonomous, Time sleepTime, Time workTime, 
+  public AutoGeneration(
+      AutonomousCommands autonomous,
+      Time sleepTime,
+      Time workTime,
       Supplier<AutoPaths.PlanParameters> parametersSupplier) {
     this.autonomous = autonomous;
     this.workDelay = sleepTime;
@@ -37,13 +38,14 @@ public class AutoGeneration extends SubsystemBase {
 
   @Override
   public void periodic() {
-      setParameters(parametersSupplier.get(), false);
+    setParameters(parametersSupplier.get(), false);
   }
 
   private void setParameters(AutoPaths.PlanParameters parameters, boolean forceWork) {
     Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
 
-    if (!parameters.constraints.pathExists() || (!AutoThread.shouldWorkInBackground() && !forceWork)) {
+    if (!parameters.constraints.pathExists()
+        || (!AutoThread.shouldWorkInBackground() && !forceWork)) {
       if (currentThread != null && !currentThread.isFinished()) currentThread.interrupt();
 
       return;
@@ -71,7 +73,8 @@ public class AutoGeneration extends SubsystemBase {
     AutoPaths.PlanParameters parameters = parametersSupplier.get();
 
     if (!parameters.constraints.pathExists()) {
-      return CommandUtils.warnWithRequirements("No valid autonomous selected", autonomous.getRequirements());
+      return CommandUtils.warnWithRequirements(
+          "No valid autonomous selected", autonomous.getRequirements());
     }
 
     setParameters(parameters, true);
@@ -84,7 +87,9 @@ public class AutoGeneration extends SubsystemBase {
     Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
     Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
 
-    if (command == null) return CommandUtils.warnWithRequirements("Failed to generate autonomous command", autonomous.getRequirements());
+    if (command == null)
+      return CommandUtils.warnWithRequirements(
+          "Failed to generate autonomous command", autonomous.getRequirements());
     else return command;
   }
 }

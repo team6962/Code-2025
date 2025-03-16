@@ -12,15 +12,9 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -32,6 +26,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -130,19 +128,33 @@ public final class Constants {
       new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
       new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
       new SwerveConfig.Module( // Front Right (Test)
-          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))), // -2.439
+          14,
+          24,
+          34,
+          Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))), // -2.439
       new SwerveConfig.Module( // Front Left (Test)
-          15, 25, 35, Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(12.83)).plus(Degrees.of(.35))), // -0.440
+          15,
+          25,
+          35,
+          Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4)
+              .plus(ALL_OFFSET)
+              .minus(Degrees.of(12.83))
+              .plus(Degrees.of(.35))), // -0.440
       new SwerveConfig.Module( // Back Right (Test)
           16,
           26,
           36,
-          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET).minus(Degrees.of(15.82))), // -1.842
+          Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI)
+              .plus(ALL_OFFSET)
+              .minus(Degrees.of(15.82))), // -1.842
       new SwerveConfig.Module( // Back Left (Test)
           17,
           27,
           37,
-          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI).plus(ALL_OFFSET).minus(Degrees.of(14.41)).minus(Degrees.of(.88))), // -1.049
+          Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI)
+              .plus(ALL_OFFSET)
+              .minus(Degrees.of(14.41))
+              .minus(Degrees.of(.88))), // -1.049
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -254,6 +266,7 @@ public final class Constants {
   }
 
   public static final boolean SAFETIES_ENABLED = false;
+
   public static final class ELEVATOR {
     public static final double GEARING = 6.72;
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
@@ -273,7 +286,7 @@ public final class Constants {
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
 
     public static final class CORAL {
-      public static final Distance L1_HEIGHT = Inches.of(46.0); //change
+      public static final Distance L1_HEIGHT = Inches.of(46.0); // change
       public static final Distance L2_HEIGHT = Inches.of(49.2);
       public static final Distance L3_HEIGHT = Inches.of(57.2);
       public static final Distance L4_HEIGHT = Inches.of(72.5);
@@ -290,7 +303,7 @@ public final class Constants {
   }
 
   public static final class MANIPULATOR_PIVOT {
-    public static final double GEARING = (36.0/16.0)*(4.0)*(4.0);
+    public static final double GEARING = (36.0 / 16.0) * (4.0) * (4.0);
     public static final double ROTATION_DELAY = 0.3; // seconds
     public static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.25);
     public static final Angle ABSOLUTE_POSITION_OFFSET = Rotations.of(0.652);
@@ -320,7 +333,7 @@ public final class Constants {
     public static final Angle TOLERANCE = Degrees.of(2.0);
     public static final Angle SAFE_TOLERANCE = Degrees.of(4.0);
     public static final boolean INVERTED = true;
-    
+
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(-10.0);
       public static final Angle L23_ANGLE = Degrees.of(-22.35);
@@ -394,7 +407,6 @@ public final class Constants {
       public static final double kI = 0.0;
     }
   }
-
 
   // LED
   public static final class LED {

@@ -1,12 +1,11 @@
 package com.team6962.lib.utils;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import java.util.function.Supplier;
 
 public final class CommandUtils {
   private CommandUtils() {}
@@ -44,14 +43,16 @@ public final class CommandUtils {
     return command;
   }
 
-  public static Command warnWithRequirements(Supplier<String> message, boolean trace, Subsystem... requirements) {
-    return withRequirements(Commands.runOnce(() -> 
-      DriverStation.reportWarning(message.get(), trace)), requirements);
+  public static Command warnWithRequirements(
+      Supplier<String> message, boolean trace, Subsystem... requirements) {
+    return withRequirements(
+        Commands.runOnce(() -> DriverStation.reportWarning(message.get(), trace)), requirements);
   }
 
-  public static Command warnWithRequirements(String message, boolean trace, Subsystem... requirements) {
-    return withRequirements(Commands.runOnce(() -> 
-      DriverStation.reportWarning(message, trace)), requirements);
+  public static Command warnWithRequirements(
+      String message, boolean trace, Subsystem... requirements) {
+    return withRequirements(
+        Commands.runOnce(() -> DriverStation.reportWarning(message, trace)), requirements);
   }
 
   public static Command warnWithRequirements(String message, Subsystem... requirements) {

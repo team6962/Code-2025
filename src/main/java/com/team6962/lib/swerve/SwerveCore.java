@@ -1,7 +1,5 @@
 package com.team6962.lib.swerve;
 
-import java.util.Arrays;
-
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.RobotCoordinates;
 import com.team6962.lib.swerve.module.SimulatedModule;
@@ -9,7 +7,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +24,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Arrays;
 
 /**
  * The "core" of the swerve drive system. This class is responsible for managing the swerve modules,
@@ -156,7 +154,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     states =
         KinematicsUtils.desaturateWheelSpeeds(
             states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
-    
+
     Logger.log(getName() + "/targetModuleStates", states);
 
     Pose2d[] poses = getModulePoses();

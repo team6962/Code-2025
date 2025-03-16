@@ -6,8 +6,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Consumer;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
@@ -30,7 +28,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -47,8 +44,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.Constants.CANBUS;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -100,7 +97,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new FeedbackConfigs().withRotorToSensorRatio(1).withSensorToMechanismRatio(1)));
 
     CTREUtils.check(
-        driveConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
+        driveConfig.apply(
+            new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
 
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
 
@@ -127,7 +125,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withNeutralMode(NeutralModeValue.Brake)));
 
     CTREUtils.check(
-        steerConfig.apply(new CurrentLimitsConfigs().withSupplyCurrentLimit(config.steerMotor().maxCurrent())));
+        steerConfig.apply(
+            new CurrentLimitsConfigs().withSupplyCurrentLimit(config.steerMotor().maxCurrent())));
 
     CTREUtils.check(
         steerConfig.apply(
@@ -212,9 +211,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   private void refreshStatusSignals() {
     BaseStatusSignal.refreshAll(
-      drivePositionIn, steerAngleIn, driveSpeedIn,
-      steerVelocityIn, driveCurrentIn, steerCurrentIn
-    );
+        drivePositionIn,
+        steerAngleIn,
+        driveSpeedIn,
+        steerVelocityIn,
+        driveCurrentIn,
+        steerCurrentIn);
   }
 
   /**
@@ -304,11 +306,14 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     Logger.log(getName() + "/targetState", targetState);
 
-    CTREUtils.check(driveMotor.setControl(driveSpeedOut.withVelocity(
-      constants.driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond))
-    )));
+    CTREUtils.check(
+        driveMotor.setControl(
+            driveSpeedOut.withVelocity(
+                constants.driveMotorMechanismToRotor(
+                    MetersPerSecond.of(targetState.speedMetersPerSecond)))));
 
-    CTREUtils.check(steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
+    CTREUtils.check(
+        steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
   }
 
   /**
@@ -371,10 +376,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private Command calibrateMotor(
-      String motorName,
-      TalonFX motor,
-      Current maxCurrent,
-      Consumer<MotorLog> logEncoder) {
+      String motorName, TalonFX motor, Current maxCurrent, Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(),

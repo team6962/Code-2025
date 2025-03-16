@@ -94,7 +94,6 @@ public class PivotController extends SubsystemBase {
     // motorConfig.absoluteEncoder.zeroCentered(false);
     motorConfig.absoluteEncoder.zeroOffset(absolutePositionOffset);
 
-
     this.kS = kS;
     this.minAngle = minAngle;
     this.maxAngle = maxAngle;
@@ -130,7 +129,6 @@ public class PivotController extends SubsystemBase {
     Logger.logBoolean(this.getName() + "/safety/reverse", this::triggeredReverseSafety);
     Logger.logNumber(this.getName() + "/duty/applied", () -> motor.getAppliedOutput());
     Logger.logNumber(this.getName() + "/duty/pid", () -> motor.get());
-
 
     Logger.logNumber(this.getName() + "/angle/target", () -> getTargetAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/relative", () -> getRelativePosition().in(Rotations));

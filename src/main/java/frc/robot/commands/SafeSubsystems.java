@@ -38,10 +38,7 @@ public class SafeSubsystems extends SubsystemBase {
 
   public Command safeMoveCommand(Command elevatorCommand, Command manipulatorCommand) {
     // if (Constants.SAFETIES_ENABLED) {
-      return Commands.sequence(
-        manipulator.pivot.safe(),
-        elevatorCommand,
-        manipulatorCommand);
+    return Commands.sequence(manipulator.pivot.safe(), elevatorCommand, manipulatorCommand);
     // }
     // return Commands.sequence(elevatorCommand, manipulatorCommand);
   }
@@ -49,11 +46,10 @@ public class SafeSubsystems extends SubsystemBase {
   public Command parallelSafeCommand(Command elevatorCommand, Command manipulatorCommand) {
     if (Constants.SAFETIES_ENABLED) {
       return Commands.sequence(
-        manipulator.pivot.safe(), Commands.parallel(elevatorCommand, manipulatorCommand));
+          manipulator.pivot.safe(), Commands.parallel(elevatorCommand, manipulatorCommand));
     }
 
     return Commands.parallel(elevatorCommand, manipulatorCommand);
-   
   }
 
   @Override
@@ -62,7 +58,7 @@ public class SafeSubsystems extends SubsystemBase {
       Distance elevatorHeight = elevator.getAverageHeight();
       Angle minAngle = calcSafeMinAngle(elevatorHeight);
       Angle maxAngle = calcSafeMaxAngle(elevatorHeight);
-  
+
       manipulator.pivot.setMinMaxAngle(minAngle, maxAngle);
     }
   }
