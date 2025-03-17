@@ -120,14 +120,10 @@ public class XBoxSwerve extends Command {
         -rightStick.getX()
             * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
 
-    Logger.log("XBoxSwerve/rightTrig", rightTrigger);
-
     velocity =
         velocity.plus(
             leftStick.times(
                 MathUtils.map(rightTrigger, 0, 1, NOMINAL_DRIVE_VELOCITY, MAX_DRIVE_VELOCITY)));
-
-    Logger.log("XBoxSwerve/leftStick", leftStick);
 
     if (controller.getPOV() != -1) {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
@@ -161,14 +157,9 @@ public class XBoxSwerve extends Command {
     ChassisSpeeds drivenSpeeds =
         new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
 
-    Logger.log("XBoxSwerve/maxDriveSpeed", swerveDrive.getConstants().maxDriveSpeed());
-    Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
-
     boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
-    Logger.log("XBoxSwerve/movingTranslation", movingTranslation);
 
     Command currentTranslateCommand = swerveDrive.useTranslation().getCurrentCommand();
-    Logger.logObject("XBoxSwerve/currentTranslateCommand", currentTranslateCommand);
 
     if (currentTranslateCommand == translateCommand
         || currentTranslateCommand == null
@@ -181,9 +172,7 @@ public class XBoxSwerve extends Command {
     }
 
     boolean movingRotation = Math.abs(angularVelocity) > Units.degreesToRadians(3);
-    Logger.log("XBoxSwerve/movingRotation", movingRotation);
     Command currentRotateCommand = swerveDrive.useRotation().getCurrentCommand();
-    Logger.logObject("XBoxSwerve/currentRotateCommand", currentRotateCommand);
 
     if (currentRotateCommand == rotateCommand || currentRotateCommand == null || movingRotation) {
       if (rotateCommand != null) rotateCommand.cancel();
