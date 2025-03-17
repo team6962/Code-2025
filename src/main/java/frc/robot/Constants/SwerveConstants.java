@@ -55,8 +55,8 @@ public final class SwerveConstants {
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
                 Amps.of(60)),
             Wheel.COLSON,
-            new DriveGains(new PIDConstants(5.0, 0.0, 0.1), new PIDConstants(2.0, 0.5, 0.01))
-                .withFineTranslation(new PIDConstants(5.0, 0.0, 0.1)))
+            new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
+                .withFineTranslation(new PIDConstants(1.0, 0.0, 0.2)))
         .withMaxDriveSpeed(MetersPerSecond.of(3.9))
         .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
   }
