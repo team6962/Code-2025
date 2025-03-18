@@ -140,7 +140,8 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
   }
 
   public boolean inRange(Angle angle) {
-    return getAbsolutePosition().minus(angle).abs(Rotations)< MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
+    return getAbsolutePosition().minus(angle).abs(Rotations)
+        < MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
   }
 
   public Command safe() {
