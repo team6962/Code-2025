@@ -6,11 +6,14 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.pathplanner.lib.auto.CommandUtil;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -21,6 +24,7 @@ import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.Constants.Constants.MANIPULATOR;
+import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealGrabber extends Grabber {
@@ -33,9 +37,13 @@ public class RealGrabber extends Grabber {
   private Debouncer coralDebouncer = new Debouncer(0.15);
 
   private boolean hasCoral = false;
+<<<<<<< HEAD
   private boolean coralClear = false;
 
+=======
+>>>>>>> 4b37b57 (reimplement algae hold)
   private boolean detectedAlgae = false;
+
 
   private Timer gripCheckTimer = new Timer();
 
@@ -97,30 +105,30 @@ public class RealGrabber extends Grabber {
     return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
   }
 
+  public boolean detectedAlgae() {
+    return detectedAlgae;
+  }
+
   public Command intakeAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
-        .until(this::hasAlgae)
-        .andThen(() -> expectAlgae(true));
+        .until(this::detectedAlgae)
+        .finallyDo((b) -> expectAlgae(b));
   }
 
   public Command dropAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED)
-        .finallyDo(
-            () -> {
-              expectAlgae(false);
-              stop();
-            });
+        .finallyDo(() -> expectAlgae(false));
   }
 
   public Command checkAlgaeGrip() {
-    return Commands.runOnce(this::resetDebouncer)
-        .andThen(
-            Commands.parallel(
+    return Commands.sequence(
+      Commands.runOnce(this::resetDebouncer),
+      Commands.parallel(
                 runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
                 Commands.race(
-                    Commands.waitUntil(() -> detectedAlgae).andThen(() -> expectAlgae(true)),
-                    Commands.waitSeconds(MANIPULATOR.ALGAE_GRIP_CHECK_TIME.in(Seconds))
-                        .andThen(() -> expectAlgae(false)))));
+                    Commands.waitUntil(this::detectedAlgae).andThen(() -> expectAlgae(true)),
+                    Commands.waitTime(MANIPULATOR.ALGAE_GRIP_CHECK_TIME).andThen(() -> expectAlgae(false))))
+    );
   }
 
   private void resetDebouncer() {
@@ -135,18 +143,17 @@ public class RealGrabber extends Grabber {
     return runSpeed(-MANIPULATOR.BASE_SPEED);
   }
 
+  public Command holdAlgae() {
+    if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
+    return Commands.sequence(
+      runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED).until(this::detectedAlgae),
+      stop().withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
+    ).repeatedly();
+  }
+
   // update this for both game pieces
   public Command hold() {
-    return run(
-        () -> {
-          if (!ENABLED_SYSTEMS.MANIPULATOR) motor.set(0);
-          else if (hasCoral()) motor.set(MANIPULATOR.CORAL_HOLD_SPEED);
-          else if (!hasAlgae()) motor.set(0);
-          else if (MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED
-              && gripCheckTimer.advanceIfElapsed(MANIPULATOR.ALGAE_GRIP_CHECK_RATE.in(Seconds))) {
-            checkAlgaeGrip().schedule();
-          } else motor.set(0);
-        });
+    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
   }
 
   public Command stop() {
