@@ -46,6 +46,8 @@ public interface Elevator extends Subsystem {
 
   public Command down();
 
+  public boolean inRange(Distance height);
+
   public static Elevator create() {
     if (ENABLED_SYSTEMS.ELEVATOR) return new RealElevator();
     else return new DisabledElevator();
