@@ -26,12 +26,14 @@ import frc.robot.util.hardware.SparkMaxUtil;
 public class RealGrabber extends Grabber {
 
   private final SparkMax motor;
-  private final DigitalInput sensor;
+  private final DigitalInput detectSensor;
+  private final DigitalInput clearSensor;
 
   private Debouncer algaeDebouncer;
   private Debouncer coralDebouncer = new Debouncer(0.15);
 
   private boolean hasCoral = false;
+  private boolean coralClear = false;
 
   private boolean detectedAlgae = false;
 
@@ -41,6 +43,8 @@ public class RealGrabber extends Grabber {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
     Logger.logBoolean(getName() + "/motorsStalled", () -> detectedAlgae);
+    Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
+    Logger.logNumber(getName() + "/temp", () -> motor.getMotorTemperature());
     Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
 
     resetDebouncer();
@@ -52,7 +56,8 @@ public class RealGrabber extends Grabber {
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    sensor = new DigitalInput(DIO.CORAL_BEAM_BREAK);
+    detectSensor = new DigitalInput(DIO.CORAL_DETECT_BEAM_BREAK);
+    clearSensor = new DigitalInput(DIO.CORAL_CLEAR_BEAM_BREAK);
 
     setDefaultCommand(hold());
 
@@ -68,8 +73,17 @@ public class RealGrabber extends Grabber {
     return hasCoral;
   }
 
+  public boolean isClear() {
+    return coralClear;
+  }
+
   public Command intakeCoral() {
-    return runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral);
+    return Commands.sequence(
+      runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(() -> !isClear()),
+      runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
+      runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isClear),
+      stop()
+    );
   }
 
   public Command dropCoral() {
@@ -144,6 +158,7 @@ public class RealGrabber extends Grabber {
     super.periodic();
 
     detectedAlgae = algaeDebouncer.calculate(Amps.of(motor.getOutputCurrent()).gt(Amps.of(40)));
-    hasCoral = coralDebouncer.calculate(!sensor.get());
+    hasCoral = coralDebouncer.calculate(!detectSensor.get());
+    coralClear = clearSensor.get();
   }
 }

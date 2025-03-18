@@ -188,7 +188,8 @@ public final class Constants {
 
   public static final class DIO {
     public static final int HANG_ENCODER = 10;
-    public static final int CORAL_BEAM_BREAK = 0;
+    public static final int CORAL_CLEAR_BEAM_BREAK = -1;
+    public static final int CORAL_DETECT_BEAM_BREAK = 0;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
     public static final int ELEVATOR_CEIL_LIMIT = 2;
     public static final int MANIPULATOR_ENCODER = 4;
@@ -397,7 +398,8 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = -0.1;
 
     public static final double CORAL_OUT_SPEED = 0.7;
-    public static final double CORAL_IN_SPEED = 0.1;
+    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_SLOW_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.1;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
