@@ -346,8 +346,8 @@ public final class Constants {
         public static final Angle AIM_ANGLE = MAX_ANGLE;
         public static final Angle RELEASE_ANGLE = Degrees.of(0.0);
         public static final Angle END_ANGLE = Degrees.of(-30.0);
-        
       }
+
       public static final Angle REEF_ANGLE = Degrees.of(-51.2);
       public static final Angle GROUND_ANGLE = Degrees.of(-75.0);
       public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);

@@ -4,7 +4,6 @@ import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.ELEVATOR;
-import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 
@@ -20,7 +19,8 @@ public class PieceCombos {
   }
 
   public Command intakeCoral() {
-    return safeSubsystems.safeMoveCommand(elevator.coralL1().andThen(elevator.coralIntake()), manipulator.intakeCoral());
+    return safeSubsystems.safeMoveCommand(
+        elevator.coralL1().andThen(elevator.coralIntake()), manipulator.intakeCoral());
   }
 
   public Command coral(int level) {
@@ -70,23 +70,27 @@ public class PieceCombos {
   }
 
   public Command algaeBargeSetup() {
-    return safeSubsystems.safeMoveCommand(elevator.algaeBarge(), manipulator.pivot.algaeBargeSetup());
+    return safeSubsystems.safeMoveCommand(
+        elevator.algaeBarge(), manipulator.pivot.algaeBargeSetup());
   }
 
   public Command algaeBargeShoot() {
     return Commands.either(
-      manipulator.pivot.algaeBargeSetup().andThen(
-        manipulator.pivot.algaeBargeSetup(),
-        manipulator.pivot.algaeBargeShoot().deadlineFor(
-          Commands.sequence(
-            // Commands.waitUntil(() -> manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
-            manipulator.grabber.dropAlgae()
-          )
-        )
-      ),
-
-      Commands.print("not at barge height"),
-      () -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
+        manipulator
+            .pivot
+            .algaeBargeSetup()
+            .andThen(
+                manipulator.pivot.algaeBargeSetup(),
+                manipulator
+                    .pivot
+                    .algaeBargeShoot()
+                    .deadlineFor(
+                        Commands.sequence(
+                            // Commands.waitUntil(() ->
+                            // manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
+                            manipulator.grabber.dropAlgae()))),
+        Commands.print("not at barge height"),
+        () -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
   }
 
   public Command algaeProcessor() {
