@@ -108,7 +108,7 @@ public class SimGrabber extends Grabber {
   }
 
   @Override
-  public Command checkAlgaeGrip() {
+  public Command holdAlgae() {
     return waitTimeCommand(algaeGripTime);
   }
 
