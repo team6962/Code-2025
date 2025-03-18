@@ -87,4 +87,8 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   public Distance getMinHeight() {
     return Meters.of(Double.NEGATIVE_INFINITY);
   }
+
+  public boolean inRange(Distance height) {
+    return true;
+  }
 }
