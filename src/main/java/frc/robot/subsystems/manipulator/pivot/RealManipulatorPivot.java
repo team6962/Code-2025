@@ -99,8 +99,12 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE);
   }
 
-  public Command algaeBarge() {
-    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE_ANGLE);
+  public Command algaeBargeSetup() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.AIM_ANGLE);
+  }
+
+  public Command algaeBargeShoot() {
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.END_ANGLE);
   }
 
   public Command algaeProcessor() {
@@ -133,6 +137,10 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
             () ->
                 getAbsolutePosition().lt(MANIPULATOR_PIVOT.SAFE_MAX_ANGLE)
                     && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
+  }
+
+  public boolean inRange(Angle angle) {
+    return getAbsolutePosition().minus(angle).abs(Rotations)< MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
   }
 
   public Command safe() {
