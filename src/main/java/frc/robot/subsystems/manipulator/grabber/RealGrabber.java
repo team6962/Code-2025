@@ -123,7 +123,10 @@ public class RealGrabber extends Grabber {
   public Command holdAlgae() {
     if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
     return Commands.sequence(
-            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED).until(this::detectedAlgae),
+            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
+                .until(this::detectedAlgae)
+                .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
+                .finallyDo(() -> expectAlgae(detectedAlgae())),
             stop().withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME))
         .repeatedly();
   }
