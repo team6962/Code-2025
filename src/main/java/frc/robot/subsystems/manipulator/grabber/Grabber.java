@@ -46,7 +46,7 @@ public abstract class Grabber extends SubsystemBase {
 
   public abstract Command dropAlgae();
 
-  public abstract Command checkAlgaeGrip();
+  public abstract Command holdAlgae();
 
   public abstract Command stop();
 

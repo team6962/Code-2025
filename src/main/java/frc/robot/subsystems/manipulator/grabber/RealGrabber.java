@@ -108,17 +108,6 @@ public class RealGrabber extends Grabber {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false));
   }
 
-  public Command checkAlgaeGrip() {
-    return Commands.sequence(
-        Commands.runOnce(this::resetDebouncer),
-        Commands.parallel(
-            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED),
-            Commands.race(
-                Commands.waitUntil(this::detectedAlgae).andThen(() -> expectAlgae(true)),
-                Commands.waitTime(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
-                    .andThen(() -> expectAlgae(false)))));
-  }
-
   private void resetDebouncer() {
     algaeDebouncer = new Debouncer(0.5, DebounceType.kFalling);
   }
