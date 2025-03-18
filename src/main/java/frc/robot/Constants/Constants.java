@@ -265,7 +265,7 @@ public final class Constants {
     public static final Angle STOW_ANGLE = Degrees.of(110.0);
   }
 
-  public static final boolean SAFETIES_ENABLED = false;
+  public static final boolean SAFETIES_ENABLED = true;
 
   public static final class ELEVATOR {
     public static final double GEARING = 6.72;
@@ -280,7 +280,7 @@ public final class Constants {
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(41.50);
-    public static final Distance MAX_HEIGHT = Inches.of(72.5);
+    public static final Distance MAX_HEIGHT = Inches.of(71.0);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
@@ -289,7 +289,7 @@ public final class Constants {
       public static final Distance L1_HEIGHT = Inches.of(46.0); // change
       public static final Distance L2_HEIGHT = Inches.of(49.2);
       public static final Distance L3_HEIGHT = Inches.of(57.2);
-      public static final Distance L4_HEIGHT = Inches.of(72.5);
+      public static final Distance L4_HEIGHT = MAX_HEIGHT;
       public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
     }
 
@@ -317,15 +317,15 @@ public final class Constants {
       public static final double MAX_ACCELERATION = 30.0; // rad/s^2
     }
 
-    public static final Angle MAX_ANGLE = Degrees.of(0.0); // RESET TO 40.0
+    public static final Angle MAX_ANGLE = Degrees.of(40.0); // RESET TO 40.0
     public static final Angle MIN_ANGLE = Degrees.of(-90.0);
 
     public static final Angle STOW_ANGLE = Degrees.of(-5.0);
     public static final Angle SAFE_ANGLE = Degrees.of(-5.0);
 
     // TODO: update for v2
-    public static final Angle SAFE_MIN_ANGLE = Degrees.of(-45);
-    public static final Angle SAFE_MAX_ANGLE = Degrees.of(-20.0);
+    public static final Angle SAFE_MIN_ANGLE = MIN_ANGLE;
+    public static final Angle SAFE_MAX_ANGLE = Degrees.of(0.0);
 
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
@@ -342,7 +342,12 @@ public final class Constants {
     }
 
     public static final class ALGAE {
-      public static final Angle BARGE_ANGLE = Degrees.of(25.0);
+      public static final class BARGE {
+        public static final Angle AIM_ANGLE = MAX_ANGLE;
+        public static final Angle RELEASE_ANGLE = Degrees.of(0.0);
+        public static final Angle END_ANGLE = Degrees.of(-30.0);
+        
+      }
       public static final Angle REEF_ANGLE = Degrees.of(-51.2);
       public static final Angle GROUND_ANGLE = Degrees.of(-75.0);
       public static final Angle PROCESSOR_ANGLE = Degrees.of(-10.0);
@@ -350,22 +355,33 @@ public final class Constants {
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
 
+    // static {
+    //   MIN_ANGLES = new TreeMap<>();
+    //   MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
+    //   MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
+    //   MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
+    // }
+
     static {
       MIN_ANGLES = new TreeMap<>();
-      MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
-      MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
       MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
     }
 
     public static final NavigableMap<Distance, Angle> MAX_ANGLES;
 
+    // static {
+    //   MAX_ANGLES = new TreeMap<>();
+    //   MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
+    //   MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
+    //   MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
+    //   MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
+    //   MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));
+    // }
+
     static {
       MAX_ANGLES = new TreeMap<>();
-      MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
-      MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
-      MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
-      MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
-      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));
+      MAX_ANGLES.put(ELEVATOR.MAX_HEIGHT.minus(Inches.of(0.3)), SAFE_MAX_ANGLE);
+      MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MAX_ANGLE);
     }
   }
 

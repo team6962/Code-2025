@@ -103,7 +103,7 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
-    operator.leftStick().onTrue(pieceCombos.algaeBarge());
+    operator.leftStick().onTrue(pieceCombos.algaeBargeSetup());
     operator
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle

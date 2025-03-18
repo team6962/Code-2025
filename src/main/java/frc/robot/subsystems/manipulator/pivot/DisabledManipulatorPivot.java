@@ -38,7 +38,11 @@ public class DisabledManipulatorPivot implements ManipulatorPivot {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeBarge() {
+  public Command algaeBargeSetup() {
+    return CommandUtils.noneWithRequirements(this);
+  }
+
+  public Command algaeBargeShoot() {
     return CommandUtils.noneWithRequirements(this);
   }
 
@@ -72,6 +76,10 @@ public class DisabledManipulatorPivot implements ManipulatorPivot {
 
   public Command down() {
     return CommandUtils.noneWithRequirements(this);
+  }
+
+  public boolean inRange(Angle angle) {
+    return true;
   }
 
   public void setMinMaxAngle(Angle min, Angle max) {}

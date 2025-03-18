@@ -51,7 +51,7 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command placeBargeAlgae() {
-    return pivot.algaeBarge().andThen(grabber.dropAlgae());
+    return pivot.algaeBargeSetup().andThen(grabber.dropAlgae());
   }
 
   public Command placeProcessorAlgae() {

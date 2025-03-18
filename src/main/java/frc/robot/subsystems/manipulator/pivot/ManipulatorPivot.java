@@ -23,7 +23,9 @@ public interface ManipulatorPivot extends Subsystem {
 
   public Command algaeReef();
 
-  public Command algaeBarge();
+  public Command algaeBargeSetup();
+
+  public Command algaeBargeShoot();
 
   public Command algaeProcessor();
 
@@ -40,6 +42,8 @@ public interface ManipulatorPivot extends Subsystem {
   public Command up();
 
   public Command down();
+
+  public boolean inRange(Angle angle);
 
   public void setMinMaxAngle(Angle min, Angle max);
 
