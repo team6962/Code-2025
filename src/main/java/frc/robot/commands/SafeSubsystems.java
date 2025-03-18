@@ -1,10 +1,14 @@
 package frc.robot.commands;
 
+import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.subsystems.elevator.Elevator;
@@ -38,7 +42,7 @@ public class SafeSubsystems extends SubsystemBase {
 
   public Command safeMoveCommand(Command elevatorCommand, Command manipulatorCommand) {
     // if (Constants.SAFETIES_ENABLED) {
-    return Commands.sequence(manipulator.pivot.safe(), elevatorCommand, manipulatorCommand);
+    return Commands.sequence(Logger.logCommand("test", Robot.getLoopTime()), manipulator.pivot.safe(), elevatorCommand, manipulatorCommand);
     // }
     // return Commands.sequence(elevatorCommand, manipulatorCommand);
   }

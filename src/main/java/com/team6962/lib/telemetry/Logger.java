@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.Arrays;
@@ -110,12 +112,20 @@ public class Logger extends SubsystemBase {
     addUpdate(key, () -> log(key, supplier.get()));
   }
 
+  public static Command logCommand(String key, String value) {
+    return Commands.runOnce(() -> log(key, value));
+  }
+
   public static void log(String key, String value) {
     table.getEntry(key).setString(value == null ? "null" : value);
   }
 
   public static void logNumber(String key, Supplier<Number> supplier) {
     addUpdate(key, () -> log(key, supplier.get()));
+  }
+
+  public static Command logCommand(String key, Number value) {
+    return Commands.runOnce(() -> log(key, value));
   }
 
   public static void log(String key, Number value) {
