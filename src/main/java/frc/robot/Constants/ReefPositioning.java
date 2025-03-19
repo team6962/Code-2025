@@ -23,7 +23,7 @@ public final class ReefPositioning {
   public static final Distance ROBOT_TO_EDGE_PLACE_CORAL =
       SWERVE.CONFIG.chassis().outerLength().div(2).plus(Inches.of(1));
   public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL =
-      ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(12));
+      ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(6));
 
   public static final Distance ROBOT_TO_EDGE_PLACE_ALGAE =
       SWERVE.CONFIG.chassis().outerLength().div(2);
@@ -103,13 +103,13 @@ public final class ReefPositioning {
 
   public static Pose2d getCoralPlacePose(int pole) {
     return rotatePose(
-        getPolePose(PLACE_CORAL_RELATIVE, new Translation2d(0, Units.inchesToMeters(1.0)), pole),
+        getPolePose(PLACE_CORAL_RELATIVE, new Translation2d(0, 0), pole),
         Rotation2d.fromDegrees(180)); // 180
   }
 
   public static Pose2d getCoralAlignPose(int pole) {
     return rotatePose(
-        getPolePose(ALIGN_CORAL_RELATIVE, new Translation2d(0, Units.inchesToMeters(1.0)), pole),
+        getPolePose(ALIGN_CORAL_RELATIVE, new Translation2d(0, 0), pole),
         Rotation2d.fromDegrees(180)); // 180
   }
 

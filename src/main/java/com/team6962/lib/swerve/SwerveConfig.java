@@ -213,7 +213,8 @@ public class SwerveConfig {
   }
 
   public static enum Wheel {
-    COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
+    COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55)),
+    BILLET_USED(Inches.of(3.9), Inches.of(1.5), 1.0, Pounds.of(0.55));
 
     public final Distance diameter;
     public final Distance width;

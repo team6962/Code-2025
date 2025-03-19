@@ -180,7 +180,7 @@ public class AutonomousCommands {
         .pathfindTo(ReefPositioning.getCoralAlignPose(pole))
         .andThen(
             swerveDrive
-                .alignTo(ReefPositioning.getCoralPlacePose(pole))
+                .alignTo(ReefPositioning.getCoralPlacePose(pole), Inches.of(0.5), Degrees.of(2))
                 .withEndWithinTolerance(endWithinTolerance));
   }
 
