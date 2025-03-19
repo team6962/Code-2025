@@ -110,12 +110,12 @@ public class Controls {
 
     operator
         .rightBumper()
-        .whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth())); // intake coral
+        .whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
         .rightTrigger()
         .whileTrue(
-            manipulator.grabber.dropCoral().andThen(rumbleBoth())); // drop coral/intake algae
-    operator.leftBumper().whileTrue(manipulator.grabber.adjustCoral()); // reverse coral
+            pieceCombos.intakeAlgaeOrShootCoral().andThen(rumbleBoth())); // drop coral/intake algae
+    operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // reverse coral
     operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
 
     // operator.povUp().onTrue(hang.deploy());

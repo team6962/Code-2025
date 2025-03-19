@@ -111,4 +111,8 @@ public class PieceCombos {
   public Command stow() {
     return manipulator.pivot.safe().andThen(elevator.stow()).andThen(manipulator.stow()).withName("STOW");
   }
+
+  public Command intakeAlgaeOrShootCoral(){
+    return new ConditionalCommand(manipulator.grabber.dropCoral(), manipulator.grabber.intakeAlgae(), () -> manipulator.grabber.hasCoral());
+  }
 }
