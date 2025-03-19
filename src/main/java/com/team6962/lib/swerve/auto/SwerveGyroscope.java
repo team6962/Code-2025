@@ -1,7 +1,10 @@
 package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -10,8 +13,11 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 
@@ -30,6 +36,8 @@ public class SwerveGyroscope extends SubsystemBase {
   private Supplier<SwerveModulePosition[]> moduleDeltasSupplier;
   private SwerveDriveKinematics kinematics;
   private Angle absoluteHeading = Radians.of(0);
+  private AngularVelocity angularVelocity;
+  private Timer deltaTimer;
 
   public SwerveGyroscope(
       Supplier<SwerveModulePosition[]> moduleDeltasSupplier, SwerveDriveKinematics kinematics) {
@@ -39,6 +47,7 @@ public class SwerveGyroscope extends SubsystemBase {
 
     this.moduleDeltasSupplier = moduleDeltasSupplier;
     this.kinematics = kinematics;
+    angularVelocity = RadiansPerSecond.of(0);
 
     setName("Swerve Drive/Gyroscope");
 
@@ -75,6 +84,7 @@ public class SwerveGyroscope extends SubsystemBase {
   public void periodic() {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
+      angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
 
       Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
       Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
@@ -84,6 +94,10 @@ public class SwerveGyroscope extends SubsystemBase {
       Logger.log(getName() + "/Gyroscope/linearAccelY", Degrees.of(navx.getWorldLinearAccelY()));
       Logger.log(getName() + "/Gyroscope/linearAccelZ", Degrees.of(navx.getWorldLinearAccelZ()));
     } else {
+      if (deltaTimer == null) {
+        deltaTimer = new Timer();
+      }
+
       Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 
       Logger.log(getName() + "/headingChange", headingChange);
@@ -92,6 +106,10 @@ public class SwerveGyroscope extends SubsystemBase {
         headingChange = Radians.of(0);
       }
 
+      Time delta = Seconds.of(deltaTimer.get());
+      deltaTimer.restart();
+
+      angularVelocity = headingChange.div(delta);
       absoluteHeading = absoluteHeading.plus(headingChange);
     }
   }
@@ -124,6 +142,10 @@ public class SwerveGyroscope extends SubsystemBase {
    */
   public Angle getHeading() {
     return getAbsoluteHeading().plus(offset);
+  }
+
+  public AngularVelocity getAngularVelocity() {
+    return angularVelocity;
   }
 
   // h = a + o

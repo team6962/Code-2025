@@ -1,11 +1,16 @@
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.auto.PoseEstimator;
+import com.team6962.lib.swerve.auto.SwerveGyroscope;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -47,7 +52,7 @@ public class AprilTags extends SubsystemBase {
 
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses);
+    List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses, poseEstimator);
 
     // poseEstimates.add(new PoseEstimate(
     //   new Pose2d(3, 4, Rotation2d.fromDegrees(90)),
@@ -139,17 +144,23 @@ public class AprilTags extends SubsystemBase {
               bestPoseEstimate.rotationError.in(Radians)));
     }
 
-    Logger.getField().getObject("visionPosese").setPoses(loggedVisionPoses);
+    Logger.getField().getObject("visionPoses").setPoses(loggedVisionPoses);
   }
 
   private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
-      Map<String, Pose3d> cameraPoses) {
+      Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
+
+    // Set robot headings for each limelight (required for megatag 2)
+    for (String cameraName : cameraPoses.keySet()) {
+        LimelightHelpers.SetRobotOrientation(cameraName, poseEstimator.getEstimatedHeading().getDegrees(), poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
+    }
+
     return cameraPoses.keySet().stream()
         .map(
             name ->
                 CachedRobotState.isAllianceInverted().orElse(false)
-                    ? LimelightHelpers.getBotPoseEstimate_wpiRed(name)
-                    : LimelightHelpers.getBotPoseEstimate_wpiBlue(name))
+                    ? LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(name)
+                    : LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name))
         .filter((estimate) -> estimate != null)
         .collect(Collectors.toList());
   }

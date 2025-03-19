@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -111,6 +112,10 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   @Override
   public Pose2d getEstimatedPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+
+  public AngularVelocity getAngularVelocity() {
+    return gyroscope.getAngularVelocity();
   }
 
   public Pose2d getFuturePose(Time time) {
