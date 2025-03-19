@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Amps;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.controls.DifferentialVelocityDutyCycle;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -27,7 +28,7 @@ public class RealGrabber extends Grabber {
   private final DigitalInput detectSensor;
   private final DigitalInput clearSensor;
 
-  private Debouncer algaeDebouncer;
+  private Debouncer algaeDebouncer = new Debouncer(0.5);
   private Debouncer coralDebouncer = new Debouncer(0.15);
 
   private boolean hasCoral = false;
@@ -40,12 +41,13 @@ public class RealGrabber extends Grabber {
   public RealGrabber() {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
-    Logger.logBoolean(getName() + "/motorsStalled", () -> detectedAlgae);
+    Logger.logBoolean(getName() + "/detectedAlgae", this::detectedAlgae);
+    Logger.logNumber(getName() + "/vel", () -> motor.getEncoder().getVelocity());
+    Logger.logNumber(getName() + "/get", () -> motor.get());
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
     Logger.logNumber(getName() + "/temp", () -> motor.getMotorTemperature());
     Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
 
-    resetDebouncer();
 
     SparkMaxConfig config = new SparkMaxConfig();
 
@@ -101,7 +103,8 @@ public class RealGrabber extends Grabber {
   public Command intakeAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::detectedAlgae)
-        .finallyDo((b) -> expectAlgae(b));
+        .andThen(Commands.print("FINISHED INTAKING"))
+        .finallyDo(() -> expectAlgae(detectedAlgae()));
   }
 
   public Command dropAlgae() {
@@ -127,24 +130,27 @@ public class RealGrabber extends Grabber {
                 .until(this::detectedAlgae)
                 .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
                 .finallyDo(() -> expectAlgae(detectedAlgae())),
-            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME))
-        .repeatedly();
+            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
   }
 
   // update this for both game pieces
   public Command hold() {
-    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
+    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae()).repeatedly();
   }
 
   public Command stop() {
     return runSpeed(0);
   }
 
+  public boolean isStalled() {
+    return Math.abs(motor.get()) > 0.0 && Math.abs(motor.getEncoder().getVelocity()) < 0.2;
+  }
+
   @Override
   public void periodic() {
     super.periodic();
 
-    detectedAlgae = algaeDebouncer.calculate(Amps.of(motor.getOutputCurrent()).gt(Amps.of(40)));
+    detectedAlgae = algaeDebouncer.calculate(isStalled());
     hasCoral = coralDebouncer.calculate(!detectSensor.get());
     coralClear = clearSensor.get();
   }
