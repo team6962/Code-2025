@@ -3,6 +3,7 @@ package frc.robot.commands;
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -18,9 +19,18 @@ public class PieceCombos {
     this.safeSubsystems = safeSubsystems;
   }
 
-  public Command intakeCoral() {
+  public Command intakeCoral(){
+    return new ConditionalCommand(safeIntakeCoral(), quickIntakeCoral(), () -> elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT));
+  }
+
+  public Command quickIntakeCoral(){
     return safeSubsystems.safeMoveCommand(
-        elevator.coralL1().andThen(elevator.coralIntake()), manipulator.intakeCoral()).withName("CORAL INTAKE");
+        elevator.coralIntake(), manipulator.intakeCoral()).withName("QUICK CORAL INTAKE");
+  }
+
+  public Command safeIntakeCoral() {
+    return safeSubsystems.safeMoveCommand(
+        elevator.coralL1().andThen(elevator.coralIntake()), manipulator.intakeCoral()).withName("SAFE CORAL INTAKE");
   }
 
   public Command coral(int level) {
