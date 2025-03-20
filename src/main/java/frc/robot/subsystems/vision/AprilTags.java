@@ -15,6 +15,7 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -152,7 +153,17 @@ public class AprilTags extends SubsystemBase {
 
     // Set robot headings for each limelight (required for megatag 2)
     for (String cameraName : cameraPoses.keySet()) {
-        LimelightHelpers.SetRobotOrientation(cameraName, poseEstimator.getEstimatedHeading().getDegrees(), poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
+        if (CachedRobotState.isAllianceInverted().orElse(false))  {
+          LimelightHelpers.SetRobotOrientation(
+            cameraName, 
+            poseEstimator.getEstimatedHeading().rotateBy(Rotation2d.fromDegrees(180.0)).getDegrees(), 
+            poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
+        } else {
+          LimelightHelpers.SetRobotOrientation(
+            cameraName, 
+            poseEstimator.getEstimatedHeading().getDegrees(), 
+            poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
+        }
     }
 
     return cameraPoses.keySet().stream()
