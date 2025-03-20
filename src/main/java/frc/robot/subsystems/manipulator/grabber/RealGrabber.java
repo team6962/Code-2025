@@ -42,6 +42,7 @@ public class RealGrabber extends Grabber {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
     Logger.logBoolean(getName() + "/detectedAlgae", this::detectedAlgae);
+    Logger.logBoolean(getName() + "/coralClear", this::coralClear);
     Logger.logNumber(getName() + "/vel", () -> motor.getEncoder().getVelocity());
     Logger.logNumber(getName() + "/get", () -> motor.get());
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
@@ -73,15 +74,15 @@ public class RealGrabber extends Grabber {
     return hasCoral;
   }
 
-  public boolean isClear() {
+  public boolean coralClear() {
     return coralClear;
   }
 
   public Command intakeCoral() {
     return Commands.sequence(
-        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(() -> !isClear()),
+        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(() -> !coralClear()),
         runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-        runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isClear),
+        runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::coralClear),
         stop());
   }
 
