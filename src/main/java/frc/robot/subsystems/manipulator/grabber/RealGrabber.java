@@ -65,6 +65,10 @@ public class RealGrabber extends Grabber {
     StatusChecks.under(this).add("motor", motor);
   }
 
+  public Command runSpeedOnce(double speed) {
+    return this.runOnce(() -> motor.set(speed));
+  }
+
   public Command runSpeed(double speed) {
     return this.run(() -> motor.set(speed));
   }
@@ -80,10 +84,10 @@ public class RealGrabber extends Grabber {
 
   public Command intakeCoral() {
     return Commands.sequence(
-        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(() -> !coralClear()),
         runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
         runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::coralClear),
-        stop());
+        stopOnce()
+        );
   }
 
   public Command dropCoral() {
@@ -131,12 +135,16 @@ public class RealGrabber extends Grabber {
                 .until(this::detectedAlgae)
                 .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
                 .finallyDo(() -> expectAlgae(detectedAlgae())),
-            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
+            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME)).repeatedly();
   }
 
   // update this for both game pieces
   public Command hold() {
-    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae()).repeatedly();
+    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
+  }
+
+  public Command stopOnce() {
+    return runSpeedOnce(0.0);
   }
 
   public Command stop() {

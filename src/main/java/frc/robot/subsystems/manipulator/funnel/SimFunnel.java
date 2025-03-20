@@ -33,7 +33,7 @@ public class SimFunnel extends Funnel {
   }
 
   @Override
-  public Command intake(Grabber coral) {
+  public Command intake() {
     return wait(intakeTime);
   }
 

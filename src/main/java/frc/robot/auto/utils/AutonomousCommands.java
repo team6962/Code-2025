@@ -112,7 +112,7 @@ public class AutonomousCommands {
                 CommandUtils.simulationMessage(
                     "Moving elevator and manipulator for coral intaking", 0.5))),
         CommandUtils.selectByMode(
-                manipulator.funnel.intake(manipulator.grabber),
+                manipulator.intakeCoral(),
                 CommandUtils.simulationMessage("Intaking coral", 0.25))
             .alongWith(swerveDrive.alignTo(intake)));
   }

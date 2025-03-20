@@ -12,7 +12,7 @@ public abstract class Funnel extends SubsystemBase {
     setName("Funnel");
   }
 
-  public abstract Command intake(Grabber coral);
+  public abstract Command intake();
 
   public abstract Command stop();
 

@@ -35,8 +35,8 @@ public class RealFunnel extends Funnel {
     return this.run(() -> motor.set(speed));
   }
 
-  public Command intake(Grabber grabber) {
-    return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED).until(grabber::hasCoral);
+  public Command intake() {
+    return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED);
   }
 
   public Command forwards() {
