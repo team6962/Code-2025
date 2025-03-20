@@ -98,6 +98,7 @@ public final class Constants {
                     Units.inchesToMeters(36.0),
                     new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))),
             "limelight-rtag",
+                new Pose3d(
                   Units.inchesToMeters(10.451441),
                   Units.inchesToMeters(-11.119072),
                   Units.inchesToMeters(8.821067),
