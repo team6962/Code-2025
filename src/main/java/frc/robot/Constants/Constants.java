@@ -96,7 +96,20 @@ public final class Constants {
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(0.0),
                     Units.inchesToMeters(36.0),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))),
+            "limelight-rtag",
+                  Units.inchesToMeters(10.451441),
+                  Units.inchesToMeters(-11.119072),
+                  Units.inchesToMeters(8.821067),
+                  new Rotation3d(0, 10, 47.758140)
+                ),
+            "limelight-ltag",
+                new Pose3d(
+                  Units.inchesToMeters(10.451441),
+                  Units.inchesToMeters(11.119072),
+                  Units.inchesToMeters(8.621067),
+                  new Rotation3d(180, 10, 47.758140)
+                ));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
