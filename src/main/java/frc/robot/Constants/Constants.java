@@ -202,7 +202,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int HANG_ENCODER = 10;
-    public static final int CORAL_CLEAR_BEAM_BREAK = 9;
+    public static final int CORAL_CLEAR_BEAM_BREAK = 3;
     public static final int CORAL_DETECT_BEAM_BREAK = 0;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
     public static final int ELEVATOR_CEIL_LIMIT = 2;
