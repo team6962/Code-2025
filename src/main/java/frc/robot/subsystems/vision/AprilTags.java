@@ -2,15 +2,11 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.auto.PoseEstimator;
-import com.team6962.lib.swerve.auto.SwerveGyroscope;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -53,7 +49,8 @@ public class AprilTags extends SubsystemBase {
 
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates = getPoseEstimates(cameraPoses, poseEstimator);
+    List<LimelightHelpers.PoseEstimate> poseEstimates =
+        getPoseEstimates(cameraPoses, poseEstimator);
 
     // poseEstimates.add(new PoseEstimate(
     //   new Pose2d(3, 4, Rotation2d.fromDegrees(90)),
@@ -153,17 +150,28 @@ public class AprilTags extends SubsystemBase {
 
     // Set robot headings for each limelight (required for megatag 2)
     for (String cameraName : cameraPoses.keySet()) {
-        if (CachedRobotState.isAllianceInverted().orElse(false))  {
-          LimelightHelpers.SetRobotOrientation(
-            cameraName, 
-            poseEstimator.getEstimatedHeading().rotateBy(Rotation2d.fromDegrees(180.0)).getDegrees(), 
-            poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
-        } else {
-          LimelightHelpers.SetRobotOrientation(
-            cameraName, 
-            poseEstimator.getEstimatedHeading().getDegrees(), 
-            poseEstimator.getAngularVelocity().in(DegreesPerSecond), 0, 0, 0, 0);
-        }
+      if (CachedRobotState.isAllianceInverted().orElse(false)) {
+        LimelightHelpers.SetRobotOrientation(
+            cameraName,
+            poseEstimator
+                .getEstimatedHeading()
+                .rotateBy(Rotation2d.fromDegrees(180.0))
+                .getDegrees(),
+            poseEstimator.getAngularVelocity().in(DegreesPerSecond),
+            0,
+            0,
+            0,
+            0);
+      } else {
+        LimelightHelpers.SetRobotOrientation(
+            cameraName,
+            poseEstimator.getEstimatedHeading().getDegrees(),
+            poseEstimator.getAngularVelocity().in(DegreesPerSecond),
+            0,
+            0,
+            0,
+            0);
+      }
     }
 
     return cameraPoses.keySet().stream()
