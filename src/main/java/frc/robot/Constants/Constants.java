@@ -87,16 +87,29 @@ public final class Constants {
         Map.of(
             "limelight-ftag",
                 new Pose3d(
-                    Units.inchesToMeters(14.5),
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(7.5),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(19.0), 0.0)),
+                    Units.inchesToMeters(14.5),
+                    Units.inchesToMeters(6.1),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(19.0), Units.degreesToRadians(0.0))),
             "limelight-btag",
                 new Pose3d(
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(36.0),
-                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
+                    Units.inchesToMeters(1.3),
+                    Units.inchesToMeters(37.4),
+                    new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))),
+            "limelight-ltag",
+                new Pose3d(
+                    Units.inchesToMeters(-11.1),
+                    Units.inchesToMeters(10.5),
+                    Units.inchesToMeters(8.8),
+                    new Rotation3d(180.0, 10.0, Units.degreesToRadians(47.8))),
+            "limelight-rtag",
+                new Pose3d(
+                    Units.inchesToMeters(11.1),
+                    Units.inchesToMeters(10.5),
+                    Units.inchesToMeters(8.8),
+                    new Rotation3d(180.0, 10.0, Units.degreesToRadians(-47.8)))
+              );
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
