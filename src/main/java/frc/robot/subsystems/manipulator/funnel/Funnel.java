@@ -21,7 +21,7 @@ public abstract class Funnel extends SubsystemBase {
   }
 
   public static Funnel create() {
-    if (!ENABLED_SYSTEMS.MANIPULATOR) return SimFunnel.disabled();
+    if (!ENABLED_SYSTEMS.isFunnelEnabled()) return SimFunnel.disabled();
     else if (RobotBase.isReal()) return new RealFunnel();
     else return SimFunnel.simulated();
   }

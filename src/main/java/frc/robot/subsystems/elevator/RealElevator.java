@@ -59,20 +59,23 @@ public class RealElevator extends DualLinearActuator implements Elevator {
 
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.ELEVATOR) stopMotors();
+    if (!ENABLED_SYSTEMS.isElevatorEnabled()) stopMotors();
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.ELEVATOR) stopMotors();
     super.periodic();
   }
 
+  @Override
   public Command setHeight(Distance height) {
-    if (!ENABLED_SYSTEMS.ELEVATOR) return stop();
+    if (!ENABLED_SYSTEMS.isElevatorEnabled()) return stop();
     return this.run(() -> moveTo(height)).until(this::doneMoving);
   }
 
+  @Override
   public Command stop() {
     return this.run(this::stopMotors);
   }
 
+  @Override
   public Command hold() {
     return Commands.defer(
         () -> {
@@ -83,50 +86,62 @@ public class RealElevator extends DualLinearActuator implements Elevator {
         Set.of(this));
   }
 
+  @Override
   public Command stow() {
     return setHeight(ELEVATOR.STOW_HEIGHT);
   }
 
+  @Override
   public Command coralL1() {
     return setHeight(ELEVATOR.CORAL.L1_HEIGHT);
   }
 
+  @Override
   public Command coralL2() {
     return setHeight(ELEVATOR.CORAL.L2_HEIGHT);
   }
 
+  @Override
   public Command coralL3() {
     return setHeight(ELEVATOR.CORAL.L3_HEIGHT);
   }
 
+  @Override
   public Command coralL4() {
     return setHeight(ELEVATOR.CORAL.L4_HEIGHT);
   }
 
+  @Override
   public Command coralIntake() {
     return setHeight(ELEVATOR.CORAL.INTAKE_HEIGHT);
   }
 
+  @Override
   public Command algaeGround() {
     return setHeight(ELEVATOR.ALGAE.GROUND_HEIGHT);
   }
 
+  @Override
   public Command algaeL2() {
     return setHeight(ELEVATOR.ALGAE.L2_HEIGHT);
   }
 
+  @Override
   public Command algaeL3() {
     return setHeight(ELEVATOR.ALGAE.L3_HEIGHT);
   }
 
+  @Override
   public Command algaeBarge() {
     return setHeight(ELEVATOR.ALGAE.BARGE_HEIGHT);
   }
 
+  @Override
   public Command algaeProcessor() {
     return setHeight(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
   }
 
+  @Override
   public Command rezeroAtBottom() {
     return this.run(this::unsafeMoveDown).until(this::triggeredFloorLimit);
   }

@@ -115,8 +115,8 @@ public final class AutoPaths {
         int pole1 = (6 - i * 2 + 12) % 12; // ((6 - i * 2) % 12 + 12) % 12
         int pole2 = (5 - i * 2 + 12) % 12;
 
-        targets.add(new CoralPosition(pole1, 4));
-        targets.add(new CoralPosition(pole2, 4));
+        targets.add(new CoralPosition(pole1, 3));
+        targets.add(new CoralPosition(pole2, 3));
       }
 
       return new PlanParameters(new PlanConstraints(targets, sources), startPose);

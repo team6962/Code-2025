@@ -48,12 +48,36 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = true;
-    public static final boolean DASHBOARD = true;
-    public static final boolean HANG = false;
-    public static final boolean MANIPULATOR = true;
-    public static final boolean ELEVATOR = true;
-    public static final boolean FUNNEL = true;
+    private static final boolean DRIVE = true;
+    private static final boolean DASHBOARD = true;
+    private static final boolean HANG = false;
+    private static final boolean MANIPULATOR = true;
+    private static final boolean ELEVATOR = true;
+    private static final boolean FUNNEL = true;
+
+    public static boolean isDriveEnabled() {
+      return DRIVE;
+    }
+
+    public static boolean isDashboardEnabled() {
+      return DASHBOARD;
+    }
+
+    public static boolean isHangEnabled() {
+      return false;
+    }
+
+    public static boolean isManipulatorEnabled() {
+      return MANIPULATOR && RobotVersion.isV2();
+    }
+
+    public static boolean isElevatorEnabled() {
+      return ELEVATOR && RobotVersion.isV2();
+    }
+
+    public static boolean isFunnelEnabled() {
+      return FUNNEL && RobotVersion.isV2();
+    }
   }
 
   public static final class LOGGING {
@@ -410,7 +434,7 @@ public final class Constants {
 
     public static final double ALGAE_OUT_SPEED = -1.0;
     public static final double ALGAE_IN_SPEED = 0.7;
-    public static final double ALGAE_HOLD_SPEED = -0.1;
+    public static final double ALGAE_HOLD_SPEED = 0.2;
 
     public static final double CORAL_OUT_SPEED = 0.7;
     public static final double CORAL_IN_SPEED = 0.2;

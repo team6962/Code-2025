@@ -55,7 +55,7 @@ public final class StationPositioning {
           new Pose2d(
               rsPose.getX(),
               Field.WIDTH - rsPose.getY(),
-              rsPose.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(180)));
+              rsPose.getRotation().unaryMinus());
     }
 
     return rsPose;

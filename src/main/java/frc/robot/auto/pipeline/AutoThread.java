@@ -26,8 +26,8 @@ public class AutoThread extends Thread {
     this.workTimeSeconds = workTime.in(Seconds);
     lastPauseTimestampSeconds = Timer.getFPGATimestamp();
 
-    Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", "null");
-    Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
+    // Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", "null");
+    // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
 
     logWorkState(WorkState.NEW);
   }
@@ -42,9 +42,9 @@ public class AutoThread extends Thread {
         this.parameters = null;
       }
 
-      Logger.log(AutoPaths.Logging.AUTO_THREAD + "/parametersReplaced", true);
-      Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", parameters);
-      Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
+      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/parametersReplaced", true);
+      // Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", parameters);
+      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
 
       return;
     }
@@ -55,7 +55,7 @@ public class AutoThread extends Thread {
       needsReplacement = this.parameters == null || !this.parameters.matches(parameters);
     }
 
-    Logger.log(AutoPaths.Logging.AUTO_THREAD + "/parametersReplaced", needsReplacement);
+    // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/parametersReplaced", needsReplacement);
 
     // System.out.println("Old parameters: " + this.parameters);
     // System.out.println("New parameters: " + parameters);
@@ -84,16 +84,17 @@ public class AutoThread extends Thread {
         builder = commandBuilder;
       }
 
-      if (!shouldWorkInBackground()
-          || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds
-          || builder == null
-          || builder.isDone()) {
+      boolean cantWork = !shouldWorkInBackground()
+        || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds
+        || builder == null;
+
+      if (cantWork || builder.isDone()) {
         logWorkState(WorkState.SLEEPING);
 
         try {
           Thread.sleep((long) sleepTimeMilliseconds);
         } catch (InterruptedException e) {
-          Logger.log(AutoPaths.Logging.AUTO_THREAD + "/interruptTime", Timer.getFPGATimestamp());
+          // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/interruptTime", Timer.getFPGATimestamp());
 
           logWorkState(WorkState.DEAD);
 
@@ -118,9 +119,9 @@ public class AutoThread extends Thread {
   }
 
   public Command getCommand(BooleanSupplier shouldContinueComputing) {
-    Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/updateTime", Timer.getFPGATimestamp());
-    Logger.log(
-        AutoPaths.Logging.AUTO_THREAD + "/command/hasCommandBuilder", commandBuilder != null);
+    // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/updateTime", Timer.getFPGATimestamp());
+    // Logger.log(
+    //     AutoPaths.Logging.AUTO_THREAD + "/command/hasCommandBuilder", commandBuilder != null);
 
     if (commandBuilder == null) return null;
 
@@ -130,7 +131,7 @@ public class AutoThread extends Thread {
       done = commandBuilder.isDone();
     }
 
-    Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/isDone", done);
+    // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/isDone", done);
 
     if (done) {
       synchronized (this) {
@@ -138,7 +139,7 @@ public class AutoThread extends Thread {
       }
     }
 
-    Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/interrupting", true);
+    // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/interrupting", true);
 
     interrupt();
 
@@ -151,7 +152,7 @@ public class AutoThread extends Thread {
         if (!shouldContinueComputing.getAsBoolean()) return Commands.none();
       }
 
-      Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/worked", worked);
+      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/command/worked", worked);
 
       return commandBuilder.getPathCommand();
     }
@@ -167,7 +168,7 @@ public class AutoThread extends Thread {
     if (AutoThread.state != state) {
       AutoThread.state = state;
 
-      Logger.log(AutoPaths.Logging.AUTO_THREAD + "/state", state.toString());
+      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/state", state.toString());
     }
   }
 

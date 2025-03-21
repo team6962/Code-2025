@@ -36,6 +36,8 @@ public abstract class Grabber extends SubsystemBase {
     return Commands.defer(() -> hasAlgae() ? dropAlgae() : intakeAlgae(), Set.of(this));
   }
 
+  public abstract Command hold();
+
   public abstract Command intakeCoral();
 
   public abstract Command dropCoral();
@@ -59,7 +61,7 @@ public abstract class Grabber extends SubsystemBase {
   }
 
   public static Grabber create() {
-    if (!ENABLED_SYSTEMS.MANIPULATOR) return SimGrabber.disabled();
+    if (!ENABLED_SYSTEMS.isManipulatorEnabled()) return SimGrabber.disabled();
     else if (RobotBase.isReal()) return new RealGrabber();
     else return SimGrabber.simulated();
   }

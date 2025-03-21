@@ -96,9 +96,9 @@ public class XBoxSwerve extends Command {
     double leftTrigger = controller.getLeftTriggerAxis();
     double rightTrigger = controller.getRightTriggerAxis();
     Translation2d leftStick =
-        new Translation2d(-controller.getLeftY(), -controller.getLeftX()).times(2);
+        new Translation2d(-controller.getLeftY(), -controller.getLeftX());
     Translation2d rightStick =
-        new Translation2d(controller.getRightX(), -controller.getRightY()).times(2);
+        new Translation2d(controller.getRightX(), -controller.getRightY());
 
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));
@@ -156,6 +156,8 @@ public class XBoxSwerve extends Command {
 
     ChassisSpeeds drivenSpeeds =
         new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
+
+    Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
     boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
 

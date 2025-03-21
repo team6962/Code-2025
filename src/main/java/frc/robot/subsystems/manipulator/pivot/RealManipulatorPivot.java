@@ -47,7 +47,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   @Override
   public void periodic() {
-    if (!ENABLED_SYSTEMS.MANIPULATOR) return;
+    if (!ENABLED_SYSTEMS.isManipulatorEnabled()) return;
     super.periodic();
     if (RobotContainer.getVoltage() < VOLTAGE_LADDER.MANIPULATOR) {
       stopMotor();
@@ -55,20 +55,23 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     }
   }
 
+  @Override
   public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
-    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    if (!ENABLED_SYSTEMS.isManipulatorEnabled()) return stop();
     return run(() -> moveTowards(angleSupplier.get()))
         .until(() -> this.doneMoving(tolerance))
         .finallyDo(this::seedEncoder);
   }
 
+  @Override
   public Command pivotTo(Supplier<Angle> angleSupplier) {
-    if (!ENABLED_SYSTEMS.MANIPULATOR) return stop();
+    if (!ENABLED_SYSTEMS.isManipulatorEnabled()) return stop();
     return run(() -> moveTowards(angleSupplier.get()))
         .until(this::doneMoving)
         .finallyDo(this::seedEncoder);
   }
 
+  @Override
   public Command hold() {
     return Commands.defer(
         () -> {
@@ -79,46 +82,57 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
         Set.of(this));
   }
 
+  @Override
   public Command coralIntake() {
     return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.INTAKE_ANGLE);
   }
 
+  @Override
   public Command coralL1() {
     return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L1_ANGLE);
   }
 
+  @Override
   public Command coralL23() {
     return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L23_ANGLE);
   }
 
+  @Override
   public Command coralL4() {
     return pivotTo(() -> MANIPULATOR_PIVOT.CORAL.L4_ANGLE);
   }
 
+  @Override
   public Command algaeReef() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.REEF_ANGLE);
   }
 
+  @Override
   public Command algaeBargeSetup() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.AIM_ANGLE);
   }
 
+  @Override
   public Command algaeBargeShoot() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.END_ANGLE);
   }
 
+  @Override
   public Command algaeProcessor() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.PROCESSOR_ANGLE);
   }
 
+  @Override
   public Command algaeGround() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.GROUND_ANGLE);
   }
 
+  @Override
   public Command stow() {
     return pivotTo(() -> MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
+  @Override
   public Command safe(Angle tolerance) {
     // Angle currentAngle = getAbsolutePosition();
     // if (currentAngle.lt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE)) {
@@ -139,11 +153,13 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
                     && getAbsolutePosition().gt(MANIPULATOR_PIVOT.SAFE_MIN_ANGLE));
   }
 
+  @Override
   public boolean inRange(Angle angle) {
     return getAbsolutePosition().minus(angle).abs(Rotations)
         < MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
   }
 
+  @Override
   public Command safe() {
     return safe(MANIPULATOR_PIVOT.SAFE_TOLERANCE);
   }
@@ -160,6 +176,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     return pivotTo(() -> MANIPULATOR_PIVOT.PID_MAX_ANGLE);
   }
 
+  @Override
   public Command stop() {
     return run(this::stopMotor);
   }

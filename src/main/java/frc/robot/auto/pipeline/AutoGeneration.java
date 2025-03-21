@@ -32,8 +32,8 @@ public class AutoGeneration extends SubsystemBase {
   }
 
   private void logState() {
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadExists", currentThread != null);
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished", currentThread.isFinished());
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadExists", currentThread != null);
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished", currentThread.isFinished());
   }
 
   @Override
@@ -42,7 +42,7 @@ public class AutoGeneration extends SubsystemBase {
   }
 
   private void setParameters(AutoPaths.PlanParameters parameters, boolean forceWork) {
-    Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
+    // Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
 
     if (!parameters.constraints.pathExists()
         || (!AutoThread.shouldWorkInBackground() && !forceWork)) {
@@ -52,7 +52,7 @@ public class AutoGeneration extends SubsystemBase {
     }
 
     if (currentThread == null || currentThread.isFinished()) {
-      Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", true);
+      // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", true);
 
       currentThread = new AutoThread(autonomous, workDelay, workTime);
       currentThread.setParameters(parameters);
@@ -61,7 +61,7 @@ public class AutoGeneration extends SubsystemBase {
       currentThread.setParameters(parameters);
       currentThread.start();
     } else {
-      Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", false);
+      // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", false);
 
       currentThread.setParameters(parameters);
     }
@@ -84,8 +84,8 @@ public class AutoGeneration extends SubsystemBase {
     System.out.print("Auto command: ");
     System.out.println(command);
 
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
 
     if (command == null)
       return CommandUtils.warnWithRequirements(

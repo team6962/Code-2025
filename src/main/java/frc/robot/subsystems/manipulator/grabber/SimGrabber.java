@@ -64,6 +64,12 @@ public class SimGrabber extends Grabber {
   }
 
   @Override
+  public Command hold() {
+      // TODO Auto-generated method stub
+      return null;
+  }
+
+  @Override
   public boolean hasCoral() {
     return hasCoral;
   }

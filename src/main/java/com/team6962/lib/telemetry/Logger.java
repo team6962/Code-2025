@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.RobotVersion;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +49,7 @@ import java.util.function.Supplier;
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
   private static List<Updatable> updates = new LinkedList<>();
+  private static List<Updatable> onceUpdates = new LinkedList<>();
   private static Notifier notifier = new Notifier(Logger::update);
   private static Field2d field2d = new Field2d();
   private static double threadLastPing = Timer.getFPGATimestamp();
@@ -87,7 +89,7 @@ public class Logger extends SubsystemBase {
     }
   }
 
-  private static void addUpdate(String key, Runnable runnable) {
+  public static void addUpdate(String key, Runnable runnable) {
     synchronized (updates) {
       updates.add(new Updatable(key, runnable));
     }
@@ -480,11 +482,13 @@ public class Logger extends SubsystemBase {
   }
 
   public static void logEnabledSystems() {
-    log("Enabled Systems/Dashboard", ENABLED_SYSTEMS.DASHBOARD);
-    log("Enabled Systems/Drive", ENABLED_SYSTEMS.DRIVE);
-    log("Enabled Systems/Elevator", ENABLED_SYSTEMS.ELEVATOR);
-    log("Enabled Systems/Funnel", ENABLED_SYSTEMS.FUNNEL);
-    log("Enabled Systems/Hang", ENABLED_SYSTEMS.HANG);
-    log("Enabled Systems/Manipulator", ENABLED_SYSTEMS.MANIPULATOR);
+    log("Enabled Systems/Dashboard", ENABLED_SYSTEMS.isDashboardEnabled());
+    log("Enabled Systems/Drive", ENABLED_SYSTEMS.isDriveEnabled());
+    log("Enabled Systems/Elevator", ENABLED_SYSTEMS.isElevatorEnabled());
+    log("Enabled Systems/Funnel", ENABLED_SYSTEMS.isFunnelEnabled());
+    log("Enabled Systems/Hang", ENABLED_SYSTEMS.isHangEnabled());
+    log("Enabled Systems/Manipulator", ENABLED_SYSTEMS.isManipulatorEnabled());
+
+    log("Robot Version", RobotVersion.isV2() ? "V2" : "V1");
   }
 }

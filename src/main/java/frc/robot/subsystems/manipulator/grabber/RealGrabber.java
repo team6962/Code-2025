@@ -82,6 +82,7 @@ public class RealGrabber extends Grabber {
     return coralClear;
   }
 
+  @Override
   public Command intakeCoral() {
     return Commands.sequence(
         runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
@@ -90,6 +91,7 @@ public class RealGrabber extends Grabber {
         );
   }
 
+  @Override
   public Command dropCoral() {
     return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
         .withDeadline(
@@ -97,6 +99,7 @@ public class RealGrabber extends Grabber {
                 Commands.waitUntil(this::hasCoral), Commands.waitUntil(() -> !hasCoral())));
   }
 
+  @Override
   public Command adjustCoral() {
     return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
   }
@@ -105,6 +108,7 @@ public class RealGrabber extends Grabber {
     return detectedAlgae;
   }
 
+  @Override
   public Command intakeAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::detectedAlgae)
@@ -112,6 +116,7 @@ public class RealGrabber extends Grabber {
         .finallyDo(() -> expectAlgae(detectedAlgae()));
   }
 
+  @Override
   public Command dropAlgae() {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false));
   }
@@ -120,14 +125,17 @@ public class RealGrabber extends Grabber {
     algaeDebouncer = new Debouncer(0.5, DebounceType.kFalling);
   }
 
+  @Override
   public Command forwards() {
     return runSpeed(MANIPULATOR.BASE_SPEED);
   }
 
+  @Override
   public Command backwards() {
     return runSpeed(-MANIPULATOR.BASE_SPEED);
   }
 
+  @Override
   public Command holdAlgae() {
     if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
     return Commands.sequence(
@@ -135,10 +143,11 @@ public class RealGrabber extends Grabber {
                 .until(this::detectedAlgae)
                 .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
                 .finallyDo(() -> expectAlgae(detectedAlgae())),
-            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME)).repeatedly();
+            runSpeed(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME)).repeatedly();
   }
 
   // update this for both game pieces
+  @Override
   public Command hold() {
     return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
   }
@@ -147,6 +156,7 @@ public class RealGrabber extends Grabber {
     return runSpeedOnce(0.0);
   }
 
+  @Override
   public Command stop() {
     return runSpeed(0);
   }

@@ -13,6 +13,7 @@ public class CommandBuilder {
   private List<AutoPaths.CoralMovement> path;
   private int currentIndex = 0;
   private SequenceChooser sequenceChooser;
+  private int logCommandIndex = 0;
 
   public CommandBuilder(AutonomousCommands autonomous) {
     this.autonomous = autonomous;
@@ -27,14 +28,14 @@ public class CommandBuilder {
 
     System.out.println("Starting to generate a new autonomous path");
 
-    Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/isDone", false);
-    Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/currentIndex", 0);
-    Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "started");
+    // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/isDone", false);
+    // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/currentIndex", 0);
+    // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "started");
   }
 
   public void work() {
     if (!sequenceChooser.isDone()) {
-      Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "waiting");
+      // Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/status", "waiting");
       sequenceChooser.work();
       return;
     }
@@ -46,15 +47,19 @@ public class CommandBuilder {
       path = sequenceChooser.getBestPath();
     }
 
-    if (currentIndex + 1 >= path.size()) return;
+    if (currentIndex + 1 > path.size()) return;
 
     AutoPaths.CoralMovement movement = path.get(currentIndex);
 
     if (movement.source != AutoPaths.CoralSource.PREPLACED) {
       group.addCommands(autonomous.intakeCoral(movement.source.station()));
+      Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex, "intakeCoral(" + movement.source.station().name() + ")");
+      logCommandIndex++;
     }
 
     group.addCommands(autonomous.placeCoral(movement.destination));
+    Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex, "placeCoral(level " + movement.destination.level + ", pole " + movement.destination.pole + ")");
+    logCommandIndex++;
 
     currentIndex++;
 
@@ -64,7 +69,7 @@ public class CommandBuilder {
   }
 
   public boolean isDone() {
-    return sequenceChooser.isDone() && path != null && currentIndex + 1 >= path.size();
+    return sequenceChooser.isDone() && path != null && currentIndex + 1 > path.size();
   }
 
   public Command getPathCommand() {

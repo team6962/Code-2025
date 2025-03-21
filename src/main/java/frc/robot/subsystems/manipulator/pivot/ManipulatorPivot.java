@@ -48,7 +48,7 @@ public interface ManipulatorPivot extends Subsystem {
   public void setMinMaxAngle(Angle min, Angle max);
 
   public static ManipulatorPivot create() {
-    if (ENABLED_SYSTEMS.MANIPULATOR) return new RealManipulatorPivot();
+    if (ENABLED_SYSTEMS.isManipulatorEnabled()) return new RealManipulatorPivot();
     else return new DisabledManipulatorPivot();
   }
 }

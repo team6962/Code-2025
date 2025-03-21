@@ -89,8 +89,8 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
 
-    Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
-    Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
+    // Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
+    // Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }
 
   public void resetPoseEstimate(Pose2d expectedFieldPose) {

@@ -40,11 +40,12 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a();
+    driver.a()
+      .whileTrue(autonomous.alignToClosestFace(false));
     driver
         .b()
-        .whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false));
-    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false));
+        .whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false, false));
+    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false, false));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());

@@ -136,8 +136,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     setName(getModuleName(corner.index) + " Swerve Module");
 
-    Logger.logSwerveModuleState(getName() + "/measuredState", () -> getState());
-    Logger.logSwerveModulePosition(getName() + "/measuredPosition", () -> getPosition());
+    Logger.logSwerveModuleState(getName() + "/measuredState", this::getState);
+    Logger.logSwerveModulePosition(getName() + "/measuredPosition", this::getPosition);
+    Logger.logMeasure(getName() + "/consumedCurrent", this::getConsumedCurrent);
 
     StatusChecks.under(this).add("Drive Motor", driveMotor);
     StatusChecks.under(this).add("Steer Motor", steerMotor);
@@ -267,8 +268,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     refreshStatusSignals();
-
-    Logger.log(getName() + "/consumedCurrent", getConsumedCurrent());
   }
 
   /**
@@ -278,7 +277,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public void driveState(SwerveModuleState targetState) {
     if (isCalibrating) return;
-    if (!ENABLED_SYSTEMS.DRIVE) {
+    if (!ENABLED_SYSTEMS.isDriveEnabled()) {
       if (!isNeutralCoast) {
         driveMotor.setNeutralMode(NeutralModeValue.Coast);
         steerMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -304,7 +303,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
       targetState = new SwerveModuleState(0, targetState.angle);
     }
 
-    Logger.log(getName() + "/targetState", targetState);
+    // Logger.log(getName() + "/targetState", targetState);
 
     CTREUtils.check(
         driveMotor.setControl(

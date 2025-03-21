@@ -147,7 +147,7 @@ public class PivotController extends SubsystemBase {
   }
 
   public void seedEncoder() {
-    Logger.log(this.getName() + "/lastSeeded", Timer.getFPGATimestamp());
+    // Logger.log(this.getName() + "/lastSeeded", Timer.getFPGATimestamp());
     encoder.setPosition(getAbsolutePosition().in(Rotations));
   }
 

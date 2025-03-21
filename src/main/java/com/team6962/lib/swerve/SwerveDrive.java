@@ -41,6 +41,8 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -355,8 +357,8 @@ public class SwerveDrive extends SwerveCore {
     public Translation2d getTranslationError() {
       Pose2d target = targetSupplier.get();
 
-      Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
-      Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
+      // Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
+      // Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
 
       Translation2d error = target.getTranslation().minus(getEstimatedPose().getTranslation());
 
@@ -364,7 +366,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     private Translation2d getTranslationOutput(Translation2d translationError) {
-      Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
+      // Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
 
       double translationXOutput =
           translationXPID.calculate(-translationError.getX()); // Setpoint is 0, so need to invert
@@ -386,7 +388,7 @@ public class SwerveDrive extends SwerveCore {
 
       Translation2d translationOutput = new Translation2d(translationXOutput, translationYOutput);
 
-      Logger.log("Swerve Drive/AlignCommand/translationOutput", translationOutput);
+      // Logger.log("Swerve Drive/AlignCommand/translationOutput", translationOutput);
 
       return translationOutput;
     }
@@ -403,7 +405,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     private Rotation2d getRotationOutput(Rotation2d rotationError) {
-      Logger.log("Swerve Drive/AlignCommand/rotationError", rotationError);
+      // Logger.log("Swerve Drive/AlignCommand/rotationError", rotationError);
 
       double rotationOutput = rotationPID.calculate(rotationError.getRadians());
 
@@ -413,7 +415,7 @@ public class SwerveDrive extends SwerveCore {
 
       Rotation2d rotationOutputMeasure = Rotation2d.fromRadians(rotationOutput);
 
-      Logger.log("Swerve Drive/AlignCommand/rotationOutput", rotationOutputMeasure);
+      // Logger.log("Swerve Drive/AlignCommand/rotationOutput", rotationOutputMeasure);
 
       return rotationOutputMeasure;
     }
@@ -663,15 +665,15 @@ public class SwerveDrive extends SwerveCore {
         endTime = Seconds.of(profile.timeLeftUntil(0));
       }
 
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
-          -targetEndVelocity.in(MetersPerSecond));
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
+      // Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
+      //     -targetEndVelocity.in(MetersPerSecond));
+      // Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
 
       moveFieldRelative(errorUnit.times(-state.velocity));
     }

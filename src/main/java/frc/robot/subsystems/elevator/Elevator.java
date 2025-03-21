@@ -49,7 +49,7 @@ public interface Elevator extends Subsystem {
   public boolean inRange(Distance height);
 
   public static Elevator create() {
-    if (ENABLED_SYSTEMS.ELEVATOR) return new RealElevator();
+    if (ENABLED_SYSTEMS.isElevatorEnabled()) return new RealElevator();
     else return new DisabledElevator();
   }
 }
