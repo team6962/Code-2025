@@ -28,7 +28,7 @@ public class RealGrabber extends Grabber {
   private final DigitalInput detectSensor;
   private final DigitalInput clearSensor;
 
-  private Debouncer algaeDebouncer = new Debouncer(0.5);
+  private Debouncer algaeDebouncer = new Debouncer(0.3);
   private Debouncer coralDebouncer = new Debouncer(0.15);
 
   private boolean hasCoral = false;
@@ -121,10 +121,6 @@ public class RealGrabber extends Grabber {
     return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false));
   }
 
-  private void resetDebouncer() {
-    algaeDebouncer = new Debouncer(0.5, DebounceType.kFalling);
-  }
-
   @Override
   public Command forwards() {
     return runSpeed(MANIPULATOR.BASE_SPEED);
@@ -162,7 +158,7 @@ public class RealGrabber extends Grabber {
   }
 
   public boolean isStalled() {
-    return Math.abs(motor.get()) > 0.0 && Math.abs(motor.getEncoder().getVelocity()) < 0.2;
+    return Math.abs(motor.get()) > 0.0 && Math.abs(motor.getEncoder().getVelocity()) < 3000;
   }
 
   @Override
