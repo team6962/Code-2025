@@ -65,8 +65,7 @@ public class SimGrabber extends Grabber {
 
   @Override
   public Command hold() {
-      // TODO Auto-generated method stub
-      return null;
+      return Commands.none();
   }
 
   @Override
