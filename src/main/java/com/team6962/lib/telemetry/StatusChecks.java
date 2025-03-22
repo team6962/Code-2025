@@ -49,7 +49,7 @@ public final class StatusChecks {
 
   public static void refresh() {
     System.out.println("Refreshing Status Checks");
-    // updates.forEach(Runnable::run);
+    updates.forEach(Runnable::run);
   }
 
   public static Category under(String name) {
