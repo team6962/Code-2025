@@ -13,6 +13,7 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,12 +64,21 @@ public class RealGrabber extends Grabber {
     StatusChecks.under(this).add("motor", motor);
   }
 
-  public Command runSpeedOnce(double speed) {
+  public Command setDutyCycleOnce(double speed) {
     return this.runOnce(() -> motor.set(speed));
   }
 
-  public Command runSpeed(double speed) {
+  public Command setDutyCycle(double speed) {
     return this.run(() -> motor.set(speed));
+  }
+
+
+  public Command setVoltageOnce(Voltage volts) {
+    return this.runOnce(() -> motor.setVoltage(volts));
+  }
+
+  public Command setVoltage(Voltage volts) {
+    return this.run(() -> motor.setVoltage(volts));
   }
 
   @Override
@@ -83,15 +93,15 @@ public class RealGrabber extends Grabber {
   @Override
   public Command intakeCoral() {
     return Commands.sequence(
-        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-        runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::coralClear),
+        setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
+        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::coralClear),
         stopOnce()
         );
   }
 
   @Override
   public Command dropCoral() {
-    return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
+    return setDutyCycle(MANIPULATOR.CORAL_OUT_SPEED)
         .withDeadline(
             Commands.sequence(
                 Commands.waitUntil(this::hasCoral), Commands.waitUntil(() -> !hasCoral())));
@@ -99,7 +109,7 @@ public class RealGrabber extends Grabber {
 
   @Override
   public Command adjustCoral() {
-    return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
+    return setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED);
   }
 
   public boolean detectedAlgae() {
@@ -108,7 +118,7 @@ public class RealGrabber extends Grabber {
 
   @Override
   public Command intakeAlgae() {
-    return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
+    return setDutyCycle(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::detectedAlgae)
         .andThen(Commands.print("FINISHED INTAKING"))
         .finallyDo(() -> expectAlgae(detectedAlgae()));
@@ -116,28 +126,28 @@ public class RealGrabber extends Grabber {
 
   @Override
   public Command dropAlgae() {
-    return new ConditionalCommand(Commands.none(), runSpeed(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false)), () -> hasCoral());
+    return new ConditionalCommand(Commands.none(), setDutyCycle(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false)), () -> hasCoral());
   }
 
   @Override
   public Command forwards() {
-    return runSpeed(MANIPULATOR.BASE_SPEED);
+    return setDutyCycle(MANIPULATOR.BASE_SPEED);
   }
 
   @Override
   public Command backwards() {
-    return runSpeed(-MANIPULATOR.BASE_SPEED);
+    return setDutyCycle(-MANIPULATOR.BASE_SPEED);
   }
 
   @Override
   public Command holdAlgae() {
     if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
     return Commands.sequence(
-            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
+            setDutyCycle(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
                 .until(this::detectedAlgae)
                 .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
                 .finallyDo(() -> expectAlgae(detectedAlgae())),
-            runSpeed(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
+            setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
   }
 
   // update this for both game pieces
@@ -147,12 +157,12 @@ public class RealGrabber extends Grabber {
   }
 
   public Command stopOnce() {
-    return runSpeedOnce(0.0);
+    return this.runOnce(motor::stopMotor);
   }
 
   @Override
   public Command stop() {
-    return runSpeed(0);
+    return this.run(motor::stopMotor);
   }
 
   public boolean isStalled() {
