@@ -36,8 +36,6 @@ public class RealGrabber extends Grabber {
 
   private boolean detectedAlgae = false;
 
-  private Timer gripCheckTimer = new Timer();
-
   public RealGrabber() {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
@@ -47,7 +45,6 @@ public class RealGrabber extends Grabber {
     Logger.logNumber(getName() + "/get", () -> motor.get());
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
     Logger.logNumber(getName() + "/temp", () -> motor.getMotorTemperature());
-    Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
 
 
     SparkMaxConfig config = new SparkMaxConfig();
@@ -139,13 +136,13 @@ public class RealGrabber extends Grabber {
                 .until(this::detectedAlgae)
                 .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
                 .finallyDo(() -> expectAlgae(detectedAlgae())),
-            runSpeed(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME)).repeatedly();
+            runSpeed(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
   }
 
   // update this for both game pieces
   @Override
   public Command hold() {
-    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
+    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae()).repeatedly();
   }
 
   public Command stopOnce() {
