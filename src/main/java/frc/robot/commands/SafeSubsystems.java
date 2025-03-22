@@ -48,9 +48,10 @@ public class SafeSubsystems extends SubsystemBase {
              () -> (targetHeight.minus(elevator.getAverageHeight()).abs(Inches) < ELEVATOR.TOLERANCE.abs(Inches)));
     Command safeElevatorCommand = 
          new ConditionalCommand(
-              elevator.coralL1().andThen(elevatorCommand),
-              elevatorCommand, 
-              () -> targetHeight.lte(ELEVATOR.BASE_HEIGHT) && elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT));
+              elevator.coralL1(),
+              Commands.none(), 
+              () -> targetHeight.lte(ELEVATOR.BASE_HEIGHT) && elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT))
+          .andThen(elevatorCommand);
      return Commands.sequence(safeMoveCommand, safeElevatorCommand, manipulatorCommand);
   }
 
