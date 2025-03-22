@@ -103,7 +103,7 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
-    operator.leftStick().onTrue(pieceCombos.algaeBargeSetup());
+    operator.leftStick().onTrue(pieceCombos.algaeBargeSetup().andThen(pieceCombos.algaeBargeShoot())); //barge combo
     operator
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
@@ -115,7 +115,7 @@ public class Controls {
         .rightTrigger()
         .whileTrue(
             pieceCombos.intakeAlgaeOrShootCoral().andThen(rumbleBoth())); // drop coral/intake algae
-    operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // reverse coral
+    operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // shoot barge
     operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
 
     // operator.povUp().onTrue(hang.deploy());
