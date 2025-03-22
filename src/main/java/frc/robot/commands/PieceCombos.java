@@ -19,6 +19,13 @@ public class PieceCombos {
     this.safeSubsystems = safeSubsystems;
   }
 
+  public Command hold() {
+    return Commands.parallel(
+      elevator.hold(),
+      manipulator.pivot.hold()
+    );
+  }
+
   public Command intakeCoral(){
     return new ConditionalCommand(safeIntakeCoral(), quickIntakeCoral(), () -> elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT));
   }

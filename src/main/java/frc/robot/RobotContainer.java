@@ -202,6 +202,8 @@ public class RobotContainer {
 
     return autoGen.getCommand();
 
+    // return swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(60));
+
     // return Commands.sequence(
     //   // elevator.calibrate()
     //   manipulator.pivot.calibrate()

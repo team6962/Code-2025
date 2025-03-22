@@ -44,8 +44,8 @@ public class Controls {
       .whileTrue(autonomous.alignToClosestFace(false));
     driver
         .b()
-        .whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false, false));
-    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false, false));
+        .whileTrue(autonomous.alignToClosestPoleTeleop(AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
+    driver.x().whileTrue(autonomous.alignToClosestPoleTeleop(AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());

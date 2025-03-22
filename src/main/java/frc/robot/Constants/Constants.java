@@ -12,9 +12,15 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -26,10 +32,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -161,10 +163,21 @@ public final class Constants {
     private static final Angle ALL_OFFSET = Degrees.of(135);
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
-      new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
-      new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
-      new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
+      // Back Left: -9.416 (0.008777960769)
+      // Back Right: -9.406 (0.01877796077)
+      // Front Left: -3.123 (0.01859265359)
+      // Front Right: -3.129 (0.01259265359)
+
+      new SwerveConfig.Module(
+        10, 20, 30, Radians.of(0.192)
+        .minus(Radians.of(0.00959265359))), // Front Right
+      new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)
+        .minus(Radians.of(0.00959265359))), // Front Left
+      new SwerveConfig.Module(12, 22, 32,
+        Radians.of(1.555).minus(Radians.of(0.01577796077))
+        .minus(Radians.of(0.002777960769))), // Back Left
+      new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)
+        .minus(Radians.of(0.01877796077))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,

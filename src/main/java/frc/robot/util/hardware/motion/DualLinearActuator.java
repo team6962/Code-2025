@@ -230,6 +230,13 @@ public class DualLinearActuator extends SubsystemBase {
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
     if (!canMoveInDirection(requestedHeight.minus(getAverageHeight()).in(Meters))) {
+      if (!triggeredFloorLimit() && triggeredCeilingLimit()) {
+        leftMotor.setVoltage(kS);
+        rightMotor.setVoltage(kS);
+
+        return;
+      }
+
       stopMotors();
       return;
     }
@@ -248,7 +255,7 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public boolean triggeredFloorLimit() {
-    if (floorLimit.get()) {
+    if (!floorLimit.get()) {
       zeroed = true;
       return true;
     }

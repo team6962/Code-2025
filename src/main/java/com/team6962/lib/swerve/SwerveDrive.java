@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
@@ -44,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -284,7 +286,7 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public AlignCommand alignTo(Supplier<Pose2d> target) {
-    return alignTo(target, Inches.of(0.5), Degrees.of(2));
+    return alignTo(target, Inches.of(1.0), Degrees.of(4));
   }
 
   public AlignCommand alignTo(Pose2d target) {
