@@ -27,17 +27,8 @@ public class PieceCombos {
   }
 
   public Command intakeCoral(){
-    return new ConditionalCommand(safeIntakeCoral(), quickIntakeCoral(), () -> elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT));
-  }
-
-  public Command quickIntakeCoral(){
     return safeSubsystems.safeMoveCommand(
-        elevator.coralIntake(), manipulator.intakeCoral()).withName("QUICK CORAL INTAKE");
-  }
-
-  public Command safeIntakeCoral() {
-    return safeSubsystems.safeMoveCommand(
-        elevator.coralL1().andThen(elevator.coralIntake()), manipulator.intakeCoral()).withName("SAFE CORAL INTAKE");
+        elevator.coralIntake(), manipulator.intakeCoral(), ELEVATOR.CORAL.INTAKE_HEIGHT).withName("CORAL INTAKE");
   }
 
   public Command coral(int level) {
@@ -51,23 +42,23 @@ public class PieceCombos {
   }
 
   public Command coralL1() {
-    return safeSubsystems.safeMoveCommand(elevator.coralL1(), manipulator.placeCoralL1()).withName("CORAL L1");
+    return safeSubsystems.safeMoveCommand(elevator.coralL1(), manipulator.placeCoralL1(), ELEVATOR.CORAL.L1_HEIGHT).withName("CORAL L1");
   }
 
   public Command coralL2() {
-    return safeSubsystems.safeMoveCommand(elevator.coralL2(), manipulator.placeCoralL23()).withName("CORAL L2");
+    return safeSubsystems.safeMoveCommand(elevator.coralL2(), manipulator.placeCoralL23(), ELEVATOR.CORAL.L2_HEIGHT).withName("CORAL L2");
   }
 
   public Command coralL3() {
-    return safeSubsystems.safeMoveCommand(elevator.coralL3(), manipulator.placeCoralL23()).withName("CORAL L3");
+    return safeSubsystems.safeMoveCommand(elevator.coralL3(), manipulator.placeCoralL23(), ELEVATOR.CORAL.L3_HEIGHT).withName("CORAL L3");
   }
 
   public Command coralL4() {
-    return safeSubsystems.safeMoveCommand(elevator.coralL4(), manipulator.placeCoralL4()).withName("CORAL L4");
+    return safeSubsystems.safeMoveCommand(elevator.coralL4(), manipulator.placeCoralL4(), ELEVATOR.CORAL.L4_HEIGHT).withName("CORAL L4");
   }
 
   public Command pickupGroundAlgae() {
-    return safeSubsystems.safeMoveCommand(elevator.algaeGround(), manipulator.pickupGroundAlgae()).withName("ALGAE GROUND");
+    return safeSubsystems.safeMoveCommand(elevator.algaeGround(), manipulator.pickupGroundAlgae(), ELEVATOR.ALGAE.GROUND_HEIGHT).withName("ALGAE GROUND");
   }
 
   public Command algae(int level) {
@@ -79,16 +70,16 @@ public class PieceCombos {
   }
 
   public Command algaeL2() {
-    return safeSubsystems.safeMoveCommand(elevator.algaeL2(), manipulator.pivot.algaeReef()).withName("ALGAE L2");
+    return safeSubsystems.safeMoveCommand(elevator.algaeL2(), manipulator.pivot.algaeReef(), ELEVATOR.ALGAE.L2_HEIGHT).withName("ALGAE L2");
   }
 
   public Command algaeL3() {
-    return safeSubsystems.safeMoveCommand(elevator.algaeL3(), manipulator.pivot.algaeReef()).withName("ALGAE L3");
+    return safeSubsystems.safeMoveCommand(elevator.algaeL3(), manipulator.pivot.algaeReef(), ELEVATOR.ALGAE.L3_HEIGHT).withName("ALGAE L3");
   }
 
   public Command algaeBargeSetup() {
     return safeSubsystems.safeMoveCommand(
-        elevator.algaeBarge(), manipulator.pivot.algaeBargeSetup()).withName("BARGE SETUP");
+        elevator.algaeBarge(), manipulator.pivot.algaeBargeSetup(), ELEVATOR.ALGAE.BARGE_HEIGHT).withName("BARGE SETUP");
   }
 
   public Command algaeBargeShoot() {
@@ -112,7 +103,7 @@ public class PieceCombos {
 
   public Command algaeProcessor() {
     return safeSubsystems.safeMoveCommand(
-        elevator.algaeProcessor(), manipulator.placeProcessorAlgae()).withName("ALGAE PROCESSOR");
+        elevator.algaeProcessor(), manipulator.placeProcessorAlgae(), ELEVATOR.ALGAE.PROCESSOR_HEIGHT).withName("ALGAE PROCESSOR");
   }
 
   public Command stow() {
