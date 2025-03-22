@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.Constants.TEAM_COLOR;
-import frc.robot.subsystems.RobotStateController;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
@@ -27,7 +26,6 @@ import frc.robot.util.software.MathUtils.InputMath;
 public class XBoxSwerve extends Command {
   private XboxController controller;
   private SwerveDrive swerveDrive;
-  private RobotStateController stateController;
 
   public double MAX_DRIVE_VELOCITY;
   public double NOMINAL_DRIVE_VELOCITY;
@@ -43,11 +41,9 @@ public class XBoxSwerve extends Command {
 
   public XBoxSwerve(
       SwerveDrive swerveDrive,
-      XboxController xboxController,
-      RobotStateController stateController) {
+      XboxController xboxController) {
     this.swerveDrive = swerveDrive;
     this.controller = xboxController;
-    this.stateController = stateController;
     // controller.setRumble(RumbleType.kBothRumble, 1.0);
     addRequirements(swerveDrive);
 

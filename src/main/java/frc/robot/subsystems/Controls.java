@@ -21,7 +21,6 @@ public class Controls {
       new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
 
   public static void configureBindings(
-      RobotStateController stateController,
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
@@ -63,7 +62,7 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
+    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
 
     // Operator
     // Button to L2-L4, and Barge Height

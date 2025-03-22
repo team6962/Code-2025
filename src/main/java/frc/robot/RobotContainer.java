@@ -31,7 +31,6 @@ import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.RobotStateController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -63,7 +62,6 @@ public class RobotContainer {
 
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
-  public final RobotStateController stateController;
   // public final LEDs ledStrip;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -123,7 +121,6 @@ public class RobotContainer {
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
-    stateController = new RobotStateController(swerveDrive);
     // ledStrip =
     //     new LEDs(
     //         stateController,
@@ -142,7 +139,12 @@ public class RobotContainer {
 
     // // Configure the trigger bindings
     Controls.configureBindings(
-        stateController, swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+      swerveDrive,
+      elevator,
+      manipulator,
+      hang,
+      autonomous,
+      pieceCombos);
 
     autoGen =
         new AutoGeneration(

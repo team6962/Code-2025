@@ -16,7 +16,6 @@ import java.util.function.DoubleSupplier;
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
-  private RobotStateController stateController;
   private static int length = 30;
   private static State state = State.OFF;
   private static double time = 0;
@@ -66,8 +65,7 @@ public class LEDs extends SubsystemBase {
 
   private DoubleSupplier animationSpeed;
 
-  public LEDs(RobotStateController stateController, DoubleSupplier animationSpeed) {
-    this.stateController = stateController;
+  public LEDs(DoubleSupplier animationSpeed) {
     this.animationSpeed = animationSpeed;
 
     strip = new AddressableLED(PWM.LEDS);
