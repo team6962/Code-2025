@@ -4,10 +4,6 @@
 
 package frc.robot.subsystems.LEDs;
 
-import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -17,21 +13,28 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
 import frc.robot.subsystems.RobotStateController;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Distance;
+
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
   private RobotStateController stateController;
-  private static State state = State.HAS_CORAL;
+  private static State state = State.DRIVING_TELEOP_RED;
+  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
+  private final LEDPattern m_scrollingRainbow =
+        m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
   public static enum State {
     OFF,
-    DISABLED,
-    ENABLED,
-    DRIVING_AUTO,
-    DRIVING_TELEOP_RED,
-    DRIVING_TELEOP_BLUE,
-    HAS_ALGAE,
+    DISABLED, 
+    ENABLED, // Right colors, fix scrolling
+    DRIVING_AUTO, // good
+    DRIVING_TELEOP_RED, // Wrong colors, fix scrolling
+    DRIVING_TELEOP_BLUE, // Right colors, fix scroll
+    HAS_ALGAE, // Wrong colors
     HAS_CORAL,
     CAN_SEE_ALGAE,
     AIMING_PROCESSOR,
@@ -46,7 +49,7 @@ public class LEDs extends SubsystemBase {
   public static final Color WHITE = new Color(255, 255, 255);
   public static final Color ANTARES_BLUE = new Color(37, 46, 69);
   public static final Color ANTARES_YELLOW = new Color(242, 222, 139);
-  public static final Color RED = new Color(255, 0, 0);
+  public static final Color RED = new Color(0, 255, 0);
   public static final Color GREEN = new Color(0, 255, 0);
   public static final Color BLUE = new Color(0, 20, 255);
   public static final Color RSL_ORANGE = new Color(255, 100, 0);
@@ -61,7 +64,7 @@ public class LEDs extends SubsystemBase {
     this.stateController = stateController;
 
     strip = new AddressableLED(LED.port);
-    buffer = new AddressableLEDBuffer(LED.length);
+    buffer = new AddressableLEDBuffer(LED.SIDE_STRIP_HEIGHT);
     strip.setLength(buffer.getLength());
 
     strip.setData(buffer);
@@ -76,11 +79,14 @@ public class LEDs extends SubsystemBase {
     if (state.ordinal() > LEDs.state.ordinal()) LEDs.state = state;
   }
 
+  /*public static void rainbowCommand(State state) {
+    return Commands.run(() --> setState())
+  }*/
+
   private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
     LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
     LEDPattern blink = base.blink(Seconds.of(Blink));
     LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
-
     LEDPattern pattern = blink.overlayOn(scroll);
 
     return pattern;
@@ -103,7 +109,8 @@ public class LEDs extends SubsystemBase {
       case DISABLED:
         break;
       case ENABLED:
-        apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 1.0, 0.0));
+        m_scrollingRainbow.applyTo(buffer);
+        strip.setData(buffer);
         break;
       case DRIVING_AUTO:
         apply(createColor(WHITE, WHITE, 1.0, 50.0));
@@ -115,7 +122,7 @@ public class LEDs extends SubsystemBase {
         apply(createColor(BLUE, ANTARES_BLUE, 1.0, 50.0));
         break;
       case HAS_ALGAE:
-        apply(createColor(RED, ANTARES_YELLOW, 1.0, 50.0));
+        apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
         break;
       case HAS_CORAL:
         break;
