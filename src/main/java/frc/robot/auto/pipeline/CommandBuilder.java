@@ -1,5 +1,6 @@
 package frc.robot.auto.pipeline;
 
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;

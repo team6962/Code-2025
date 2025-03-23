@@ -109,40 +109,28 @@ public class AutonomousCommands {
     Pose2d intake =
         StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
 
-    return Commands.sequence(
-        Commands.parallel(
-            swerveDrive.pathfindTo(intake),
-            CommandUtils.selectByMode(
-                pieceCombos.intakeCoral(),
-                CommandUtils.simulationMessage(
-                    "Moving elevator and manipulator for coral intaking", 0.5))),
+    return Commands.race(
+      // swerveDrive.pathfindTo(intake),
+      Commands.sequence(
+        swerveDrive.pathfindTo(intake),
         swerveDrive.alignTo(intake)
-          .withDeadline(
-            pieceCombos.intakeCoral()
-            // CommandUtils.selectByMode(
-            //   Commands.deadline(
-            //     manipulator.grabber.intakeCoral(),
-            //     Commands.sequence(
-            //       manipulator.pivot.coralIntake(),
-            //       manipulator.pivot.hold().repeatedly()
-            //         .deadlineFor(Commands.print("Holding!").repeatedly())
-            //     ),
-            //     manipulator.funnel.intake(),
-            //     elevator.coralIntake()
-            //   ),
-            //   CommandUtils.simulationMessage("Intaking coral", 0.25)
-            // )
-          )
-        // CommandUtils.selectByMode(
-        //   manipulator.pivot.coralIntake()
-        //     .andThen(manipulator.pivot.hold())
-        //     .alongWith(
-        //       manipulator.grabber.intakeCoral()
-        //         .deadlineFor(manipulator.funnel.intake())
-        //     ),
-        //   CommandUtils.simulationMessage("Intaking coral", 0.25)
-        // ).alongWith(swerveDrive.alignTo(intake))
-    );
+          .withTimeout(Seconds.of(0.1))
+      ),
+      pieceCombos.intakeCoral()
+    );//.until(() -> !manipulator.grabber.isCoralClear());
+
+    // return Commands.sequence(
+    //     Commands.parallel(
+    //         swerveDrive.pathfindTo(intake),
+    //         CommandUtils.selectByMode(
+    //             pieceCombos.intakeCoral(),
+    //             CommandUtils.simulationMessage(
+    //                 "Moving elevator and manipulator for coral intaking", 0.5))),
+    //     Commands.parallel(
+    //       pieceCombos.intakeCoral(),
+    //       swerveDrive.alignTo(intake)
+    //     ).until(() -> !manipulator.grabber.isCoralClear())
+    // );
   }
 
   public Command processAlgae() {
@@ -257,7 +245,8 @@ public class AutonomousCommands {
   }
 
   public Command placeCoral(CoralPosition position) {
-    Pose2d alignPose = ReefPositioning.getCoralPlacePose(position.pole);
+    Pose2d alignPose = ReefPositioning.getCoralAlignPose(position.pole);
+    Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
 
     return Commands.sequence(
         // CommandUtils.selectByMode(
@@ -266,26 +255,62 @@ public class AutonomousCommands {
         //           .andThen(elevator.hold()),
         //         CommandUtils.simulationMessage("Stowing elevator", position.level * 0.5))
         //     .withDeadline(swerveDrive.pathfindTo(ReefPositioning.getCoralAlignPose(position.pole))),
-        Commands.parallel(
+        Commands.deadline(
           swerveDrive.pathfindTo(alignPose),
           Commands.sequence(
-            pieceCombos.stow()
-              .deadlineFor(manipulator.grabber.hold())
-              .andThen(elevator.hold())
-              .until(() ->
-                swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
-                Math.hypot(swerveDrive.getEstimatedSpeeds().vxMetersPerSecond, swerveDrive.getEstimatedSpeeds().vyMetersPerSecond) < 3.0
-              ),
-            manipulator.grabber.hold()
-              .withDeadline(pieceCombos.coral(position.level))
+            pieceCombos.intakeCoral(),
+            Commands.print("A"),
+            pieceCombos.readyL3(),
+            Commands.print("B"),
+            pieceCombos.holdCoral(),
+            Commands.print("C")
           )
+            .until(() ->
+              swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
+              Math.hypot(swerveDrive.getEstimatedSpeeds().vxMetersPerSecond, swerveDrive.getEstimatedSpeeds().vyMetersPerSecond) < 3.0
+            )
+            .andThen(
+              Commands.print("D")
+                .andThen(pieceCombos.coralL4()))
+          // Commands.sequence(
+          //   pieceCombos.stow()
+          //     .deadlineFor(manipulator.grabber.hold())
+          //     .andThen(elevator.hold())
+          //     .until(() ->
+          //       swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
+          //       Math.hypot(swerveDrive.getEstimatedSpeeds().vxMetersPerSecond, swerveDrive.getEstimatedSpeeds().vyMetersPerSecond) < 3.0
+          //     ),
+          //   manipulator.grabber.hold()
+          //     .withDeadline(pieceCombos.coral(position.level))
+          // )
         ),
-        swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole))
-          .deadlineFor(manipulator.grabber.hold(), manipulator.pivot.hold(), elevator.hold()),
-        manipulator.grabber.dropCoral()
-          .deadlineFor(manipulator.pivot.hold(), elevator.hold()),
-        pieceCombos.stow()
-          .withTimeout(Seconds.of(0.3)));
+        Commands.print("E"),
+        Commands.sequence(
+          Commands.print("F"),
+          Commands.parallel(
+            swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
+            Commands.sequence(
+              Commands.print("G"),
+              pieceCombos.coralL4(),
+              Commands.print("H"),
+              pieceCombos.holdCoral()
+                .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(1), Degrees.of(4))),
+              Commands.print("I")
+              // () ->
+                // swerveDrive.getEstimatedPose().getTranslation().getDistance(placePose.getTranslation()) < Units.inchesToMeters(0.5) &&
+                // Math.abs(MeasureMath.minDifference(swerveDrive.getEstimatedPose().getRotation(), placePose.getRotation()).getDegrees()) < 2.0
+              // )
+            )
+          ),
+          Commands.print("J"),
+          // swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole), Inches.of(0.5), Degrees.of(2))
+          //   .deadlineFor(manipulator.grabber.hold(), manipulator.pivot.hold(), elevator.hold()),
+          manipulator.grabber.dropCoral()
+            .deadlineFor(manipulator.pivot.hold(), elevator.hold()),
+          pieceCombos.stow()
+            .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+        ).onlyIf(manipulator.grabber::hasCoral)
+      );
   }
 
   public Command driveToAlgae(int face) {

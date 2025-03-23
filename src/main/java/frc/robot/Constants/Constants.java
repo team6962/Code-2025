@@ -365,6 +365,10 @@ public final class Constants {
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
       public static final Distance PROCESSOR_HEIGHT = Inches.of(41.50);
     }
+
+    public static final class AUTO {
+      public static final Distance READY_HEIGHT = Inches.of(53);
+    }
   }
 
   public static final class MANIPULATOR_PIVOT {

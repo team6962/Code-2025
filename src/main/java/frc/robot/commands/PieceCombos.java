@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -51,6 +53,10 @@ public class PieceCombos {
 
   public Command coralL3() {
     return safeSubsystems.safeMoveCommand(elevator.coralL3(), manipulator.placeCoralL23(), ELEVATOR.CORAL.L3_HEIGHT).withName("CORAL L3");
+  }
+
+  public Command readyL3() {
+    return safeSubsystems.safeMoveCommand(elevator.setHeight(ELEVATOR.AUTO.READY_HEIGHT), manipulator.stow(), Inches.of(53)).withName("READY L3");
   }
 
   public Command coralL4() {
@@ -108,6 +114,10 @@ public class PieceCombos {
 
   public Command stow() {
     return manipulator.pivot.safe().andThen(elevator.stow()).andThen(manipulator.stow()).withName("STOW");
+  }
+
+  public Command holdCoral() {
+    return Commands.parallel(manipulator.grabber.hold(), manipulator.pivot.hold(), elevator.hold());
   }
 
   public Command intakeAlgaeOrShootCoral(){

@@ -1,21 +1,17 @@
 package frc.robot.subsystems.manipulator.grabber;
 
-import static edu.wpi.first.units.Units.Amps;
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.ctre.phoenix6.controls.DifferentialVelocityDutyCycle;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -42,7 +38,7 @@ public class RealGrabber extends Grabber {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
     Logger.logBoolean(getName() + "/detectedAlgae", this::detectedAlgae);
-    Logger.logBoolean(getName() + "/coralClear", this::coralClear);
+    Logger.logBoolean(getName() + "/coralClear", this::isCoralClear);
     Logger.logNumber(getName() + "/vel", () -> motor.getEncoder().getVelocity());
     Logger.logNumber(getName() + "/get", () -> motor.get());
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
@@ -86,7 +82,8 @@ public class RealGrabber extends Grabber {
     return hasCoral;
   }
 
-  public boolean coralClear() {
+  @Override
+  public boolean isCoralClear() {
     return coralClear;
   }
 
@@ -94,7 +91,7 @@ public class RealGrabber extends Grabber {
   public Command intakeCoral() {
     return Commands.sequence(
         setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::coralClear),
+        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isCoralClear),
         stopOnce()
         );
   }

@@ -293,6 +293,21 @@ public class SwerveDrive extends SwerveCore {
     return alignTo(() -> target);
   }
 
+  public boolean isWithinToleranceOf(Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
+    Pose2d target = targetSupplier.get();
+    Pose2d current = getEstimatedPose();
+
+    return current.getTranslation().getDistance(target.getTranslation())
+            < toleranceDistance.in(Meters)
+        && MeasureMath.minDifference(
+                current.getRotation().getMeasure(), target.getRotation().getMeasure())
+            .lt(toleranceAngle);
+  }
+
+  public boolean isWithinToleranceOf(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
+    return isWithinToleranceOf(() -> target, toleranceDistance, toleranceAngle);
+  }
+
   /**
    * A command to precisely align to a target position. This should not be used to drive to a target
    * far away, as it will not pathfind and may have unexpected behavior.

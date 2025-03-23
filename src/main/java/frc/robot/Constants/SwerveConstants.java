@@ -55,7 +55,7 @@ public final class SwerveConstants {
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
                 Amps.of(60)),
             chassisType == ChassisType.COMPETITION ? Wheel.BILLET_NEW : Wheel.COLSON,
-            new DriveGains(new PIDConstants(3.0, 0.0, 0.4), new PIDConstants(1.0, 0.0, 0.2))
+            new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
                 .withFineTranslation(new PIDConstants(3.0, 0.05, 0.4))
                 .withFineRotation(new PIDConstants(1.0, 0.05, 0.2)))
         .withMaxDriveSpeed(MetersPerSecond.of(3.9))

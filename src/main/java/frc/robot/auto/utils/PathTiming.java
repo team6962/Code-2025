@@ -18,7 +18,7 @@ import java.util.List;
 
 public final class PathTiming {
   public static Time getPathTime(List<AutoPaths.CoralMovement> path, Pose2d startPose) {
-    return getPathTime(path, startPose, 0);
+    return getPathTime(path, startPose, 0.5);
   }
 
   public static Time getPathTime(
