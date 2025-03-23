@@ -6,10 +6,14 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -38,8 +42,6 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

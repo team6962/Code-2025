@@ -80,6 +80,7 @@ public class SwerveGyroscope extends SubsystemBase {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
       angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
 
+      Logger.log(getName() + "/angularVelocity", angularVelocity);
       Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
       Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
       Logger.log(getName() + "/Gyroscope/discontinuousPitch", Degrees.of(navx.getPitch()));
