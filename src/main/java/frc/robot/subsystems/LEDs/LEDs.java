@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.LEDs;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -12,20 +15,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
-import frc.robot.subsystems.RobotStateController;
-import static edu.wpi.first.units.Units.*;
-import edu.wpi.first.units.measure.Distance;
-
 
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
-  private RobotStateController stateController;
   private static State state = State.DRIVING_TELEOP_RED;
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private static final Distance kLedSpacing = Meters.of(1 / 120.0);
   private final LEDPattern m_scrollingRainbow =
-        m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
   public static enum State {
     OFF,
@@ -60,9 +58,7 @@ public class LEDs extends SubsystemBase {
   public static final Color PURPLE = new Color(108, 59, 170);
   public static final Color MAGENTA = new Color(255, 0, 255);
 
-  public LEDs(RobotStateController stateController) {
-    this.stateController = stateController;
-
+  public LEDs() {
     strip = new AddressableLED(LED.port);
     buffer = new AddressableLEDBuffer(LED.SIDE_STRIP_HEIGHT);
     strip.setLength(buffer.getLength());
@@ -83,8 +79,10 @@ public class LEDs extends SubsystemBase {
     return Commands.run(() --> setState())
   }*/
 
-  private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
-    LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
+  private static LEDPattern createColor(
+      Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
+    LEDPattern base =
+        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
     LEDPattern blink = base.blink(Seconds.of(Blink));
     LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
     LEDPattern pattern = blink.overlayOn(scroll);
@@ -102,11 +100,12 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
-        switch (state) {
+    switch (state) {
       case OFF:
         apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 1.0, 0.0));
         break;
       case DISABLED:
+        apply(createColor(RED, WHITE, 1.0, 50.0));
         break;
       case ENABLED:
         m_scrollingRainbow.applyTo(buffer);
@@ -147,11 +146,9 @@ public class LEDs extends SubsystemBase {
       case SCORING_REEF:
         apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
         break;
-    case HANG:
+      case HANG:
         apply(createColor(MAGENTA, MAGENTA, 1.0, 0.0));
         break;
-
-
     }
   }
 }

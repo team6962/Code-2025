@@ -9,7 +9,6 @@ import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
-import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -27,8 +26,7 @@ public class Controls {
       Manipulator manipulator,
       Hang hang,
       AutonomousCommands autonomous,
-      PieceCombos pieceCombos,
-      LEDs ledStrip) {
+      PieceCombos pieceCombos) {
 
     // Driver
     // Move swerve chassis
