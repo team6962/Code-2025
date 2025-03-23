@@ -87,6 +87,7 @@ public class SwerveGyroscope extends SubsystemBase {
       angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
 
       Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
+      Logger.log(getName() + "/continuousYawRadians", -navx.getAngle() / 360.0);
       Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
       Logger.log(getName() + "/Gyroscope/discontinuousPitch", Degrees.of(navx.getPitch()));
       Logger.log(getName() + "/Gyroscope/discontinuousRoll", Degrees.of(navx.getRoll()));
