@@ -65,6 +65,7 @@ public class SwerveConfig {
   private final Motor steerMotor;
   private final Wheel wheel;
   private final DriveGains driveGains;
+  private String canBus = "rio";
   private LinearVelocity maxSpeed;
   private AngularVelocity maxRotation;
 
@@ -95,6 +96,16 @@ public class SwerveConfig {
     this.maxRotation = maxRotation;
 
     return this;
+  }
+
+  public SwerveConfig withCANBus(String canBus) {
+    this.canBus = canBus;
+
+    return this;
+  }
+
+  public String canBus() {
+    return canBus;
   }
 
   public Chassis chassis() {

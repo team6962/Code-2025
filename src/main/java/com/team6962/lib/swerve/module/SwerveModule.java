@@ -82,7 +82,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     SwerveConfig.Module moduleConstants = getModuleConstants();
 
-    driveMotor = new TalonFX(moduleConstants.driveMotorId());
+    driveMotor = new TalonFX(moduleConstants.driveMotorId(), config.canBus());
 
     TalonFXConfigurator driveConfig = driveMotor.getConfigurator();
 
@@ -99,7 +99,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveConfig.apply(
             new CurrentLimitsConfigs().withSupplyCurrentLimit(config.driveMotor().maxCurrent())));
 
-    steerEncoder = new CANcoder(moduleConstants.steerEncoderId());
+    steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), config.canBus());
 
     CANcoderConfigurator steerEncoderConfig = steerEncoder.getConfigurator();
 
@@ -109,7 +109,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withMagnetOffset(
                     moduleConstants.steerEncoderOffset().minus(corner.getModuleRotation()))));
 
-    steerMotor = new TalonFX(moduleConstants.steerMotorId());
+    steerMotor = new TalonFX(moduleConstants.steerMotorId(), config.canBus());
 
     TalonFXConfigurator steerConfig = steerMotor.getConfigurator();
 

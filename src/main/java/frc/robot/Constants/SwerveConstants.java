@@ -59,7 +59,8 @@ public final class SwerveConstants {
                 .withFineTranslation(new PIDConstants(3.0, 0.05, 0.4))
                 .withFineRotation(new PIDConstants(1.0, 0.05, 0.2)))
         .withMaxDriveSpeed(MetersPerSecond.of(3.9))
-        .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
+        .withMaxRotationSpeed(RotationsPerSecond.of(3.1))
+        .withCANBus(chassisType == ChassisType.COMPETITION ? "drivetrain" : "rio");
   }
 
   private static Chassis getChassis(ChassisType chassisType) {
