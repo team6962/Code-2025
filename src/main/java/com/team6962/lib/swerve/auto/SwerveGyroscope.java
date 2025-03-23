@@ -1,6 +1,7 @@
 package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.studica.frc.AHRS;
@@ -10,6 +11,7 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,6 +32,7 @@ public class SwerveGyroscope extends SubsystemBase {
   private Supplier<SwerveModulePosition[]> moduleDeltasSupplier;
   private SwerveDriveKinematics kinematics;
   private Angle absoluteHeading = Radians.of(0);
+  private AngularVelocity angularVelocity;
 
   public SwerveGyroscope(
       Supplier<SwerveModulePosition[]> moduleDeltasSupplier, SwerveDriveKinematics kinematics) {
@@ -75,6 +78,7 @@ public class SwerveGyroscope extends SubsystemBase {
   public void periodic() {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
+      angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
 
       Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
       Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
@@ -114,6 +118,10 @@ public class SwerveGyroscope extends SubsystemBase {
    */
   public Angle getAbsoluteHeading() {
     return absoluteHeading;
+  }
+
+  public AngularVelocity getAngularVelocity() {
+    return angularVelocity;
   }
 
   /**

@@ -67,7 +67,9 @@ public class SwerveConfig {
   private final DriveGains driveGains;
   private String canBus = "rio";
   private LinearVelocity maxSpeed;
+  private LinearAcceleration maxLinearAcceleration;
   private AngularVelocity maxRotation;
+  private AngularAcceleration maxAngularAcceleration;
 
   public SwerveConfig(
       Chassis chassis,
@@ -94,6 +96,18 @@ public class SwerveConfig {
 
   public SwerveConfig withMaxRotationSpeed(AngularVelocity maxRotation) {
     this.maxRotation = maxRotation;
+
+    return this;
+  }
+
+  public SwerveConfig withMaxLinearAcceleration(LinearAcceleration acceleration) {
+    this.maxLinearAcceleration = acceleration;
+
+    return this;
+  }
+
+  public SwerveConfig withMaxAngularAcceleration(AngularAcceleration acceleration) {
+    this.maxAngularAcceleration = acceleration;
 
     return this;
   }
@@ -392,6 +406,8 @@ public class SwerveConfig {
   }
 
   public LinearAcceleration maxLinearAcceleration() {
+    if (maxLinearAcceleration != null) return maxLinearAcceleration;
+    
     return MeasureMath.min(
             driveTorque(driveMotor.maxCurrent()).div(wheel.radius()), staticFriction())
         .div(chassis.mass);
@@ -405,6 +421,8 @@ public class SwerveConfig {
   }
 
   public AngularAcceleration maxAngularAcceleration() {
+    if (maxAngularAcceleration != null) return maxAngularAcceleration;
+
     double frictionLimitedRps =
         staticFriction().in(Newtons)
             / chassis.driveRadius().in(Meters)

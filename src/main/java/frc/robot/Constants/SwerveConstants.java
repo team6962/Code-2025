@@ -3,6 +3,7 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -58,7 +59,8 @@ public final class SwerveConstants {
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
                 .withFineTranslation(new PIDConstants(3.0, 0.05, 0.4))
                 .withFineRotation(new PIDConstants(1.0, 0.05, 0.2)))
-        .withMaxDriveSpeed(MetersPerSecond.of(3.9))
+        .withMaxDriveSpeed(MetersPerSecond.of(4.2))
+        .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(3.077))
         .withMaxRotationSpeed(RotationsPerSecond.of(3.1))
         .withCANBus(chassisType == ChassisType.COMPETITION ? "drivetrain" : "rio");
   }
