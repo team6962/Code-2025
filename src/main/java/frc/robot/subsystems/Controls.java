@@ -39,12 +39,17 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a()
-      .whileTrue(autonomous.alignToClosestFace(false));
+    driver.a().whileTrue(autonomous.alignToClosestFace(false));
     driver
         .b()
-        .whileTrue(autonomous.alignToClosestPoleTeleop(AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
-    driver.x().whileTrue(autonomous.alignToClosestPoleTeleop(AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
+        .whileTrue(
+            autonomous.alignToClosestPoleTeleop(
+                AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
+    driver
+        .x()
+        .whileTrue(
+            autonomous.alignToClosestPoleTeleop(
+                AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
@@ -103,14 +108,15 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
-    operator.leftStick().onTrue(pieceCombos.algaeBargeSetup().andThen(pieceCombos.algaeBargeShoot())); //barge combo
+    operator
+        .leftStick()
+        .onTrue(
+            pieceCombos.algaeBargeSetup().andThen(pieceCombos.algaeBargeShoot())); // barge combo
     operator
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
 
-    operator
-        .rightBumper()
-        .whileTrue(manipulator.grabber.adjustCoral()); // intake coral
+    operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
         .rightTrigger()
         .whileTrue(

@@ -114,15 +114,11 @@ public final class ReefPositioning {
   }
 
   public static Pose2d getAlgaePlacePose(int face) {
-    return rotatePose(
-      getFacePose(PLACE_ALGAE_RELATIVE, face),
-      Rotation2d.fromDegrees(180));
+    return rotatePose(getFacePose(PLACE_ALGAE_RELATIVE, face), Rotation2d.fromDegrees(180));
   }
 
   public static Pose2d getAlgaeAlignPose(int face) {
-    return rotatePose(
-      getFacePose(ALIGN_ALGAE_RELATIVE, face),
-      Rotation2d.fromDegrees(180));
+    return rotatePose(getFacePose(ALIGN_ALGAE_RELATIVE, face), Rotation2d.fromDegrees(180));
   }
 
   public static Pose2d getAlgaeLeavePose(int face) {

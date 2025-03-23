@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -44,7 +43,6 @@ public class RealGrabber extends Grabber {
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
     Logger.logNumber(getName() + "/temp", () -> motor.getMotorTemperature());
 
-
     SparkMaxConfig config = new SparkMaxConfig();
 
     SparkMaxUtil.configure(config, false, IdleMode.kBrake);
@@ -67,7 +65,6 @@ public class RealGrabber extends Grabber {
   public Command setDutyCycle(double speed) {
     return this.run(() -> motor.set(speed));
   }
-
 
   public Command setVoltageOnce(Voltage volts) {
     return this.runOnce(() -> motor.setVoltage(volts));
@@ -92,8 +89,7 @@ public class RealGrabber extends Grabber {
     return Commands.sequence(
         setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
         setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isCoralClear),
-        stopOnce()
-        );
+        stopOnce());
   }
 
   @Override
@@ -123,7 +119,10 @@ public class RealGrabber extends Grabber {
 
   @Override
   public Command dropAlgae() {
-    return new ConditionalCommand(Commands.none(), setDutyCycle(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false)), () -> hasCoral());
+    return new ConditionalCommand(
+        Commands.none(),
+        setDutyCycle(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false)),
+        () -> hasCoral());
   }
 
   @Override
@@ -140,11 +139,11 @@ public class RealGrabber extends Grabber {
   public Command holdAlgae() {
     if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
     return Commands.sequence(
-            setDutyCycle(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
-                .until(this::detectedAlgae)
-                .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
-                .finallyDo(() -> expectAlgae(detectedAlgae())),
-            setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
+        setDutyCycle(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
+            .until(this::detectedAlgae)
+            .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
+            .finallyDo(() -> expectAlgae(detectedAlgae())),
+        setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
   }
 
   // update this for both game pieces

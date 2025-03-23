@@ -7,7 +7,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.MANIPULATOR;
@@ -36,17 +35,17 @@ public class RealFunnel extends Funnel {
   }
 
   @Override
-public Command intake() {
+  public Command intake() {
     return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED);
   }
 
   @Override
-public Command forwards() {
+  public Command forwards() {
     return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED);
   }
 
   @Override
-public Command stop() {
+  public Command stop() {
     return runSpeed(0);
   }
 }

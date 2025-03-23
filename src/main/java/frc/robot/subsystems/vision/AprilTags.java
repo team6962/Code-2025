@@ -5,17 +5,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -30,6 +21,13 @@ import frc.robot.Constants.Field;
 import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -39,31 +37,33 @@ public class AprilTags extends SubsystemBase {
   private static Map<String, LimelightHelpers.PoseEstimate> loggedEstimates;
 
   static {
-    Logger.addUpdate("/PoseEstimates/", () -> {
-      for (String id : LIMELIGHT.APRILTAG_CAMERA_POSES.keySet()) {
-        if (loggedEstimates.get(id) != null) {
-          PoseEstimate estimate = loggedEstimates.get(id);
+    Logger.addUpdate(
+        "/PoseEstimates/",
+        () -> {
+          for (String id : LIMELIGHT.APRILTAG_CAMERA_POSES.keySet()) {
+            if (loggedEstimates.get(id) != null) {
+              PoseEstimate estimate = loggedEstimates.get(id);
 
-          Logger.log("/PoseEstimates/" + id + "/pose", estimate.pose);
-          Logger.log("/PoseEstimates/" + id + "/timestamp", estimate.timestampSeconds);
-          Logger.log("/PoseEstimates/" + id + "/avgTagArea", estimate.avgTagArea);
-          Logger.log("/PoseEstimates/" + id + "/avgTagDist", estimate.avgTagDist);
-          Logger.log("/PoseEstimates/" + id + "/isMegaTag2", estimate.isMegaTag2);
-          Logger.log("/PoseEstimates/" + id + "/tagSpan", estimate.tagSpan);
-          Logger.log("/PoseEstimates/" + id + "/latency", estimate.latency);
-          Logger.logObject("/PoseEstimates/" + id + "/rawFiducials", estimate.rawFiducials);
-        } else {
-          Logger.log("/PoseEstimates/" + id + "/pose", new Pose2d());
-          Logger.log("/PoseEstimates/" + id + "/timestamp", 0);
-          Logger.log("/PoseEstimates/" + id + "/avgTagArea", 0);
-          Logger.log("/PoseEstimates/" + id + "/avgTagDist", 0);
-          Logger.log("/PoseEstimates/" + id + "/isMegaTag2", false);
-          Logger.log("/PoseEstimates/" + id + "/tagSpan", 0);
-          Logger.log("/PoseEstimates/" + id + "/latency", 0);
-          Logger.log("/PoseEstimates/" + id + "/rawFiducials", "null");
-        }
-      }
-    });
+              Logger.log("/PoseEstimates/" + id + "/pose", estimate.pose);
+              Logger.log("/PoseEstimates/" + id + "/timestamp", estimate.timestampSeconds);
+              Logger.log("/PoseEstimates/" + id + "/avgTagArea", estimate.avgTagArea);
+              Logger.log("/PoseEstimates/" + id + "/avgTagDist", estimate.avgTagDist);
+              Logger.log("/PoseEstimates/" + id + "/isMegaTag2", estimate.isMegaTag2);
+              Logger.log("/PoseEstimates/" + id + "/tagSpan", estimate.tagSpan);
+              Logger.log("/PoseEstimates/" + id + "/latency", estimate.latency);
+              Logger.logObject("/PoseEstimates/" + id + "/rawFiducials", estimate.rawFiducials);
+            } else {
+              Logger.log("/PoseEstimates/" + id + "/pose", new Pose2d());
+              Logger.log("/PoseEstimates/" + id + "/timestamp", 0);
+              Logger.log("/PoseEstimates/" + id + "/avgTagArea", 0);
+              Logger.log("/PoseEstimates/" + id + "/avgTagDist", 0);
+              Logger.log("/PoseEstimates/" + id + "/isMegaTag2", false);
+              Logger.log("/PoseEstimates/" + id + "/tagSpan", 0);
+              Logger.log("/PoseEstimates/" + id + "/latency", 0);
+              Logger.log("/PoseEstimates/" + id + "/rawFiducials", "null");
+            }
+          }
+        });
   }
 
   private static record BestEstimate(
@@ -80,7 +80,8 @@ public class AprilTags extends SubsystemBase {
 
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
-    Map<String, LimelightHelpers.PoseEstimate> poseEstimates = getIdentifiedPoseEstimates(cameraPoses.keySet());
+    Map<String, LimelightHelpers.PoseEstimate> poseEstimates =
+        getIdentifiedPoseEstimates(cameraPoses.keySet());
 
     loggedEstimates = poseEstimates;
 
@@ -148,14 +149,16 @@ public class AprilTags extends SubsystemBase {
         .collect(Collectors.toList());
   }
 
-  private static Map<String, LimelightHelpers.PoseEstimate> getIdentifiedPoseEstimates(Set<String> cameraIds) {
+  private static Map<String, LimelightHelpers.PoseEstimate> getIdentifiedPoseEstimates(
+      Set<String> cameraIds) {
     HashMap<String, LimelightHelpers.PoseEstimate> output = new HashMap<>();
 
     for (String cameraId : cameraIds) {
-      LimelightHelpers.PoseEstimate estimate = CachedRobotState.isAllianceInverted().orElse(false)
-        ? LimelightHelpers.getBotPoseEstimate_wpiRed(cameraId)
-        : LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
-      
+      LimelightHelpers.PoseEstimate estimate =
+          CachedRobotState.isAllianceInverted().orElse(false)
+              ? LimelightHelpers.getBotPoseEstimate_wpiRed(cameraId)
+              : LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
+
       if (estimate == null) continue;
 
       output.put(cameraId, estimate);

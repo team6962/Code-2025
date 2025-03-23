@@ -65,7 +65,7 @@ public class SimGrabber extends Grabber {
 
   @Override
   public Command hold() {
-      return Commands.none();
+    return Commands.none();
   }
 
   @Override

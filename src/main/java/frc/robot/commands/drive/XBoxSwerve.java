@@ -39,9 +39,7 @@ public class XBoxSwerve extends Command {
   private Command translateCommand;
   private Command rotateCommand;
 
-  public XBoxSwerve(
-      SwerveDrive swerveDrive,
-      XboxController xboxController) {
+  public XBoxSwerve(SwerveDrive swerveDrive, XboxController xboxController) {
     this.swerveDrive = swerveDrive;
     this.controller = xboxController;
     // controller.setRumble(RumbleType.kBothRumble, 1.0);
@@ -91,10 +89,8 @@ public class XBoxSwerve extends Command {
 
     double leftTrigger = controller.getLeftTriggerAxis();
     double rightTrigger = controller.getRightTriggerAxis();
-    Translation2d leftStick =
-        new Translation2d(-controller.getLeftY(), -controller.getLeftX());
-    Translation2d rightStick =
-        new Translation2d(controller.getRightX(), -controller.getRightY());
+    Translation2d leftStick = new Translation2d(-controller.getLeftY(), -controller.getLeftX());
+    Translation2d rightStick = new Translation2d(controller.getRightX(), -controller.getRightY());
 
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));

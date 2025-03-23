@@ -40,19 +40,24 @@ public class SafeSubsystems extends SubsystemBase {
     return returnAngle;
   }
 
-  public Command safeMoveCommand(Command elevatorCommand, Command manipulatorCommand, Distance targetHeight) {
+  public Command safeMoveCommand(
+      Command elevatorCommand, Command manipulatorCommand, Distance targetHeight) {
     Command safeMoveCommand =
-         new ConditionalCommand(
-             Commands.none(),
-             manipulator.pivot.safe(),
-             () -> (targetHeight.minus(elevator.getAverageHeight()).abs(Inches) < ELEVATOR.TOLERANCE.abs(Inches)));
-    Command safeElevatorCommand = 
-         new ConditionalCommand(
-              elevator.coralL1(),
-              Commands.none(), 
-              () -> targetHeight.lte(ELEVATOR.BASE_HEIGHT) && elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT))
-          .andThen(elevatorCommand);
-     return Commands.sequence(safeMoveCommand, safeElevatorCommand, manipulatorCommand);
+        new ConditionalCommand(
+            Commands.none(),
+            manipulator.pivot.safe(),
+            () ->
+                (targetHeight.minus(elevator.getAverageHeight()).abs(Inches)
+                    < ELEVATOR.TOLERANCE.abs(Inches)));
+    Command safeElevatorCommand =
+        new ConditionalCommand(
+                elevator.coralL1(),
+                Commands.none(),
+                () ->
+                    targetHeight.lte(ELEVATOR.BASE_HEIGHT)
+                        && elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT))
+            .andThen(elevatorCommand);
+    return Commands.sequence(safeMoveCommand, safeElevatorCommand, manipulatorCommand);
   }
 
   public Command parallelSafeCommand(Command elevatorCommand, Command manipulatorCommand) {

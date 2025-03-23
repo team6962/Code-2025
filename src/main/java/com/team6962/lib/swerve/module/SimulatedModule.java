@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.team6962.lib.swerve.SwerveConfig;
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CTREUtils;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotController;
@@ -92,9 +91,11 @@ public class SimulatedModule extends SwerveModule {
       double gearing = getDrivetrainConstants().gearing().drive();
 
       // Logger.log(
-      //     getName() + "/driveSimRotorPosition", driveMotorSim.getAngularPosition().times(gearing));
+      //     getName() + "/driveSimRotorPosition",
+      // driveMotorSim.getAngularPosition().times(gearing));
       // Logger.log(
-      //     getName() + "/driveSimRotorVelocity", driveMotorSim.getAngularVelocity().times(gearing));
+      //     getName() + "/driveSimRotorVelocity",
+      // driveMotorSim.getAngularVelocity().times(gearing));
       // Logger.log(
       //     getName() + "/driveSimRotorAcceleration",
       //     driveMotorSim.getAngularAcceleration().times(gearing));

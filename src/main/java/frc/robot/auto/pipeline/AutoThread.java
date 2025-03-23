@@ -3,7 +3,6 @@ package frc.robot.auto.pipeline;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
@@ -44,7 +43,8 @@ public class AutoThread extends Thread {
 
       // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/parametersReplaced", true);
       // Logger.logObject(AutoPaths.Logging.AUTO_THREAD + "/parameters", parameters);
-      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder != null);
+      // Logger.log(AutoPaths.Logging.AUTO_THREAD + "/commandBuilderExists", commandBuilder !=
+      // null);
 
       return;
     }
@@ -84,9 +84,10 @@ public class AutoThread extends Thread {
         builder = commandBuilder;
       }
 
-      boolean cantWork = !shouldWorkInBackground()
-        || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds
-        || builder == null;
+      boolean cantWork =
+          !shouldWorkInBackground()
+              || Timer.getFPGATimestamp() - lastPauseTimestampSeconds > workTimeSeconds
+              || builder == null;
 
       if (cantWork || builder.isDone()) {
         logWorkState(WorkState.SLEEPING);

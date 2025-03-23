@@ -14,7 +14,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
@@ -42,10 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -293,7 +289,8 @@ public class SwerveDrive extends SwerveCore {
     return alignTo(() -> target);
   }
 
-  public boolean isWithinToleranceOf(Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
+  public boolean isWithinToleranceOf(
+      Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
     Pose2d target = targetSupplier.get();
     Pose2d current = getEstimatedPose();
 
@@ -304,7 +301,8 @@ public class SwerveDrive extends SwerveCore {
             .lt(toleranceAngle);
   }
 
-  public boolean isWithinToleranceOf(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
+  public boolean isWithinToleranceOf(
+      Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
     return isWithinToleranceOf(() -> target, toleranceDistance, toleranceAngle);
   }
 
@@ -684,7 +682,8 @@ public class SwerveDrive extends SwerveCore {
 
       // Logger.log(
       //     "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
-      // Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
+      // Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed",
+      // -currentScalarSpeed);
       // Logger.log(
       //     "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
       // Logger.log(

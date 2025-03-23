@@ -1,10 +1,8 @@
 package frc.robot.auto.pipeline;
 
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
@@ -33,7 +31,8 @@ public class AutoGeneration extends SubsystemBase {
 
   private void logState() {
     // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadExists", currentThread != null);
-    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished", currentThread.isFinished());
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished",
+    // currentThread.isFinished());
   }
 
   @Override

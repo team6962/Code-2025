@@ -1,6 +1,5 @@
 package frc.robot.auto.pipeline;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -54,12 +53,20 @@ public class CommandBuilder {
 
     if (movement.source != AutoPaths.CoralSource.PREPLACED) {
       group.addCommands(autonomous.intakeCoral(movement.source.station()));
-      Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex, "intakeCoral(" + movement.source.station().name() + ")");
+      Logger.log(
+          AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex,
+          "intakeCoral(" + movement.source.station().name() + ")");
       logCommandIndex++;
     }
 
     group.addCommands(autonomous.placeCoral(movement.destination));
-    Logger.log(AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex, "placeCoral(level " + movement.destination.level + ", pole " + movement.destination.pole + ")");
+    Logger.log(
+        AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex,
+        "placeCoral(level "
+            + movement.destination.level
+            + ", pole "
+            + movement.destination.pole
+            + ")");
     logCommandIndex++;
 
     currentIndex++;
