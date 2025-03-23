@@ -157,28 +157,28 @@ public class AprilTags extends SubsystemBase {
     for (String cameraName : cameraPoses.keySet()) {
       Logger.log("/yaw", poseEstimator.getEstimatedHeading().getDegrees());
       Logger.log("/yawRate", poseEstimator.getAngularVelocity().in(DegreesPerSecond));
-      if (CachedRobotState.isAllianceInverted().orElse(false)) {
-        LimelightHelpers.SetRobotOrientation(
-            cameraName,
-            poseEstimator
-                .getEstimatedHeading()
-                .rotateBy(Rotation2d.fromDegrees(180.0))
-                .getDegrees(),
-            poseEstimator.getAngularVelocity().in(DegreesPerSecond),
-            0,
-            0,
-            0,
-            0);
-      } else {
-        LimelightHelpers.SetRobotOrientation(
-            cameraName,
-            poseEstimator.getEstimatedHeading().getDegrees(),
-            poseEstimator.getAngularVelocity().in(DegreesPerSecond),
-            0,
-            0,
-            0,
-            0);
-      }
+      // if (CachedRobotState.isAllianceInverted().orElse(false)) {
+      //   LimelightHelpers.SetRobotOrientation(
+      //       cameraName,
+      //       poseEstimator
+      //           .getEstimatedHeading()
+      //           .rotateBy(Rotation2d.fromDegrees(180.0))
+      //           .getDegrees(),
+      //       poseEstimator.getAngularVelocity().in(DegreesPerSecond),
+      //       0,
+      //       0,
+      //       0,
+      //       0);
+      // } else {
+      //   LimelightHelpers.SetRobotOrientation(
+      //       cameraName,
+      //       poseEstimator.getEstimatedHeading().getDegrees(),
+      //       poseEstimator.getAngularVelocity().in(DegreesPerSecond),
+      //       0,
+      //       0,
+      //       0,
+      //       0);
+      // }
 
       if (CachedRobotState.isDisabled() && !mt1_initalHeadingLocked) { // only update INITIAL heading estimate when disabled
         if (LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName) != null) {
@@ -193,6 +193,8 @@ public class AprilTags extends SubsystemBase {
           // }
           // avgHeading /= mt1_inititalHeadingEstimates.size();
           // mt1_avgInitialHeadingEstimate = avgHeading;
+        } else {
+          System.out.println(cameraName + ": MT1 pose estimate is null!");
         }
       } else {
         mt1_initalHeadingLocked = true; // prevent any further modifications to this initial heading
@@ -200,7 +202,7 @@ public class AprilTags extends SubsystemBase {
       }
     }
 
-    System.out.println("MT1 heading estimate: " + mt1_lastInitialHeadingEstimate + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
+    System.out.println("MT1 heading estimate: " + mt1_lastInitialHeadingEstimate + ". Gyroscope angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
 
     // System.out.println("Final heading estimate: " + (poseEstimator.getEstimatedHeading().getDegrees() + mt1_avgInitialHeadingEstimate) + ", Gyro angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ", Initial angle: " + mt1_avgInitialHeadingEstimate);
 
