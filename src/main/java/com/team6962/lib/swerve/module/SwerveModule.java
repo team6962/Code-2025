@@ -277,19 +277,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public void driveState(SwerveModuleState targetState) {
     if (isCalibrating) return;
-    if (!ENABLED_SYSTEMS.isDriveEnabled()) {
-      if (!isNeutralCoast) {
-        driveMotor.setNeutralMode(NeutralModeValue.Coast);
-        steerMotor.setNeutralMode(NeutralModeValue.Coast);
-
-        isNeutralCoast = true;
-      }
-
-      driveMotor.stopMotor();
-      steerMotor.stopMotor();
-      return;
-    }
-
     if (isNeutralCoast) {
       driveMotor.setNeutralMode(NeutralModeValue.Brake);
       steerMotor.setNeutralMode(NeutralModeValue.Brake);
