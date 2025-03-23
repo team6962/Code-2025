@@ -447,8 +447,8 @@ public class SwerveDrive extends SwerveCore {
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
       if (translationNeedsAdjustment && rotationNeedsAdjustment) {
-        if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
-        else state = State.ROTATING;
+        // if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
+        // else state = State.ROTATING;
       }
     }
 
