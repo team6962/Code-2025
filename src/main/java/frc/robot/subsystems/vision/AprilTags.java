@@ -35,6 +35,11 @@ public class AprilTags extends SubsystemBase {
   private static final double TRANSLATION_ERROR_FACTOR = 10;
   private static final double ADDITIONAL_TRANSLATION_ERROR = 0.5;
 
+  private static ArrayList<Double> mt1_inititalHeadingEstimates = new ArrayList<Double>();
+  private static double mt1_avgInitialHeadingEstimate = 0;
+  private static double mt1_lastInitialHeadingEstimate = 0;
+  private static boolean mt1_initalHeadingLocked = false;
+
   private static record BestEstimate(
       Pose2d pose, Time timestamp, Distance translationError, Angle rotationError, int tagCount) {
     public BestEstimate() {
@@ -150,6 +155,8 @@ public class AprilTags extends SubsystemBase {
 
     // Set robot headings for each limelight (required for megatag 2)
     for (String cameraName : cameraPoses.keySet()) {
+      Logger.log("/yaw", poseEstimator.getEstimatedHeading().getDegrees());
+      Logger.log("/yawRate", poseEstimator.getAngularVelocity().in(DegreesPerSecond));
       if (CachedRobotState.isAllianceInverted().orElse(false)) {
         LimelightHelpers.SetRobotOrientation(
             cameraName,
@@ -172,7 +179,30 @@ public class AprilTags extends SubsystemBase {
             0,
             0);
       }
+
+      if (CachedRobotState.isDisabled() && !mt1_initalHeadingLocked) { // only update INITIAL heading estimate when disabled
+        if (LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName) != null) {
+          mt1_lastInitialHeadingEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getDegrees();
+          // mt1_inititalHeadingEstimates.add(
+          //   LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getDegrees()
+          // );
+
+          // double avgHeading = 0;
+          // for (double heading : mt1_inititalHeadingEstimates) {
+          //   avgHeading += heading;
+          // }
+          // avgHeading /= mt1_inititalHeadingEstimates.size();
+          // mt1_avgInitialHeadingEstimate = avgHeading;
+        }
+      } else {
+        mt1_initalHeadingLocked = true; // prevent any further modifications to this initial heading
+        // mt1_inititalHeadingEstimates.clear();
+      }
     }
+
+    System.out.println("MT1 heading estimate: " + mt1_lastInitialHeadingEstimate + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
+
+    // System.out.println("Final heading estimate: " + (poseEstimator.getEstimatedHeading().getDegrees() + mt1_avgInitialHeadingEstimate) + ", Gyro angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ", Initial angle: " + mt1_avgInitialHeadingEstimate);
 
     return cameraPoses.keySet().stream()
         .map(
