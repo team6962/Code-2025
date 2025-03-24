@@ -270,11 +270,8 @@ public class AutonomousCommands {
             swerveDrive.pathfindTo(alignPose),
             Commands.sequence(
                     pieceCombos.intakeCoral(),
-                    Commands.print("A"),
                     pieceCombos.readyL3(),
-                    Commands.print("B"),
-                    pieceCombos.holdCoral(),
-                    Commands.print("C"))
+                    pieceCombos.holdCoral()
                 .until(
                     () ->
                         swerveDrive
@@ -286,7 +283,7 @@ public class AutonomousCommands {
                                     swerveDrive.getEstimatedSpeeds().vxMetersPerSecond,
                                     swerveDrive.getEstimatedSpeeds().vyMetersPerSecond)
                                 < 3.0)
-                .andThen(Commands.print("D").andThen(pieceCombos.coralL4()))
+                .andThen(pieceCombos.coralL4())
             // Commands.sequence(
             //   pieceCombos.stow()
             //     .deadlineFor(manipulator.grabber.hold())
@@ -300,29 +297,26 @@ public class AutonomousCommands {
             //   manipulator.grabber.hold()
             //     .withDeadline(pieceCombos.coral(position.level))
             // )
-            ),
-        Commands.print("E"),
+            )
+        ),
+        pieceCombos.intakeCoral()
+          .onlyIf(() -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear()),
         Commands.sequence(
-                Commands.print("F"),
                 Commands.parallel(
                     swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
                     Commands.sequence(
-                        Commands.print("G"),
                         pieceCombos.coralL4(),
-                        Commands.print("H"),
                         pieceCombos
                             .holdCoral()
                             .until(
                                 () ->
                                     swerveDrive.isWithinToleranceOf(
-                                        placePose, Inches.of(1), Degrees.of(4))),
-                        Commands.print("I")
+                                        placePose, Inches.of(1), Degrees.of(4)))
                         // () ->
                         // swerveDrive.getEstimatedPose().getTranslation().getDistance(placePose.getTranslation()) < Units.inchesToMeters(0.5) &&
                         // Math.abs(MeasureMath.minDifference(swerveDrive.getEstimatedPose().getRotation(), placePose.getRotation()).getDegrees()) < 2.0
                         // )
                         )),
-                Commands.print("J"),
                 // swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole),
                 // Inches.of(0.5), Degrees.of(2))
                 //   .deadlineFor(manipulator.grabber.hold(), manipulator.pivot.hold(),
@@ -334,7 +328,7 @@ public class AutonomousCommands {
                 pieceCombos
                     .stow()
                     .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT)))
-            .onlyIf(manipulator.grabber::hasCoral));
+            .onlyIf(() -> manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear()));
   }
 
   public Command driveToAlgae(int face) {
