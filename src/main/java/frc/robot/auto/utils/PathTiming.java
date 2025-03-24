@@ -99,9 +99,8 @@ public final class PathTiming {
                 .chassis()
                 .driveRadius()
                 .times(
-                    MeasureMath.abs(
-                            MeasureMath.minDifference(start.getRotation(), end.getRotation()))
-                        .getRadians()));
+                    MeasureMath.minAbsDifference(start.getRotation(), end.getRotation())
+                      .getRadians()));
   }
 
   public static Time estimatePathTime(Pose2d start, Pose2d end) {

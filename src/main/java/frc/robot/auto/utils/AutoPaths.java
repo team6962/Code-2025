@@ -96,7 +96,7 @@ public final class AutoPaths {
           other.startPose.getTranslation().getDistance(startPose.getTranslation())
               < Units.inchesToMeters(6);
       boolean d =
-          MeasureMath.minDifference(other.startPose.getRotation(), startPose.getRotation())
+          MeasureMath.minAbsDifference(other.startPose.getRotation(), startPose.getRotation())
                   .getMeasure()
                   .abs(Degrees)
               < 10;

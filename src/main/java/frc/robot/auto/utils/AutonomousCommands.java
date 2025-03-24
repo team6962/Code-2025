@@ -221,7 +221,7 @@ public class AutonomousCommands {
                                           .getDistance(
                                               swerveDrive.getEstimatedPose().getTranslation())
                                       < Units.inchesToMeters(1)
-                                  && MeasureMath.minDifference(
+                                  && MeasureMath.minAbsDifference(
                                               polePose.getRotation(),
                                               swerveDrive.getEstimatedHeading())
                                           .getDegrees()
@@ -270,6 +270,7 @@ public class AutonomousCommands {
             swerveDrive.pathfindTo(alignPose),
             Commands.sequence(
                     pieceCombos.intakeCoral(),
+                    Commands.print("A"),
                     pieceCombos.readyL3(),
                     pieceCombos.holdCoral()
                 .until(
@@ -299,8 +300,12 @@ public class AutonomousCommands {
             // )
             )
         ),
-        pieceCombos.intakeCoral()
-          .onlyIf(() -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear()),
+        Commands.sequence(
+          Commands.print("B"),
+          pieceCombos.intakeCoral()
+        ) 
+          .onlyWhile(() -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear()),
+        Commands.print("C"),
         Commands.sequence(
                 Commands.parallel(
                     swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),

@@ -296,7 +296,7 @@ public class SwerveDrive extends SwerveCore {
 
     return current.getTranslation().getDistance(target.getTranslation())
             < toleranceDistance.in(Meters)
-        && MeasureMath.minDifference(
+        && MeasureMath.minAbsDifference(
                 current.getRotation().getMeasure(), target.getRotation().getMeasure())
             .lt(toleranceAngle);
   }
@@ -488,7 +488,7 @@ public class SwerveDrive extends SwerveCore {
 
       return current.getTranslation().getDistance(target.getTranslation())
               < toleranceDistance.in(Meters)
-          && MeasureMath.minDifference(
+          && MeasureMath.minAbsDifference(
                   current.getRotation().getMeasure(), target.getRotation().getMeasure())
               .lt(toleranceAngle);
     }
