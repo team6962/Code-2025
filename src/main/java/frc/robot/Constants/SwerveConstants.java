@@ -58,8 +58,8 @@ public final class SwerveConstants {
                 Amps.of(60)),
             chassisType == ChassisType.COMPETITION ? Wheel.BILLET_NEW : Wheel.COLSON,
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
-                .withFineTranslation(new PIDConstants(3.0, 0.05, 0.4))
-                .withFineRotation(new PIDConstants(1.0, 0.05, 0.2)))
+                .withFineTranslation(new PIDConstants(3.5, 0.0, 1.5))
+                .withFineRotation(new PIDConstants(3.5, 0.0, 1.5)))
         .withMaxDriveSpeed(MetersPerSecond.of(4.6))
         .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(4.365))
         .withMaxRotationSpeed(RotationsPerSecond.of(1.68))
