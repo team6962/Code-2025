@@ -72,6 +72,15 @@ public class SwerveGyroscope extends SubsystemBase {
     //         gyroscope.getNavX().deregisterCallback(this);
     //     }
     // }, this);
+
+    Logger.logMeasure(getName() + "/angularVelocity", () -> angularVelocity);
+    Logger.logMeasure(getName() + "/continuousYaw", () -> Degrees.of(navx.getAngle()));
+    Logger.logMeasure(getName() + "/Gyroscope/discontinuousYaw", () -> Degrees.of(navx.getYaw()));
+    Logger.logMeasure(getName() + "/Gyroscope/discontinuousPitch", () -> Degrees.of(navx.getPitch()));
+    Logger.logMeasure(getName() + "/Gyroscope/discontinuousRoll", () -> Degrees.of(navx.getRoll()));
+    Logger.logMeasure(getName() + "/Gyroscope/linearAccelX", () -> Degrees.of(navx.getWorldLinearAccelX()));
+    Logger.logMeasure(getName() + "/Gyroscope/linearAccelY", () -> Degrees.of(navx.getWorldLinearAccelY()));
+    Logger.logMeasure(getName() + "/Gyroscope/linearAccelZ", () -> Degrees.of(navx.getWorldLinearAccelZ()));
   }
 
   @Override
@@ -79,15 +88,6 @@ public class SwerveGyroscope extends SubsystemBase {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
       angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
-
-      Logger.log(getName() + "/angularVelocity", angularVelocity);
-      Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
-      Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
-      Logger.log(getName() + "/Gyroscope/discontinuousPitch", Degrees.of(navx.getPitch()));
-      Logger.log(getName() + "/Gyroscope/discontinuousRoll", Degrees.of(navx.getRoll()));
-      Logger.log(getName() + "/Gyroscope/linearAccelX", Degrees.of(navx.getWorldLinearAccelX()));
-      Logger.log(getName() + "/Gyroscope/linearAccelY", Degrees.of(navx.getWorldLinearAccelY()));
-      Logger.log(getName() + "/Gyroscope/linearAccelZ", Degrees.of(navx.getWorldLinearAccelZ()));
     } else {
       Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
 

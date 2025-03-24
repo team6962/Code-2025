@@ -44,7 +44,7 @@ public class SequenceChooser {
       bestPath = path;
 
       // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestTime", bestTime);
-      Logger.logObject(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestPath", bestPath);
+      // Logger.logObject(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestPath", bestPath);
     }
 
     int pathIndex = pathFactory.getCurrentIndex();
