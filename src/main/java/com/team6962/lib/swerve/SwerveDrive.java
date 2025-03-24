@@ -446,10 +446,14 @@ public class SwerveDrive extends SwerveCore {
 
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
-      if (translationNeedsAdjustment && rotationNeedsAdjustment) {
-        // if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
-        // else state = State.ROTATING;
+      if (!translationNeedsAdjustment && !rotationNeedsAdjustment) {
+        if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
+        else state = State.ROTATING;
       }
+
+      Logger.log("Swerve Drive/AlignCommand/state", state.name());
+      Logger.log("Swerve Drive/AlignCommand/needsTranslate", translationNeedsAdjustment);
+      Logger.log("Swerve Drive/AlignCommand/needsRotate", rotationNeedsAdjustment);
     }
 
     @Override
