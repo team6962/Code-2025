@@ -467,14 +467,14 @@ public final class Constants {
   public static final class MANIPULATOR {
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
     public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(1.0);
-    public static final Time ALGAE_GRIP_IDLE_TIME = Seconds.of(0.1);
+    public static final Time ALGAE_GRIP_IDLE_TIME = Seconds.of(1.0);
 
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
     public static final double ALGAE_GRIP_CHECK_SPEED = 0.4;
 
     public static final double ALGAE_OUT_SPEED = -1.0;
     public static final double ALGAE_IN_SPEED = 0.7;
-    public static final double ALGAE_HOLD_SPEED = 0.2;
+    public static final double ALGAE_HOLD_SPEED = 0.4;
 
     public static final double CORAL_OUT_SPEED = 0.7;
     public static final double CORAL_IN_SPEED = 0.2;
