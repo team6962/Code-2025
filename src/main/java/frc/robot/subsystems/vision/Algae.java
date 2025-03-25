@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.util.CachedRobotState;
 
 public class Algae {

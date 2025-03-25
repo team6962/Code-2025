@@ -100,7 +100,7 @@ public final class PathTiming {
                 .driveRadius()
                 .times(
                     MeasureMath.minAbsDifference(start.getRotation(), end.getRotation())
-                      .getRadians()));
+                        .getRadians()));
   }
 
   public static Time estimatePathTime(Pose2d start, Pose2d end) {

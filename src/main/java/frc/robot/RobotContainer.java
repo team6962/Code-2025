@@ -6,15 +6,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -36,6 +31,7 @@ import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -43,6 +39,8 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -65,12 +63,12 @@ public class RobotContainer {
 
   // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
-  // public final LEDs ledStrip;
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
   public final AutonomousCommands autonomous;
   public final Algae algaeDetector;
+  private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -124,11 +122,8 @@ public class RobotContainer {
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
-    // ledStrip =
-    //     new LEDs(
-    //         stateController,
-    //         () -> 1.0 +
-    // KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm());
+    ledStrip = new LEDs();
+
     manipulator = new Manipulator();
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);

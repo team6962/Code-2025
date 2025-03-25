@@ -27,7 +27,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.team6962.lib.swerve.module.SwerveModule.Corner;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -408,7 +407,7 @@ public class SwerveConfig {
 
   public LinearAcceleration maxLinearAcceleration() {
     if (maxLinearAcceleration != null) return maxLinearAcceleration;
-    
+
     return MeasureMath.min(
             driveTorque(driveMotor.maxCurrent()).div(wheel.radius()), staticFriction())
         .div(chassis.mass);
