@@ -477,7 +477,7 @@ public final class Constants {
     public static final double ALGAE_HOLD_SPEED = 0.4;
 
     public static final double CORAL_OUT_SPEED = 0.7;
-    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.3;
     public static final double CORAL_SLOW_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.1;
     public static final double CORAL_HOLD_SPEED = -0.0;
@@ -512,7 +512,7 @@ public final class Constants {
 
   public static final class FUNNEL {
     public static final boolean MOTOR_INVERTED = false;
-    public static final double INTAKE_SPEED = 0.2;
+    public static final double INTAKE_SPEED = 1.0;
     public static final Time INTAKE_TIME = Seconds.of(0.5);
   }
 

@@ -14,6 +14,7 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -199,6 +200,8 @@ public class RobotContainer {
     // return autonomous.createAutonomousCommand();
 
     return autoGen.getCommand();
+
+    // return swerveDrive.drive(new ChassisSpeeds(0, 0, 100000));
 
     // return swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(60));
 

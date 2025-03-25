@@ -5,9 +5,14 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,8 +34,6 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class AutonomousCommands {
   private SwerveDrive swerveDrive;
@@ -109,9 +112,14 @@ public class AutonomousCommands {
     return Commands.race(
         // swerveDrive.pathfindTo(intake),
         Commands.sequence(
+            logState("I"),
             swerveDrive.pathfindTo(intake),
-            swerveDrive.alignTo(intake).withTimeout(Seconds.of(0.1))),
-        pieceCombos.intakeCoral()); // .until(() -> !manipulator.grabber.isCoralClear());
+            logState("K"),
+            swerveDrive.alignTo(intake).withTimeout(Seconds.of(0.1)),
+            logState("L")),
+        pieceCombos.intakeCoral()
+          .andThen(logState("J")))
+      .andThen(logState("M")); // .until(() -> !manipulator.grabber.isCoralClear());
 
     // return Commands.sequence(
     //     Commands.parallel(
@@ -254,6 +262,10 @@ public class AutonomousCommands {
         .andThen(swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(pole)));
   }
 
+  private Command logState(String state) {
+    return Commands.runOnce(() -> Logger.log("autoState", state));
+  }
+
   public Command placeCoral(CoralPosition position) {
     Pose2d alignPose = ReefPositioning.getCoralAlignPose(position.pole);
     Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
@@ -270,8 +282,9 @@ public class AutonomousCommands {
             swerveDrive.pathfindTo(alignPose),
             Commands.sequence(
                     pieceCombos.intakeCoral(),
-                    Commands.print("A"),
+                    logState("A"),
                     pieceCombos.readyL3(),
+                    logState("D"),
                     pieceCombos.holdCoral()
                 .until(
                     () ->
@@ -300,32 +313,47 @@ public class AutonomousCommands {
             // )
             )
         ),
-        Commands.sequence(
-          Commands.print("B"),
-          pieceCombos.intakeCoral()
-        ) 
+        logState("B"),
+        pieceCombos.intakeCoral()
           .onlyWhile(() -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear()),
-        Commands.print("C"),
+        logState("C"),
         Commands.sequence(
-                Commands.parallel(
-                    swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
-                    Commands.sequence(
-                        pieceCombos.coralL4(),
-                        pieceCombos
-                            .holdCoral()
-                            .until(
-                                () ->
-                                    swerveDrive.isWithinToleranceOf(
-                                        placePose, Inches.of(1), Degrees.of(4)))
-                        // () ->
-                        // swerveDrive.getEstimatedPose().getTranslation().getDistance(placePose.getTranslation()) < Units.inchesToMeters(0.5) &&
-                        // Math.abs(MeasureMath.minDifference(swerveDrive.getEstimatedPose().getRotation(), placePose.getRotation()).getDegrees()) < 2.0
-                        // )
-                        )),
+          logState("1"),
+          Commands.deadline(
+            pieceCombos.coralL4(),
+            swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4))
+              .withEndWithinTolerance(false)
+          ),
+          logState("2"),
+          Commands.deadline(
+            swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
+            pieceCombos.holdCoral()
+          ),
+          logState("3"),
+                // Commands.parallel(
+                //     swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4))
+                //       .andThen(logState("F")),
+                //     Commands.sequence(
+                //         pieceCombos.coralL4(),
+                //         logState("H"),
+                //         pieceCombos
+                //             .holdCoral()
+                //             .until(
+                //                 () ->
+                //                     swerveDrive.isWithinToleranceOf(
+                //                         placePose, Inches.of(1), Degrees.of(4)))
+                //             .andThen(logState("I"))
+                //         // () ->
+                //         // swerveDrive.getEstimatedPose().getTranslation().getDistance(placePose.getTranslation()) < Units.inchesToMeters(0.5) &&
+                //         // Math.abs(MeasureMath.minDifference(swerveDrive.getEstimatedPose().getRotation(), placePose.getRotation()).getDegrees()) < 2.0
+                //         // )
+                //         )
+                //       .andThen(logState("G"))),
                 // swerveDrive.alignTo(ReefPositioning.getCoralPlacePose(position.pole),
                 // Inches.of(0.5), Degrees.of(2))
                 //   .deadlineFor(manipulator.grabber.hold(), manipulator.pivot.hold(),
                 // elevator.hold()),
+                logState("E"),
                 manipulator
                     .grabber
                     .dropCoral()

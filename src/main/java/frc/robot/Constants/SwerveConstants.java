@@ -60,10 +60,10 @@ public final class SwerveConstants {
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
                 .withFineTranslation(new PIDConstants(3.5, 0.0, 1.5))
                 .withFineRotation(new PIDConstants(3.5, 0.0, 1.5)))
-        .withMaxDriveSpeed(MetersPerSecond.of(4.6))
-        .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(4.365))
-        .withMaxRotationSpeed(RotationsPerSecond.of(1.68))
-        .withMaxAngularAcceleration(RotationsPerSecondPerSecond.of(0.7305))
+        .withMaxDriveSpeed(MetersPerSecond.of(4.5))
+        .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(3))
+        .withMaxRotationSpeed(RotationsPerSecond.of(1.62))
+        .withMaxAngularAcceleration(RotationsPerSecondPerSecond.of(1.28))
         .withCANBus(chassisType == ChassisType.COMPETITION ? "drivetrain" : "rio");
   }
 
