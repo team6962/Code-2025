@@ -76,11 +76,15 @@ public class SwerveGyroscope extends SubsystemBase {
     Logger.logMeasure(getName() + "/angularVelocity", () -> angularVelocity);
     Logger.logMeasure(getName() + "/continuousYaw", () -> Degrees.of(navx.getAngle()));
     Logger.logMeasure(getName() + "/Gyroscope/discontinuousYaw", () -> Degrees.of(navx.getYaw()));
-    Logger.logMeasure(getName() + "/Gyroscope/discontinuousPitch", () -> Degrees.of(navx.getPitch()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/discontinuousPitch", () -> Degrees.of(navx.getPitch()));
     Logger.logMeasure(getName() + "/Gyroscope/discontinuousRoll", () -> Degrees.of(navx.getRoll()));
-    Logger.logMeasure(getName() + "/Gyroscope/linearAccelX", () -> Degrees.of(navx.getWorldLinearAccelX()));
-    Logger.logMeasure(getName() + "/Gyroscope/linearAccelY", () -> Degrees.of(navx.getWorldLinearAccelY()));
-    Logger.logMeasure(getName() + "/Gyroscope/linearAccelZ", () -> Degrees.of(navx.getWorldLinearAccelZ()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelX", () -> Degrees.of(navx.getWorldLinearAccelX()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelY", () -> Degrees.of(navx.getWorldLinearAccelY()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelZ", () -> Degrees.of(navx.getWorldLinearAccelZ()));
   }
 
   @Override

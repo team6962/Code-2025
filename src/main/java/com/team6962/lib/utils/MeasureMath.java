@@ -106,7 +106,8 @@ public final class MeasureMath {
   }
 
   public static Angle minAbsDifference(Angle a, Angle b) {
-    return Rotations.of(Math.abs(MathUtils.floorMod(a.in(Rotations) - b.in(Rotations) - 0.5, 1) - 0.5));
+    return Rotations.of(
+        Math.abs(MathUtils.floorMod(a.in(Rotations) - b.in(Rotations) - 0.5, 1) - 0.5));
   }
 
   public static Rotation2d minDifference(Rotation2d a, Rotation2d b) {
