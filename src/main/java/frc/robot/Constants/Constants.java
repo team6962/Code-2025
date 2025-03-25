@@ -363,7 +363,7 @@ public final class Constants {
     public static final class CORAL {
       public static final Distance L1_HEIGHT = Inches.of(46.0); // change
       public static final Distance L2_HEIGHT = Inches.of(49.2);
-      public static final Distance L3_HEIGHT = Inches.of(57.2);
+      public static final Distance L3_HEIGHT = Inches.of(56.1);
       public static final Distance L4_HEIGHT = MAX_HEIGHT;
       public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
     }
