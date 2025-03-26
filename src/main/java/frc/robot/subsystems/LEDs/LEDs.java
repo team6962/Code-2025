@@ -34,21 +34,21 @@ public class LEDs extends SubsystemBase {
     DRIVING_AUTO, // good
     DRIVING_TELEOP_RED, // Wrong colors, fix scrolling
     DRIVING_TELEOP_BLUE, // Right colors, fix scroll
-    HAS_ALGAE, // Wrong colors
-    HAS_CORAL,
-    CAN_SEE_ALGAE,
-    AIMING_PROCESSOR,
-    SCORING_PROCESSOR,
-    AIMING_BARGE,
-    SCORING_BARGE,
-    AIMING_REEF,
-    SCORING_REEF,
-    HANG
+    AUTO_ALIGN
+    //HAS_CORAL,
+    //CAN_SEE_ALGAE,
+    //AIMING_PROCESSOR,
+    //SCORING_PROCESSOR,
+    //AIMING_BARGE,
+    //SCORING_BARGE,
+    //AIMING_REEF,
+    //SCORING_REEF,
+    //HANG
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
   public static final Color ANTARES_BLUE = new Color(37, 46, 69);
-  public static final Color ANTARES_YELLOW = new Color(242, 222, 139);
+  public static final Color ANTARES_YELLOW = new Color(222, 242, 139);
   public static final Color RED = new Color(0, 255, 0);
   public static final Color GREEN = new Color(0, 255, 0);
   public static final Color BLUE = new Color(0, 20, 255);
@@ -121,7 +121,9 @@ public class LEDs extends SubsystemBase {
       case DRIVING_TELEOP_BLUE:
         apply(createColor(BLUE, ANTARES_BLUE, 1.0, 50.0));
         break;
-      case HAS_ALGAE:
+      case AUTO_ALIGN:
+          apply(createColor(GREEN, GREEN, 1.0, 50.0));
+      /*case HAS_ALGAE:
         apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
         break;
       case HAS_CORAL:
@@ -149,7 +151,7 @@ public class LEDs extends SubsystemBase {
         break;
     case HANG:
         apply(createColor(MAGENTA, MAGENTA, 1.0, 0.0));
-        break;
+        break;*/
 
 
     }

@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.telemetry.Logger;
 
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -28,6 +29,7 @@ import frc.robot.Constants.Field;
 import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
+import frc.robot.subsystems.LEDs.*;
 
 public class AprilTags extends SubsystemBase {
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
@@ -106,7 +108,7 @@ public class AprilTags extends SubsystemBase {
       }
 
       if (canChangeHeading) {
-        // LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        LEDs.setState(LEDs.State.AUTO_ALIGN);
         LimelightHelpers.setLEDMode_ForceBlink("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceBlink("limelight-btag");
       } else {
