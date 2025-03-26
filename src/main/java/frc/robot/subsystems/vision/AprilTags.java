@@ -199,7 +199,7 @@ public class AprilTags extends SubsystemBase {
       // }
     }
 
-    System.out.println("MT1 heading estimate: " + mt1_lastInitialHeadingEstimate + ". Gyroscope angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
+    System.out.println("MT1 heading estimate: " + mt1_avgInitialHeadingEstimate + ". Gyroscope angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
 
     // System.out.println("Final heading estimate: " + (poseEstimator.getEstimatedHeading().getDegrees() + mt1_avgInitialHeadingEstimate) + ", Gyro angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ", Initial angle: " + mt1_avgInitialHeadingEstimate);
 
