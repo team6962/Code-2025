@@ -5,10 +5,14 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,8 +34,6 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class AutonomousCommands {
   private SwerveDrive swerveDrive;
@@ -279,11 +281,15 @@ public class AutonomousCommands {
             swerveDrive.pathfindTo(alignPose),
             Commands.sequence(
                 pieceCombos.intakeCoral(),
-                logState("A"),
-                pieceCombos.readyL3(),
-                logState("D"),
-                pieceCombos
-                    .holdCoral()
+                Commands.parallel(
+                  elevator.move(1.0).until(() -> elevator.getAverageHeight().gt(ELEVATOR.AUTO.READY_HEIGHT)),
+                  manipulator.pivot.hold(),
+                  manipulator.grabber.stop()
+                ),
+                Commands.sequence(
+                  pieceCombos.readyL3(),
+                  pieceCombos.holdCoral()
+                )
                     .until(
                         () ->
                             swerveDrive

@@ -42,6 +42,8 @@ public interface Elevator extends Subsystem {
 
   public Distance getMinHeight();
 
+  public Command move(double speed);
+
   public Command up();
 
   public Command down();
