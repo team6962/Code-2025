@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto.utils.AutoPaths;
-import frc.robot.auto.utils.AutonomousCommands;
+import frc.robot.auto.utils.AutoCommands;
 import java.util.function.BooleanSupplier;
 
 public class AutoThread extends Thread {
@@ -19,7 +19,7 @@ public class AutoThread extends Thread {
   private final double workTimeSeconds;
   private double lastPauseTimestampSeconds;
 
-  public AutoThread(AutonomousCommands autonomous, Time sleepTime, Time workTime) {
+  public AutoThread(AutoCommands autonomous, Time sleepTime, Time workTime) {
     this.commandBuilder = new CommandBuilder(autonomous);
     this.sleepTimeMilliseconds = (long) sleepTime.in(Milliseconds);
     this.workTimeSeconds = workTime.in(Seconds);

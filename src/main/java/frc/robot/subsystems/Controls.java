@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
-import frc.robot.auto.utils.AutonomousCommands;
+import frc.robot.auto.utils.AutoCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.elevator.Elevator;
@@ -25,7 +25,7 @@ public class Controls {
       Elevator elevator,
       Manipulator manipulator,
       Hang hang,
-      AutonomousCommands autonomous,
+      AutoCommands autonomous,
       PieceCombos pieceCombos) {
 
     // Driver
@@ -39,17 +39,17 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a().whileTrue(autonomous.alignToClosestFace(false));
+    driver.a().whileTrue(autonomous.alignToClosestFaceTeleop());
     driver
         .b()
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
-                AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
+                AutoCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
     driver
         .x()
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
-                AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
+                AutoCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());

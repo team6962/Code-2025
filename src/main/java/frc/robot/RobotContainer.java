@@ -6,10 +6,14 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -26,8 +30,8 @@ import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.pipeline.AutoGeneration;
+import frc.robot.auto.utils.AutoCommands;
 import frc.robot.auto.utils.AutoPaths;
-import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
@@ -39,8 +43,6 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -66,7 +68,7 @@ public class RobotContainer {
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
-  public final AutonomousCommands autonomous;
+  public final AutoCommands autonomous;
   public final Algae algaeDetector;
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
@@ -128,7 +130,7 @@ public class RobotContainer {
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
-    autonomous = new AutonomousCommands(swerveDrive, manipulator, elevator, pieceCombos);
+    autonomous = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
@@ -195,6 +197,18 @@ public class RobotContainer {
     // return autonomous.createAutonomousCommand();
 
     return autoGen.getCommand();
+    
+    // return swerveDrive.pathfindBetweenWaypoints(
+    //   new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+    //   new Pose2d(
+    //     Math.random() * 5, Math.random() * 3,
+    //     Rotation2d.fromRotations(Math.random())
+    //   ),
+    //   Rotation2d.fromDegrees(0),
+    //   Rotation2d.fromRotations(Math.random()),
+    //   MetersPerSecond.of(0),
+    //   MetersPerSecond.of(1)
+    // );
 
     // return swerveDrive.drive(new ChassisSpeeds(0, 0, 100000));
 

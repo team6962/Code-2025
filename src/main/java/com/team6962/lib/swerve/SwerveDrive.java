@@ -12,13 +12,24 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.CommandUtil;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -41,8 +52,6 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -704,5 +713,67 @@ public class SwerveDrive extends SwerveCore {
           || getEstimatedPose().getTranslation().getDistance(targetTranslation)
               < positionTolerance.in(Meters);
     }
+  }
+
+  public Command pathfindBetweenWaypoints(
+    Pose2d startPose,
+    Pose2d endPose,
+    Rotation2d startVelocityAngle,
+    Rotation2d endVelocityAngle,
+    LinearVelocity expectedStartVelocity,
+    LinearVelocity maxEndVelocity
+  ) {
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(List.of(
+      new Pose2d(startPose.getTranslation(), startVelocityAngle),
+      new Pose2d(endPose.getTranslation(), endVelocityAngle)
+    ));
+
+    PathPlannerPath path = new PathPlannerPath(
+      waypoints,
+      getConstants().pathConstraints(),
+      new IdealStartingState(expectedStartVelocity, startPose.getRotation()),
+      new GoalEndState(maxEndVelocity.in(MetersPerSecond), endPose.getRotation())
+    );
+
+    path.getIdealTrajectory(getConstants().pathRobotConfig());
+
+    return CommandUtils.withRequirements(new FollowPathCommand(
+      path,
+      this::getEstimatedPose,
+      () -> fieldToRobot(getEstimatedSpeeds()),
+      (speeds, ff) -> {
+        moveRobotRelative(speeds);
+      },
+      getConstants().driveGains().pathController(),
+      getConstants().pathRobotConfig(),
+      () -> false
+    ), useMotion());
+  }
+
+  public Command pathfindToWaypoint(
+    Pose2d precomputedStartPose,
+    Pose2d endPose,
+    Rotation2d precomputedStartVelocityAngle,
+    Rotation2d endVelocityAngle,
+    LinearVelocity precomputedStartVelocity,
+    LinearVelocity maxEndVelocity
+  ) {
+    Command pregenerated = pathfindBetweenWaypoints(precomputedStartPose, endPose, precomputedStartVelocityAngle, endVelocityAngle, precomputedStartVelocity, maxEndVelocity);
+
+    return Commands.sequence(
+      Commands.defer(() -> {
+        Command attachment = pathfindBetweenWaypoints(
+          getEstimatedPose(),
+          precomputedStartPose,
+          precomputedStartPose.getTranslation().minus(getEstimatedPose().getTranslation()).getAngle(),
+          precomputedStartVelocityAngle,
+          MetersPerSecond.of(KinematicsUtils.getTranslation(getEstimatedSpeeds()).getNorm()),
+          precomputedStartVelocity
+        );
+
+        return attachment;
+      }, Set.of(useMotion())),
+      pregenerated
+    );
   }
 }

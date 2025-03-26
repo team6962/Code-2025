@@ -4,18 +4,18 @@ import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.auto.utils.AutoPaths;
-import frc.robot.auto.utils.AutonomousCommands;
+import frc.robot.auto.utils.AutoCommands;
 import java.util.List;
 
 public class CommandBuilder {
-  private AutonomousCommands autonomous;
+  private AutoCommands autonomous;
   private SequentialCommandGroup group = new SequentialCommandGroup();
   private List<AutoPaths.CoralMovement> path;
   private int currentIndex = 0;
   private SequenceChooser sequenceChooser;
   private int logCommandIndex = 0;
 
-  public CommandBuilder(AutonomousCommands autonomous) {
+  public CommandBuilder(AutoCommands autonomous) {
     this.autonomous = autonomous;
     sequenceChooser = new SequenceChooser();
   }

@@ -6,19 +6,19 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.auto.utils.AutoPaths;
-import frc.robot.auto.utils.AutonomousCommands;
+import frc.robot.auto.utils.AutoCommands;
 import java.lang.Thread.State;
 import java.util.function.Supplier;
 
 public class AutoGeneration extends SubsystemBase {
   private AutoThread currentThread;
-  private AutonomousCommands autonomous;
+  private AutoCommands autonomous;
   private Time workDelay;
   private Time workTime;
   private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
   public AutoGeneration(
-      AutonomousCommands autonomous,
+      AutoCommands autonomous,
       Time sleepTime,
       Time workTime,
       Supplier<AutoPaths.PlanParameters> parametersSupplier) {
