@@ -32,6 +32,7 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs.LEDs;
+import frc.robot.subsystems.LEDs.LEDs.State;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -68,7 +69,8 @@ public class RobotContainer {
   public final Hang hang;
   public final AutonomousCommands autonomous;
   public final Algae algaeDetector;
-  private final LEDs ledStrip;
+  private final LEDs ledStrip1;
+  private final LEDs ledStrip2;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   // public final ManipulatorSafeties manipulatorSafeties;
@@ -122,7 +124,8 @@ public class RobotContainer {
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
-    ledStrip = new LEDs();
+    ledStrip1 = new LEDs();
+    ledStrip2 = new LEDs();
 
     manipulator = new Manipulator();
     elevator = Elevator.create();
@@ -225,7 +228,8 @@ public class RobotContainer {
   }
 
   public void latePeriodic() {
-    swerveDrive.latePeriodic(); // TODO: Uncomment before use
+    swerveDrive.latePeriodic(); 
+    ledStrip1.periodic();
 
     // Pose2d[] poses;
 
@@ -251,7 +255,9 @@ public class RobotContainer {
     disabledPeriodic.run();
   }
 
-  public void disabledInit() {}
+  public void disabledInit() {
+    LEDs.setState(LEDs.State.DISABLED);
+  }
 
   public void testInit() {
     // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
@@ -263,7 +269,7 @@ public class RobotContainer {
     // checks.schedule();
 
     // elevator.rezeroAtBottom().schedule();
-    // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
+    //LEDs.setState(LEDs.State.ENABLED);
 
     swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
   }

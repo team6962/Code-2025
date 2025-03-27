@@ -12,16 +12,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
-import frc.robot.subsystems.RobotStateController;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 
 
 public class LEDs extends SubsystemBase {
-  private static AddressableLED strip;
+  private static AddressableLED strip1;
+  private static AddressableLED strip2;
   private static AddressableLEDBuffer buffer;
-  private RobotStateController stateController;
-  private static State state = State.DRIVING_TELEOP_RED;
+  private static State state = State.DEFAULT;
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private static final Distance kLedSpacing = Meters.of(1 / 120.0);
   private final LEDPattern m_scrollingRainbow =
@@ -30,11 +29,14 @@ public class LEDs extends SubsystemBase {
   public static enum State {
     OFF,
     DISABLED, 
-    ENABLED, // Right colors, fix scrolling
+    DEFAULT, // Right colors, fix scrolling
     DRIVING_AUTO, // good
     DRIVING_TELEOP_RED, // Wrong colors, fix scrolling
     DRIVING_TELEOP_BLUE, // Right colors, fix scroll
-    AUTO_ALIGN
+    AUTO_ALIGN,
+    HAS_CORAL,
+    GOOD,
+    CAN_SEE_ALGAE
     //HAS_CORAL,
     //CAN_SEE_ALGAE,
     //AIMING_PROCESSOR,
@@ -60,15 +62,17 @@ public class LEDs extends SubsystemBase {
   public static final Color PURPLE = new Color(108, 59, 170);
   public static final Color MAGENTA = new Color(255, 0, 255);
   
-  public LEDs(RobotStateController stateController) {
-    this.stateController = stateController;
-
-    strip = new AddressableLED(LED.port);
+  public LEDs() {
+    strip1 = new AddressableLED(LED.port);
+    strip2 = new AddressableLED(LED.port + 1);
     buffer = new AddressableLEDBuffer(LED.SIDE_STRIP_HEIGHT);
-    strip.setLength(buffer.getLength());
+    strip1.setLength(buffer.getLength());
+    strip2.setLength(buffer.getLength());
 
-    strip.setData(buffer);
-    strip.start();
+    strip1.setData(buffer);
+    strip2.setData(buffer);
+    strip2.start();
+    strip1.start();
   }
 
   public static Command setStateCommand(State state) {
@@ -97,32 +101,43 @@ public class LEDs extends SubsystemBase {
     pattern.applyTo(buffer);
 
     // Write the data to the LED strip
-    strip.setData(buffer);
+    strip1.setData(buffer);
+    strip2.setData(buffer);
   }
 
   @Override
   public void periodic() {
-        switch (state) {
+    switch (state) {
       case OFF:
         apply(createColor(new Color(0, 0, 0), new Color(0, 0, 0), 1.0, 0.0));
         break;
       case DISABLED:
+        apply(createColor(RSL_ORANGE, RSL_ORANGE, 1.0, 50.0));
         break;
-      case ENABLED:
+      case DEFAULT:
         m_scrollingRainbow.applyTo(buffer);
-        strip.setData(buffer);
+        strip1.setData(buffer);
+        strip2.setData(buffer);
         break;
       case DRIVING_AUTO:
         apply(createColor(WHITE, WHITE, 1.0, 50.0));
         break;
       case DRIVING_TELEOP_RED:
-        apply(createColor(RED, ANTARES_YELLOW, 1.0, 50.0));
+        apply(createColor(RED, RED, 1.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
         apply(createColor(BLUE, ANTARES_BLUE, 1.0, 50.0));
         break;
       case AUTO_ALIGN:
-          apply(createColor(GREEN, GREEN, 1.0, 50.0));
+          apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
+      case HAS_CORAL:
+        apply(createColor(ANTARES_YELLOW, ANTARES_YELLOW, 1.0, 50.0));
+        break;
+      case GOOD:
+        apply(createColor(GREEN, GREEN, 1.0, 50.0));
+      case CAN_SEE_ALGAE:
+        apply(createColor(CYAN, CYAN, 1.0, 50.0));
+        break;
       /*case HAS_ALGAE:
         apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
         break;

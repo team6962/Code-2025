@@ -9,6 +9,8 @@ import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.auto.utils.AutonomousCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
+import frc.robot.subsystems.LEDs.LEDs;
+import frc.robot.subsystems.LEDs.LEDs.State;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -45,11 +47,13 @@ public class Controls {
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
                 AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()));
+                LEDs.setState(LEDs.State.AUTO_ALIGN);
     driver
         .x()
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
                 AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()));
+                LEDs.setState(LEDs.State.AUTO_ALIGN);
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
@@ -115,6 +119,7 @@ public class Controls {
     operator
         .rightStick()
         .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+        LEDs.setState(LEDs.State.HAS_CORAL);
 
     operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
@@ -123,6 +128,7 @@ public class Controls {
             pieceCombos.intakeAlgaeOrShootCoral().andThen(rumbleBoth())); // drop coral/intake algae
     operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // shoot barge
     operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
+    LEDs.setState(LEDs.State.GOOD);
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
@@ -163,7 +169,7 @@ public class Controls {
     return Commands.runEnd(
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-              // LEDs.setState(LEDs.State.GOOD);
+              LEDs.setState(LEDs.State.GOOD);
             },
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
@@ -176,7 +182,7 @@ public class Controls {
         () -> {
           if (booleanSupplier.getAsBoolean()) {
             controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-            // LEDs.setState(LEDs.State.GOOD);
+            LEDs.setState(LEDs.State.GOOD);
           } else {
             controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           }
