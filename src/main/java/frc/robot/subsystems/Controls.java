@@ -68,7 +68,8 @@ public class Controls {
     driver.povDown(); // USED
     driver.povLeft(); // USED
     driver.povRight(); // USED
-    driver.leftTrigger().whileTrue(swerveDrive.drive(MeasureMath.fromMeasure(swerveDrive.getConstants().maxSteerSpeed()))); // USED
+    driver.leftTrigger(); //USED
+    // driver.leftTrigger().whileTrue(swerveDrive.drive(MeasureMath.fromMeasure(swerveDrive.getConstants().maxSteerSpeed()))); // USED
     driver.rightTrigger(); // USED
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
 
