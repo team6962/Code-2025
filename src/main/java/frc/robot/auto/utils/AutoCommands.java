@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -86,7 +87,7 @@ public class AutoCommands {
         );
     }
 
-    private List<Boolean> commandsRunning;
+    private List<Boolean> commandsRunning = new LinkedList<>();
 
     private Command annotate(String name, Command command) {
         return command.deadlineFor(new Command() {
