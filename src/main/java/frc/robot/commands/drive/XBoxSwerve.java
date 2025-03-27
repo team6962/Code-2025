@@ -32,6 +32,7 @@ public class XBoxSwerve extends Command {
   public double FINE_TUNE_DRIVE_VELOCITY;
   public double NOMINAL_ANGULAR_VELOCITY;
   public double MAX_ANGULAR_VELOCITY;
+  public double SUPER_ANGULAR_VELOCITY;
 
   private Translation2d velocity = new Translation2d();
   private double angularVelocity = 0.0;
@@ -65,6 +66,10 @@ public class XBoxSwerve extends Command {
         swerveDrive
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_BOOST_POWER)
             .in(RadiansPerSecond);
+    SUPER_ANGULAR_VELOCITY =
+          swerveDrive
+              .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_SUPER_ROTATE_POWER)
+              .in(RadiansPerSecond);
 
     Logger.logNumber("XBoxSwerve/nomVel", () -> NOMINAL_DRIVE_VELOCITY);
     Logger.logNumber("XBoxSwerve/maxVel", () -> MAX_DRIVE_VELOCITY);
@@ -108,9 +113,15 @@ public class XBoxSwerve extends Command {
     leftStick = InputMath.addCircularDeadband(leftStick, 0.1);
     rightStick = InputMath.addCircularDeadband(rightStick, 0.1);
 
-    angularVelocity +=
-        -rightStick.getX()
-            * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+    if (leftTrigger > 0.1) {
+      angularVelocity +=
+      -rightStick.getX()
+          * MathUtils.map(leftTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, SUPER_ANGULAR_VELOCITY);
+    }else {
+      angularVelocity +=
+      -rightStick.getX()
+          * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+    }
 
     velocity =
         velocity.plus(

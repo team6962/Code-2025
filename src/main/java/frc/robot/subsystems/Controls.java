@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.utils.MeasureMath;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -65,7 +68,8 @@ public class Controls {
     driver.povDown(); // USED
     driver.povLeft(); // USED
     driver.povRight(); // USED
-    driver.leftTrigger(); // USED
+    driver.leftTrigger(); //USED
+    // driver.leftTrigger().whileTrue(swerveDrive.drive(MeasureMath.fromMeasure(swerveDrive.getConstants().maxSteerSpeed()))); // USED
     driver.rightTrigger(); // USED
     swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
 
