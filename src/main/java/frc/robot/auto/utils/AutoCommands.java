@@ -70,9 +70,9 @@ public class AutoCommands {
 
     // Full Autonomous
 
-    public Command intakeCoral(CoralStation station) {
+    public Command intakeCoral(Pose2d previousPose, CoralStation station) {
         Pose2d intake =
-            StationPositioning.getNearestIntakePose(station, swerveDrive.getEstimatedPose());
+            StationPositioning.getIntakePose(station, 4);
 
         // Drives to the coral station to pickup coral, finishing either when
         // a coral is detected or the robot gets to the intake pose and the
@@ -80,7 +80,7 @@ public class AutoCommands {
         // there is no beam break sensor.
         return Commands.race(
             Commands.sequence(
-                swerveDrive.pathfindTo(intake),
+                swerveDrive.pathfindToPrecomputed(previousPose, intake),
                 swerveDrive.alignTo(intake).withTimeout(Seconds.of(0.1))
             ),
             pieceCombos.intakeCoral()
@@ -122,7 +122,7 @@ public class AutoCommands {
         });
     }
 
-    public Command placeCoral(CoralPosition position) {
+    public Command placeCoral(Pose2d previousPose, CoralPosition position) {
         Pose2d alignPose = ReefPositioning.getCoralAlignPose(position.pole);
         Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
 
@@ -131,7 +131,7 @@ public class AutoCommands {
             // manipulator early if possible.
             Commands.deadline(
                 // Pathfind to the alignment pose
-                annotate("pathfind align", swerveDrive.pathfindTo(alignPose)),
+                annotate("pathfind align", swerveDrive.pathfindToPrecomputed(previousPose, alignPose)),
                 // Run a sequence of movements to prepare the elevator and
                 // manipulator early, that will immediately end when the robot
                 // gets to the alignment pose.

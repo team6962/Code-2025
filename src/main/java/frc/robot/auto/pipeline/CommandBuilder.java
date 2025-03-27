@@ -1,9 +1,13 @@
 package frc.robot.auto.pipeline;
 
 import com.team6962.lib.telemetry.Logger;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.auto.utils.AutoPaths;
+import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.StationPositioning;
 import frc.robot.auto.utils.AutoCommands;
 import java.util.List;
 
@@ -14,6 +18,7 @@ public class CommandBuilder {
   private int currentIndex = 0;
   private SequenceChooser sequenceChooser;
   private int logCommandIndex = 0;
+  private Pose2d previousPose;
 
   public CommandBuilder(AutoCommands autonomous) {
     this.autonomous = autonomous;
@@ -25,6 +30,7 @@ public class CommandBuilder {
     group = new SequentialCommandGroup();
     currentIndex = 0;
     path = null;
+    previousPose = parameters.startPose;
 
     System.out.println("Starting to generate a new autonomous path");
 
@@ -52,14 +58,18 @@ public class CommandBuilder {
     AutoPaths.CoralMovement movement = path.get(currentIndex);
 
     if (movement.source != AutoPaths.CoralSource.PREPLACED) {
-      group.addCommands(autonomous.intakeCoral(movement.source.station()));
+      group.addCommands(autonomous.intakeCoral(previousPose, movement.source.station()));
+
+      previousPose = StationPositioning.getIntakePose(movement.source.station(), 4);
+
       Logger.log(
           AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex,
           "intakeCoral(" + movement.source.station().name() + ")");
       logCommandIndex++;
     }
 
-    group.addCommands(autonomous.placeCoral(movement.destination));
+    group.addCommands(autonomous.placeCoral(previousPose, movement.destination));
+    previousPose = ReefPositioning.getCoralPlacePose(movement.destination.pole);
     Logger.log(
         AutoPaths.Logging.COMMAND_BUILDER + "/commands/" + logCommandIndex,
         "placeCoral(level "

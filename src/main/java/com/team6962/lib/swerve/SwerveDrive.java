@@ -17,14 +17,15 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.CommandUtil;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.team6962.lib.prepath.CustomPathfindingCommand;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
+import com.team6962.lib.swerve.auto.PathPrecomputing;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
@@ -69,6 +70,8 @@ public class SwerveDrive extends SwerveCore {
 
   private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
 
+  private PathPrecomputing pathPrecomputing;
+
   /**
    * Create a new SwerveDrive object with the given configuration.
    *
@@ -78,6 +81,8 @@ public class SwerveDrive extends SwerveCore {
     super(constants);
 
     setName("Swerve Drive");
+
+    pathPrecomputing = new PathPrecomputing(getConstants().pathConstraints(), getConstants().pathRobotConfig());
 
     autoBuilder.configure(
         this::getEstimatedPose,
@@ -775,5 +780,49 @@ public class SwerveDrive extends SwerveCore {
       }, Set.of(useMotion())),
       pregenerated
     );
+  }
+
+  public Command pathfindToPrecomputed(Pose2d startPose, Pose2d endPose) {
+    PathPrecomputing.Precompute precompute = pathPrecomputing.precompute(startPose, endPose);
+
+    return Commands.defer(() -> {
+      CustomPathfindingCommand pathfindToPose = new CustomPathfindingCommand(
+        endPose,
+        getConstants().pathConstraints(),
+        this::getEstimatedPose,
+        () -> fieldToRobot(getEstimatedSpeeds()),
+        (speeds, ff) -> moveRobotRelative(speeds),
+        getConstants().driveGains().pathController(),
+        getConstants().pathRobotConfig(),
+        useMotion()
+      );
+
+      if (precompute.isAvailable() && precompute.isStartPoseNear(getEstimatedPose())) {
+        System.out.println("Using precomputed path!");
+        pathfindToPose.currentPath = precompute.getPath();
+        pathfindToPose.currentTrajectory = precompute.getTrajectory();
+        pathfindToPose.timer.restart();
+      }
+
+      return pathfindToPose;
+
+      // PathPlannerPath precomputedPath = precompute.getPath();
+
+      // if (precomputedPath != null && precompute.isStartPoseNear(getEstimatedPose())) {
+      //   return CommandUtils.withRequirements(new FollowPathCommand(
+      //     precomputedPath,
+      //     this::getEstimatedPose,
+      //     () -> fieldToRobot(getEstimatedSpeeds()),
+      //     (speeds, ff) -> {
+      //       moveRobotRelative(speeds);
+      //     },
+      //     getConstants().driveGains().pathController(),
+      //     getConstants().pathRobotConfig(),
+      //     () -> false
+      //   ), useMotion());
+      // } else {
+      //   return pathfindTo(endPose);
+      // }
+    }, Set.of(useMotion()));
   }
 }

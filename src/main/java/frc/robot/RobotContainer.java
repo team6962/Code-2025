@@ -9,11 +9,14 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.team6962.lib.prepath.CustomLocalADStar;
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -196,7 +199,11 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    return autoGen.getCommand();
+    Command auto = autoGen.getCommand();
+
+    return auto;
+
+    // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));
     
     // return swerveDrive.pathfindBetweenWaypoints(
     //   new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
