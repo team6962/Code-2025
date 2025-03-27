@@ -159,15 +159,8 @@ public class AprilTags extends SubsystemBase {
         if (LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName) != null) {
           mt1_lastInitialHeadingEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getDegrees();
           mt1_inititalHeadingEstimates.add(
-            LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getDegrees()
+            LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getRadians()
           );
-
-          double avgHeading = 0;
-          for (double heading : mt1_inititalHeadingEstimates) {
-            avgHeading += (heading + 360.0) % 360;
-          }
-          avgHeading /= mt1_inititalHeadingEstimates.size();
-          mt1_avgInitialHeadingEstimate = avgHeading;
         } else {
           System.out.println(cameraName + ": MT1 pose estimate is null!");
         }
@@ -199,9 +192,23 @@ public class AprilTags extends SubsystemBase {
       // }
     }
 
-    System.out.println("MT1 heading estimate: " + mt1_avgInitialHeadingEstimate + ". Gyroscope angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ". Final heading estimate: " + (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
+    // Calculate average heading estimate
+    double avgX = 0;
+    double avgY = 0;
+    for (double heading : mt1_inititalHeadingEstimates) {
+      avgX += Math.cos(heading);
+      avgY += Math.sin(heading);
+    }
 
-    // System.out.println("Final heading estimate: " + (poseEstimator.getEstimatedHeading().getDegrees() + mt1_avgInitialHeadingEstimate) + ", Gyro angle: " + poseEstimator.getEstimatedHeading().getDegrees() + ", Initial angle: " + mt1_avgInitialHeadingEstimate);
+    avgX /= mt1_inititalHeadingEstimates.size();
+    avgY /= mt1_inititalHeadingEstimates.size();
+
+    mt1_avgInitialHeadingEstimate = Math.atan2(avgY, avgX) * 180 / Math.PI;
+    mt1_avgInitialHeadingEstimate = mt1_avgInitialHeadingEstimate < 0 ? (mt1_avgInitialHeadingEstimate + 360) % 360 : mt1_avgInitialHeadingEstimate;
+
+    Logger.log("/mt1Estimate", mt1_lastInitialHeadingEstimate);
+    Logger.log("/gyroAngle", poseEstimator.getEstimatedHeading().getDegrees());
+    Logger.log("/finalEstimate", (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
 
     return cameraPoses.keySet().stream()
         .map(
