@@ -200,6 +200,11 @@ public class AutoCommands {
                         .grabber
                         .dropCoral()
                         .deadlineFor(manipulator.pivot.hold(), elevator.hold()),
+                    Commands.deadline(
+                        manipulator.pivot.stow(),
+                        elevator.hold(),
+                        manipulator.grabber.stop()
+                    ),
                     // Move the elevator down at maximum speed until it gets
                     // under the safe height to drive at.
                     Commands.parallel(
