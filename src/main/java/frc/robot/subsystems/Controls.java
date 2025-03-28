@@ -55,7 +55,7 @@ public class Controls {
     .x()
     .whileTrue(
         autonomous.alignToClosestPoleTeleop(
-            AutonomousCommands.PolePattern.RIGHT, () -> rumbleBoth().repeatedly()
+            AutonomousCommands.PolePattern.LEFT, () -> rumbleBoth().repeatedly()
               .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN)))
     );
     driver.y();
