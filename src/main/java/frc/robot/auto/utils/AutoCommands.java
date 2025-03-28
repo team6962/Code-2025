@@ -87,32 +87,16 @@ public class AutoCommands {
         );
     }
 
-    private List<Boolean> commandsRunning = new LinkedList<>();
-
     private Command annotate(String name, Command command) {
         return command.deadlineFor(new Command() {
-            int commandIndex = 0;
-
             @Override
             public void initialize() {
-                for (int i = 0; i < commandsRunning.size(); i++) {
-                    if (!commandsRunning.get(i)) {
-                        commandsRunning.set(i, true);
-                        commandIndex = i;
-                        return;
-                    }
-                }
-
-                commandIndex = commandsRunning.size();
-                commandsRunning.add(true);
-
-                Logger.log("AutoCommands/activeCommands/" + commandIndex, name);
+                System.out.println("start: " + name);
             }
 
             @Override
             public void end(boolean interrupted) {
-                commandsRunning.set(commandIndex, false);
-                Logger.log("AutoCommands/activeCommands/" + commandIndex, "");
+                System.out.println("end: " + name);
             }
 
             @Override
