@@ -12,7 +12,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LED;
+import frc.robot.subsystems.vision.AprilTags;
+import frc.robot.util.CachedRobotState;
+
 import static edu.wpi.first.units.Units.*;
+
+import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.units.measure.Distance;
 
 
@@ -164,6 +170,14 @@ public class LEDs extends SubsystemBase {
         break;*/
 
 
+    }
+
+    Logger.log("changingHeading", AprilTags.changingHeading);
+
+    if (CachedRobotState.isDisabled() && AprilTags.changingHeading) {
+      state = State.DEFAULT;
+    } else {
+      state = CachedRobotState.isBlue().orElse(false) ? State.DRIVING_TELEOP_BLUE : State.DRIVING_TELEOP_RED;
     }
   }
 }
