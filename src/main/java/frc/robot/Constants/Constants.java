@@ -159,17 +159,10 @@ public final class Constants {
     private static final Angle ALL_OFFSET = Degrees.of(135);
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      // Back Left: -0.003370614359
-      // Back Right: -0.00318530718
-      // Front Left: -0.04577796077
-      // Front Right: -0.009370614359
-
-      // Odometry: 2.278 m, Real: 104 in - 2.6416 m
-      // Odometry: 2.809 m, Real: 106.75 in - 2.71145 m
-      // Odometry: 2.831 m, Real: 108 in - 2.7432 m
-
-      // TEST BAD: Odometry: 2.753 m, Real: 104.75 in, 2.66065 m
-      // TEST 2: Odometry: 2.605 m, Reak: 102 in, 2.5908 m
+      // Back Left: -0.003
+      // Back Right: -0.018
+      // Front Left: 0.028
+      // Front Right: 0.018
 
       new SwerveConfig.Module(
           10,
@@ -178,14 +171,16 @@ public final class Constants {
           Radians.of(0.192)
               .minus(Radians.of(0.00959265359))
               .minus(Radians.of(-0.009370614359))
-              .minus(Radians.of(0.002629385641))), // Front Right
+              .minus(Radians.of(0.002629385641))
+              .minus(Radians.of(0.018))), // Front Right
       new SwerveConfig.Module(
           11,
           21,
           31,
           Radians.of(-1.911)
               .minus(Radians.of(0.00959265359))
-              .minus(Radians.of(-0.04577796077))), // Front Left
+              .minus(Radians.of(-0.04577796077))
+              .minus(Radians.of(0.028))), // Front Left
       new SwerveConfig.Module(
           12,
           22,
@@ -193,14 +188,16 @@ public final class Constants {
           Radians.of(1.555)
               .minus(Radians.of(0.01577796077))
               .minus(Radians.of(0.002777960769))
-              .minus(Radians.of(-0.003370614359))), // Back Left
+              .minus(Radians.of(-0.003370614359))
+              .minus(Radians.of(-0.003))), // Back Left
       new SwerveConfig.Module(
           13,
           23,
           33,
           Radians.of(-0.019)
               .minus(Radians.of(0.01877796077))
-              .minus(Radians.of(-0.00318530718))), // Back Right
+              .minus(Radians.of(-0.00318530718))
+              .minus(Radians.of(-0.018))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,
