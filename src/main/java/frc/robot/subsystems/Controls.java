@@ -28,8 +28,7 @@ public class Controls {
       Manipulator manipulator,
       Hang hang,
       AutonomousCommands autonomous,
-      PieceCombos pieceCombos,
-      LEDs ledStrip) {
+      PieceCombos pieceCombos) {
 
     // Driver
     // Move swerve chassis

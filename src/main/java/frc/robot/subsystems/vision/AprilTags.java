@@ -100,7 +100,7 @@ public class AprilTags extends SubsystemBase {
       }
 
       if (canChangeHeading) {
-        // LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        LEDs.setState(LEDs.State.AUTO_ALIGN);
         LimelightHelpers.setLEDMode_ForceBlink("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceBlink("limelight-btag");
       } else {

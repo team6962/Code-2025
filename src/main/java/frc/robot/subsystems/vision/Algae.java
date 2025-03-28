@@ -19,6 +19,7 @@ import frc.robot.Constants.Constants.LIMELIGHT;
 import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.util.CachedRobotState;
 import edu.wpi.first.wpilibj.RobotState;
+import frc.robot.subsystems.LEDs.LEDs;
 
 public class Algae {
   private static final double MAX_FOV_RATIO = Math.PI / 2;
