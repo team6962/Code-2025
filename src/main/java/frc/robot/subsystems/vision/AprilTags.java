@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.Constants.Field;
 import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
+  public static boolean changingHeading = false;
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
   private static final double LARGE_ROTATION_ERROR = 9999999;
   private static final double TRANSLATION_ERROR_FACTOR = 10;
@@ -82,6 +84,7 @@ public class AprilTags extends SubsystemBase {
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
     Map<String, LimelightHelpers.PoseEstimate> poseEstimates =
         getIdentifiedPoseEstimates(cameraPoses.keySet());
+    changingHeading = false;
 
     loggedEstimates = poseEstimates;
 
@@ -100,7 +103,7 @@ public class AprilTags extends SubsystemBase {
       }
 
       if (canChangeHeading) {
-        // LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        changingHeading = true;
         LimelightHelpers.setLEDMode_ForceBlink("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceBlink("limelight-btag");
       } else {
