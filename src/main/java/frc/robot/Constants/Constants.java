@@ -243,6 +243,7 @@ public final class Constants {
         1.0; // Percent power when using the triggers
     public static final double TELEOPERATED_ROTATE_POWER = 0.1; // Percent rotating power
     public static final double TELEOPERATED_ROTATE_BOOST_POWER = 0.2; // Percent rotating power
+    public static final double TELEOPERATED_SUPER_ROTATE_POWER = 0.7; // Percent rotating power
   }
 
   public static final class CANBUS {
@@ -508,6 +509,7 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final Distance Spacing = Meters.of(1 / 60.0);
+    //public static final int length = 31;
     public static final int port = 9;
     public static final int SIDE_STRIP_HEIGHT = 56;
   }
