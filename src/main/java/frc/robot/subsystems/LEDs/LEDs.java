@@ -57,7 +57,7 @@ public class LEDs extends SubsystemBase {
   public static final Color ANTARES_BLUE = new Color(37, 46, 69);
   public static final Color ANTARES_YELLOW = new Color(222, 242, 139);
   public static final Color RED = new Color(0, 255, 0);
-  public static final Color GREEN = new Color(0, 255, 1);
+  public static final Color GREEN = new Color(255, 0, 1);
   public static final Color BLUE = new Color(0, 20, 255);
   public static final Color RSL_ORANGE = new Color(255, 100, 0);
   public static final Color LIGHT_BLUE = new Color(173, 216, 230);

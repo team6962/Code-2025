@@ -162,7 +162,7 @@ public final class Constants {
       // Back Left: -0.003
       // Back Right: -0.018
       // Front Left: 0.028
-      // Front Right: 0.018
+      // Front Right: 0.018(needs recalibration)
 
       new SwerveConfig.Module(
           10,
@@ -194,10 +194,8 @@ public final class Constants {
           13,
           23,
           33,
-          Radians.of(-0.019)
-              .minus(Radians.of(0.01877796077))
-              .minus(Radians.of(-0.00318530718))
-              .minus(Radians.of(-0.018))), // Back Right
+          Radians.of(0.01540734641)
+            .minus(Radians.of(0.08577796077))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,

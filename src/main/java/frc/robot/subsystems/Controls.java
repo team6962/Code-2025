@@ -121,7 +121,7 @@ public class Controls {
             pieceCombos.algaeBargeSetup().andThen(pieceCombos.algaeBargeShoot())); // barge combo
     operator
       .rightStick()
-      .onTrue(pieceCombos.intakeCoral()
+      .whileTrue(pieceCombos.intakeCoral()
         .andThen(Commands.parallel(
           rumbleBoth(),
           LEDs.setStateCommand(LEDs.State.GOOD)

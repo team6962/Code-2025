@@ -159,6 +159,12 @@ public class AutoCommands {
                 () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
                 annotate("intake coral", pieceCombos.intakeCoral())
             ).withTimeout(1.0),
+            // Continue intaking the coral in case the coral hasn't reached the
+            // "has coral" beam break but has gotten to "coral clear"
+            CommandUtils.onlyIf(
+                () -> !manipulator.grabber.hasCoral() && !manipulator.grabber.isCoralClear(),
+                annotate("intake coral because coral clear", pieceCombos.intakeCoral())
+            ),
             // If the robot has coral, align to the place pose, raise the
             // elevator, and drop it. Otherwise, end the command, skipping this
             // pole.
