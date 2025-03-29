@@ -51,8 +51,8 @@ public class PathPrecomputing extends SubsystemBase {
         }
 
         public boolean isStartPoseNear(Pose2d otherPose) {
-            return startPose.getTranslation().getDistance(otherPose.getTranslation()) < Units.inchesToMeters(6) &&
-                   MeasureMath.minAbsDifference(startPose.getRotation(), otherPose.getRotation()).getDegrees() < 10;
+            return startPose.getTranslation().getDistance(otherPose.getTranslation()) < Units.inchesToMeters(12) &&
+                   MeasureMath.minAbsDifference(startPose.getRotation(), otherPose.getRotation()).getDegrees() < 30;
         }
     }
 

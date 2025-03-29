@@ -138,7 +138,6 @@ public class AutoCommands {
                     // then keep it there until the robot is near to the
                     // alignment pose and slow enough to raise the elevator higher.
                     Commands.sequence(
-                        annotate("to ready", pieceCombos.readyL3()),
                         annotate("hold ready", pieceCombos.holdCoral())
                     ).until(() ->
                         swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
