@@ -122,7 +122,7 @@ public class LEDs extends SubsystemBase {
         apply(createColor(WHITE, WHITE, 1.0, 50.0));
         break;
       case DRIVING_TELEOP_RED:
-        apply(createColor(RED, RED, 1.0, 50.0));
+        apply(createColor(RED, ANTARES_YELLOW, 1.0, 50.0));
         break;
       case DRIVING_TELEOP_BLUE:
         apply(createColor(BLUE, ANTARES_BLUE, 1.0, 50.0));
