@@ -196,7 +196,7 @@ public class CustomLocalADStar implements Pathfinder {
       GridPosition startPos = findClosestNonObstacle(getGridPos(startPosition), requestObstacles);
       GridPosition endPos = findClosestNonObstacle(getGridPos(endPosition), requestObstacles);
 
-      return startPos != null && !startPos.equals(requestStart) && endPos != null;
+      return startPos != null && !startPos.equals(endPos) && endPos != null;
     }
   
     /**
