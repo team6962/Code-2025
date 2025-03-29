@@ -31,7 +31,10 @@ public class Manipulator extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return pivot.coralIntake().alongWith(runCoralIntake());
+    return Commands.sequence(
+      pivot.coralIntake(),
+      pivot.hold()
+    ).withDeadline(runCoralIntake());
   }
 
   public Command runCoralIntake() {
