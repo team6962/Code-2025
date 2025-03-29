@@ -52,7 +52,7 @@ public final class Constants {
     private static final boolean DASHBOARD = true;
     private static final boolean HANG = false;
     private static final boolean MANIPULATOR = true;
-    private static final boolean ELEVATOR = true;
+    private static final boolean ELEVATOR = false;
     private static final boolean FUNNEL = true;
 
     public static boolean isDriveEnabled() {
@@ -400,7 +400,7 @@ public final class Constants {
 
     // TODO: update for v2
     public static final Angle SAFE_MIN_ANGLE = MIN_ANGLE;
-    public static final Angle SAFE_MAX_ANGLE = Degrees.of(0.0);
+    public static final Angle SAFE_MAX_ANGLE = Degrees.of(5.0);
 
     public static final Angle PID_MIN_ANGLE = Degrees.of(-90.0);
     public static final Angle PID_MID_ANGLE = Degrees.of(-45.0);
@@ -410,7 +410,7 @@ public final class Constants {
     public static final boolean INVERTED = true;
 
     public static final class CORAL {
-      public static final Angle L1_ANGLE = Degrees.of(-10.0);
+      public static final Angle L1_ANGLE = Degrees.of(5.0);
       public static final Angle L23_ANGLE = Degrees.of(-22.35);
       public static final Angle L4_ANGLE = Degrees.of(-42.5);
       public static final Angle INTAKE_ANGLE = Degrees.of(-22.0);

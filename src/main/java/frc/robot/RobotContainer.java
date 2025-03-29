@@ -29,12 +29,14 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.pipeline.AutoGeneration;
 import frc.robot.auto.utils.AutoCommands;
 import frc.robot.auto.utils.AutoPaths;
+import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
@@ -197,11 +199,13 @@ public class RobotContainer {
     //   return auto.getCommand();
     // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
 
+    return swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(0));
+
     // return autonomous.createAutonomousCommand();
 
-    Command auto = autoGen.getCommand();
+    // Command auto = autoGen.getCommand();
 
-    return auto;
+    // return auto;
 
     // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));
     
