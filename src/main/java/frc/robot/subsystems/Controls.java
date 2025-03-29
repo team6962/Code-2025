@@ -62,7 +62,7 @@ public class Controls {
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
-    driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
+    // driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
     driver
         .leftStick()
