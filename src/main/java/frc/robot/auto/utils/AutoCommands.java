@@ -249,12 +249,9 @@ public class AutoCommands {
   }
 
   public Command alignFace(int face, boolean endWithinTolerance) {
-    return swerveDrive
-        .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
-        .andThen(
-            swerveDrive
-                .alignTo(ReefPositioning.getAlgaePlacePose(face))
-                .withEndWithinTolerance(endWithinTolerance));
+    return swerveDrive.pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
+        .andThen(swerveDrive.alignTo(ReefPositioning.getAlgaeAlignPose(face), Inches.of(1), Degrees.of(4))
+            .withEndWithinTolerance(endWithinTolerance));
   }
 
   public Command alignToClosestPoleTeleop(PolePattern pattern, Supplier<Command> rumble) {
@@ -282,9 +279,17 @@ public class AutoCommands {
         Set.of(swerveDrive.useMotion()));
   }
 
-  public Command alignToClosestFaceTeleop() {
+  public Command alignToClosestFaceTeleop(Supplier<Command> rumble) {
     return Commands.defer(
-        () -> alignFace(getClosestReefFace(swerveDrive.getEstimatedPose()), false),
+        () -> {
+            int closestFace = getClosestReefFace(swerveDrive.getEstimatedPose());
+            Pose2d facePose = ReefPositioning.getAlgaeAlignPose(closestFace);
+
+            return alignFace(closestFace, false)
+            .alongWith(Commands.sequence(
+                Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(facePose, Inches.of(1.5), Degrees.of(4)))
+            ));
+        },
         Set.of(swerveDrive.useMotion()));
   }
 }
