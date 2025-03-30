@@ -802,6 +802,16 @@ public class SwerveDrive extends SwerveCore {
         pathfindToPose.currentPath = precompute.getPath();
         pathfindToPose.currentTrajectory = precompute.getTrajectory();
         pathfindToPose.timer.restart();
+
+        List<Waypoint> waypoints = precompute.getPath().getWaypoints();
+
+        for (int i = 0; i < waypoints.size(); i++) {
+          System.out.println(" (waypoint " + i + ") " + waypoints.get(i).anchor());
+        }
+
+        System.out.println(" (start) " + precompute.getStartPose());
+        System.out.println(" (end) " + precompute.getEndPose());
+        System.out.println(" (current) " + getEstimatedPose());
       }
 
       return pathfindToPose;

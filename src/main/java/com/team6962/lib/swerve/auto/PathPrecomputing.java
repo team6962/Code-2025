@@ -7,6 +7,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team6962.lib.prepath.CustomLocalADStar;
@@ -46,6 +48,14 @@ public class PathPrecomputing extends SubsystemBase {
             return trajectory;
         }
 
+        public Pose2d getStartPose() {
+            return startPose;
+        }
+
+        public Pose2d getEndPose() {
+            return endPose;
+        }
+
         public boolean isAvailable() {
             return path != null && trajectory != null;
         }
@@ -70,7 +80,32 @@ public class PathPrecomputing extends SubsystemBase {
 
     private void update() {
         if (Pathfinding.isNewPathAvailable()) {
-            current.path = Pathfinding.getCurrentPath(constraints, new GoalEndState(0, current.endPose.getRotation()));
+            PathPlannerPath path = Pathfinding.getCurrentPath(constraints, new GoalEndState(0, current.endPose.getRotation()));
+
+            if (path == null) return;
+
+            PathPoint lastPoint = null;
+
+            for (PathPoint point : path.getAllPathPoints()) {
+                if (point != null) lastPoint = point;
+            }
+
+            if (lastPoint == null) return;
+
+            if (lastPoint.position.getDistance(current.endPose.getTranslation()) > Units.inchesToMeters(3)) {
+                System.out.println("Last path point is too far from the end pose, so the path will not be used");
+                return;
+            }
+
+            Waypoint lastWaypoint = path.getWaypoints().get(path.getWaypoints().size() - 1);
+
+            if (lastWaypoint == null) return;
+            if (lastWaypoint.anchor().getDistance(current.endPose.getTranslation()) > Units.inchesToMeters(3)) {
+                System.out.println("Last waypoint is too far from the end pose, so the path will not be used");
+                return;
+            }
+
+            current.path = path;
 
             if (current.path != null) {
                 current.trajectory = new PathPlannerTrajectory(current.path, new ChassisSpeeds(), current.startPose.getRotation(), robot);
