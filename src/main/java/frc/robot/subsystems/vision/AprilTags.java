@@ -36,7 +36,7 @@ public class AprilTags extends SubsystemBase {
   private static final double LARGE_ROTATION_ERROR = 9999999;
   private static final double TRANSLATION_ERROR_FACTOR = 10;
   private static final double ADDITIONAL_TRANSLATION_ERROR = 0.5;
-  private static Map<String, LimelightHelpers.PoseEstimate> loggedEstimates;
+  private static Map<String, LimelightHelpers.PoseEstimate> loggedEstimates = Map.of();
 
   static {
     Logger.addUpdate(
