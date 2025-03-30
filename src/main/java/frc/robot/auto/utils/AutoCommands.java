@@ -107,7 +107,7 @@ public class AutoCommands {
     }
 
     public Command placeCoral(Pose2d previousPose, CoralPosition position) {
-        Pose2d alignPose = ReefPositioning.getCoralAlignPose(position.pole);
+        Pose2d alignPose = ReefPositioning.getCoralPlacePose(position.pole);
         Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
 
         return Commands.sequence(
@@ -138,8 +138,7 @@ public class AutoCommands {
                     // then keep it there until the robot is near to the
                     // alignment pose and slow enough to raise the elevator higher.
                     annotate("hold ready", pieceCombos.holdCoral()).until(() ->
-                        swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
-                        KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm() < 3.0
+                        swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0
                     ),
                     // Move the elevator to the maximum height to prepare for
                     // placing, then hold it there. This command is wrapped in a
@@ -174,11 +173,13 @@ public class AutoCommands {
                         pieceCombos.coralL4(),
                         swerveDrive
                             .alignTo(placePose, Inches.of(1), Degrees.of(4))
-                            .withEndWithinTolerance(false)),
+                            .withEndWithinTolerance(false)
+                            .withInitialState(SwerveDrive.AlignCommand.State.ROTATING)),
                     // Finish aligning while holding the elevator and
                     // manipulator in the same place.
                     Commands.deadline(
-                        swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
+                        swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4))
+                            .withInitialState(SwerveDrive.AlignCommand.State.ROTATING),
                         pieceCombos.holdCoral()
                     ),
                     // Drop the coral while keeping the elevator and manipulator
@@ -198,7 +199,9 @@ public class AutoCommands {
                         elevator.move(-1.0),
                         manipulator.pivot.hold(),
                         manipulator.grabber.stop()
-                    ).until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                    )
+                        .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                        .withTimeout(0.1)
                 )
             )
         );

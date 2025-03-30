@@ -88,7 +88,10 @@ public class RealGrabber extends Grabber {
   public Command intakeCoral() {
     return Commands.sequence(
         setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isCoralClear),
+        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED).withDeadline(Commands.sequence(
+          Commands.waitUntil(this::isCoralClear),
+          Commands.waitSeconds(0.05)
+        )),
         stopOnce());
   }
 

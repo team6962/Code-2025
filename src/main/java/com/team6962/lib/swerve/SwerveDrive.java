@@ -335,9 +335,11 @@ public class SwerveDrive extends SwerveCore {
     private Distance toleranceDistance;
     private Angle toleranceAngle;
     private State state = State.TRANSLATING;
+    private State initialState = State.TRANSLATING;
     private boolean endWithinTolerance = true;
+    private double currentActionStartSeconds;
 
-    private enum State {
+    public static enum State {
       TRANSLATING,
       ROTATING
     }
@@ -349,6 +351,12 @@ public class SwerveDrive extends SwerveCore {
       this.toleranceAngle = toleranceAngle;
 
       addRequirements(useMotion());
+    }
+
+    public AlignCommand withInitialState(State state) {
+      initialState = state;
+
+      return this;
     }
 
     public AlignCommand withEndWithinTolerance(boolean value) {
@@ -381,6 +389,9 @@ public class SwerveDrive extends SwerveCore {
 
       translateFeedforward = new SimpleMotorFeedforward(0.01, 0);
       rotateFeedforward = new SimpleMotorFeedforward(0.45, 0);
+
+      state = initialState;
+      currentActionStartSeconds = Timer.getFPGATimestamp();
     }
 
     public Translation2d getTranslationError() {
@@ -458,12 +469,24 @@ public class SwerveDrive extends SwerveCore {
       double rotationErrorRatio =
           rotationError.getMeasure().abs(Rotation) / toleranceAngle.abs(Rotations);
 
-      if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
-      if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
+      State newState = state;
+
+      if (translationNeedsAdjustment && !rotationNeedsAdjustment) newState = State.TRANSLATING;
+      if (!translationNeedsAdjustment && rotationNeedsAdjustment) newState = State.ROTATING;
       if (!translationNeedsAdjustment && !rotationNeedsAdjustment) {
-        if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
-        else state = State.ROTATING;
+        if (translationErrorRatio > rotationErrorRatio) newState = State.TRANSLATING;
+        else newState = State.ROTATING;
       }
+
+      if (newState != state) {
+        currentActionStartSeconds = Timer.getFPGATimestamp();
+      } else if (currentActionStartSeconds > 1.5 && state == State.TRANSLATING && rotationNeedsAdjustment) {
+        newState = State.ROTATING;
+      } else if (currentActionStartSeconds > 1.5 && state == State.ROTATING && translationNeedsAdjustment) {
+        newState = State.TRANSLATING;
+      }
+
+      state = newState;
 
       Logger.log("Swerve Drive/AlignCommand/state", state.name());
       Logger.log("Swerve Drive/AlignCommand/needsTranslate", translationNeedsAdjustment);
