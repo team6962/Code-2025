@@ -149,13 +149,21 @@ public class AutoCommands {
             // the funnel.
             CommandUtils.onlyIf(
                 () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
-                annotate("intake coral", pieceCombos.intakeCoral())
+                annotate("intake coral", Commands.deadline(
+                    manipulator.grabber.intakeCoral(),
+                    elevator.hold(),
+                    manipulator.pivot.hold()
+                ))
             ).withTimeout(1.0),
             // Continue intaking the coral in case the coral hasn't reached the
             // "has coral" beam break but has gotten to "coral clear"
             CommandUtils.onlyIf(
                 () -> !manipulator.grabber.hasCoral() && !manipulator.grabber.isCoralClear(),
-                annotate("intake coral because coral clear", pieceCombos.intakeCoral())
+                annotate("intake coral because coral clear", Commands.deadline(
+                    manipulator.grabber.intakeCoral(),
+                    elevator.hold(),
+                    manipulator.pivot.hold()
+                ))
             ),
             // If the robot has coral, align to the place pose, raise the
             // elevator, and drop it. Otherwise, end the command, skipping this
@@ -287,7 +295,8 @@ public class AutoCommands {
 
             return alignFace(closestFace, false)
             .alongWith(Commands.sequence(
-                Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(facePose, Inches.of(1.5), Degrees.of(4)))
+                Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(facePose, Inches.of(1.5), Degrees.of(4))),
+                rumble.get()
             ));
         },
         Set.of(swerveDrive.useMotion()));
