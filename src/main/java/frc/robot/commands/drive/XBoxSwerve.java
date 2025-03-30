@@ -137,7 +137,7 @@ public class XBoxSwerve extends Command {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
 
       Translation2d povVelocity =
-          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0)
+          new Translation2d(1.0, 0)
               .rotateBy(povDirection)
               .times(
                   MathUtils.map(
