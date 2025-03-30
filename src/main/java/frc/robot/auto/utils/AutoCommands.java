@@ -4,15 +4,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
-import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -107,7 +103,7 @@ public class AutoCommands {
     }
 
     public Command placeCoral(Pose2d previousPose, CoralPosition position) {
-        Pose2d alignPose = ReefPositioning.getCoralAlignPose(position.pole);
+        Pose2d alignPose = ReefPositioning.getCoralPlacePose(position.pole);
         Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
 
         return Commands.sequence(
@@ -138,8 +134,7 @@ public class AutoCommands {
                     // then keep it there until the robot is near to the
                     // alignment pose and slow enough to raise the elevator higher.
                     annotate("hold ready", pieceCombos.holdCoral()).until(() ->
-                        swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
-                        KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm() < 3.0
+                        swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0
                     ),
                     // Move the elevator to the maximum height to prepare for
                     // placing, then hold it there. This command is wrapped in a
