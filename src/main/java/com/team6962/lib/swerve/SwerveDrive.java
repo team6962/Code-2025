@@ -812,6 +812,11 @@ public class SwerveDrive extends SwerveCore {
         System.out.println(" (start) " + precompute.getStartPose());
         System.out.println(" (end) " + precompute.getEndPose());
         System.out.println(" (current) " + getEstimatedPose());
+      } else {
+        System.out.println("Using non-precomputed path.");
+
+        System.out.println(" (current) " + getEstimatedPose());
+        System.out.println(" (end) " + endPose);
       }
 
       return pathfindToPose;
