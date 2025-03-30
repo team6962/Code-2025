@@ -30,6 +30,7 @@ public class XBoxSwerve extends Command {
   public double MAX_DRIVE_VELOCITY;
   public double NOMINAL_DRIVE_VELOCITY;
   public double FINE_TUNE_DRIVE_VELOCITY;
+  public double ULTRA_FINE_TUNE_DRIVE_VELOCITY;
   public double NOMINAL_ANGULAR_VELOCITY;
   public double MAX_ANGULAR_VELOCITY;
   public double SUPER_ANGULAR_VELOCITY;
@@ -58,6 +59,10 @@ public class XBoxSwerve extends Command {
         swerveDrive
             .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER)
             .in(MetersPerSecond);
+    ULTRA_FINE_TUNE_DRIVE_VELOCITY =
+        swerveDrive
+            .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ULTRA_FINE_TUNE_DRIVE_POWER)
+            .in(MetersPerSecond);
     NOMINAL_ANGULAR_VELOCITY =
         swerveDrive
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER)
@@ -67,9 +72,9 @@ public class XBoxSwerve extends Command {
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_BOOST_POWER)
             .in(RadiansPerSecond);
     SUPER_ANGULAR_VELOCITY =
-          swerveDrive
-              .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_SUPER_ROTATE_POWER)
-              .in(RadiansPerSecond);
+        swerveDrive
+            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_SUPER_ROTATE_POWER)
+            .in(RadiansPerSecond);
 
     Logger.logNumber("XBoxSwerve/nomVel", () -> NOMINAL_DRIVE_VELOCITY);
     Logger.logNumber("XBoxSwerve/maxVel", () -> MAX_DRIVE_VELOCITY);
@@ -115,12 +120,12 @@ public class XBoxSwerve extends Command {
 
     if (leftTrigger > 0.1) {
       angularVelocity +=
-      -rightStick.getX()
-          * MathUtils.map(leftTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, SUPER_ANGULAR_VELOCITY);
-    }else {
+          -rightStick.getX()
+              * MathUtils.map(leftTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, SUPER_ANGULAR_VELOCITY);
+    } else {
       angularVelocity +=
-      -rightStick.getX()
-          * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+          -rightStick.getX()
+              * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
     }
 
     velocity =
@@ -132,11 +137,13 @@ public class XBoxSwerve extends Command {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
 
       Translation2d povVelocity =
-          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0).rotateBy(povDirection);
+          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0)
+              .rotateBy(povDirection)
+              .times(
+                  MathUtils.map(
+                      leftTrigger, 0, 1, FINE_TUNE_DRIVE_VELOCITY, ULTRA_FINE_TUNE_DRIVE_VELOCITY));
 
       povVelocity = swerveDrive.robotToField(povVelocity);
-
-      velocity = velocity.plus(povVelocity);
     }
 
     // Zero heading when Y is pressed

@@ -191,11 +191,7 @@ public final class Constants {
               .minus(Radians.of(-0.003370614359))
               .minus(Radians.of(-0.003))), // Back Left
       new SwerveConfig.Module(
-          13,
-          23,
-          33,
-          Radians.of(0.01540734641)
-            .minus(Radians.of(0.08577796077))), // Back Right
+          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,
@@ -239,6 +235,7 @@ public final class Constants {
     public static final double TELEOPERATED_ROTATE_POWER = 0.1; // Percent rotating power
     public static final double TELEOPERATED_ROTATE_BOOST_POWER = 0.2; // Percent rotating power
     public static final double TELEOPERATED_SUPER_ROTATE_POWER = 0.7; // Percent rotating power
+    public static final double TELEOPERATED_ULTRA_FINE_TUNE_DRIVE_POWER = 0.5;
   }
 
   public static final class CANBUS {
@@ -504,7 +501,7 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final Distance Spacing = Meters.of(1 / 60.0);
-    //public static final int length = 31;
+    // public static final int length = 31;
     public static final int port = 9;
     public static final int SIDE_STRIP_HEIGHT = 56;
   }
