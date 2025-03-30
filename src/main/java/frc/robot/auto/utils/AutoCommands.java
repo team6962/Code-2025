@@ -137,7 +137,10 @@ public class AutoCommands {
                     // Finely position the elevator at the maximum safe height,
                     // then keep it there until the robot is near to the
                     // alignment pose and slow enough to raise the elevator higher.
-                    annotate("hold ready", pieceCombos.holdCoral()).until(() ->
+                    Commands.sequence(
+                        annotate("to ready", pieceCombos.readyL3()),
+                        annotate("hold ready", pieceCombos.holdCoral())
+                    ).until(() ->
                         swerveDrive.getEstimatedPose().getTranslation().getDistance(alignPose.getTranslation()) < 2.0 &&
                         KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds()).getNorm() < 3.0
                     ),
