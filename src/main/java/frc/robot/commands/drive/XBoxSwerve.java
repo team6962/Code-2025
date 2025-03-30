@@ -137,13 +137,15 @@ public class XBoxSwerve extends Command {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
 
       Translation2d povVelocity =
-          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0)
+          new Translation2d(1.0, 0)
               .rotateBy(povDirection)
               .times(
                   MathUtils.map(
-                      leftTrigger, 0, 1, FINE_TUNE_DRIVE_VELOCITY, ULTRA_FINE_TUNE_DRIVE_VELOCITY));
+                      rightTrigger, 0, 1, FINE_TUNE_DRIVE_VELOCITY, ULTRA_FINE_TUNE_DRIVE_VELOCITY));
 
       povVelocity = swerveDrive.robotToField(povVelocity);
+
+      velocity = velocity.plus(povVelocity);
     }
 
     // Zero heading when Y is pressed
