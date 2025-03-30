@@ -12,6 +12,7 @@ import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team6962.lib.prepath.CustomLocalADStar;
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -127,6 +128,34 @@ public class PathPrecomputing extends SubsystemBase {
         return precompute;
     }
 
+    private void log(String key, Precompute precompute) {
+        if (precompute == null) {
+            Logger.log(key, "null");
+            return;
+        }
+
+        Logger.log(key, "");
+
+        Logger.log(key + "/startPose", precompute.startPose);
+        Logger.log(key + "/endPose", precompute.endPose);
+
+        if (precompute.path != null) {
+            List<Waypoint> waypoints = precompute.path.getWaypoints();
+
+            for (int i = 0; i < waypoints.size(); i++) {
+                Logger.log(key + "/waypoint" + i, waypoints.get(i).anchor());
+            }
+        }
+    }
+
+    private void log(String key, List<Precompute> precomputes) {
+        for (int i = 0; i < precomputes.size(); i++) {
+            log(key + "/precompute" + i, precomputes.get(i));
+        }
+
+        Logger.log(key + "/size", precomputes.size());
+    }
+
     @Override
     public void periodic() {
         if (CachedRobotState.isEnabled()) {
@@ -137,6 +166,9 @@ public class PathPrecomputing extends SubsystemBase {
 
             return;
         }
+
+        log("PathPrecomputing/current", current);
+        log("PathPrecomputing/queue", queue);
         
         if (current == null || current.trajectory != null) {
             if (current != null) {
