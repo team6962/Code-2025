@@ -169,7 +169,8 @@ public class AutoCommands {
                         pieceCombos.coralL4(),
                         swerveDrive
                             .alignTo(placePose, Inches.of(1), Degrees.of(4))
-                            .withEndWithinTolerance(false)),
+                            .withEndWithinTolerance(false)
+                    ),
                     // Finish aligning while holding the elevator and
                     // manipulator in the same place.
                     Commands.deadline(
@@ -193,7 +194,9 @@ public class AutoCommands {
                         elevator.move(-1.0),
                         manipulator.pivot.hold(),
                         manipulator.grabber.stop()
-                    ).until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                    )
+                        .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                        .withTimeout(0.1)
                 )
             )
         );
