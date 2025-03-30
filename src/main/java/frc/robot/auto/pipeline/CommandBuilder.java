@@ -31,6 +31,7 @@ public class CommandBuilder {
     currentIndex = 0;
     path = null;
     previousPose = parameters.startPose;
+    logCommandIndex = 0;
 
     System.out.println("Starting to generate a new autonomous path");
 
