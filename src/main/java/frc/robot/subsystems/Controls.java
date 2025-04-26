@@ -58,15 +58,15 @@ public class Controls {
               .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN)))
     );
     driver.y();
-    driver.start().onTrue(pieceCombos.stow());
+    // driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
     // driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
-    driver
-        .leftStick()
-        .onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
+    // driver
+    //     .leftStick()
+    //     .onTrue(pieceCombos.algaeProcessor()); // TODO: Change to whileTrue() before test
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -87,7 +87,7 @@ public class Controls {
     // L3 Algae Removal Height
     // Algae ground Height
 
-    operator.a().onTrue(pieceCombos.coralL1());
+    operator.a().onTrue(pieceCombos.stow());
     operator.b().onTrue(pieceCombos.coralL2());
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(pieceCombos.coralL4());
@@ -128,6 +128,7 @@ public class Controls {
       ))); // big right paddle
 
     operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
+    // pieceCombos.algaeProcessor()
     operator
         .rightTrigger()
         .whileTrue(
