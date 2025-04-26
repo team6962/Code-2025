@@ -138,11 +138,9 @@ public class PieceCombos {
   }
 
   public Command stow() {
-    return manipulator
-        .pivot
-        .safe()
-        .andThen(elevator.stow())
-        .andThen(manipulator.stow())
+    return safeSubsystems
+        .safeMoveCommand(
+            elevator.coralIntake(), manipulator.stow(), ELEVATOR.CORAL.INTAKE_HEIGHT)
         .withName("STOW");
   }
 

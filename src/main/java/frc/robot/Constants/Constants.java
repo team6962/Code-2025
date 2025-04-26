@@ -358,14 +358,14 @@ public final class Constants {
       public static final Distance L2_HEIGHT = Inches.of(49.2);
       public static final Distance L3_HEIGHT = Inches.of(56.1);
       public static final Distance L4_HEIGHT = MAX_HEIGHT;
-      public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
+      public static final Distance INTAKE_HEIGHT = BASE_HEIGHT;
     }
 
     public static final class ALGAE {
       public static final Distance L2_HEIGHT = Inches.of(49.35);
       public static final Distance L3_HEIGHT = Inches.of(56.75);
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
-      public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
+      public static final Distance GROUND_HEIGHT = BASE_HEIGHT;
       public static final Distance PROCESSOR_HEIGHT = Inches.of(41.50);
     }
 

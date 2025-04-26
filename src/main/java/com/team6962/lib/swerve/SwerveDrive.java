@@ -286,21 +286,35 @@ public class SwerveDrive extends SwerveCore {
         useMotion());
   }
 
-  public AlignCommand alignTo(
-      Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle) {
-    return new AlignCommand(target, toleranceDistance, toleranceAngle);
+  public Command alignTo(
+      Supplier<Pose2d> target, Distance toleranceDistance, Angle toleranceAngle, boolean endWithinTolerance) {
+    return Commands.sequence(
+      Commands.defer(() -> {
+        return new CustomPathfindingCommand(
+          target.get(),
+          getConstants().pathConstraints(),
+          this::getEstimatedPose,
+          this::getEstimatedSpeeds,
+          (speeds, ff) -> moveRobotRelative(speeds),
+          getConstants().driveGains().pathController(),
+          getConstants().pathRobotConfig(),
+          useMotion()
+        );
+      }, Set.of(useMotion())),
+      new AlignCommand(target, toleranceDistance, toleranceAngle).withEndWithinTolerance(endWithinTolerance)
+    );
   }
 
-  public AlignCommand alignTo(Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
-    return alignTo(() -> target, toleranceDistance, toleranceAngle);
+  public Command alignTo(Pose2d target, Distance toleranceDistance, Angle toleranceAngle, boolean endWithinTolerance) {
+    return alignTo(() -> target, toleranceDistance, toleranceAngle, endWithinTolerance);
   }
 
-  public AlignCommand alignTo(Supplier<Pose2d> target) {
-    return alignTo(target, Inches.of(1.0), Degrees.of(4));
+  public Command alignTo(Supplier<Pose2d> target, boolean endWithinTolerance) {
+    return alignTo(target, Inches.of(1.0), Degrees.of(4), endWithinTolerance);
   }
 
-  public AlignCommand alignTo(Pose2d target) {
-    return alignTo(() -> target);
+  public Command alignTo(Pose2d target, boolean endWithinTolerance) {
+    return alignTo(() -> target, endWithinTolerance);
   }
 
   public boolean isWithinToleranceOf(

@@ -81,7 +81,7 @@ public class AutoCommands {
         return Commands.race(
             Commands.sequence(
                 swerveDrive.pathfindToPrecomputed(previousPose, intake),
-                swerveDrive.alignTo(intake).withTimeout(Seconds.of(0.1))
+                swerveDrive.alignTo(intake, false).withTimeout(Seconds.of(0.1))
             ),
             pieceCombos.intakeCoral()
         );
@@ -176,13 +176,12 @@ public class AutoCommands {
                     Commands.deadline(
                         pieceCombos.coralL4(),
                         swerveDrive
-                            .alignTo(placePose, Inches.of(1), Degrees.of(4))
-                            .withEndWithinTolerance(false)
+                            .alignTo(placePose, Inches.of(1), Degrees.of(4), false)
                     ),
                     // Finish aligning while holding the elevator and
                     // manipulator in the same place.
                     Commands.deadline(
-                        swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4)),
+                        swerveDrive.alignTo(placePose, Inches.of(1), Degrees.of(4), true),
                         pieceCombos.holdCoral()
                     ),
                     // Drop the coral while keeping the elevator and manipulator
@@ -252,8 +251,7 @@ public class AutoCommands {
                 : ReefPositioning.getCoralPlacePose(pole))
         .andThen(
             swerveDrive
-                .alignTo(ReefPositioning.getCoralPlacePose(pole), Inches.of(0.5), Degrees.of(2))
-                .withEndWithinTolerance(endWithinTolerance));
+                .alignTo(ReefPositioning.getCoralPlacePose(pole), Inches.of(0.5), Degrees.of(2), endWithinTolerance));
   }
 
   public Command alignFace(int face, boolean endWithinTolerance) {
@@ -261,8 +259,7 @@ public class AutoCommands {
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
             swerveDrive
-                .alignTo(ReefPositioning.getAlgaePlacePose(face))
-                .withEndWithinTolerance(endWithinTolerance));
+                .alignTo(ReefPositioning.getAlgaePlacePose(face), endWithinTolerance));
   }
 
   public Command alignToClosestPoleTeleop(PolePattern pattern, Supplier<Command> rumble) {
