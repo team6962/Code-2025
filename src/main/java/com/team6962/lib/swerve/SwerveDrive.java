@@ -348,8 +348,10 @@ public class SwerveDrive extends SwerveCore {
     private Supplier<Pose2d> targetSupplier;
     private Distance toleranceDistance;
     private Angle toleranceAngle;
-    private State state = State.TRANSLATING;
+    private State state = State.ROTATING;
     private boolean endWithinTolerance = true;
+
+    // private int closestReefFace;
 
     private enum State {
       TRANSLATING,
@@ -395,6 +397,21 @@ public class SwerveDrive extends SwerveCore {
 
       translateFeedforward = new SimpleMotorFeedforward(0.01, 0);
       rotateFeedforward = new SimpleMotorFeedforward(0.45, 0);
+
+      state = State.ROTATING;
+
+      // double closestDistance = 0;
+
+      // for (int f = 0; f < 6; f++) {
+      //   Pose2d facePose = ReefPositioning.getFacePose(new Translation2d(), f);
+
+      //   if (facePose.getTranslation().getDistance(getEstimatedPose().getTranslation())
+      //           < closestDistance
+      //       || closestDistance == 0) {
+      //     closestDistance = facePose.getTranslation().getDistance(getEstimatedPose().getTranslation());
+      //     closestReefFace = f;
+      //   }
+      // }
     }
 
     public Translation2d getTranslationError() {
