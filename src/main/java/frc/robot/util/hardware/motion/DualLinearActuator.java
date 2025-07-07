@@ -28,7 +28,7 @@ import frc.robot.util.hardware.SparkMaxUtil;
 
 public class DualLinearActuator extends SubsystemBase {
   private Distance targetHeight = Meters.of(0.0);
-  private double kS = 0.0;
+  private double kG = 0.0;
 
   protected SparkMax leftMotor, rightMotor;
   private RelativeEncoder leftEncoder, rightEncoder;
@@ -51,7 +51,7 @@ public class DualLinearActuator extends SubsystemBase {
    * @param absoluteEncoderDIO The DIO port for the absolute encoder.
    * @param absolutePositionOffset The offset for the absolute encoder position.
    * @param kP The proportional gain for the PID controller.
-   * @param kS The static gain for the PID controller.
+   * @param kG The static gain for the PID controller.
    * @param sensorToMotorRatio The ratio of the sensor to motor.
    * @param spoolHeight The ratio of the mechanism to sensor.
    * @param baseHeight The base height of the mechanism.
@@ -66,7 +66,7 @@ public class DualLinearActuator extends SubsystemBase {
       int ceilingLimitDIO,
       int floorLimitDIO,
       double kP,
-      double kS,
+      double kG,
       double gearing,
       Distance spoolHeight,
       Distance baseHeight,
@@ -75,7 +75,7 @@ public class DualLinearActuator extends SubsystemBase {
       Distance tolerance) {
     setName(name);
 
-    this.kS = kS;
+    this.kG = kG;
     this.baseHeight = baseHeight;
     this.minHeight = minHeight;
     this.maxHeight = maxHeight;
@@ -90,7 +90,7 @@ public class DualLinearActuator extends SubsystemBase {
     rightPID = rightMotor.getClosedLoopController();
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
-    motorConfig.closedLoop.minOutput((-12. + kS) / 12.);
+    motorConfig.closedLoop.minOutput((-12. + kG) / 12.);
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
@@ -98,7 +98,7 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
-    motorConfig.closedLoop.minOutput((-12. + kS) / 12.);
+    motorConfig.closedLoop.minOutput((-12. + kG) / 12.);
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
@@ -231,8 +231,8 @@ public class DualLinearActuator extends SubsystemBase {
 
     if (!canMoveInDirection(requestedHeight.minus(getAverageHeight()).in(Meters))) {
       if (!triggeredFloorLimit() && triggeredCeilingLimit()) {
-        leftMotor.setVoltage(kS);
-        rightMotor.setVoltage(kS);
+        leftMotor.setVoltage(kG);
+        rightMotor.setVoltage(kG);
 
         return;
       }
@@ -242,9 +242,9 @@ public class DualLinearActuator extends SubsystemBase {
     }
 
     moving = true;
-    leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+    leftPID.setReference(targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kG);
     rightPID.setReference(
-        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kS);
+        targetHeight.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, kG);
   }
 
   public boolean triggeredCeilingLimit() {

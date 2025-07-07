@@ -14,12 +14,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants.Constants.ALGAE;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.subsystems.LEDs.LEDs;
-import frc.robot.util.CachedRobotState;
-import edu.wpi.first.wpilibj.RobotState;
-import frc.robot.subsystems.LEDs.LEDs;
 
 public class Algae {
   private static final double MAX_FOV_RATIO = Math.PI / 2;
@@ -66,7 +63,7 @@ public class Algae {
         robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
 
     if (!RobotState.isDisabled()) {
-      //LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
+      // LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
     }
 
     return algaePosition;

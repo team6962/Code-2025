@@ -79,42 +79,42 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-public Command algaeProcessor() {
+  public Command algaeProcessor() {
     return CommandUtils.noneWithRequirements(this);
   }
 
   @Override
-public Command rezeroAtBottom() {
+  public Command rezeroAtBottom() {
     return CommandUtils.noneWithRequirements(this);
   }
 
   @Override
-public Distance getAverageHeight() {
+  public Distance getAverageHeight() {
     return Meters.of(0.0);
   }
 
   @Override
-public Command up() {
+  public Command up() {
     return CommandUtils.noneWithRequirements(this);
   }
 
   @Override
-public Command down() {
+  public Command down() {
     return CommandUtils.noneWithRequirements(this);
   }
 
   @Override
-public Distance getMaxHeight() {
+  public Distance getMaxHeight() {
     return Meters.of(Double.POSITIVE_INFINITY);
   }
 
   @Override
-public Distance getMinHeight() {
+  public Distance getMinHeight() {
     return Meters.of(Double.NEGATIVE_INFINITY);
   }
 
   @Override
-public boolean inRange(Distance height) {
+  public boolean inRange(Distance height) {
     return true;
   }
 }

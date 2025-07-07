@@ -1,14 +1,13 @@
 package frc.robot.auto.pipeline;
 
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.auto.utils.AutoPaths;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
 import frc.robot.auto.utils.AutoCommands;
+import frc.robot.auto.utils.AutoPaths;
 import java.util.List;
 
 public class CommandBuilder {

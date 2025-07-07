@@ -141,7 +141,11 @@ public class XBoxSwerve extends Command {
               .rotateBy(povDirection)
               .times(
                   MathUtils.map(
-                      rightTrigger, 0, 1, FINE_TUNE_DRIVE_VELOCITY, ULTRA_FINE_TUNE_DRIVE_VELOCITY));
+                      rightTrigger,
+                      0,
+                      1,
+                      FINE_TUNE_DRIVE_VELOCITY,
+                      ULTRA_FINE_TUNE_DRIVE_VELOCITY));
 
       povVelocity = swerveDrive.robotToField(povVelocity);
 

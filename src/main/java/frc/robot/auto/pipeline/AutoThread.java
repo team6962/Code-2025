@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.auto.utils.AutoPaths;
 import frc.robot.auto.utils.AutoCommands;
+import frc.robot.auto.utils.AutoPaths;
 import java.util.function.BooleanSupplier;
 
 public class AutoThread extends Thread {

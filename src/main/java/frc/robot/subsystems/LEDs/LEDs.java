@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.LEDs;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.team6962.lib.telemetry.Logger;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -15,13 +19,6 @@ import frc.robot.Constants.Constants.LED;
 import frc.robot.subsystems.vision.AprilTags;
 import frc.robot.util.CachedRobotState;
 
-import static edu.wpi.first.units.Units.*;
-
-import com.team6962.lib.telemetry.Logger;
-
-import edu.wpi.first.units.measure.Distance;
-
-
 public class LEDs extends SubsystemBase {
   private static AddressableLED strip;
   private static AddressableLEDBuffer buffer;
@@ -29,11 +26,11 @@ public class LEDs extends SubsystemBase {
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private static final Distance kLedSpacing = Meters.of(1 / 20.0);
   private final LEDPattern m_scrollingRainbow =
-        m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
   public static enum State {
     OFF,
-    DISABLED, 
+    DISABLED,
     DEFAULT, // Right colors, fix scrolling
     DRIVING_AUTO, // good
     DRIVING_TELEOP_RED, // Wrong colors, fix scrolling
@@ -42,15 +39,15 @@ public class LEDs extends SubsystemBase {
     HAS_CORAL,
     GOOD,
     CAN_SEE_ALGAE
-    //HAS_CORAL,
-    //CAN_SEE_ALGAE,
-    //AIMING_PROCESSOR,
-    //SCORING_PROCESSOR,
-    //AIMING_BARGE,
-    //SCORING_BARGE,
-    //AIMING_REEF,
-    //SCORING_REEF,
-    //HANG
+    // HAS_CORAL,
+    // CAN_SEE_ALGAE,
+    // AIMING_PROCESSOR,
+    // SCORING_PROCESSOR,
+    // AIMING_BARGE,
+    // SCORING_BARGE,
+    // AIMING_REEF,
+    // SCORING_REEF,
+    // HANG
   }
 
   public static final Color WHITE = new Color(255, 255, 255);
@@ -66,7 +63,7 @@ public class LEDs extends SubsystemBase {
   public static final Color DARK_GREEN = new Color(0, 100, 0);
   public static final Color PURPLE = new Color(108, 59, 170);
   public static final Color MAGENTA = new Color(255, 0, 255);
-  
+
   public LEDs() {
     strip = new AddressableLED(LED.port);
     buffer = new AddressableLEDBuffer(LED.SIDE_STRIP_HEIGHT);
@@ -88,8 +85,10 @@ public class LEDs extends SubsystemBase {
     return Commands.run(() --> setState())
   }*/
 
-  private static LEDPattern createColor(Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
-    LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
+  private static LEDPattern createColor(
+      Color ColorFrom, Color ColorTo, double Blink, double Scroll) {
+    LEDPattern base =
+        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, ColorFrom, ColorTo);
     LEDPattern blink = base.blink(Seconds.of(Blink));
     LEDPattern scroll = base.scrollAtRelativeSpeed(Percent.per(Second).of(Scroll));
     LEDPattern pattern = blink.overlayOn(scroll);
@@ -129,7 +128,7 @@ public class LEDs extends SubsystemBase {
         break;
       case AUTO_ALIGN:
         apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
-          break;
+        break;
       case HAS_CORAL:
         apply(createColor(ANTARES_YELLOW, ANTARES_YELLOW, 1.0, 50.0));
         break;
@@ -139,36 +138,35 @@ public class LEDs extends SubsystemBase {
       case CAN_SEE_ALGAE:
         apply(createColor(ANTARES_BLUE, CYAN, 1.0, 50.0));
         break;
-      /*case HAS_ALGAE:
-        apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
-        break;
-      case HAS_CORAL:
-        break;
-      case CAN_SEE_ALGAE:
-        apply(createColor(CYAN, CYAN, 1.0, 0.0));
-        break;
-      case AIMING_PROCESSOR:
-        apply(createColor(DARK_GREEN, DARK_GREEN, 0.5, 0.0));
-        break;
-      case SCORING_PROCESSOR:
-        apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 0.0));
-        break;
-      case AIMING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
-        break;
-      case SCORING_BARGE:
-        apply(createColor(YELLOW, YELLOW, 1.0, 0.0));
-        break;
-      case AIMING_REEF:
-        apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
-        break;
-      case SCORING_REEF:
-        apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
-        break;
-    case HANG:
-        apply(createColor(MAGENTA, MAGENTA, 1.0, 0.0));
-        break;*/
-
+        /*case HAS_ALGAE:
+            apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 50.0));
+            break;
+          case HAS_CORAL:
+            break;
+          case CAN_SEE_ALGAE:
+            apply(createColor(CYAN, CYAN, 1.0, 0.0));
+            break;
+          case AIMING_PROCESSOR:
+            apply(createColor(DARK_GREEN, DARK_GREEN, 0.5, 0.0));
+            break;
+          case SCORING_PROCESSOR:
+            apply(createColor(DARK_GREEN, DARK_GREEN, 1.0, 0.0));
+            break;
+          case AIMING_BARGE:
+            apply(createColor(YELLOW, YELLOW, 0.5, 0.0));
+            break;
+          case SCORING_BARGE:
+            apply(createColor(YELLOW, YELLOW, 1.0, 0.0));
+            break;
+          case AIMING_REEF:
+            apply(createColor(MAGENTA, MAGENTA, 0.5, 0.0));
+            break;
+          case SCORING_REEF:
+            apply(createColor(MAGENTA, MAGENTA, 0.0, 0.0));
+            break;
+        case HANG:
+            apply(createColor(MAGENTA, MAGENTA, 1.0, 0.0));
+            break;*/
 
     }
 
@@ -177,7 +175,10 @@ public class LEDs extends SubsystemBase {
     if (CachedRobotState.isDisabled() && AprilTags.changingHeading) {
       state = State.DEFAULT;
     } else {
-      state = CachedRobotState.isBlue().orElse(false) ? State.DRIVING_TELEOP_BLUE : State.DRIVING_TELEOP_RED;
+      state =
+          CachedRobotState.isBlue().orElse(false)
+              ? State.DRIVING_TELEOP_BLUE
+              : State.DRIVING_TELEOP_RED;
     }
   }
 }
