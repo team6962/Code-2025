@@ -358,6 +358,10 @@ public class BasedElevator extends SubsystemBase {
         return MetersPerSecond.of(velocitySum / motors.length);
     }
 
+    public Command stop() {
+        return run(this::stopMotors);
+    }
+
     private void stopMotors() {
         for (BasedMotor motor : motors) {
             motor.stop();

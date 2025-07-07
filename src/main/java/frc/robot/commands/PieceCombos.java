@@ -63,7 +63,7 @@ public class PieceCombos {
   public Command readyL3() {
     return safeSubsystems
         .safeMoveCommand(
-            elevator.setHeight(ELEVATOR.AUTO.READY_HEIGHT), manipulator.stow(), Inches.of(53))
+            elevator.moveTo(ELEVATOR.AUTO.READY_HEIGHT), manipulator.stow(), Inches.of(53))
         .withName("READY L3");
   }
 

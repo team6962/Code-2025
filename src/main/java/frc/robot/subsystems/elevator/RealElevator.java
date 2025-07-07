@@ -65,9 +65,9 @@ public class RealElevator extends DualLinearActuator implements Elevator {
   }
 
   @Override
-  public Command setHeight(Distance height) {
+  public Command moveTo(Distance height) {
     if (!ENABLED_SYSTEMS.isElevatorEnabled()) return stop();
-    return this.run(() -> moveTo(height)).until(this::doneMoving);
+    return this.run(() -> moveToImmediate(height)).until(this::doneMoving);
   }
 
   @Override
@@ -81,64 +81,64 @@ public class RealElevator extends DualLinearActuator implements Elevator {
         () -> {
           Distance position = getAverageHeight();
 
-          return this.run(() -> moveTo(position));
+          return this.run(() -> moveToImmediate(position));
         },
         Set.of(this));
   }
 
   @Override
   public Command stow() {
-    return setHeight(ELEVATOR.STOW_HEIGHT);
+    return moveTo(ELEVATOR.STOW_HEIGHT);
   }
 
   @Override
   public Command coralL1() {
-    return setHeight(ELEVATOR.CORAL.L1_HEIGHT);
+    return moveTo(ELEVATOR.CORAL.L1_HEIGHT);
   }
 
   @Override
   public Command coralL2() {
-    return setHeight(ELEVATOR.CORAL.L2_HEIGHT);
+    return moveTo(ELEVATOR.CORAL.L2_HEIGHT);
   }
 
   @Override
   public Command coralL3() {
-    return setHeight(ELEVATOR.CORAL.L3_HEIGHT);
+    return moveTo(ELEVATOR.CORAL.L3_HEIGHT);
   }
 
   @Override
   public Command coralL4() {
-    return setHeight(ELEVATOR.CORAL.L4_HEIGHT);
+    return moveTo(ELEVATOR.CORAL.L4_HEIGHT);
   }
 
   @Override
   public Command coralIntake() {
-    return setHeight(ELEVATOR.CORAL.INTAKE_HEIGHT);
+    return moveTo(ELEVATOR.CORAL.INTAKE_HEIGHT);
   }
 
   @Override
   public Command algaeGround() {
-    return setHeight(ELEVATOR.ALGAE.GROUND_HEIGHT);
+    return moveTo(ELEVATOR.ALGAE.GROUND_HEIGHT);
   }
 
   @Override
   public Command algaeL2() {
-    return setHeight(ELEVATOR.ALGAE.L2_HEIGHT);
+    return moveTo(ELEVATOR.ALGAE.L2_HEIGHT);
   }
 
   @Override
   public Command algaeL3() {
-    return setHeight(ELEVATOR.ALGAE.L3_HEIGHT);
+    return moveTo(ELEVATOR.ALGAE.L3_HEIGHT);
   }
 
   @Override
   public Command algaeBarge() {
-    return setHeight(ELEVATOR.ALGAE.BARGE_HEIGHT);
+    return moveTo(ELEVATOR.ALGAE.BARGE_HEIGHT);
   }
 
   @Override
   public Command algaeProcessor() {
-    return setHeight(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
+    return moveTo(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
   }
 
   @Override

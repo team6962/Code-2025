@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DisabledElevator extends SubsystemBase implements Elevator {
   @Override
-  public Command setHeight(Distance height) {
+  public Command moveTo(Distance height) {
     return CommandUtils.noneWithRequirements(this);
   }
 

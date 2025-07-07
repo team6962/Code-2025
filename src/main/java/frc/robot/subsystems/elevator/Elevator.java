@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 public interface Elevator extends Subsystem {
-  public Command setHeight(Distance height);
+  public Command moveTo(Distance height);
 
   public Command stop();
 

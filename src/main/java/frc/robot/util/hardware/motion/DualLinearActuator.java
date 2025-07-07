@@ -239,7 +239,7 @@ public class DualLinearActuator extends SubsystemBase {
     rightMotor.stopMotor();
   }
 
-  public void moveTo(Distance requestedHeight) {
+  public void moveToImmediate(Distance requestedHeight) {
     targetHeight = clampHeight(requestedHeight);
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
@@ -301,7 +301,7 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public Command _setHeight(Distance height) {
-    return this.run(() -> moveTo(height)).until(this::doneMoving);
+    return this.run(() -> moveToImmediate(height)).until(this::doneMoving);
   }
 
   public Command _hold() {
@@ -309,7 +309,7 @@ public class DualLinearActuator extends SubsystemBase {
         () -> {
           Distance position = getAverageHeight();
 
-          return this.run(() -> moveTo(position));
+          return this.run(() -> moveToImmediate(position));
         },
         Set.of(this));
   }
