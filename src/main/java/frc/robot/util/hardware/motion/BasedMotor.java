@@ -1,8 +1,10 @@
 package frc.robot.util.hardware.motion;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import com.revrobotics.RelativeEncoder;
@@ -35,8 +37,8 @@ public class BasedMotor extends SubsystemBase {
         return Meters.of(encoder.getPosition());
     }
 
-    public void setVelocity(double Velocity){
-        motor.set(Velocity);
+    public LinearVelocity getVelocity(){
+        return MetersPerSecond.of(encoder.getVelocity());
     }
 
     public void stop() {
