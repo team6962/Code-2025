@@ -12,11 +12,10 @@ public class BasedLimitSwitch {
     }
 
     public boolean isPressed() {
-        // TODO: Check direction
         if (config.wiring == BasedElevator.LimitSwitchWiring.NormallyOpen) {
-            return input.get();
-        } else {
             return !input.get();
+        } else {
+            return input.get();
         }
     }
 }
