@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Set;
 
+import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Current;
@@ -183,12 +185,33 @@ public class BasedElevator extends SubsystemBase {
         return MetersPerSecond.of(velocitySum / motors.length);
     }
 
+    private void stopMotors() {
+        for (BasedMotor motor : motors) {
+            motor.stop();
+        }
+    }
+
+    private void runMotors(Distance feedbackTarget, Voltage feedforwardVoltage) {
+        if (
+            !safeToMoveInDirection(feedbackTarget.minus(getPosition()).in(Meters)) ||
+            !safeToMoveInDirection(feedforwardVoltage.in(Volts))
+        ) {
+            stopMotors();
+        }
+
+        for (BasedMotor motor : motors) {
+            motor.run(feedbackTarget.in(Meters), feedforwardVoltage);
+        }
+    }
+
     private Command moveTo(Distance targetPosition, LinearVelocity targetVelocity, boolean endWithinTolerance) {
+        final Distance clampedTarget = MeasureMath.clamp(targetPosition, config.minHeight, config.maxHeight);
+
         return Commands.defer(() -> new Command() {
             private TrapezoidProfile.State initialState;
 
             private TrapezoidProfile.State goalState = new TrapezoidProfile.State(
-                targetPosition.in(Meters), targetVelocity.in(MetersPerSecond)
+                clampedTarget.in(Meters), targetVelocity.in(MetersPerSecond)
             );
 
             private double startTime;
@@ -222,12 +245,12 @@ public class BasedElevator extends SubsystemBase {
 
                 Voltage feedforwardVoltage = Volts.of(feedforward.calculateWithVelocities(currentState.velocity, nextState.velocity));
 
-                throw new UnsupportedOperationException("Need to add motor control calls here");
+                runMotors(Meters.of(currentState.position), feedforwardVoltage);
             }
 
             @Override
             public boolean isFinished() {
-                return endWithinTolerance && getPosition().minus(targetPosition).abs(Meters) < config.tolerance.in(Meters);
+                return endWithinTolerance && getPosition().minus(clampedTarget).abs(Meters) < config.tolerance.in(Meters);
             }
         }, Set.of(this));
     }
@@ -252,6 +275,16 @@ public class BasedElevator extends SubsystemBase {
         for (BasedMotor motor : motors) {
             motor.setPosition(position);
         }
+    }
+
+    private boolean safeToMoveInDirection(double direction) {
+        if (direction > 0 && (ceiling.isPressed() || !absolutePositionSeeded)) {
+            return false;
+        } else if (direction < 0 && floor.isPressed()) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
