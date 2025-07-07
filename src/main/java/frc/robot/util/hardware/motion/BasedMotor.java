@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -16,6 +17,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.team6962.lib.telemetry.Logger;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.util.hardware.SparkMaxUtil;
@@ -66,6 +68,10 @@ public class BasedMotor extends SubsystemBase {
         return motor.getAppliedOutput();
     }
 
+    public Current getOutputCurrent() {
+        return Amps.of(motor.getOutputCurrent());
+    }
+
     public void run(Distance pidSetpoint, Voltage feedforwardVoltage) {
         PID.setReference(pidSetpoint.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts));
     }
@@ -73,5 +79,14 @@ public class BasedMotor extends SubsystemBase {
     @Override
     public String getName() {
         return motorConfig.name;
+    }
+
+    public void logUnder(String path) {
+        Logger.logMeasure(path + "/" + getName() + "Motor/position", this::getPosition);
+        Logger.logMeasure(path + "/" + getName() + "Motor/velocity", this::getVelocity);
+        Logger.logNumber(path + "/" + getName() + "Motor/dutyCycle", this::getDutyCycle);
+        Logger.logMeasure(path + "/" + getName() + "Motor/outputCurrent", this::getOutputCurrent);
+        Logger.logNumber(path + "/" + getName() + "Motor/busVoltage", motor::getBusVoltage);
+        Logger.logNumber(path + "/" + getName() + "Motor/outputVoltage", () -> getDutyCycle() * motor.getBusVoltage());
     }
 }
