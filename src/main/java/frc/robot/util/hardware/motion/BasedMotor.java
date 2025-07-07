@@ -1,7 +1,7 @@
 package frc.robot.util.hardware.motion;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.units.measure.Distance;
@@ -9,8 +9,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -65,7 +67,11 @@ public class BasedMotor extends SubsystemBase {
     }
 
     public void run(double pidSetpoint, Voltage feedforwardVoltage) {
-        // PID.setReference(pidSetpoint, feedforwardVoltage);
+        PID.setReference(pidSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts)); // PID.setReference(pidSetpoint, feedforwardVoltage);
+    }
+
+    public String getName() {
+        return motorConfig.name;
     }
     //run with a pid setpoint and a feedforward voltage
 }
