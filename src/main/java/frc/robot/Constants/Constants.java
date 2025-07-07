@@ -6,6 +6,7 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Radians;
@@ -24,6 +25,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
 import java.util.Map;
@@ -340,11 +343,23 @@ public final class Constants {
     public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
-
+    public static final boolean LEFT_INVERTED = true;
+    public static final boolean RIGHT_INVERTED = false;
     public static final class PROFILE {
       public static final double kP = 4.5;
+      public static final double kI = 0.0;
+      public static final double kD = 0.0;
       public static final double kS = 0.9;
+      public static final double kG = 0.0;
+      public static final double kV = 0.0;
+      public static final double kA = 0.0;
     }
+
+    //CHANGE
+    public static final LinearVelocity MAX_UPWARD_VELOCITY = InchesPerSecond.of(0.5); // inches per second
+    public static final LinearAcceleration MAX_UPWARD_ACCELERATION = InchesPerSecond.per(Seconds).of(0.5); // inches per second squared
+    public static final LinearVelocity MAX_DOWNWARD_VELOCITY = InchesPerSecond.of(0.5); // inches per second
+    public static final LinearAcceleration MAX_DOWNWARD_ACCELERATION = InchesPerSecond.per(Seconds).of(0.5); // inches per second squared
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(41.50);
@@ -371,6 +386,11 @@ public final class Constants {
 
     public static final class AUTO {
       public static final Distance READY_HEIGHT = Inches.of(53);
+    }
+
+    public static final class CURRENT {
+      public static final Current FREE_LIMIT = Amps.of(80);
+      public static final Current STALL_LIMIT = Amps.of(60);
     }
   }
 
