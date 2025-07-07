@@ -73,5 +73,4 @@ public class BasedMotor extends SubsystemBase {
     public String getName() {
         return motorConfig.name;
     }
-    //run with a pid setpoint and a feedforward voltage
 }
