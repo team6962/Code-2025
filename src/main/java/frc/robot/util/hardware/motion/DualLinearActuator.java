@@ -1,8 +1,16 @@
 package frc.robot.util.hardware.motion;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Set;
+
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -13,12 +21,18 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+import com.team6962.lib.utils.CTREUtils;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 /*
@@ -91,7 +105,7 @@ public class DualLinearActuator extends SubsystemBase {
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.minOutput((-12. + kG) / 12.);
-    SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake);
+    SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake, 80, 60);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
         motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
@@ -99,7 +113,7 @@ public class DualLinearActuator extends SubsystemBase {
 
     motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.minOutput((-12. + kG) / 12.);
-    SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
+    SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake, 80, 60);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
         motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
@@ -270,10 +284,116 @@ public class DualLinearActuator extends SubsystemBase {
     }
   }
 
+  double appliedVoltage;
+
   @Override
   public void periodic() {
     if (triggeredFloorLimit()) {
       seedEncoders(baseHeight);
     }
+
+    if (appliedVoltage != 0 && !canMoveInDirection(appliedVoltage)) {
+      stopMotors();
+      Logger.log(getName() + "/stopped", "backup");
+      if (getCurrentCommand() != null) getCurrentCommand().cancel();
+      return;
+    }
+  }
+
+  public Command _setHeight(Distance height) {
+    return this.run(() -> moveTo(height)).until(this::doneMoving);
+  }
+
+  public Command _hold() {
+    return Commands.defer(
+        () -> {
+          Distance position = getAverageHeight();
+
+          return this.run(() -> moveTo(position));
+        },
+        Set.of(this));
+  }
+
+  private SysIdRoutine createRoutine(String name) {
+    return new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.per(Second).of(8.0), Volts.of(2), Seconds.of(0.8)),
+      new SysIdRoutine.Mechanism(
+        voltage -> {
+          if (voltage.in(Volts) != 0 && !canMoveInDirection(voltage.in(Volts))) {
+            stopMotors();
+            Logger.log(getName() + "/stopped", "yes");
+            return;
+          }
+
+          Logger.log(getName() + "/stopped", "no");
+
+          appliedVoltage = voltage.in(Volts);
+
+          leftMotor.setVoltage(voltage.in(Volts));
+          rightMotor.setVoltage(voltage.in(Volts));
+        },
+        log ->
+          log.motor("elevator-" + name)
+            .voltage(Volts.of(leftMotor.getAppliedOutput() * leftMotor.getBusVoltage()))
+            .linearPosition(getLeftHeight()).linearVelocity(MetersPerSecond.of(leftEncoder.getVelocity())),
+        this
+      )
+    );
+  }
+
+  public Command sysId() {
+    Time timeout = Seconds.of(2.0);
+
+    // BOTH DIRECTIONS - DO NOT USE
+    // return Commands.sequence(
+    //   _hold().withTimeout(timeout),
+    //   _setHeight(minHeight.plus(Inches.of(5))),
+    //   _hold().withTimeout(timeout),
+    //   calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+    //   _hold().withTimeout(timeout),
+    //   _setHeight(maxHeight.minus(Inches.of(5))),
+    //   _hold().withTimeout(timeout),
+    //   calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+    //   _hold().withTimeout(timeout),
+    //   _setHeight(minHeight.plus(Inches.of(5))),
+    //   _hold().withTimeout(timeout),
+    //   calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+    //   _hold().withTimeout(timeout),
+    //   _setHeight(maxHeight.minus(Inches.of(5))),
+    //   _hold().withTimeout(timeout),
+    //   calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+    //   _hold().withTimeout(timeout)
+    // );
+
+    SysIdRoutine forwardRoutine = createRoutine("forward");
+    SysIdRoutine reverseRoutine = createRoutine("reverse");
+
+    return Commands.sequence(
+      _hold().withTimeout(timeout),
+      _setHeight(minHeight.plus(Inches.of(5))),
+      _hold().withTimeout(timeout),
+      forwardRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+      _hold().withTimeout(timeout),
+      _setHeight(minHeight.plus(Inches.of(5))),
+      _hold().withTimeout(timeout),
+      forwardRoutine.dynamic(SysIdRoutine.Direction.kForward),
+      _hold().withTimeout(timeout),
+      _setHeight(minHeight.plus(Inches.of(5))),
+      _hold().withTimeout(timeout),
+      forwardRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+      _hold().withTimeout(timeout),
+      _setHeight(minHeight.plus(Inches.of(5))),
+      _hold().withTimeout(timeout),
+      forwardRoutine.dynamic(SysIdRoutine.Direction.kForward)
+      // _hold().withTimeout(timeout),
+      // _setHeight(maxHeight.minus(Inches.of(5))),
+      // _hold().withTimeout(timeout),
+      // reverseRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+      // _hold().withTimeout(timeout),
+      // _setHeight(maxHeight.minus(Inches.of(5))),
+      // _hold().withTimeout(timeout),
+      // reverseRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+      // _hold().withTimeout(timeout)
+    );
   }
 }

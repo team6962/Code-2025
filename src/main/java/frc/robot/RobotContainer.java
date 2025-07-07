@@ -32,6 +32,7 @@ import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.RealElevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
@@ -193,9 +194,11 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    Command auto = autoGen.getCommand();
+    // Command auto = autoGen.getCommand();
 
-    return auto;
+    // return auto;
+
+    return ((RealElevator) elevator).sysId();
 
     // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new
     // Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));

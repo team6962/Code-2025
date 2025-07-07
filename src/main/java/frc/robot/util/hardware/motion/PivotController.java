@@ -304,7 +304,7 @@ public class PivotController extends SubsystemBase {
   }
 
   public boolean triggeredReverseSafety() {
-    return pastMin() && encoder.getVelocity() < -0.0;
+    return pastMin() && encoder.getVelocity() < 0.0;
   }
 
   public boolean doneMoving(Angle tolerance) {

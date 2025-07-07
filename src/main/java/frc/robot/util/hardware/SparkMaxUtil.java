@@ -26,6 +26,7 @@ public final class SparkMaxUtil {
     config.voltageCompensation(12.0);
     config.smartCurrentLimit(stallCurrentLimit, freeCurrentLimit);
     config.openLoopRampRate(NEO.SAFE_RAMP_RATE);
+    config.closedLoopRampRate(NEO.SAFE_RAMP_RATE);
     config.inverted(inverted);
 
     // String logPath = "motor" + motor.getDeviceId() + "/";
@@ -120,7 +121,7 @@ public final class SparkMaxUtil {
 
   public static void configureEncoder(SparkMaxConfig config, double encoderConversionFactor) {
     config.encoder.positionConversionFactor(encoderConversionFactor);
-    config.encoder.velocityConversionFactor(encoderConversionFactor);
+    config.encoder.velocityConversionFactor(encoderConversionFactor / 60.0);
   }
 
   public static void configureFollower(SparkMaxConfig config, SparkMax leader, boolean inverted) {
