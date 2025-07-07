@@ -1,5 +1,7 @@
 package frc.robot.util.hardware.motion;
 
+import com.team6962.lib.telemetry.Logger;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class BasedLimitSwitch {
@@ -17,5 +19,10 @@ public class BasedLimitSwitch {
         } else {
             return input.get();
         }
+    }
+
+    public void logUnder(String path) {
+        Logger.logBoolean(path, this::isPressed);
+        Logger.logBoolean(path + "Raw", input::get);
     }
 }
