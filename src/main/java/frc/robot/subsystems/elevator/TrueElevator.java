@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
@@ -113,6 +114,9 @@ public class TrueElevator extends BasedElevator implements Elevator{
         return this.getMinHeight();
     }
 
+    public Command move(double dutyCycle) {
+        return this.move(dutyCycle);
+    }
     @Override
     public Command up() {
         return this.applyDutyCycle(ELEVATOR.FINE_CONTROL_DUTY_CYCLE);

@@ -84,6 +84,11 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
+  public Command move(double speed) {
+    return CommandUtils.noneWithRequirements(this);
+  }
+
+  @Override
   public Command up() {
     return CommandUtils.noneWithRequirements(this);
   }
