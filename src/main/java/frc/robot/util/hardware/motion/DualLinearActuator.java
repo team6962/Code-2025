@@ -108,7 +108,7 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxUtil.configure(motorConfig, true, IdleMode.kBrake, 80, 60);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
-        motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
+        motorConfig, kP, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, leftMotor, motorConfig);
 
     motorConfig = new SparkMaxConfig();
@@ -116,7 +116,7 @@ public class DualLinearActuator extends SubsystemBase {
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake, 80, 60);
     SparkMaxUtil.configureEncoder(motorConfig, spoolHeight.in(Meters) / gearing);
     SparkMaxUtil.configurePID(
-        motorConfig, kP, 0.0, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
+        motorConfig, kP, 0.0, 0.0, minHeight.in(Meters), maxHeight.in(Meters), false);
     SparkMaxUtil.saveAndLog(this, rightMotor, motorConfig);
 
     this.ceilingLimit = new DigitalInput(ceilingLimitDIO);

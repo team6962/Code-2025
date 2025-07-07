@@ -200,7 +200,7 @@ public class BasedElevator extends SubsystemBase {
         }
 
         for (BasedMotor motor : motors) {
-            motor.run(feedbackTarget.in(Meters), feedforwardVoltage);
+            motor.run(feedbackTarget, feedforwardVoltage);
         }
     }
 

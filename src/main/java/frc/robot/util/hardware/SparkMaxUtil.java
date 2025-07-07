@@ -102,7 +102,6 @@ public final class SparkMaxUtil {
       double kP,
       double kI,
       double kD,
-      double kV,
       double minValue,
       double maxValue,
       boolean wrap) {

@@ -1,5 +1,6 @@
 package frc.robot.util.hardware.motion;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -34,11 +35,10 @@ public class BasedMotor extends SubsystemBase {
         PID = motor.getClosedLoopController();
 
         SparkMaxConfig sparkConfig = new SparkMaxConfig();
-        sparkConfig.closedLoop.minOutput((-12. + elevatorConfig.kG) / 12.);
-        SparkMaxUtil.configure(sparkConfig, true, IdleMode.kBrake, 80, 60);
-        SparkMaxUtil.configureEncoder(sparkConfig, elevatorConfig.sprocketRadius.in(Meters) / elevatorConfig.gearReduction); // replace with conversion factor
+        SparkMaxUtil.configure(sparkConfig, motorConfig.inverted, IdleMode.kBrake, (int) elevatorConfig.freeCurrentLimit.in(Amps), (int) elevatorConfig.stallCurrentLimit.in(Amps));
+        SparkMaxUtil.configureEncoder(sparkConfig, elevatorConfig.sprocketRadius.in(Meters) / elevatorConfig.gearReduction);
         SparkMaxUtil.configurePID(
-            sparkConfig, elevatorConfig.kP, elevatorConfig.kI, elevatorConfig.kD, elevatorConfig.kV, elevatorConfig.minHeight.in(Meters),elevatorConfig.maxHeight.in(Meters), false);
+            sparkConfig, elevatorConfig.kP, elevatorConfig.kI, elevatorConfig.kD, elevatorConfig.minHeight.in(Meters),elevatorConfig.maxHeight.in(Meters), false);
         SparkMaxUtil.saveAndLog(this, motor, sparkConfig);
     }   
 
@@ -66,10 +66,11 @@ public class BasedMotor extends SubsystemBase {
         return motor.getAppliedOutput();
     }
 
-    public void run(double pidSetpoint, Voltage feedforwardVoltage) {
-        PID.setReference(pidSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts)); // PID.setReference(pidSetpoint, feedforwardVoltage);
+    public void run(Distance pidSetpoint, Voltage feedforwardVoltage) {
+        PID.setReference(pidSetpoint.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts)); // PID.setReference(pidSetpoint, feedforwardVoltage);
     }
 
+    @Override
     public String getName() {
         return motorConfig.name;
     }

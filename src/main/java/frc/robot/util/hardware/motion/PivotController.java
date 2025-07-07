@@ -103,7 +103,7 @@ public class PivotController extends SubsystemBase {
     SparkMaxUtil.configure(motorConfig, false, IdleMode.kBrake);
     SparkMaxUtil.configureEncoder(motorConfig, 1.0 / gearing);
     SparkMaxUtil.configurePID(
-        motorConfig, kP, kI, kD, 0.0, minAngle.in(Rotations), maxAngle.in(Rotations), false);
+        motorConfig, kP, kI, kD, minAngle.in(Rotations), maxAngle.in(Rotations), false);
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
