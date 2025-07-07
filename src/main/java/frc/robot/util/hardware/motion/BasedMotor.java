@@ -67,7 +67,7 @@ public class BasedMotor extends SubsystemBase {
     }
 
     public void run(double pidSetpoint, Voltage feedforwardVoltage) {
-        PID.setReference(pidSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts)); // PID.setReference(pidSetpoint, feedforwardVoltage);
+        PID.setReference(pidSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforwardVoltage.in(Volts));
     }
 
     public String getName() {
