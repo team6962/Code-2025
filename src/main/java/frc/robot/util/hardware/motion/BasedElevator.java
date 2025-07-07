@@ -357,6 +357,11 @@ public class BasedElevator extends SubsystemBase {
         ceiling.logUnder(getName() + "/limits/ceiling");
     }
 
+    /**
+     * Get the position of the elevator.
+     * @return The current position of the elevator as a Distance, averaged
+     * over all motors.
+     */
     public Distance getPosition() {
         double positionSum = 0;
 
@@ -367,6 +372,11 @@ public class BasedElevator extends SubsystemBase {
         return Meters.of(positionSum / motors.length);
     }
 
+    /**
+     * Get the velocity of the elevator.
+     * @return The current velocity of the elevator as a LinearVelocity, averaged
+     * over all motors.
+     */
     public LinearVelocity getVelocity() {
         double velocitySum = 0;
 
@@ -377,16 +387,31 @@ public class BasedElevator extends SubsystemBase {
         return MetersPerSecond.of(velocitySum / motors.length);
     }
 
+    /**
+     * Stop all motors of the elevator.
+     * @return A command that stops all motors of the elevator.
+     */
     public Command stop() {
         return run(this::stopMotors);
     }
 
+    /**
+     * Immediately stops all motors of the elevator.
+     */
     private void stopMotors() {
         for (BasedMotor motor : motors) {
             motor.stop();
         }
     }
 
+    /**
+     * Run the motors of the elevator with the given feedback (PID) target and
+     * feedforward voltage.
+     * @param feedbackTarget The target position for the feedback controller, as
+     * a Distance.
+     * @param feedforwardVoltage The feedforward voltage to apply to the motors,
+     * as a Voltage.
+     */
     private void runMotors(Distance feedbackTarget, Voltage feedforwardVoltage) {
         if (
             !safeToMoveInDirection(feedbackTarget.minus(getPosition()).in(Meters)) ||
@@ -400,6 +425,13 @@ public class BasedElevator extends SubsystemBase {
         }
     }
 
+    /**
+     * Apply a voltage to the motors of the elevator based on the given by a
+     * Supplier of Voltage.
+     * @param voltageSupplier A Supplier that provides the Voltage to apply to
+     * the motors.
+     * @return A command that applies the voltage to the motors of the elevator.
+     */
     public Command applyVoltage(Supplier<Voltage> voltageSupplier) {
         return run(() -> {
             Voltage voltage = voltageSupplier.get();
@@ -414,20 +446,52 @@ public class BasedElevator extends SubsystemBase {
         });
     }
 
-    public Command applyVoltage(Voltage voltage) {
-        return applyVoltage(() -> voltage);
+    /**
+     * Apply a voltage to the motors of the elevator, with gravity compensation.
+     * @param voltage The voltage to apply to the motors, as a Voltage.
+     * @return A command that applies the voltage to the motors of the elevator.
+     */
+    public Command applyVoltageWithGravityCompensation(Voltage voltage) {
+        return applyVoltage(() -> voltage.plus(Volts.of(config.kG)));
     }
 
-    public Command applyDutyCycle(double dutyCycle) {
-        return applyVoltage(() -> Volts.of(dutyCycle * 12.0));
+    /**
+     * Apply a duty cycle to the motors of the elevator, which is a double
+     * between -1 and 1 representing the fraction of the maximum power. This
+     * method compensates for gravity, so a duty cycle of 0 actually powers
+     * the motor at the voltage specified by kG.
+     * @param dutyCycle The duty cycle to apply to the motors, as a double.
+     * @return A command that applies the duty cycle to the motors of the elevator.
+     */
+    public Command applyDutyCycleWithGravityCompensation(double dutyCycle) {
+        return applyVoltageWithGravityCompensation(Volts.of(dutyCycle * 12.0));
     }
 
-    public Command moveSpeed(LinearVelocity targetVelocity) {
+    /**
+     * Move the elevator to a target position at a specified speed.
+     * @param targetVelocity The target velocity to move the elevator at, as a
+     * LinearVelocity.
+     * @return A command that moves the elevator to the target position at the
+     * specified speed.
+     */
+    public Command moveVelocity(LinearVelocity targetVelocity) {
         return applyVoltage(() -> Volts.of(feedforward.calculate(
             targetVelocity.in(MetersPerSecond)
         )));
     }
 
+    /**
+     * Move the elevator to a target position with a specified velocity,
+     * optionally ending within a tolerance.
+     * @param targetPosition The target position to move the elevator to, as a
+     * Distance.
+     * @param targetVelocity The target velocity to move the elevator at, as a
+     * LinearVelocity.
+     * @param endWithinTolerance Whether the command should end when the elevator
+     * is within the specified tolerance of the target position.
+     * @return A command that moves the elevator to the target position with the
+     * specified velocity.
+     */
     private Command moveTo(Distance targetPosition, LinearVelocity targetVelocity, boolean endWithinTolerance) {
         final Distance clampedTarget = MeasureMath.clamp(targetPosition, config.minHeight, config.maxHeight);
 
@@ -479,32 +543,78 @@ public class BasedElevator extends SubsystemBase {
         }, Set.of(this));
     }
 
+    /**
+     * Move the elevator to a target position while attempting to reach a
+     * specified velocity.
+     * @param targetPosition The target position to move the elevator to, as a
+     * Distance.
+     * @param targetVelocity The target velocity to try to move the elevator at
+     * when it is at the target position.
+     * @return A command that moves the elevator to the target position at the
+     * specified velocity.
+     */
     public Command moveTo(Distance targetPosition, LinearVelocity targetVelocity) {
         return moveTo(targetPosition, targetVelocity, true);
     }
 
+    /**
+     * Move the elevator to a target position and stop it there.
+     * @param targetPosition The target position to move the elevator to, as a
+     * Distance.
+     * @return A command that moves the elevator to the target position and
+     * stop it there.
+     */
     public Command moveTo(Distance targetPosition) {
         return moveTo(targetPosition, MetersPerSecond.of(0), true);
     }
 
+    /**
+     * Hold the elevator at a specific position without moving. If the target
+     * position is not the current position, the elevator will first move to
+     * the target position, then hold there.
+     * @param targetPosition The position to hold the elevator at, as a Distance.
+     * @return A command that holds the elevator at the specified position.
+     */
     public Command holdAt(Distance targetPosition) {
         return moveTo(targetPosition, MetersPerSecond.of(0), false);
     }
 
+    /**
+     * Hold the elevator at its current position without moving.
+     * @return A command that holds the elevator at its current position.
+     */
     public Command hold() {
         return Commands.defer(() -> holdAt(getPosition()), Set.of(this));
     }
 
+    /**
+     * Check if the elevator is at a specific position within a tolerance.
+     * @param position The position to check if the elevator is at, as a Distance.
+     * @return True if the elevator is at the specified position within the
+     * tolerance, false otherwise.
+     */
     public boolean atPosition(Distance position) {
         return getPosition().minus(position).abs(Meters) < config.tolerance.in(Meters);
     }
 
+    /**
+     * Seed the motors' internal relative encoders with an absolute position.
+     * This should be called when the elevator is at a known position, such as
+     * when a limit switch is pressed.
+     * @param position The absolute position to seed the motors with, as a Distance.
+     */
     private void setPosition(Distance position) {
         for (BasedMotor motor : motors) {
             motor.setPosition(position);
         }
     }
 
+    /**
+     * Returns whether it is safe to move in the given direction.
+     * @param direction The direction to check, as a double. Positive values
+     * indicate upward movement, negative values indicate downward movement.
+     * @return True if it is safe to move in the given direction, false otherwise.
+     */
     private boolean safeToMoveInDirection(double direction) {
         if (direction > 0 && (ceiling.isPressed() || !absolutePositionSeeded)) {
             return false;
