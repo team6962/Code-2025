@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
@@ -101,40 +102,40 @@ public class BasedElevator extends SubsystemBase {
         }
 
         /**
-         * Proportional term of the PID controller.
+         * Proportional gain of the PID controller.
          */
         public double kP;
 
         /**
-         * Integral term of the PID controller.
+         * Integral gain of the PID controller.
          */
         public double kI;
 
         /**
-         * Derivative term of the PID controller.
+         * Derivative gain of the PID controller.
          */
         public double kD;
 
         /**
-         * Static Feedforward term, which is the voltage required for the
+         * Static feedforward gain, which is the voltage required for the
          * elevator to overcome static friction.
          */
         public double kS;
 
         /**
-         * Gravity Feedforward term, which is the voltage required to
+         * Gravity feedforward gain, which is the voltage required to
          * overcome the force of gravity on the elevator.
          */
         public double kG;
 
         /**
-         * Velocity Feedforward term, which is the coefficient multiplied
+         * Velocity feedforward gain, which is the coefficient multiplied
          * by velocity to find the voltage required to maintain that velocity.
          */
         public double kV;
 
         /**
-         * Acceleration Feedforward term, which is the coefficient
+         * Acceleration feedforward gain, which is the coefficient
          * multiplied by acceleration to find the voltage required to reach
          * that acceleration.
          */
@@ -286,8 +287,20 @@ public class BasedElevator extends SubsystemBase {
         }
     }
 
+    /**
+     * Enumeration for the possible wiring configurations of a limit switch.
+     */
     public static enum LimitSwitchWiring {
+        /**
+         * The limit switch is normally open, meaning that the circuit is open
+         * when the switch is not pressed,
+         */
         NormallyOpen,
+
+        /**
+         * The limit switch is normally closed, meaning that the circuit is
+         * closed when the switch is not pressed.
+         */
         NormallyClosed
     }
 
@@ -303,6 +316,12 @@ public class BasedElevator extends SubsystemBase {
 
     private boolean absolutePositionSeeded = false;
 
+    /**
+     * Create a BasedElevator with the given configuration.
+     * @param config The configuration for the elevator, which includes PID and
+     * feedforward gains, motor configurations, limit switch configurations, and
+     * elevator dimensions.
+     */
     public BasedElevator(Config config) {
         this.config = config;
 
@@ -379,6 +398,34 @@ public class BasedElevator extends SubsystemBase {
         for (BasedMotor motor : motors) {
             motor.run(feedbackTarget, feedforwardVoltage);
         }
+    }
+
+    public Command applyVoltage(Supplier<Voltage> voltageSupplier) {
+        return run(() -> {
+            Voltage voltage = voltageSupplier.get();
+
+            if (safeToMoveInDirection(voltage.in(Volts))) {
+                for (BasedMotor motor : motors) {
+                    motor.setVoltage(voltage);
+                }
+            } else {
+                stopMotors();
+            }
+        });
+    }
+
+    public Command applyVoltage(Voltage voltage) {
+        return applyVoltage(() -> voltage);
+    }
+
+    public Command applyDutyCycle(double dutyCycle) {
+        return applyVoltage(() -> Volts.of(dutyCycle * 12.0));
+    }
+
+    public Command moveSpeed(LinearVelocity targetVelocity) {
+        return applyVoltage(() -> Volts.of(feedforward.calculate(
+            targetVelocity.in(MetersPerSecond)
+        )));
     }
 
     private Command moveTo(Distance targetPosition, LinearVelocity targetVelocity, boolean endWithinTolerance) {
