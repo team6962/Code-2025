@@ -48,7 +48,7 @@ public interface Elevator extends Subsystem {
 
   public Command down();
 
-  public boolean inRange(Distance height);
+  public boolean atPosition(Distance height);
 
   public static Elevator create() {
     if (ENABLED_SYSTEMS.isElevatorEnabled()) return new RealElevator();

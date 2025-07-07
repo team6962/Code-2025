@@ -221,13 +221,13 @@ public class DualLinearActuator extends SubsystemBase {
     return true;
   }
 
-  public boolean inRange(Distance height) {
+  public boolean atPosition(Distance height) {
     if (height == null) return true;
     return debouncer.calculate(getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
   }
 
   public boolean doneMoving() {
-    if (inRange(targetHeight)) {
+    if (atPosition(targetHeight)) {
       moving = false;
       return true;
     }

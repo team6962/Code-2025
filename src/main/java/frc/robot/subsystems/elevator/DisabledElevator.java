@@ -114,7 +114,7 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public boolean inRange(Distance height) {
+  public boolean atPosition(Distance height) {
     return true;
   }
 }

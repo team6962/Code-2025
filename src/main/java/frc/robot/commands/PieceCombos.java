@@ -125,7 +125,7 @@ public class PieceCombos {
                             // manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
                             manipulator.grabber.dropAlgae()))),
         Commands.print("not at barge height"),
-        () -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
+        () -> elevator.atPosition(ELEVATOR.ALGAE.BARGE_HEIGHT));
   }
 
   public Command algaeProcessor() {

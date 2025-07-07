@@ -448,6 +448,10 @@ public class BasedElevator extends SubsystemBase {
         return Commands.defer(() -> holdAt(getPosition()), Set.of(this));
     }
 
+    public boolean atPosition(Distance position) {
+        return getPosition().minus(position).abs(Meters) < config.tolerance.in(Meters);
+    }
+
     private void setPosition(Distance position) {
         for (BasedMotor motor : motors) {
             motor.setPosition(position);
