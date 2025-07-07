@@ -34,15 +34,11 @@ public interface Elevator extends Subsystem {
 
   public Command algaeProcessor();
 
-  public Command rezeroAtBottom();
-
   public Distance getAverageHeight();
 
   public Distance getMaxHeight();
 
   public Distance getMinHeight();
-
-  public Command move(double speed);
 
   public Command up();
 

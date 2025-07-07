@@ -14,11 +14,6 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public Command move(double speed) {
-    return CommandUtils.noneWithRequirements(this);
-  }
-
-  @Override
   public Command stop() {
     return CommandUtils.noneWithRequirements(this);
   }
@@ -80,11 +75,6 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
 
   @Override
   public Command algaeProcessor() {
-    return CommandUtils.noneWithRequirements(this);
-  }
-
-  @Override
-  public Command rezeroAtBottom() {
     return CommandUtils.noneWithRequirements(this);
   }
 

@@ -140,8 +140,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
   public Command algaeProcessor() {
     return moveTo(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
   }
-
-  @Override
+  
   public Command rezeroAtBottom() {
     return this.run(this::unsafeMoveDown).until(this::triggeredFloorLimit);
   }
