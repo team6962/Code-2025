@@ -34,7 +34,7 @@ public class PrematchChecks extends SequentialCommandGroup {
 
     addCommands(
         manipulator.pivot.safe(),
-        elevator.rezeroAtBottom(),
+        // elevator.rezeroAtBottom(),
         Commands.waitSeconds(1.0),
         // combos.coralL1(),
         Commands.waitSeconds(1.0),

@@ -355,6 +355,7 @@ public final class Constants {
       public static final double kA = 0.0;
     }
 
+    public static final double FINE_CONTROL_DUTY_CYCLE = 0.2;
     //CHANGE
     public static final LinearVelocity MAX_UPWARD_VELOCITY = InchesPerSecond.of(0.5); // inches per second
     public static final LinearAcceleration MAX_UPWARD_ACCELERATION = InchesPerSecond.per(Seconds).of(0.5); // inches per second squared

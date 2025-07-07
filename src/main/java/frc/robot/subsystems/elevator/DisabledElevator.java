@@ -14,11 +14,6 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public Command move(double speed) {
-    return CommandUtils.noneWithRequirements(this);
-  }
-
-  @Override
   public Command stop() {
     return CommandUtils.noneWithRequirements(this);
   }
@@ -84,13 +79,13 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public Command rezeroAtBottom() {
-    return CommandUtils.noneWithRequirements(this);
+  public Distance getAverageHeight() {
+    return Meters.of(0.0);
   }
 
   @Override
-  public Distance getAverageHeight() {
-    return Meters.of(0.0);
+  public Command move(double speed) {
+    return CommandUtils.noneWithRequirements(this);
   }
 
   @Override
