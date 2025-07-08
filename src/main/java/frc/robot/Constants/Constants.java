@@ -172,7 +172,8 @@ public final class Constants {
               .minus(Radians.of(0.00959265359))
               .minus(Radians.of(-0.009370614359))
               .minus(Radians.of(0.002629385641))
-              .minus(Radians.of(0.018))), // Front Right
+              .minus(Radians.of(0.018))
+              .minus(Radians.of(-0.037))), // Front Right
       new SwerveConfig.Module(
           11,
           21,
@@ -180,7 +181,8 @@ public final class Constants {
           Radians.of(-1.911)
               .minus(Radians.of(0.00959265359))
               .minus(Radians.of(-0.04577796077))
-              .minus(Radians.of(0.028))), // Front Left
+              .minus(Radians.of(0.028))
+              .minus(Radians.of(-0.01259265359))), // Front Left
       new SwerveConfig.Module(
           12,
           22,
@@ -189,9 +191,10 @@ public final class Constants {
               .minus(Radians.of(0.01577796077))
               .minus(Radians.of(0.002777960769))
               .minus(Radians.of(-0.003370614359))
-              .minus(Radians.of(-0.003))), // Back Left
+              .minus(Radians.of(-0.003))
+              .minus(Radians.of(-0.012))), // Back Left
       new SwerveConfig.Module(
-          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077))), // Back Right
+          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077)).plus(Radians.of(0.04290734641))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,
