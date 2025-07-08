@@ -56,7 +56,8 @@ public final class SwerveConstants {
                     .withKP(50)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
                 Amps.of(60)),
-            chassisType == ChassisType.COMPETITION ? Wheel.BILLET_NEW : Wheel.COLSON,
+            // Before CCR, we measured the billet wheels' diameters at 3.83 in
+            chassisType == ChassisType.COMPETITION ? Wheel.BILLET : Wheel.COLSON,
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
                 .withFineTranslation(new PIDConstants(3.5, 0.0, 1.5))
                 .withFineRotation(new PIDConstants(3.5, 0.0, 1.5)))
