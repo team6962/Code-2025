@@ -232,6 +232,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(drivePositionIn));
   }
 
+  public Angle getDriveWheelAngle() {
+    return CTREUtils.unwrap(drivePositionIn).div(constants.gearing().drive());
+  }
+
   /**
    * Gets the current speed of the drive motor.
    *
@@ -239,6 +243,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public LinearVelocity getDriveSpeed() {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveSpeedIn));
+  }
+
+  public AngularVelocity getDriveWheelAngularVelocity() {
+    return CTREUtils.unwrap(driveSpeedIn).div(constants.gearing().drive());
   }
 
   /**
