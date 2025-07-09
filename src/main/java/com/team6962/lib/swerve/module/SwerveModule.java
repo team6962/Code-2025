@@ -1,10 +1,11 @@
 package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.Consumer;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -16,8 +17,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,6 +28,7 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -44,7 +45,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -69,9 +69,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private StatusSignal<AngularVelocity> steerVelocityIn;
   private StatusSignal<Current> driveCurrentIn;
   private StatusSignal<Current> steerCurrentIn;
-
-  private VelocityVoltage driveSpeedOut = new VelocityVoltage(RotationsPerSecond.of(0));
-  private PositionVoltage steerAngleOut = new PositionVoltage(Rotations.of(0));
 
   private boolean isNeutralCoast = false;
   protected boolean isCalibrating = false;
@@ -273,37 +270,44 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     refreshStatusSignals();
   }
 
+  public void drive(ControlRequest driveRequest, ControlRequest steerRequest) {
+    if (isCalibrating) return;
+
+    CTREUtils.check(driveMotor.setControl(driveRequest));
+    CTREUtils.check(steerMotor.setControl(steerRequest));
+  }
+
   /**
    * Drives the module to a given state.
    *
    * @param targetState The desired state to drive to
    */
-  public void driveState(SwerveModuleState targetState) {
-    if (isCalibrating) return;
-    if (isNeutralCoast) {
-      driveMotor.setNeutralMode(NeutralModeValue.Brake);
-      steerMotor.setNeutralMode(NeutralModeValue.Brake);
+  // public void driveState(SwerveModuleState targetState) {
+  //   if (isCalibrating) return;
+  //   if (isNeutralCoast) {
+  //     driveMotor.setNeutralMode(NeutralModeValue.Brake);
+  //     steerMotor.setNeutralMode(NeutralModeValue.Brake);
 
-      isNeutralCoast = false;
-    }
+  //     isNeutralCoast = false;
+  //   }
 
-    targetState = optimizeStateForTalon(targetState, getSteerAngle());
+  //   targetState = optimizeStateForTalon(targetState, getSteerAngle());
 
-    if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
-      targetState = new SwerveModuleState(0, targetState.angle);
-    }
+  //   if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
+  //     targetState = new SwerveModuleState(0, targetState.angle);
+  //   }
 
-    // Logger.log(getName() + "/targetState", targetState);
+  //   // Logger.log(getName() + "/targetState", targetState);
 
-    CTREUtils.check(
-        driveMotor.setControl(
-            driveSpeedOut.withVelocity(
-                constants.driveMotorMechanismToRotor(
-                    MetersPerSecond.of(targetState.speedMetersPerSecond)))));
+  //   CTREUtils.check(
+  //       driveMotor.setControl(
+  //           driveSpeedOut.withVelocity(
+  //               constants.driveMotorMechanismToRotor(
+  //                   MetersPerSecond.of(targetState.speedMetersPerSecond)))));
 
-    CTREUtils.check(
-        steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
-  }
+  //   CTREUtils.check(
+  //       steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
+  // }
 
   /**
    * Gets the current state of the module.
@@ -497,6 +501,14 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         .withKV(-configs.kV)
         .withKA(-configs.kA)
         .withKG(-configs.kG);
+  }
+
+  public static Angle optimizeSteerAngle(Angle targetAngle, Angle currentAngle) {
+    return targetAngle;
+    // TODO: Add back in?
+    // Angle difference = MeasureMath.minDifference(targetAngle, currentAngle);
+
+    // return currentAngle.plus(difference);
   }
 
   public static SwerveModuleState optimizeStateForTalon(

@@ -61,11 +61,15 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     poseEstimator =
         new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
 
-    currentMovement = new SwerveMovement(kinematics);
+    currentMovement = new SpeedsMovement(kinematics);
 
     Logger.logPose("Swerve Drive/robotPose", poseEstimator::getEstimatedPose);
 
     maxSpeed = constants.maxDriveSpeed();
+  }
+  
+  public LinearVelocity getMaxDriveSpeed() {
+    return maxSpeed;
   }
 
   /**
@@ -149,51 +153,45 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
   /** Should be called after CommandScheduler.run() to mimimize latency. */
   public void latePeriodic() {
-    SwerveModuleState[] states = currentMovement.getStates();
-
-    if (states == null) {
-      states = KinematicsUtils.getStoppedStates(getModuleStates());
+    if (currentMovement == null) {
+      currentMovement = new SpeedsMovement(kinematics);
     }
 
-    states =
-        KinematicsUtils.desaturateWheelSpeeds(
-            states, MeasureMath.min(maxSpeed, constants.maxDriveSpeed()));
+    currentMovement.execute(this);
 
-    // Logger.log(getName() + "/targetModuleStates", states);
+    currentMovement = currentMovement.cleared();
+  }
 
-    Pose2d[] poses = getModulePoses();
-
-    for (int i = 0; i < 4; i++) {
-      modules[i].driveState(new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle));
-      poses[i] =
-          new Pose2d(
-              poses[i].getTranslation(),
-              poseEstimator.getEstimatedPose().getRotation().plus(states[i].angle));
+  private SpeedsMovement moveSpeeds() {
+    if (!(currentMovement instanceof SpeedsMovement)) {
+      currentMovement = new SpeedsMovement(kinematics);
     }
 
-    Logger.getField().getObject("Target Module Poses").setPoses(poses);
+    return (SpeedsMovement) currentMovement;
+  }
 
-    currentMovement.clear();
+  public void moveProfiledPositionMovement(ProfiledPositionMovement movement) {
+    currentMovement = movement;
   }
 
   public void moveRobotRelative(SwerveModuleState[] states) {
-    currentMovement.setStates(states);
+    moveSpeeds().setStates(states);
   }
 
   public void moveRobotRelative(ChassisSpeeds speeds) {
-    currentMovement.setSpeeds(speeds);
+    moveSpeeds().setSpeeds(speeds);
   }
 
   public void moveRobotRelative(Translation2d translation) {
-    currentMovement.setTranslation(translation);
+    moveSpeeds().setTranslation(translation);
   }
 
   public void moveRobotRelative(Rotation2d rotation) {
-    currentMovement.setRotation(rotation);
+    moveSpeeds().setRotation(rotation);
   }
 
   public void moveRobotRelative(AngularVelocity rotation) {
-    currentMovement.setRotation(MeasureMath.fromMeasure(rotation));
+    moveSpeeds().setRotation(MeasureMath.fromMeasure(rotation));
   }
 
   public void moveFieldRelative(ChassisSpeeds speeds) {

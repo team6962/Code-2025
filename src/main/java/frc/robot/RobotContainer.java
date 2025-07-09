@@ -3,12 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Radians;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -193,9 +200,16 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    Command auto = autoGen.getCommand();
+    // Command auto = autoGen.getCommand();
 
-    return auto;
+    // return auto;
+
+    Pose2d start = new Pose2d(Units.inchesToMeters(-27), Units.inchesToMeters(38.4), Rotation2d.fromDegrees(-44.8));
+    Pose2d end = new Pose2d();
+
+    Twist2d twist = start.log(end);
+
+    return swerveDrive.driveTwist(twist);
 
     // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new
     // Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));
