@@ -3,6 +3,9 @@ package com.team6962.lib.swerve.module;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
@@ -13,11 +16,15 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -33,6 +40,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -134,11 +142,15 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withFusedCANcoder(steerEncoder)
                 .withRotorToSensorRatio(config.gearing().steer())));
 
+    CTREUtils.check(driveMotor.setPosition(Rotations.of(0)));
+
     setName(getModuleName(corner.index) + " Swerve Module");
 
     Logger.logSwerveModuleState(getName() + "/measuredState", this::getState);
     Logger.logSwerveModulePosition(getName() + "/measuredPosition", this::getPosition);
     Logger.logMeasure(getName() + "/consumedCurrent", this::getConsumedCurrent);
+    Logger.logMeasure(getName() + "/driveWheelAngle", this::getDriveWheelAngle);
+    Logger.logMeasure(getName() + "/driveWheelAngularVelocity", this::getDriveWheelAngularVelocity);
 
     StatusChecks.under(this).add("Drive Motor", driveMotor);
     StatusChecks.under(this).add("Steer Motor", steerMotor);
@@ -229,6 +241,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(drivePositionIn));
   }
 
+  public Angle getDriveWheelAngle() {
+    return CTREUtils.unwrap(drivePositionIn).div(constants.gearing().drive());
+  }
+
   /**
    * Gets the current speed of the drive motor.
    *
@@ -236,6 +252,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public LinearVelocity getDriveSpeed() {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveSpeedIn));
+  }
+
+  public AngularVelocity getDriveWheelAngularVelocity() {
+    return CTREUtils.unwrap(driveSpeedIn).div(constants.gearing().drive());
   }
 
   /**
@@ -342,14 +362,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * Creates a command to calibrate the steer motor.
    *
    * @param averageBusVoltage The expected average bus voltage to during calibration
-   * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateSteerMotor(Current maxCurrent) {
+  public Command calibrateSteerMotor() {
     return calibrateMotor(
         "steer",
         getSteerMotor(),
-        maxCurrent,
         log -> log.angularPosition(getSteerAngle()).angularVelocity(getSteerVelocity()));
   }
 
@@ -357,22 +375,20 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * Creates a command to calibrate the drive motor.
    *
    * @param averageBusVoltage The expected average bus voltage to during calibration
-   * @param maxCurrent The maximum current to use during calibration
    * @return The calibration {@link Command}
    */
-  public Command calibrateDriveMotor(Current maxCurrent) {
+  public Command calibrateDriveMotor() {
     return calibrateMotor(
         "drive",
         getDriveMotor(),
-        maxCurrent,
         log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
   }
 
   private Command calibrateMotor(
-      String motorName, TalonFX motor, Current maxCurrent, Consumer<MotorLog> logEncoder) {
+      String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(Volts.per(Second).of(2), Volts.of(7), Seconds.of(8)),
             new SysIdRoutine.Mechanism(
                 voltage -> motor.setControl(new VoltageOut(voltage.in(Volts))),
                 log ->

@@ -237,17 +237,16 @@ public class SwerveConfig {
     }
   }
 
-  public static enum Wheel {
-    COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55)),
-    BILLET_USED(Inches.of(3.83), Inches.of(1.5), 1.0, Pounds.of(0.55)),
-    BILLET_NEW(Inches.of(4.0 * 0.9696586506), Inches.of(1.5), 1.0, Pounds.of(0.55));
+  public static class Wheel {
+    public static Wheel COLSON = new Wheel(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
+    public static Wheel BILLET = new Wheel(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
 
     public final Distance diameter;
     public final Distance width;
     public final double staticFriction;
     public final Mass mass;
 
-    private Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
+    public Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
       this.diameter = diameter;
       this.width = width;
       this.staticFriction = staticFriction;
@@ -282,6 +281,14 @@ public class SwerveConfig {
               * mass.in(Kilograms)
               * (3.0 * radius().in(Meters) * radius().in(Meters)
                   + width().in(Meters) * width().in(Meters)));
+    }
+
+    public Wheel withDiameter(Distance diameter) {
+      return new Wheel(diameter, width, staticFriction, mass);
+    }
+
+    public Wheel withRadius(Distance radius) {
+      return withDiameter(radius.times(2));
     }
   }
 
