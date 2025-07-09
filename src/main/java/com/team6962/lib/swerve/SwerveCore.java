@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -145,6 +146,10 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
   public ChassisSpeeds getEstimatedSpeeds() {
     return poseEstimator.getEstimatedSpeeds();
+  }
+
+  public Angle getContinuousGyroscopeAngle() {
+    return poseEstimator.getContinuousGyroscopeAngle();
   }
 
   /** Should be called after CommandScheduler.run() to mimimize latency. */

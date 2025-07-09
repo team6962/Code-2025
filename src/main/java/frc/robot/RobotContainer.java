@@ -4,6 +4,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -195,9 +196,11 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    Command auto = autoGen.getCommand();
+    // Command auto = autoGen.getCommand();
 
-    return auto;
+    // return auto;
+
+    return swerveDrive.calibrateWheelSize();
 
     // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new
     // Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));

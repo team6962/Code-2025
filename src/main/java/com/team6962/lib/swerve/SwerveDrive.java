@@ -1,6 +1,7 @@
 package com.team6962.lib.swerve;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -12,6 +13,10 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -22,10 +27,12 @@ import com.pathplanner.lib.path.Waypoint;
 import com.team6962.lib.prepath.CustomPathfindingCommand;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.PathPrecomputing;
+import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -48,9 +55,6 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -852,5 +856,59 @@ public class SwerveDrive extends SwerveCore {
           // }
         },
         Set.of(useMotion()));
+  }
+
+  public Command calibrateWheelSize() {
+    return Commands.defer(() -> new Command() {
+      Angle initialGyroAngle;
+      Angle[] initialWheelAngles = new Angle[4];
+
+      @Override
+      public void initialize() {
+        initialGyroAngle = getContinuousGyroscopeAngle();
+
+        for (int i = 0; i < 4; i++) {
+          initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
+        }
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        Angle gyroAngleChange = Rotations.of(getContinuousGyroscopeAngle().minus(initialGyroAngle).in(Rotations));
+        Distance driveRadius = getConstants().chassis().driveRadius();
+
+        Logger.log("Swerve Drive/Wheel Size Calibration/Gyro Angle Change", gyroAngleChange);
+
+        Angle[] wheelAngleChanges = new Angle[4];
+
+        for (int i = 0; i < 4; i++) {
+          wheelAngleChanges[i] = Rotations.of(getModules()[i].getDriveWheelAngle().minus(initialWheelAngles[i]).abs(Rotations));
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Wheel Angle Change " + SwerveModule.getModuleName(i), wheelAngleChanges[i]);
+        }
+
+        Distance[] wheelDiameters = new Distance[4];
+
+        for (int i = 0; i < 4; i++) {
+          wheelDiameters[i] = driveRadius.times(gyroAngleChange.div(wheelAngleChanges[i])).times(2);
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Diameter " + SwerveModule.getModuleName(i), wheelDiameters[i]);
+        }
+
+        Distance averageDiameter = Meters.of(0);
+
+        for (Distance diameter : wheelDiameters) {
+          averageDiameter = averageDiameter.plus(diameter);
+        }
+
+        averageDiameter = averageDiameter.div(4);
+
+        Logger.log("Swerve Drive/Wheel Size Calibration/Average Diameter", averageDiameter);
+      }
+    }, Set.of()).alongWith(Commands.sequence(
+      Commands.waitSeconds(1),
+      drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))).withTimeout(10),
+      Commands.waitSeconds(1)
+    ));
   }
 }
