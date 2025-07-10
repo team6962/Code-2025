@@ -1,5 +1,6 @@
 package com.team6962.lib.telemetry;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -22,6 +23,7 @@ import com.studica.frc.AHRS;
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,6 +31,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
@@ -242,6 +245,21 @@ public class Logger extends SubsystemBase {
     table
         .getEntry(key)
         .setDoubleArray(new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()});
+  }
+
+  public static void logPose3d(String key, Supplier<Pose3d> supplier) {
+    addUpdate(key, () -> log(key, supplier.get()));
+  }
+
+  public static void log(String key, Pose3d pose) {
+    if (pose == null) return;
+
+    log(key + "/forwardMeters", pose.getX());
+    log(key + "/rightMeters", -pose.getY());
+    log(key + "/upMeters", pose.getZ());
+    log(key + "/yawDegrees", pose.getRotation().getMeasureZ().in(Degrees));
+    log(key + "/pitchDegrees", -pose.getRotation().getMeasureY().in(Degrees));
+    log(key + "/rollDegrees", pose.getRotation().getMeasureX().in(Degrees));
   }
 
   public static void logSwerveModuleState(String key, Supplier<SwerveModuleState> supplier) {

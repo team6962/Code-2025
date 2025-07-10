@@ -3,7 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.InputStream;
@@ -14,6 +17,7 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -43,6 +47,7 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import io.limelightvision.LimelightHelpers;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -176,6 +181,8 @@ public class RobotContainer {
     // Logger.log("conversionTest/speeds", testSpeeds);
     // Logger.log("conversionTest/states",
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
+
+    Logger.logPose3d("rtag-pose", () -> LimelightHelpers.getBotPose3d("limelight-rtag"));
 
     Logger.start(Milliseconds.of(20));
   }
