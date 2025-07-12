@@ -40,6 +40,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
+import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
@@ -73,6 +74,7 @@ public class RobotContainer {
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
+  public final AprilTagVision vision;
   // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
@@ -133,6 +135,7 @@ public class RobotContainer {
     autonomous = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
+    vision = new AprilTagVision();
     // // collisionDetector = new CollisionDetector();
 
     // System.out.println(swerveDrive);
