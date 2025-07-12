@@ -26,7 +26,6 @@ public class RealGrabber extends Grabber {
   private final DigitalInput clearSensor;
 
   private Debouncer algaeDebouncer = new Debouncer(0.3);
-  private Debouncer coralDebouncer = new Debouncer(0.0);
 
   private boolean hasCoral = false;
   private boolean coralClear = false;
@@ -173,7 +172,7 @@ public class RealGrabber extends Grabber {
     super.periodic();
 
     detectedAlgae = algaeDebouncer.calculate(isStalled());
-    hasCoral = coralDebouncer.calculate(!detectSensor.get());
+    hasCoral = !detectSensor.get();
     coralClear = clearSensor.get();
   }
 }
