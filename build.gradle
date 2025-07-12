@@ -2,7 +2,25 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
     id "com.diffplug.spotless" version "6.20.0"
+    id "com.gorylenko.gradle-git-properties" version '2.5.0'
 }
+
+gitProperties {
+    keys = [
+        'git.branch',
+        'git.build.host',
+        'git.commit.id.abbrev',
+        'git.commit.message.short',
+        'git.commit.time',
+        'git.commit.user.email',
+        'git.commit.user.name',
+        'git.dirty',
+    ]
+    dateFormat = "yyyy-MM-dd HH:mm:ss"
+    dateFormatTimeZone = "America/Los_Angeles"
+}
+
+generateGitProperties.outputs.upToDateWhen { false } // make sure the generateGitProperties task always executes (even when git.properties is not changed)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -106,6 +124,9 @@ jar {
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
+
+// Make sure jar task depends on generateGitProperties
+jar.dependsOn generateGitProperties
 
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar

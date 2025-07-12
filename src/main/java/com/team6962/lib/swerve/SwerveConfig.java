@@ -65,8 +65,11 @@ public class SwerveConfig {
   private final Motor steerMotor;
   private final Wheel wheel;
   private final DriveGains driveGains;
+  private String canBus = "rio";
   private LinearVelocity maxSpeed;
+  private LinearAcceleration maxLinearAcceleration;
   private AngularVelocity maxRotation;
+  private AngularAcceleration maxAngularAcceleration;
 
   public SwerveConfig(
       Chassis chassis,
@@ -95,6 +98,28 @@ public class SwerveConfig {
     this.maxRotation = maxRotation;
 
     return this;
+  }
+
+  public SwerveConfig withMaxLinearAcceleration(LinearAcceleration acceleration) {
+    this.maxLinearAcceleration = acceleration;
+
+    return this;
+  }
+
+  public SwerveConfig withMaxAngularAcceleration(AngularAcceleration acceleration) {
+    this.maxAngularAcceleration = acceleration;
+
+    return this;
+  }
+
+  public SwerveConfig withCANBus(String canBus) {
+    this.canBus = canBus;
+
+    return this;
+  }
+
+  public String canBus() {
+    return canBus;
   }
 
   public Chassis chassis() {
@@ -212,15 +237,16 @@ public class SwerveConfig {
     }
   }
 
-  public static enum Wheel {
-    COLSON(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
+  public static class Wheel {
+    public static Wheel COLSON = new Wheel(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
+    public static Wheel BILLET = new Wheel(Inches.of(4.0), Inches.of(1.5), 1.0, Pounds.of(0.55));
 
     public final Distance diameter;
     public final Distance width;
     public final double staticFriction;
     public final Mass mass;
 
-    private Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
+    public Wheel(Distance diameter, Distance width, double staticFriction, Mass mass) {
       this.diameter = diameter;
       this.width = width;
       this.staticFriction = staticFriction;
@@ -255,6 +281,14 @@ public class SwerveConfig {
               * mass.in(Kilograms)
               * (3.0 * radius().in(Meters) * radius().in(Meters)
                   + width().in(Meters) * width().in(Meters)));
+    }
+
+    public Wheel withDiameter(Distance diameter) {
+      return new Wheel(diameter, width, staticFriction, mass);
+    }
+
+    public Wheel withRadius(Distance radius) {
+      return withDiameter(radius.times(2));
     }
   }
 
@@ -379,6 +413,8 @@ public class SwerveConfig {
   }
 
   public LinearAcceleration maxLinearAcceleration() {
+    if (maxLinearAcceleration != null) return maxLinearAcceleration;
+
     return MeasureMath.min(
             driveTorque(driveMotor.maxCurrent()).div(wheel.radius()), staticFriction())
         .div(chassis.mass);
@@ -392,6 +428,8 @@ public class SwerveConfig {
   }
 
   public AngularAcceleration maxAngularAcceleration() {
+    if (maxAngularAcceleration != null) return maxAngularAcceleration;
+
     double frictionLimitedRps =
         staticFriction().in(Newtons)
             / chassis.driveRadius().in(Meters)

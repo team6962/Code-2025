@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.Constants.TEAM_COLOR;
-import frc.robot.subsystems.RobotStateController;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
@@ -27,13 +26,14 @@ import frc.robot.util.software.MathUtils.InputMath;
 public class XBoxSwerve extends Command {
   private XboxController controller;
   private SwerveDrive swerveDrive;
-  private RobotStateController stateController;
 
   public double MAX_DRIVE_VELOCITY;
   public double NOMINAL_DRIVE_VELOCITY;
   public double FINE_TUNE_DRIVE_VELOCITY;
+  public double ULTRA_FINE_TUNE_DRIVE_VELOCITY;
   public double NOMINAL_ANGULAR_VELOCITY;
   public double MAX_ANGULAR_VELOCITY;
+  public double SUPER_ANGULAR_VELOCITY;
 
   private Translation2d velocity = new Translation2d();
   private double angularVelocity = 0.0;
@@ -41,13 +41,9 @@ public class XBoxSwerve extends Command {
   private Command translateCommand;
   private Command rotateCommand;
 
-  public XBoxSwerve(
-      SwerveDrive swerveDrive,
-      XboxController xboxController,
-      RobotStateController stateController) {
+  public XBoxSwerve(SwerveDrive swerveDrive, XboxController xboxController) {
     this.swerveDrive = swerveDrive;
     this.controller = xboxController;
-    this.stateController = stateController;
     // controller.setRumble(RumbleType.kBothRumble, 1.0);
     addRequirements(swerveDrive);
 
@@ -63,6 +59,10 @@ public class XBoxSwerve extends Command {
         swerveDrive
             .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_FINE_TUNE_DRIVE_POWER)
             .in(MetersPerSecond);
+    ULTRA_FINE_TUNE_DRIVE_VELOCITY =
+        swerveDrive
+            .getLinearDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ULTRA_FINE_TUNE_DRIVE_POWER)
+            .in(MetersPerSecond);
     NOMINAL_ANGULAR_VELOCITY =
         swerveDrive
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_POWER)
@@ -70,6 +70,10 @@ public class XBoxSwerve extends Command {
     MAX_ANGULAR_VELOCITY =
         swerveDrive
             .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_ROTATE_BOOST_POWER)
+            .in(RadiansPerSecond);
+    SUPER_ANGULAR_VELOCITY =
+        swerveDrive
+            .getAngularDriveVelocity(SWERVE_DRIVE.TELEOPERATED_SUPER_ROTATE_POWER)
             .in(RadiansPerSecond);
 
     Logger.logNumber("XBoxSwerve/nomVel", () -> NOMINAL_DRIVE_VELOCITY);
@@ -95,10 +99,8 @@ public class XBoxSwerve extends Command {
 
     double leftTrigger = controller.getLeftTriggerAxis();
     double rightTrigger = controller.getRightTriggerAxis();
-    Translation2d leftStick =
-        new Translation2d(-controller.getLeftY(), -controller.getLeftX()).times(2);
-    Translation2d rightStick =
-        new Translation2d(controller.getRightX(), -controller.getRightY()).times(2);
+    Translation2d leftStick = new Translation2d(-controller.getLeftY(), -controller.getLeftX());
+    Translation2d rightStick = new Translation2d(controller.getRightX(), -controller.getRightY());
 
     if (RobotBase.isSimulation()) {
       leftStick = new Translation2d(controller.getRawAxis(0), -controller.getRawAxis(1));
@@ -116,9 +118,15 @@ public class XBoxSwerve extends Command {
     leftStick = InputMath.addCircularDeadband(leftStick, 0.1);
     rightStick = InputMath.addCircularDeadband(rightStick, 0.1);
 
-    angularVelocity +=
-        -rightStick.getX()
-            * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+    if (leftTrigger > 0.1) {
+      angularVelocity +=
+          -rightStick.getX()
+              * MathUtils.map(leftTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, SUPER_ANGULAR_VELOCITY);
+    } else {
+      angularVelocity +=
+          -rightStick.getX()
+              * MathUtils.map(rightTrigger, 0, 1, NOMINAL_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+    }
 
     velocity =
         velocity.plus(
@@ -129,7 +137,15 @@ public class XBoxSwerve extends Command {
       Rotation2d povDirection = Rotation2d.fromDegrees(controller.getPOV()).unaryMinus();
 
       Translation2d povVelocity =
-          new Translation2d(FINE_TUNE_DRIVE_VELOCITY, 0).rotateBy(povDirection);
+          new Translation2d(1.0, 0)
+              .rotateBy(povDirection)
+              .times(
+                  MathUtils.map(
+                      rightTrigger,
+                      0,
+                      1,
+                      FINE_TUNE_DRIVE_VELOCITY,
+                      ULTRA_FINE_TUNE_DRIVE_VELOCITY));
 
       povVelocity = swerveDrive.robotToField(povVelocity);
 
@@ -156,6 +172,8 @@ public class XBoxSwerve extends Command {
 
     ChassisSpeeds drivenSpeeds =
         new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
+
+    Logger.log("XBoxSwerve/drivenSpeeds", drivenSpeeds);
 
     boolean movingTranslation = Math.abs(velocity.getNorm()) > 0.05;
 

@@ -10,7 +10,6 @@ import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.MANIPULATOR;
-import frc.robot.subsystems.manipulator.grabber.Grabber;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealFunnel extends Funnel {
@@ -35,14 +34,17 @@ public class RealFunnel extends Funnel {
     return this.run(() -> motor.set(speed));
   }
 
-  public Command intake(Grabber grabber) {
-    return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED).until(grabber::hasCoral);
+  @Override
+  public Command intake() {
+    return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED);
   }
 
+  @Override
   public Command forwards() {
     return runSpeed(MANIPULATOR.FUNNEL_IN_SPEED);
   }
 
+  @Override
   public Command stop() {
     return runSpeed(0);
   }

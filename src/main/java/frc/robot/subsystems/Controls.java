@@ -6,9 +6,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Constants.DEVICES;
-import frc.robot.auto.utils.AutonomousCommands;
+import frc.robot.auto.utils.AutoCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
@@ -21,12 +22,11 @@ public class Controls {
       new CommandXboxController(DEVICES.DRIVE_XBOX_CONTROLLER);
 
   public static void configureBindings(
-      RobotStateController stateController,
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
       Hang hang,
-      AutonomousCommands autonomous,
+      AutoCommands autonomous,
       PieceCombos pieceCombos) {
 
     // Driver
@@ -40,17 +40,32 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a();
+    driver.a().whileTrue(autonomous.alignToClosestFaceTeleop());
     driver
         .b()
-        .whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.RIGHT, false));
-    driver.x().whileTrue(autonomous.alignToClosestPole(AutonomousCommands.PolePattern.LEFT, false));
+        .whileTrue(
+            autonomous.alignToClosestPoleTeleop(
+                AutoCommands.PolePattern.RIGHT,
+                () ->
+                    rumbleBoth()
+                        .repeatedly()
+                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
+
+    driver
+        .x()
+        .whileTrue(
+            autonomous.alignToClosestPoleTeleop(
+                AutoCommands.PolePattern.LEFT,
+                () ->
+                    rumbleBoth()
+                        .repeatedly()
+                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
     driver.y();
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
     driver.rightBumper();
-    driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
+    // driver.rightStick().onTrue(pieceCombos.pickupGroundAlgae());
     // driver.leftStick().onTrue(pieceCombos.algaeProcessor());
     driver
         .leftStick()
@@ -62,7 +77,7 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID(), stateController));
+    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
 
     // Operator
     // Button to L2-L4, and Barge Height
@@ -103,20 +118,39 @@ public class Controls {
     operator.povLeft().whileTrue(manipulator.pivot.down());
     operator.back().onTrue(pieceCombos.algaeL3());
     operator.start().onTrue(pieceCombos.algaeL2());
-    operator.leftStick().onTrue(pieceCombos.algaeBargeSetup());
+    operator
+        .leftStick()
+        .onTrue(
+            pieceCombos.algaeBargeSetup().andThen(pieceCombos.algaeBargeShoot())); // barge combo
     operator
         .rightStick()
-        .onTrue(pieceCombos.intakeCoral().andThen(rumbleBoth())); // big right paddle
+        .whileTrue(
+            pieceCombos
+                .intakeCoral()
+                .andThen(
+                    Commands.parallel(
+                        rumbleBoth(), LEDs.setStateCommand(LEDs.State.GOOD)))); // big right paddle
 
-    operator
-        .rightBumper()
-        .whileTrue(manipulator.runCoralIntake().andThen(rumbleBoth())); // intake coral
+    operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
         .rightTrigger()
         .whileTrue(
-            manipulator.grabber.dropCoral().andThen(rumbleBoth())); // drop coral/intake algae
-    operator.leftBumper().whileTrue(manipulator.grabber.adjustCoral()); // reverse coral
-    operator.leftTrigger().whileTrue(manipulator.grabber.dropAlgae()); // drop algae
+            pieceCombos
+                .intakeAlgaeOrShootCoral()
+                .andThen(
+                    rumbleBoth()
+                        .alongWith(
+                            LEDs.setStateCommand(LEDs.State.GOOD)))); // drop coral/intake algae
+    operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // shoot barge
+    operator
+        .leftTrigger()
+        .whileTrue(
+            manipulator
+                .grabber
+                .dropAlgae()
+                .andThen(
+                    LEDs.setStateCommand(LEDs.State.GOOD)) // ✅ Only runs when button is pressed
+            );
 
     // operator.povUp().onTrue(hang.deploy());
     // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
@@ -157,7 +191,6 @@ public class Controls {
     return Commands.runEnd(
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-              // LEDs.setState(LEDs.State.GOOD);
             },
             () -> {
               controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
@@ -170,7 +203,6 @@ public class Controls {
         () -> {
           if (booleanSupplier.getAsBoolean()) {
             controller.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-            // LEDs.setState(LEDs.State.GOOD);
           } else {
             controller.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           }

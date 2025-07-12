@@ -2,7 +2,6 @@ package frc.robot.auto.pipeline;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.team6962.lib.telemetry.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.auto.utils.AutoPaths;
@@ -21,8 +20,8 @@ public class SequenceChooser {
     this.startPose = parameters.startPose;
     bestPath = null;
     bestTime = Seconds.of(Double.POSITIVE_INFINITY);
-    Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/isDone", false);
-    Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathCount", pathFactory.getPathCount());
+    // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/isDone", false);
+    // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathCount", pathFactory.getPathCount());
   }
 
   public boolean isDone() {
@@ -36,21 +35,21 @@ public class SequenceChooser {
     Time time = PathTiming.getPathTime(path, startPose);
 
     if (isDone()) {
-      Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/isDone", true);
+      // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/isDone", true);
     }
 
     if (time.lt(bestTime)) {
       bestTime = time;
       bestPath = path;
 
-      Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestTime", bestTime);
-      Logger.logObject(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestPath", bestPath);
+      // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestTime", bestTime);
+      // Logger.logObject(AutoPaths.Logging.SEQUENCE_CHOOSER + "/bestPath", bestPath);
     }
 
     int pathIndex = pathFactory.getCurrentIndex();
 
     if (Math.abs(((double) pathIndex * 1000 / pathFactory.getPathCount()) % 1) < 1e-6) {
-      Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathIndex", pathIndex);
+      // Logger.log(AutoPaths.Logging.SEQUENCE_CHOOSER + "/pathIndex", pathIndex);
     }
   }
 

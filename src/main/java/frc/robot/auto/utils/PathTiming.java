@@ -18,7 +18,7 @@ import java.util.List;
 
 public final class PathTiming {
   public static Time getPathTime(List<AutoPaths.CoralMovement> path, Pose2d startPose) {
-    return getPathTime(path, startPose, 0);
+    return getPathTime(path, startPose, 0.5);
   }
 
   public static Time getPathTime(
@@ -99,8 +99,7 @@ public final class PathTiming {
                 .chassis()
                 .driveRadius()
                 .times(
-                    MeasureMath.abs(
-                            MeasureMath.minDifference(start.getRotation(), end.getRotation()))
+                    MeasureMath.minAbsDifference(start.getRotation(), end.getRotation())
                         .getRadians()));
   }
 

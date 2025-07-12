@@ -3,8 +3,10 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -55,10 +57,15 @@ public final class SwerveConstants {
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
                 Amps.of(60)),
             Wheel.COLSON,
+            // chassisType == ChassisType.COMPETITION ? Wheel.BILLET.withDiameter(Inches.of(3.824)) : Wheel.COLSON,
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
-                .withFineTranslation(new PIDConstants(1.0, 0.0, 0.2)))
-        .withMaxDriveSpeed(MetersPerSecond.of(3.9))
-        .withMaxRotationSpeed(RotationsPerSecond.of(3.1));
+                .withFineTranslation(new PIDConstants(3.5, 0.0, 1.5))
+                .withFineRotation(new PIDConstants(3.5, 0.0, 1.5)))
+        .withMaxDriveSpeed(MetersPerSecond.of(4.5))
+        .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(3))
+        .withMaxRotationSpeed(RotationsPerSecond.of(1.62))
+        .withMaxAngularAcceleration(RotationsPerSecondPerSecond.of(1.28))
+        .withCANBus(chassisType == ChassisType.COMPETITION ? "drivetrain" : "rio");
   }
 
   private static Chassis getChassis(ChassisType chassisType) {

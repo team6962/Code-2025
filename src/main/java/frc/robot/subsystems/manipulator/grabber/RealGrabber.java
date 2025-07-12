@@ -1,7 +1,5 @@
 package frc.robot.subsystems.manipulator.grabber;
 
-import static edu.wpi.first.units.Units.Amps;
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -11,11 +9,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.DIO;
 import frc.robot.Constants.Constants.MANIPULATOR;
@@ -27,25 +25,22 @@ public class RealGrabber extends Grabber {
   private final DigitalInput detectSensor;
   private final DigitalInput clearSensor;
 
-  private Debouncer algaeDebouncer;
-  private Debouncer coralDebouncer = new Debouncer(0.15);
+  private Debouncer algaeDebouncer = new Debouncer(0.3);
 
   private boolean hasCoral = false;
   private boolean coralClear = false;
 
   private boolean detectedAlgae = false;
 
-  private Timer gripCheckTimer = new Timer();
-
   public RealGrabber() {
     motor = new SparkMax(CAN.MANIPULATOR_GRABBER, MotorType.kBrushless);
 
-    Logger.logBoolean(getName() + "/motorsStalled", () -> detectedAlgae);
+    Logger.logBoolean(getName() + "/detectedAlgae", this::detectedAlgae);
+    Logger.logBoolean(getName() + "/coralClear", this::isCoralClear);
+    Logger.logNumber(getName() + "/vel", () -> motor.getEncoder().getVelocity());
+    Logger.logNumber(getName() + "/get", () -> motor.get());
     Logger.logNumber(getName() + "/amps", () -> motor.getOutputCurrent());
     Logger.logNumber(getName() + "/temp", () -> motor.getMotorTemperature());
-    Logger.logNumber(getName() + "/gripCheckTime", () -> gripCheckTimer.get());
-
-    resetDebouncer();
 
     SparkMaxConfig config = new SparkMaxConfig();
 
@@ -62,8 +57,20 @@ public class RealGrabber extends Grabber {
     StatusChecks.under(this).add("motor", motor);
   }
 
-  public Command runSpeed(double speed) {
+  public Command setDutyCycleOnce(double speed) {
+    return this.runOnce(() -> motor.set(speed));
+  }
+
+  public Command setDutyCycle(double speed) {
     return this.run(() -> motor.set(speed));
+  }
+
+  public Command setVoltageOnce(Voltage volts) {
+    return this.runOnce(() -> motor.setVoltage(volts));
+  }
+
+  public Command setVoltage(Voltage volts) {
+    return this.run(() -> motor.setVoltage(volts));
   }
 
   @Override
@@ -71,81 +78,101 @@ public class RealGrabber extends Grabber {
     return hasCoral;
   }
 
-  public boolean isClear() {
+  @Override
+  public boolean isCoralClear() {
     return coralClear;
   }
 
+  @Override
   public Command intakeCoral() {
     return Commands.sequence(
-        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(() -> !isClear()),
-        runSpeed(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-        runSpeed(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isClear),
-        stop());
+        setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
+        setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED)
+            .withDeadline(
+                Commands.sequence(
+                    Commands.waitUntil(this::isCoralClear), Commands.waitSeconds(0.05))),
+        stopOnce());
   }
 
+  @Override
   public Command dropCoral() {
-    return runSpeed(MANIPULATOR.CORAL_OUT_SPEED)
+    return setDutyCycle(MANIPULATOR.CORAL_OUT_SPEED)
         .withDeadline(
             Commands.sequence(
                 Commands.waitUntil(this::hasCoral), Commands.waitUntil(() -> !hasCoral())));
   }
 
+  @Override
   public Command adjustCoral() {
-    return runSpeed(MANIPULATOR.CORAL_ADJUST_SPEED);
+    return setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED);
   }
 
   public boolean detectedAlgae() {
     return detectedAlgae;
   }
 
+  @Override
   public Command intakeAlgae() {
-    return runSpeed(MANIPULATOR.ALGAE_IN_SPEED)
+    return setDutyCycle(MANIPULATOR.ALGAE_IN_SPEED)
         .until(this::detectedAlgae)
-        .finallyDo((b) -> expectAlgae(b));
+        .andThen(Commands.print("FINISHED INTAKING"))
+        .finallyDo(() -> expectAlgae(detectedAlgae()));
   }
 
+  @Override
   public Command dropAlgae() {
-    return runSpeed(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false));
+    return new ConditionalCommand(
+        Commands.none(),
+        setDutyCycle(MANIPULATOR.ALGAE_OUT_SPEED).finallyDo(() -> expectAlgae(false)),
+        () -> hasCoral());
   }
 
-  private void resetDebouncer() {
-    algaeDebouncer = new Debouncer(0.5, DebounceType.kFalling);
-  }
-
+  @Override
   public Command forwards() {
-    return runSpeed(MANIPULATOR.BASE_SPEED);
+    return setDutyCycle(MANIPULATOR.BASE_SPEED);
   }
 
+  @Override
   public Command backwards() {
-    return runSpeed(-MANIPULATOR.BASE_SPEED);
+    return setDutyCycle(-MANIPULATOR.BASE_SPEED);
   }
 
+  @Override
   public Command holdAlgae() {
     if (!MANIPULATOR.ALGAE_GRIP_CHECK_ENABLED) return stop();
     return Commands.sequence(
-            runSpeed(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
-                .until(this::detectedAlgae)
-                .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
-                .finallyDo(() -> expectAlgae(detectedAlgae())),
-            stop().withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME))
-        .repeatedly();
+        setDutyCycle(MANIPULATOR.ALGAE_GRIP_CHECK_SPEED)
+            .until(this::detectedAlgae)
+            .withTimeout(MANIPULATOR.ALGAE_GRIP_CHECK_TIME)
+            .finallyDo(() -> expectAlgae(detectedAlgae())),
+        setDutyCycle(MANIPULATOR.ALGAE_HOLD_SPEED).withTimeout(MANIPULATOR.ALGAE_GRIP_IDLE_TIME));
   }
 
   // update this for both game pieces
+  @Override
   public Command hold() {
-    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae());
+    return Commands.either(stop(), holdAlgae(), () -> hasCoral() || !hasAlgae()).repeatedly();
   }
 
+  public Command stopOnce() {
+    return this.runOnce(motor::stopMotor);
+  }
+
+  @Override
   public Command stop() {
-    return runSpeed(0);
+    return this.run(motor::stopMotor);
+  }
+
+  public boolean isStalled() {
+    return Math.abs(motor.get()) > 0.0 && Math.abs(motor.getEncoder().getVelocity()) < 3000;
   }
 
   @Override
   public void periodic() {
     super.periodic();
 
-    detectedAlgae = algaeDebouncer.calculate(Amps.of(motor.getOutputCurrent()).gt(Amps.of(40)));
-    hasCoral = coralDebouncer.calculate(!detectSensor.get());
+    detectedAlgae = algaeDebouncer.calculate(isStalled());
+    hasCoral = !detectSensor.get();
     coralClear = clearSensor.get();
   }
 }

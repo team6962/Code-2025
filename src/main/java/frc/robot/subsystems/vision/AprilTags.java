@@ -24,16 +24,50 @@ import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AprilTags extends SubsystemBase {
+  public static boolean changingHeading = false;
   private static final double MAX_ROTATION_ERROR = Units.degreesToRadians(15);
   private static final double LARGE_ROTATION_ERROR = 9999999;
   private static final double TRANSLATION_ERROR_FACTOR = 10;
   private static final double ADDITIONAL_TRANSLATION_ERROR = 0.5;
+  private static Map<String, LimelightHelpers.PoseEstimate> loggedEstimates = Map.of();
+
+  static {
+    Logger.addUpdate(
+        "/PoseEstimates/",
+        () -> {
+          for (String id : LIMELIGHT.APRILTAG_CAMERA_POSES.keySet()) {
+            if (loggedEstimates.get(id) != null) {
+              PoseEstimate estimate = loggedEstimates.get(id);
+
+              Logger.log("/PoseEstimates/" + id + "/pose", estimate.pose);
+              Logger.log("/PoseEstimates/" + id + "/timestamp", estimate.timestampSeconds);
+              Logger.log("/PoseEstimates/" + id + "/avgTagArea", estimate.avgTagArea);
+              Logger.log("/PoseEstimates/" + id + "/avgTagDist", estimate.avgTagDist);
+              Logger.log("/PoseEstimates/" + id + "/isMegaTag2", estimate.isMegaTag2);
+              Logger.log("/PoseEstimates/" + id + "/tagSpan", estimate.tagSpan);
+              Logger.log("/PoseEstimates/" + id + "/latency", estimate.latency);
+              // Logger.logObject("/PoseEstimates/" + id + "/rawFiducials", estimate.rawFiducials);
+            } else {
+              Logger.log("/PoseEstimates/" + id + "/pose", new Pose2d());
+              Logger.log("/PoseEstimates/" + id + "/timestamp", 0);
+              Logger.log("/PoseEstimates/" + id + "/avgTagArea", 0);
+              Logger.log("/PoseEstimates/" + id + "/avgTagDist", 0);
+              Logger.log("/PoseEstimates/" + id + "/isMegaTag2", false);
+              Logger.log("/PoseEstimates/" + id + "/tagSpan", 0);
+              Logger.log("/PoseEstimates/" + id + "/latency", 0);
+              // Logger.log("/PoseEstimates/" + id + "/rawFiducials", "null");
+            }
+          }
+        });
+  }
 
   private static ArrayList<Double> mt1_inititalHeadingEstimates = new ArrayList<Double>();
   private static double mt1_avgInitialHeadingEstimate = 0;
@@ -54,53 +88,16 @@ public class AprilTags extends SubsystemBase {
 
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
-    List<LimelightHelpers.PoseEstimate> poseEstimates =
-        getPoseEstimates(cameraPoses, poseEstimator);
+    Map<String, LimelightHelpers.PoseEstimate> poseEstimates =
+        getIdentifiedPoseEstimates(cameraPoses.keySet());
+    changingHeading = false;
 
-    // poseEstimates.add(new PoseEstimate(
-    //   new Pose2d(3, 4, Rotation2d.fromDegrees(90)),
-    //   Timer.getFPGATimestamp(),
-    //   0,
-    //   2,
-    //   0.1,
-    //   1,
-    //   0.5,
-    //   new RawFiducial[0],
-    //   true
-    // ));
-
-    int index = 0;
-    for (PoseEstimate estimate : poseEstimates) {
-      Logger.log("/PoseEstimates/" + index + "/pose", estimate.pose);
-      Logger.log("/PoseEstimates/" + index + "/timestamp", estimate.timestampSeconds);
-      Logger.log("/PoseEstimates/" + index + "/avgTagArea", estimate.avgTagArea);
-      Logger.log("/PoseEstimates/" + index + "/avgTagDist", estimate.avgTagDist);
-      Logger.log("/PoseEstimates/" + index + "/isMegaTag2", estimate.isMegaTag2);
-      Logger.log("/PoseEstimates/" + index + "/tagSpan", estimate.tagSpan);
-      Logger.log("/PoseEstimates/" + index + "/latency", estimate.latency);
-      Logger.logObject("/PoseEstimates/" + index + "/rawFiducials", estimate.rawFiducials);
-
-      index++;
-    }
-
-    Logger.log("/PoseEstimates/count", index);
-
-    while (index < 2) {
-      Logger.log("/PoseEstimates/" + index + "/pose", "null");
-      Logger.log("/PoseEstimates/" + index + "/timestamp", "null");
-      Logger.log("/PoseEstimates/" + index + "/avgTagArea", "null");
-      Logger.log("/PoseEstimates/" + index + "/avgTagDist", "null");
-      Logger.log("/PoseEstimates/" + index + "/isMegaTag2", "null");
-      Logger.log("/PoseEstimates/" + index + "/tagSpan", "null");
-      Logger.log("/PoseEstimates/" + index + "/latency", "null");
-
-      index++;
-    }
+    loggedEstimates = poseEstimates;
 
     BestEstimate bestPoseEstimate = new BestEstimate();
     List<Pose2d> loggedVisionPoses = new ArrayList<>();
 
-    for (PoseEstimate poseEstimate : poseEstimates) {
+    for (PoseEstimate poseEstimate : poseEstimates.values()) {
       Pose2d pose2d = poseEstimate.pose;
       if (isInvalidPoseEstimate(poseEstimate, pose2d)) continue;
 
@@ -112,14 +109,13 @@ public class AprilTags extends SubsystemBase {
       }
 
       if (canChangeHeading) {
-        // LEDs.setState(LEDs.State.HAS_VISION_TARGETS);
+        changingHeading = true;
         LimelightHelpers.setLEDMode_ForceBlink("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceBlink("limelight-btag");
       } else {
         LimelightHelpers.setLEDMode_ForceOff("limelight-ftag");
         LimelightHelpers.setLEDMode_ForceOff("limelight-btag");
       }
-      Logger.log("vision/canChangeHeding", canChangeHeading);
 
       double translationError = calculateTranslationError(poseEstimate);
 
@@ -220,6 +216,24 @@ public class AprilTags extends SubsystemBase {
         .collect(Collectors.toList());
   }
 
+  private static Map<String, LimelightHelpers.PoseEstimate> getIdentifiedPoseEstimates(
+      Set<String> cameraIds) {
+    HashMap<String, LimelightHelpers.PoseEstimate> output = new HashMap<>();
+
+    for (String cameraId : cameraIds) {
+      LimelightHelpers.PoseEstimate estimate =
+          CachedRobotState.isAllianceInverted().orElse(false)
+              ? LimelightHelpers.getBotPoseEstimate_wpiRed(cameraId)
+              : LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
+
+      if (estimate == null) continue;
+
+      output.put(cameraId, estimate);
+    }
+
+    return output;
+  }
+
   private static boolean isInvalidPoseEstimate(PoseEstimate poseEstimate, Pose2d pose2d) {
     return IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS)
             .anyMatch(x -> x == poseEstimate.rawFiducials[0].id)
@@ -256,8 +270,7 @@ public class AprilTags extends SubsystemBase {
 
   private static boolean isBetterEstimate(
       BestEstimate bestPoseEstimate, double translationError, double rotationError) {
-    return translationError < bestPoseEstimate.translationError.in(Meters)
-        || rotationError < Units.degreesToRadians(360.0);
+    return translationError < bestPoseEstimate.translationError.in(Meters);
   }
 
   public static void printConfig(Map<String, Pose3d> cameraPoses) {

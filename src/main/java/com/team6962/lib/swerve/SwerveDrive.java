@@ -1,6 +1,7 @@
 package com.team6962.lib.swerve;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -12,13 +13,26 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.team6962.lib.prepath.CustomPathfindingCommand;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
+import com.team6962.lib.swerve.auto.PathPrecomputing;
+import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -41,8 +55,6 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -60,6 +72,8 @@ public class SwerveDrive extends SwerveCore {
 
   private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
 
+  private PathPrecomputing pathPrecomputing;
+
   /**
    * Create a new SwerveDrive object with the given configuration.
    *
@@ -69,6 +83,9 @@ public class SwerveDrive extends SwerveCore {
     super(constants);
 
     setName("Swerve Drive");
+
+    pathPrecomputing =
+        new PathPrecomputing(getConstants().pathConstraints(), getConstants().pathRobotConfig());
 
     autoBuilder.configure(
         this::getEstimatedPose,
@@ -282,11 +299,28 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public AlignCommand alignTo(Supplier<Pose2d> target) {
-    return alignTo(target, Inches.of(0.5), Degrees.of(2));
+    return alignTo(target, Inches.of(1.0), Degrees.of(4));
   }
 
   public AlignCommand alignTo(Pose2d target) {
     return alignTo(() -> target);
+  }
+
+  public boolean isWithinToleranceOf(
+      Supplier<Pose2d> targetSupplier, Distance toleranceDistance, Angle toleranceAngle) {
+    Pose2d target = targetSupplier.get();
+    Pose2d current = getEstimatedPose();
+
+    return current.getTranslation().getDistance(target.getTranslation())
+            < toleranceDistance.in(Meters)
+        && MeasureMath.minAbsDifference(
+                current.getRotation().getMeasure(), target.getRotation().getMeasure())
+            .lt(toleranceAngle);
+  }
+
+  public boolean isWithinToleranceOf(
+      Pose2d target, Distance toleranceDistance, Angle toleranceAngle) {
+    return isWithinToleranceOf(() -> target, toleranceDistance, toleranceAngle);
   }
 
   /**
@@ -355,8 +389,8 @@ public class SwerveDrive extends SwerveCore {
     public Translation2d getTranslationError() {
       Pose2d target = targetSupplier.get();
 
-      Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
-      Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
+      // Logger.log("/AlignCommand/estimatedTranslation", getEstimatedPose().getTranslation());
+      // Logger.log("/AlignCommand/targetTranslation", target.getTranslation());
 
       Translation2d error = target.getTranslation().minus(getEstimatedPose().getTranslation());
 
@@ -364,7 +398,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     private Translation2d getTranslationOutput(Translation2d translationError) {
-      Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
+      // Logger.log("Swerve Drive/AlignCommand/translationError", translationError);
 
       double translationXOutput =
           translationXPID.calculate(-translationError.getX()); // Setpoint is 0, so need to invert
@@ -386,7 +420,7 @@ public class SwerveDrive extends SwerveCore {
 
       Translation2d translationOutput = new Translation2d(translationXOutput, translationYOutput);
 
-      Logger.log("Swerve Drive/AlignCommand/translationOutput", translationOutput);
+      // Logger.log("Swerve Drive/AlignCommand/translationOutput", translationOutput);
 
       return translationOutput;
     }
@@ -403,7 +437,7 @@ public class SwerveDrive extends SwerveCore {
     }
 
     private Rotation2d getRotationOutput(Rotation2d rotationError) {
-      Logger.log("Swerve Drive/AlignCommand/rotationError", rotationError);
+      // Logger.log("Swerve Drive/AlignCommand/rotationError", rotationError);
 
       double rotationOutput = rotationPID.calculate(rotationError.getRadians());
 
@@ -413,7 +447,7 @@ public class SwerveDrive extends SwerveCore {
 
       Rotation2d rotationOutputMeasure = Rotation2d.fromRadians(rotationOutput);
 
-      Logger.log("Swerve Drive/AlignCommand/rotationOutput", rotationOutputMeasure);
+      // Logger.log("Swerve Drive/AlignCommand/rotationOutput", rotationOutputMeasure);
 
       return rotationOutputMeasure;
     }
@@ -429,10 +463,14 @@ public class SwerveDrive extends SwerveCore {
 
       if (translationNeedsAdjustment && !rotationNeedsAdjustment) state = State.TRANSLATING;
       if (!translationNeedsAdjustment && rotationNeedsAdjustment) state = State.ROTATING;
-      if (translationNeedsAdjustment && rotationNeedsAdjustment) {
+      if (!translationNeedsAdjustment && !rotationNeedsAdjustment) {
         if (translationErrorRatio > rotationErrorRatio) state = State.TRANSLATING;
         else state = State.ROTATING;
       }
+
+      Logger.log("Swerve Drive/AlignCommand/state", state.name());
+      Logger.log("Swerve Drive/AlignCommand/needsTranslate", translationNeedsAdjustment);
+      Logger.log("Swerve Drive/AlignCommand/needsRotate", rotationNeedsAdjustment);
     }
 
     @Override
@@ -467,7 +505,7 @@ public class SwerveDrive extends SwerveCore {
 
       return current.getTranslation().getDistance(target.getTranslation())
               < toleranceDistance.in(Meters)
-          && MeasureMath.minDifference(
+          && MeasureMath.minAbsDifference(
                   current.getRotation().getMeasure(), target.getRotation().getMeasure())
               .lt(toleranceAngle);
     }
@@ -663,15 +701,16 @@ public class SwerveDrive extends SwerveCore {
         endTime = Seconds.of(profile.timeLeftUntil(0));
       }
 
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed", -currentScalarSpeed);
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
-      Logger.log(
-          "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
-          -targetEndVelocity.in(MetersPerSecond));
-      Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
+      // Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed",
+      // -currentScalarSpeed);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
+      // Logger.log(
+      //     "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
+      //     -targetEndVelocity.in(MetersPerSecond));
+      // Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
 
       moveFieldRelative(errorUnit.times(-state.velocity));
     }
@@ -682,5 +721,194 @@ public class SwerveDrive extends SwerveCore {
           || getEstimatedPose().getTranslation().getDistance(targetTranslation)
               < positionTolerance.in(Meters);
     }
+  }
+
+  public Command pathfindBetweenWaypoints(
+      Pose2d startPose,
+      Pose2d endPose,
+      Rotation2d startVelocityAngle,
+      Rotation2d endVelocityAngle,
+      LinearVelocity expectedStartVelocity,
+      LinearVelocity maxEndVelocity) {
+    List<Waypoint> waypoints =
+        PathPlannerPath.waypointsFromPoses(
+            List.of(
+                new Pose2d(startPose.getTranslation(), startVelocityAngle),
+                new Pose2d(endPose.getTranslation(), endVelocityAngle)));
+
+    PathPlannerPath path =
+        new PathPlannerPath(
+            waypoints,
+            getConstants().pathConstraints(),
+            new IdealStartingState(expectedStartVelocity, startPose.getRotation()),
+            new GoalEndState(maxEndVelocity.in(MetersPerSecond), endPose.getRotation()));
+
+    path.getIdealTrajectory(getConstants().pathRobotConfig());
+
+    return CommandUtils.withRequirements(
+        new FollowPathCommand(
+            path,
+            this::getEstimatedPose,
+            () -> fieldToRobot(getEstimatedSpeeds()),
+            (speeds, ff) -> {
+              moveRobotRelative(speeds);
+            },
+            getConstants().driveGains().pathController(),
+            getConstants().pathRobotConfig(),
+            () -> false),
+        useMotion());
+  }
+
+  public Command pathfindToWaypoint(
+      Pose2d precomputedStartPose,
+      Pose2d endPose,
+      Rotation2d precomputedStartVelocityAngle,
+      Rotation2d endVelocityAngle,
+      LinearVelocity precomputedStartVelocity,
+      LinearVelocity maxEndVelocity) {
+    Command pregenerated =
+        pathfindBetweenWaypoints(
+            precomputedStartPose,
+            endPose,
+            precomputedStartVelocityAngle,
+            endVelocityAngle,
+            precomputedStartVelocity,
+            maxEndVelocity);
+
+    return Commands.sequence(
+        Commands.defer(
+            () -> {
+              Command attachment =
+                  pathfindBetweenWaypoints(
+                      getEstimatedPose(),
+                      precomputedStartPose,
+                      precomputedStartPose
+                          .getTranslation()
+                          .minus(getEstimatedPose().getTranslation())
+                          .getAngle(),
+                      precomputedStartVelocityAngle,
+                      MetersPerSecond.of(
+                          KinematicsUtils.getTranslation(getEstimatedSpeeds()).getNorm()),
+                      precomputedStartVelocity);
+
+              return attachment;
+            },
+            Set.of(useMotion())),
+        pregenerated);
+  }
+
+  public Command pathfindToPrecomputed(Pose2d startPose, Pose2d endPose) {
+    PathPrecomputing.Precompute precompute = pathPrecomputing.precompute(startPose, endPose);
+
+    return Commands.defer(
+        () -> {
+          CustomPathfindingCommand pathfindToPose =
+              new CustomPathfindingCommand(
+                  endPose,
+                  getConstants().pathConstraints(),
+                  this::getEstimatedPose,
+                  () -> fieldToRobot(getEstimatedSpeeds()),
+                  (speeds, ff) -> moveRobotRelative(speeds),
+                  getConstants().driveGains().pathController(),
+                  getConstants().pathRobotConfig(),
+                  useMotion());
+
+          if (precompute.isAvailable() && precompute.isStartPoseNear(getEstimatedPose())) {
+            System.out.println("Using precomputed path!");
+            pathfindToPose.currentPath = precompute.getPath();
+            pathfindToPose.currentTrajectory = precompute.getTrajectory();
+            pathfindToPose.timer.restart();
+
+            List<Waypoint> waypoints = precompute.getPath().getWaypoints();
+
+            for (int i = 0; i < waypoints.size(); i++) {
+              System.out.println(" (waypoint " + i + ") " + waypoints.get(i).anchor());
+            }
+
+            System.out.println(" (start) " + precompute.getStartPose());
+            System.out.println(" (end) " + precompute.getEndPose());
+            System.out.println(" (current) " + getEstimatedPose());
+          } else {
+            System.out.println("Using non-precomputed path.");
+
+            System.out.println(" (current) " + getEstimatedPose());
+            System.out.println(" (end) " + endPose);
+          }
+
+          return pathfindToPose;
+
+          // PathPlannerPath precomputedPath = precompute.getPath();
+
+          // if (precomputedPath != null && precompute.isStartPoseNear(getEstimatedPose())) {
+          //   return CommandUtils.withRequirements(new FollowPathCommand(
+          //     precomputedPath,
+          //     this::getEstimatedPose,
+          //     () -> fieldToRobot(getEstimatedSpeeds()),
+          //     (speeds, ff) -> {
+          //       moveRobotRelative(speeds);
+          //     },
+          //     getConstants().driveGains().pathController(),
+          //     getConstants().pathRobotConfig(),
+          //     () -> false
+          //   ), useMotion());
+          // } else {
+          //   return pathfindTo(endPose);
+          // }
+        },
+        Set.of(useMotion()));
+  }
+
+  public Command calibrateWheelSize() {
+    return Commands.defer(() -> new Command() {
+      Angle initialGyroAngle;
+      Angle[] initialWheelAngles = new Angle[4];
+
+      @Override
+      public void initialize() {
+        initialGyroAngle = getContinuousGyroscopeAngle();
+
+        for (int i = 0; i < 4; i++) {
+          initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
+        }
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        Angle gyroAngleChange = Rotations.of(getContinuousGyroscopeAngle().minus(initialGyroAngle).in(Rotations));
+        Distance driveRadius = getConstants().chassis().driveRadius();
+
+        Logger.log("Swerve Drive/Wheel Size Calibration/Gyro Angle Change", gyroAngleChange);
+
+        Angle[] wheelAngleChanges = new Angle[4];
+
+        for (int i = 0; i < 4; i++) {
+          wheelAngleChanges[i] = Rotations.of(getModules()[i].getDriveWheelAngle().minus(initialWheelAngles[i]).abs(Rotations));
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Wheel Angle Change " + SwerveModule.getModuleName(i), wheelAngleChanges[i]);
+        }
+
+        Distance[] wheelDiameters = new Distance[4];
+
+        for (int i = 0; i < 4; i++) {
+          wheelDiameters[i] = driveRadius.times(gyroAngleChange.div(wheelAngleChanges[i])).times(2);
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Diameter " + SwerveModule.getModuleName(i), wheelDiameters[i]);
+        }
+
+        Distance averageDiameter = Meters.of(0);
+
+        for (Distance diameter : wheelDiameters) {
+          averageDiameter = averageDiameter.plus(diameter);
+        }
+
+        averageDiameter = averageDiameter.div(4);
+
+        Logger.log("Swerve Drive/Wheel Size Calibration/Average Diameter", averageDiameter);
+      }
+    }, Set.of()).alongWith(Commands.sequence(
+      Commands.waitSeconds(1),
+      drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))).withTimeout(10),
+      Commands.waitSeconds(1)
+    ));
   }
 }

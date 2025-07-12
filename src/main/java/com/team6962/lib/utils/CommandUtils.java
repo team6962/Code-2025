@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public final class CommandUtils {
@@ -61,5 +62,9 @@ public final class CommandUtils {
 
   public static Command waitFor(Command otherCommand) {
     return Commands.waitUntil(() -> otherCommand.isFinished());
+  }
+
+  public static Command onlyIf(BooleanSupplier condition, Command command) {
+    return command.onlyIf(condition);
   }
 }

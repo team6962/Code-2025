@@ -1,4 +1,16 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -28,6 +40,16 @@
           ],
           "length": 0.40639999508857727,
           "width": 0.40639999508857727
+        },
+        "AutoPath": {
+          "arrows": false,
+          "color": [
+            255.0,
+            240.0,
+            0.0,
+            255.0
+          ],
+          "style": "Track"
         },
         "Autonomous Sequence": {
           "arrowColor": [
@@ -78,9 +100,6 @@
     }
   },
   "NetworkTables Info": {
-    "Clients": {
-      "open": true
-    },
     "Connections": {
       "open": true
     },

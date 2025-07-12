@@ -48,12 +48,36 @@ public final class Constants {
 
   // ENABLED SYSTEMS
   public static final class ENABLED_SYSTEMS {
-    public static final boolean DRIVE = true;
-    public static final boolean DASHBOARD = true;
-    public static final boolean HANG = false;
-    public static final boolean MANIPULATOR = false;
-    public static final boolean ELEVATOR = false;
-    public static final boolean FUNNEL = false;
+    private static final boolean DRIVE = true;
+    private static final boolean DASHBOARD = true;
+    private static final boolean HANG = false;
+    private static final boolean MANIPULATOR = true;
+    private static final boolean ELEVATOR = true;
+    private static final boolean FUNNEL = true;
+
+    public static boolean isDriveEnabled() {
+      return DRIVE;
+    }
+
+    public static boolean isDashboardEnabled() {
+      return DASHBOARD;
+    }
+
+    public static boolean isHangEnabled() {
+      return false;
+    }
+
+    public static boolean isManipulatorEnabled() {
+      return MANIPULATOR && RobotVersion.isV2();
+    }
+
+    public static boolean isElevatorEnabled() {
+      return ELEVATOR && RobotVersion.isV2();
+    }
+
+    public static boolean isFunnelEnabled() {
+      return FUNNEL && RobotVersion.isV2();
+    }
   }
 
   public static final class LOGGING {
@@ -97,21 +121,21 @@ public final class Constants {
             "limelight-btag",
                 new Pose3d(
                     Units.inchesToMeters(0.0),
-                    Units.inchesToMeters(1.3),
-                    Units.inchesToMeters(37.4),
+                    Units.inchesToMeters(0.0),
+                    Units.inchesToMeters(36.0),
                     new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))),
-            "limelight-ltag",
-                new Pose3d(
-                    Units.inchesToMeters(-11.1),
-                    Units.inchesToMeters(10.5),
-                    Units.inchesToMeters(8.8),
-                    new Rotation3d(180.0, 10.0, Units.degreesToRadians(47.8))),
             "limelight-rtag",
                 new Pose3d(
-                    Units.inchesToMeters(11.1),
-                    Units.inchesToMeters(10.5),
-                    Units.inchesToMeters(8.8),
-                    new Rotation3d(180.0, 10.0, Units.degreesToRadians(-47.8))));
+                    Units.inchesToMeters(10.451441),
+                    Units.inchesToMeters(-11.119072),
+                    Units.inchesToMeters(8.821067),
+                    new Rotation3d(0, 10, 47.758140)),
+            "limelight-ltag",
+                new Pose3d(
+                    Units.inchesToMeters(10.451441),
+                    Units.inchesToMeters(11.119072),
+                    Units.inchesToMeters(8.621067),
+                    new Rotation3d(180, 10, 47.758140)));
 
     public static final String ALGAE_CAMERA_NAME = "limelight-algae";
     public static final int[] BLACKLISTED_APRILTAGS = {};
@@ -138,10 +162,42 @@ public final class Constants {
     private static final Angle ALL_OFFSET = Degrees.of(135);
 
     public static final SwerveConfig.Module[] MODULE_CONFIGS = {
-      new SwerveConfig.Module(10, 20, 30, Radians.of(0.192)),
-      new SwerveConfig.Module(11, 21, 31, Radians.of(-1.911)),
-      new SwerveConfig.Module(12, 22, 32, Radians.of(1.555)),
-      new SwerveConfig.Module(13, 23, 33, Radians.of(-0.019)),
+      // Back Left: -0.003
+      // Back Right: -0.018
+      // Front Left: 0.028
+      // Front Right: 0.018(needs recalibration)
+
+      new SwerveConfig.Module(
+          10,
+          20,
+          30,
+          Radians.of(0.192)
+              .minus(Radians.of(0.00959265359))
+              .minus(Radians.of(-0.009370614359))
+              .minus(Radians.of(0.002629385641))
+              .minus(Radians.of(0.018))
+              .minus(Radians.of(-0.037))), // Front Right
+      new SwerveConfig.Module(
+          11,
+          21,
+          31,
+          Radians.of(-1.911)
+              .minus(Radians.of(0.00959265359))
+              .minus(Radians.of(-0.04577796077))
+              .minus(Radians.of(0.028))
+              .minus(Radians.of(-0.01259265359))), // Front Left
+      new SwerveConfig.Module(
+          12,
+          22,
+          32,
+          Radians.of(1.555)
+              .minus(Radians.of(0.01577796077))
+              .minus(Radians.of(0.002777960769))
+              .minus(Radians.of(-0.003370614359))
+              .minus(Radians.of(-0.003))
+              .minus(Radians.of(-0.012))), // Back Left
+      new SwerveConfig.Module(
+          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077)).plus(Radians.of(0.04290734641))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,
@@ -184,6 +240,8 @@ public final class Constants {
         1.0; // Percent power when using the triggers
     public static final double TELEOPERATED_ROTATE_POWER = 0.1; // Percent rotating power
     public static final double TELEOPERATED_ROTATE_BOOST_POWER = 0.2; // Percent rotating power
+    public static final double TELEOPERATED_SUPER_ROTATE_POWER = 0.7; // Percent rotating power
+    public static final double TELEOPERATED_ULTRA_FINE_TUNE_DRIVE_POWER = 0.5;
   }
 
   public static final class CANBUS {
@@ -203,7 +261,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int HANG_ENCODER = 10;
-    public static final int CORAL_CLEAR_BEAM_BREAK = -1;
+    public static final int CORAL_CLEAR_BEAM_BREAK = 3;
     public static final int CORAL_DETECT_BEAM_BREAK = 0;
     public static final int ELEVATOR_FLOOR_LIMIT = 1;
     public static final int ELEVATOR_CEIL_LIMIT = 2;
@@ -296,7 +354,7 @@ public final class Constants {
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(41.50);
-    public static final Distance MAX_HEIGHT = Inches.of(71.0);
+    public static final Distance MAX_HEIGHT = Inches.of(70.65);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
@@ -304,7 +362,7 @@ public final class Constants {
     public static final class CORAL {
       public static final Distance L1_HEIGHT = Inches.of(46.0); // change
       public static final Distance L2_HEIGHT = Inches.of(49.2);
-      public static final Distance L3_HEIGHT = Inches.of(57.2);
+      public static final Distance L3_HEIGHT = Inches.of(56.1);
       public static final Distance L4_HEIGHT = MAX_HEIGHT;
       public static final Distance INTAKE_HEIGHT = MIN_HEIGHT;
     }
@@ -315,6 +373,10 @@ public final class Constants {
       public static final Distance BARGE_HEIGHT = MAX_HEIGHT;
       public static final Distance GROUND_HEIGHT = MIN_HEIGHT;
       public static final Distance PROCESSOR_HEIGHT = Inches.of(41.50);
+    }
+
+    public static final class AUTO {
+      public static final Distance READY_HEIGHT = Inches.of(53);
     }
   }
 
@@ -396,25 +458,25 @@ public final class Constants {
 
     static {
       MAX_ANGLES = new TreeMap<>();
-      MAX_ANGLES.put(ELEVATOR.MAX_HEIGHT.minus(Inches.of(0.3)), SAFE_MAX_ANGLE);
+      MAX_ANGLES.put(ELEVATOR.MAX_HEIGHT.minus(Inches.of(0.5)), SAFE_MAX_ANGLE);
       MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MAX_ANGLE);
     }
   }
 
   public static final class MANIPULATOR {
     public static final Current ALGAE_DETECT_CURRENT = Amps.of(15);
-    public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(0.5);
-    public static final Time ALGAE_GRIP_IDLE_TIME = Seconds.of(0.25);
+    public static final Time ALGAE_GRIP_CHECK_TIME = Seconds.of(1.0);
+    public static final Time ALGAE_GRIP_IDLE_TIME = Seconds.of(1.0);
 
     public static final boolean ALGAE_GRIP_CHECK_ENABLED = true;
-    public static final double ALGAE_GRIP_CHECK_SPEED = 0.1;
+    public static final double ALGAE_GRIP_CHECK_SPEED = 0.4;
 
     public static final double ALGAE_OUT_SPEED = -1.0;
     public static final double ALGAE_IN_SPEED = 0.7;
-    public static final double ALGAE_HOLD_SPEED = -0.1;
+    public static final double ALGAE_HOLD_SPEED = 0.4;
 
     public static final double CORAL_OUT_SPEED = 0.7;
-    public static final double CORAL_IN_SPEED = 0.2;
+    public static final double CORAL_IN_SPEED = 0.3;
     public static final double CORAL_SLOW_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.1;
     public static final double CORAL_HOLD_SPEED = -0.0;
@@ -444,12 +506,15 @@ public final class Constants {
 
   // LED
   public static final class LED {
-    public static final int SIDE_STRIP_HEIGHT = 58; // Number of LEDs on side strip
+    public static final Distance Spacing = Meters.of(1 / 60.0);
+    // public static final int length = 31;
+    public static final int port = 9;
+    public static final int SIDE_STRIP_HEIGHT = 56;
   }
 
   public static final class FUNNEL {
     public static final boolean MOTOR_INVERTED = false;
-    public static final double INTAKE_SPEED = 0.2;
+    public static final double INTAKE_SPEED = 1.0;
     public static final Time INTAKE_TIME = Seconds.of(0.5);
   }
 

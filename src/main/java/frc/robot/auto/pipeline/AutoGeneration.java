@@ -1,26 +1,24 @@
 package frc.robot.auto.pipeline;
 
-import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.auto.utils.AutoCommands;
 import frc.robot.auto.utils.AutoPaths;
-import frc.robot.auto.utils.AutonomousCommands;
 import java.lang.Thread.State;
 import java.util.function.Supplier;
 
 public class AutoGeneration extends SubsystemBase {
   private AutoThread currentThread;
-  private AutonomousCommands autonomous;
+  private AutoCommands autonomous;
   private Time workDelay;
   private Time workTime;
   private Supplier<AutoPaths.PlanParameters> parametersSupplier;
 
   public AutoGeneration(
-      AutonomousCommands autonomous,
+      AutoCommands autonomous,
       Time sleepTime,
       Time workTime,
       Supplier<AutoPaths.PlanParameters> parametersSupplier) {
@@ -32,8 +30,9 @@ public class AutoGeneration extends SubsystemBase {
   }
 
   private void logState() {
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadExists", currentThread != null);
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished", currentThread.isFinished());
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadExists", currentThread != null);
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/threadFinished",
+    // currentThread.isFinished());
   }
 
   @Override
@@ -42,7 +41,7 @@ public class AutoGeneration extends SubsystemBase {
   }
 
   private void setParameters(AutoPaths.PlanParameters parameters, boolean forceWork) {
-    Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
+    // Logger.logObject(AutoPaths.Logging.AUTO_GENERATION + "/newParameters", parameters);
 
     if (!parameters.constraints.pathExists()
         || (!AutoThread.shouldWorkInBackground() && !forceWork)) {
@@ -52,7 +51,7 @@ public class AutoGeneration extends SubsystemBase {
     }
 
     if (currentThread == null || currentThread.isFinished()) {
-      Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", true);
+      // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", true);
 
       currentThread = new AutoThread(autonomous, workDelay, workTime);
       currentThread.setParameters(parameters);
@@ -61,7 +60,7 @@ public class AutoGeneration extends SubsystemBase {
       currentThread.setParameters(parameters);
       currentThread.start();
     } else {
-      Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", false);
+      // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/restartedThread", false);
 
       currentThread.setParameters(parameters);
     }
@@ -84,8 +83,8 @@ public class AutoGeneration extends SubsystemBase {
     System.out.print("Auto command: ");
     System.out.println(command);
 
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
-    Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/lastGetCommand", Timer.getFPGATimestamp());
+    // Logger.log(AutoPaths.Logging.AUTO_GENERATION + "/commandIsNull", command == null);
 
     if (command == null)
       return CommandUtils.warnWithRequirements(

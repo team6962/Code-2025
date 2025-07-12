@@ -11,7 +11,7 @@ public interface Hang {
   public Command stow();
 
   public static Hang create() {
-    if (ENABLED_SYSTEMS.HANG) return new RealHang();
+    if (ENABLED_SYSTEMS.isHangEnabled()) return new RealHang();
     else return new DisabledHang();
   }
 }

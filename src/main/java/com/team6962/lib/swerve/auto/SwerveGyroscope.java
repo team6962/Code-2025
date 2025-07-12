@@ -37,7 +37,6 @@ public class SwerveGyroscope extends SubsystemBase {
   private SwerveDriveKinematics kinematics;
   private Angle absoluteHeading = Radians.of(0);
   private AngularVelocity angularVelocity;
-  private Timer deltaTimer;
 
   public SwerveGyroscope(
       Supplier<SwerveModulePosition[]> moduleDeltasSupplier, SwerveDriveKinematics kinematics) {
@@ -78,6 +77,19 @@ public class SwerveGyroscope extends SubsystemBase {
     //         gyroscope.getNavX().deregisterCallback(this);
     //     }
     // }, this);
+
+    Logger.logMeasure(getName() + "/angularVelocity", () -> angularVelocity);
+    Logger.logMeasure(getName() + "/continuousYaw", () -> Degrees.of(navx.getAngle()));
+    Logger.logMeasure(getName() + "/Gyroscope/discontinuousYaw", () -> Degrees.of(navx.getYaw()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/discontinuousPitch", () -> Degrees.of(navx.getPitch()));
+    Logger.logMeasure(getName() + "/Gyroscope/discontinuousRoll", () -> Degrees.of(navx.getRoll()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelX", () -> Degrees.of(navx.getWorldLinearAccelX()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelY", () -> Degrees.of(navx.getWorldLinearAccelY()));
+    Logger.logMeasure(
+        getName() + "/Gyroscope/linearAccelZ", () -> Degrees.of(navx.getWorldLinearAccelZ()));
   }
 
   @Override
@@ -85,32 +97,13 @@ public class SwerveGyroscope extends SubsystemBase {
     if (RobotBase.isReal() && navx != null && navx.isConnected() && !navx.isCalibrating()) {
       absoluteHeading = Degrees.of(navx.getAngle()).times(-1);
       angularVelocity = DegreesPerSecond.of(navx.getRate()).times(-1);
-
-      Logger.log(getName() + "/continuousYaw", Degrees.of(navx.getAngle()));
-      Logger.log(getName() + "/continuousYawRadians", -navx.getAngle() / 360.0);
-      Logger.log(getName() + "/Gyroscope/discontinuousYaw", Degrees.of(navx.getYaw()));
-      Logger.log(getName() + "/Gyroscope/discontinuousPitch", Degrees.of(navx.getPitch()));
-      Logger.log(getName() + "/Gyroscope/discontinuousRoll", Degrees.of(navx.getRoll()));
-      Logger.log(getName() + "/Gyroscope/linearAccelX", Degrees.of(navx.getWorldLinearAccelX()));
-      Logger.log(getName() + "/Gyroscope/linearAccelY", Degrees.of(navx.getWorldLinearAccelY()));
-      Logger.log(getName() + "/Gyroscope/linearAccelZ", Degrees.of(navx.getWorldLinearAccelZ()));
     } else {
-      if (deltaTimer == null) {
-        deltaTimer = new Timer();
-      }
-
       Angle headingChange = Radians.of(kinematics.toTwist2d(moduleDeltasSupplier.get()).dtheta);
-
-      Logger.log(getName() + "/headingChange", headingChange);
 
       if (Math.abs(headingChange.in(Radians)) < 0.01) {
         headingChange = Radians.of(0);
       }
 
-      Time delta = Seconds.of(deltaTimer.get());
-      deltaTimer.restart();
-
-      angularVelocity = headingChange.div(delta);
       absoluteHeading = absoluteHeading.plus(headingChange);
     }
   }

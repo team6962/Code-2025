@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -85,13 +86,17 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
     lastPositions = modulePositions;
   }
 
+  public Angle getContinuousGyroscopeAngle() {
+    return gyroscope.getHeading();
+  }
+
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
 
-    Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
-    Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
+    // Logger.log("/PoseEstimator/lastVisionMeasurement/pose", visionRobotPoseMeters);
+    // Logger.log("/PoseEstimator/lastVisionMeasurement/timestamp", timestamp);
   }
 
   public void resetPoseEstimate(Pose2d expectedFieldPose) {
