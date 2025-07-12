@@ -16,8 +16,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -111,7 +111,7 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
   }
 
   public void resetHeadingEstimate(Rotation2d expectedFieldHeading) {
-    resetPoseEstimate(new Pose2d(getEstimatedPose().getTranslation(), expectedFieldHeading));
+    poseEstimator.resetRotation(expectedFieldHeading);
   }
 
   @Override

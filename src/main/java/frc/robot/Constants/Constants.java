@@ -197,7 +197,12 @@ public final class Constants {
               .minus(Radians.of(-0.003))
               .minus(Radians.of(-0.012))), // Back Left
       new SwerveConfig.Module(
-          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077)).plus(Radians.of(0.04290734641))), // Back Right
+          13,
+          23,
+          33,
+          Radians.of(0.01540734641)
+              .minus(Radians.of(0.08577796077))
+              .plus(Radians.of(0.04290734641))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
           14,
           24,

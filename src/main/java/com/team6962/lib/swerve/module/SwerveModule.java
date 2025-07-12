@@ -14,13 +14,11 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -36,7 +34,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -377,8 +374,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
   }
 
-  private Command calibrateMotor(
-      String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
+  private Command calibrateMotor(String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.per(Second).of(2), Volts.of(7), Seconds.of(8)),

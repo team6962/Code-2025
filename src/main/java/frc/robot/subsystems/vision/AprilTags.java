@@ -72,7 +72,7 @@ public class AprilTags extends SubsystemBase {
   private static ArrayList<Double> mt1_inititalHeadingEstimates = new ArrayList<Double>();
   private static double mt1_avgInitialHeadingEstimate = 0;
   private static double mt1_lastInitialHeadingEstimate = 0;
-  private static boolean mt1_initalHeadingLocked = false;
+  private static boolean mt1_initialHeadingLocked = false;
 
   private static record BestEstimate(
       Pose2d pose, Time timestamp, Distance translationError, Angle rotationError, int tagCount) {
@@ -89,17 +89,17 @@ public class AprilTags extends SubsystemBase {
   public static void injectVisionData(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
     Map<String, LimelightHelpers.PoseEstimate> poseEstimates =
-        getIdentifiedPoseEstimates(cameraPoses.keySet());
+        getIdentifiedPoseEstimates(cameraPoses, poseEstimator);
     changingHeading = false;
 
     loggedEstimates = poseEstimates;
 
     BestEstimate bestPoseEstimate = new BestEstimate();
     List<Pose2d> loggedVisionPoses = new ArrayList<>();
-
+    int counter = 0;
     for (PoseEstimate poseEstimate : poseEstimates.values()) {
       Pose2d pose2d = poseEstimate.pose;
-      if (isInvalidPoseEstimate(poseEstimate, pose2d)) continue;
+      if (isInvalidPoseEstimate(poseEstimate, pose2d)) {counter++; continue;}
 
       boolean canChangeHeading = canChangeHeading(poseEstimate, poseEstimator, pose2d);
 
@@ -132,7 +132,7 @@ public class AprilTags extends SubsystemBase {
                 poseEstimate.tagCount);
       }
     }
-
+    Logger.log("counter", counter);
     if (bestPoseEstimate.tagCount > 0) {
       poseEstimator.addVisionMeasurement(
           bestPoseEstimate.pose,
@@ -146,24 +146,41 @@ public class AprilTags extends SubsystemBase {
     Logger.getField().getObject("visionPoses").setPoses(loggedVisionPoses);
   }
 
-  private static List<LimelightHelpers.PoseEstimate> getPoseEstimates(
+  private static Map<String, LimelightHelpers.PoseEstimate> getIdentifiedPoseEstimates(
       Map<String, Pose3d> cameraPoses, PoseEstimator poseEstimator) {
 
     // Set robot headings for each limelight (required for megatag 2)
     for (String cameraName : cameraPoses.keySet()) {
-      if (CachedRobotState.isDisabled() && !mt1_initalHeadingLocked) { // only update INITIAL heading estimate when disabled
+      if (CachedRobotState.isDisabled()
+          && !mt1_initialHeadingLocked) { // only update INITIAL heading estimate when disabled
         if (LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName) != null) {
-          mt1_lastInitialHeadingEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getDegrees();
+          mt1_lastInitialHeadingEstimate =
+              LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName)
+                  .pose
+                  .getRotation()
+                  .getDegrees();
+          mt1_avgInitialHeadingEstimate = mt1_lastInitialHeadingEstimate;
           mt1_inititalHeadingEstimates.add(
-            LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName).pose.getRotation().getRadians()
-          );
+              LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName)
+                  .pose
+                  .getRotation()
+                  .getRadians());
         } else {
           System.out.println(cameraName + ": MT1 pose estimate is null!");
         }
       } else {
-        mt1_initalHeadingLocked = true; // prevent any further modifications to this initial heading
+        mt1_initialHeadingLocked = true; // prevent any further modifications to this initial heading
       }
-
+      for(String limelightName: cameraPoses.keySet()) {
+      LimelightHelpers.SetRobotOrientation(
+          limelightName,
+          mt1_avgInitialHeadingEstimate,
+          poseEstimator.getAngularVelocity().in(DegreesPerSecond),
+          0,
+          0,
+          0,
+          0);
+      }
       // if (CachedRobotState.isAllianceInverted().orElse(false)) {
       //   LimelightHelpers.SetRobotOrientation(
       //       cameraName,
@@ -186,53 +203,49 @@ public class AprilTags extends SubsystemBase {
       //       0,
       //       0);
       // }
-    }
-
-    // Calculate average heading estimate
-    double avgX = 0;
-    double avgY = 0;
-    for (double heading : mt1_inititalHeadingEstimates) {
-      avgX += Math.cos(heading);
-      avgY += Math.sin(heading);
-    }
-
-    avgX /= mt1_inititalHeadingEstimates.size();
-    avgY /= mt1_inititalHeadingEstimates.size();
-
-    mt1_avgInitialHeadingEstimate = Math.atan2(avgY, avgX) * 180 / Math.PI;
-    mt1_avgInitialHeadingEstimate = mt1_avgInitialHeadingEstimate < 0 ? (mt1_avgInitialHeadingEstimate + 360) % 360 : mt1_avgInitialHeadingEstimate;
-
-    Logger.log("/mt1Estimate", mt1_lastInitialHeadingEstimate);
-    Logger.log("/gyroAngle", poseEstimator.getEstimatedHeading().getDegrees());
-    Logger.log("/finalEstimate", (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
-
-    return cameraPoses.keySet().stream()
-        .map(
-            name ->
-                CachedRobotState.isAllianceInverted().orElse(false)
-                    ? LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(name)
-                    : LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name))
-        .filter((estimate) -> estimate != null)
-        .collect(Collectors.toList());
+      
   }
 
-  private static Map<String, LimelightHelpers.PoseEstimate> getIdentifiedPoseEstimates(
-      Set<String> cameraIds) {
+    // Calculate average heading estimate
+    // double avgX = 0;
+    // double avgY = 0;
+    // for (double heading : mt1_inititalHeadingEstimates) {
+    //   avgX += Math.cos(heading);
+    //   avgY += Math.sin(heading);
+    // }
+
+    // mt1_avgInitialHeadingEstimate = Math.atan2(avgY, avgX) * 180 / Math.PI;
+    // mt1_avgInitialHeadingEstimate =
+    //     mt1_avgInitialHeadingEstimate < 0
+    //         ? (mt1_avgInitialHeadingEstimate + 360) 
+    //         : mt1_avgInitialHeadingEstimate;
+  
+    if (CachedRobotState.isDisabled() && !mt1_initialHeadingLocked) {
+      poseEstimator.resetHeadingEstimate(Rotation2d.fromDegrees(mt1_avgInitialHeadingEstimate));
+    }
+    Logger.log("mt1Estimate", mt1_lastInitialHeadingEstimate);
+    Logger.log("gyroAngle", poseEstimator.getEstimatedHeading().getDegrees());
+    Logger.log("finalEstimate", (mt1_lastInitialHeadingEstimate + poseEstimator.getEstimatedHeading().getDegrees()));
+    Logger.log("mt1Locked", mt1_initialHeadingLocked);
+    Logger.log("mt1AvgEstimate", mt1_avgInitialHeadingEstimate);
     HashMap<String, LimelightHelpers.PoseEstimate> output = new HashMap<>();
 
-    for (String cameraId : cameraIds) {
+    for (String cameraId : cameraPoses.keySet()) {
       LimelightHelpers.PoseEstimate estimate =
           CachedRobotState.isAllianceInverted().orElse(false)
-              ? LimelightHelpers.getBotPoseEstimate_wpiRed(cameraId)
-              : LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
+              ? LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(cameraId)
+              : LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
 
       if (estimate == null) continue;
 
       output.put(cameraId, estimate);
     }
-
+    Logger.log("output", output.size());
     return output;
+    
   }
+
+  
 
   private static boolean isInvalidPoseEstimate(PoseEstimate poseEstimate, Pose2d pose2d) {
     return IntStream.of(LIMELIGHT.BLACKLISTED_APRILTAGS)
