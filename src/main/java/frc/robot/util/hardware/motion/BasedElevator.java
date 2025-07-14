@@ -14,12 +14,14 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -224,11 +226,18 @@ public class BasedElevator extends SubsystemBase {
          */
         public LimitSwitchConfig ceilingLimitSwitch;
 
+        public SimConfig simulation;
+
         /**
          * Robot control loop cycle frequency (frequency that periodic is
          * called).
          */
         public Frequency updateFrequency = Hertz.of(50);
+    }
+
+    public static class SimConfig {
+        public DCMotor motor;
+        public Mass mass;
     }
 
     /**
@@ -315,11 +324,11 @@ public class BasedElevator extends SubsystemBase {
         NormallyClosed
     }
 
-    private Config config;
+    protected Config config;
 
-    private BasedMotor[] motors;
-    private BasedLimitSwitch floor;
-    private BasedLimitSwitch ceiling;
+    protected BasedMotor[] motors;
+    protected BasedLimitSwitch floor;
+    protected BasedLimitSwitch ceiling;
 
     private ElevatorFeedforward feedforward;
     private TrapezoidProfile downProfile;
@@ -366,6 +375,9 @@ public class BasedElevator extends SubsystemBase {
         Logger.logMeasure(getName() + "/position", this::getPosition);
         Logger.logMeasure(getName() + "/velocity", this::getVelocity);
         Logger.logBoolean(getName() + "/seeded", () -> absolutePositionSeeded);
+        
+        Logger.logMeasure(getName() + "/minPosition", this::getMinPosition);
+        Logger.logMeasure(getName() + "/maxPosition", this::getMaxPosition);
 
         floor.logUnder(getName() + "/limits/floor");
         ceiling.logUnder(getName() + "/limits/ceiling");

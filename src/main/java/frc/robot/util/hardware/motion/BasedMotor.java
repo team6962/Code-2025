@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -25,12 +26,14 @@ import frc.robot.util.hardware.SparkMaxUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class BasedMotor extends SubsystemBase {
+    private BasedElevator.Config elevatorConfig;
     private BasedElevator.MotorConfig motorConfig;
     private SparkMax motor;
     private RelativeEncoder encoder;
     private SparkClosedLoopController PID;
 
     public BasedMotor(BasedElevator.Config elevatorConfig, BasedElevator.MotorConfig motorConfig){
+        this.elevatorConfig = elevatorConfig;
         this.motorConfig = motorConfig;
         motor = new SparkMax(motorConfig.canId, MotorType.kBrushless);
         encoder = motor.getEncoder();
@@ -88,5 +91,9 @@ public class BasedMotor extends SubsystemBase {
         Logger.logMeasure(path + "/" + getName() + "Motor/outputCurrent", this::getOutputCurrent);
         Logger.logNumber(path + "/" + getName() + "Motor/busVoltage", motor::getBusVoltage);
         Logger.logNumber(path + "/" + getName() + "Motor/outputVoltage", () -> getDutyCycle() * motor.getBusVoltage());
+    }
+
+    public SparkMaxSim createSparkMaxSim() {
+        return new SparkMaxSim(motor, elevatorConfig.simulation.motor);
     }
 }
