@@ -119,12 +119,12 @@ public class TrueElevator extends BasedElevator implements Elevator{
     }
     @Override
     public Command up() {
-        return this.applyDutyCycle(ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
+        return this.applyDutyCycleWithGravityCompensation(ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
     }
 
     @Override
     public Command down() {
-        return this.applyDutyCycle(-ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
+        return this.applyDutyCycleWithGravityCompensation(-ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
     }
 
     @Override
