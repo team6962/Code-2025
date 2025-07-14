@@ -371,6 +371,14 @@ public class BasedElevator extends SubsystemBase {
         ceiling.logUnder(getName() + "/limits/ceiling");
     }
 
+    public Distance getMinPosition() {
+        return config.minHeight;
+    }
+
+    public Distance getMaxPosition() {
+        return config.maxHeight;
+    }
+
     /**
      * Get the position of the elevator.
      * @return The current position of the elevator as a Distance, averaged

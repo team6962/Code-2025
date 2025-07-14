@@ -41,10 +41,6 @@ public class TrueElevator extends BasedElevator implements Elevator{
     }
 
     @Override
-    public Command stop() {
-        return this.stop();
-    }
-    @Override
     public Command stow() {
       return moveTo(ELEVATOR.STOW_HEIGHT);
     }
@@ -101,22 +97,24 @@ public class TrueElevator extends BasedElevator implements Elevator{
 
     @Override
     public Distance getAverageHeight() {
-        return this.getAverageHeight();
+        return this.getPosition();
     }
 
     @Override
     public Distance getMaxHeight() {
-        return this.getMaxHeight();
+        return this.getMaxPosition();
     }
 
     @Override
     public Distance getMinHeight() {
-        return this.getMinHeight();
+        return this.getMinPosition();
     }
 
+    @Override
     public Command move(double dutyCycle) {
-        return this.move(dutyCycle);
+        return this.applyDutyCycleWithGravityCompensation(dutyCycle);
     }
+
     @Override
     public Command up() {
         return this.applyDutyCycleWithGravityCompensation(ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
@@ -126,10 +124,4 @@ public class TrueElevator extends BasedElevator implements Elevator{
     public Command down() {
         return this.applyDutyCycleWithGravityCompensation(-ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
     }
-
-    @Override
-    public boolean atPosition(Distance height) {
-        return this.atPosition(height);
-    }
-
 }
