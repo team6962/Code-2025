@@ -347,7 +347,7 @@ public class BasedElevator extends SubsystemBase {
     
     private double outputState = 0;
 
-    private boolean absolutePositionSeeded = true; // TODO
+    private boolean absolutePositionSeeded = false;
 
     /**
      * Create a BasedElevator with the given configuration.
