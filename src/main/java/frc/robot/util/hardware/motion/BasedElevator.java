@@ -102,62 +102,73 @@ public class BasedElevator extends SubsystemBase {
         }
 
         /**
-         * Proportional gain of the PID controller.
+         * Proportional gain of the PID controller. This gain determines how
+         * strongly the elevator responds to error between the actual position
+         * and expected position in the motion profile. Higher values result in
+         * faster correction but may cause overshooting.
          */
         public double kP;
 
         /**
-         * Integral gain of the PID controller.
+         * Integral gain of the PID controller. Not recommended unless the load
+         * the elevator carries varies unpredictably. Changes to this elevator
+         * implementation may be needed for safe use of this gain.
          */
         public double kI;
 
         /**
-         * Derivative gain of the PID controller.
+         * Derivative gain of the PID controller. Used to reduce oscillatons and
+         * improve stability of the elevator's motion.
          */
         public double kD;
 
         /**
-         * Static feedforward gain, which is the voltage required for the
-         * elevator to overcome static friction.
+         * Static feedforward gain (volts), which is the voltage required for
+         * the elevator to overcome static friction.
          */
         public double kS;
 
         /**
-         * Gravity feedforward gain, which is the voltage required to
+         * Gravity feedforward gain (volts), which is the voltage required to
          * overcome the force of gravity on the elevator.
          */
         public double kG;
 
         /**
-         * Velocity feedforward gain, which is the coefficient multiplied
-         * by velocity to find the voltage required to maintain that velocity.
+         * Velocity feedforward gain (volts / m/s), which is the coefficient
+         * multiplied by velocity to find the voltage required to maintain that
+         * velocity.
          */
         public double kV;
 
         /**
-         * Acceleration feedforward gain, which is the coefficient
-         * multiplied by acceleration to find the voltage required to reach
-         * that acceleration.
+         * Acceleration feedforward gain (volts / m/s²), which is the
+         * coefficient multiplied by acceleration to find the voltage required
+         * to reach that acceleration.
          */
         public double kA;
 
         /**
-         * Maximum velocity at which elevator can travel updward.
+         * Maximum velocity at which elevator can travel upward, used to
+         * generate the trapezoidal motion profile for upward motion.
          */
         public LinearVelocity maxUpwardVelocity;
 
         /**
-         * Maximum upward acceleration that the elevator can achieve.
+         * Maximum upward acceleration that the elevator can achieve, used to
+         * generate the trapezoidal motion profile for upward motion.
          */
         public LinearAcceleration maxUpwardAcceleration;
 
         /**
-         * Maximum velocity at which elevator can travel downward.
+         * Maximum velocity at which elevator can travel downward, used to
+         * generate the trapezoidal motion profile for downward motion.
          */
         public LinearVelocity maxDownwardVelocity;
 
         /**
-         * Maximum downward acceleration that the elevator can achieve.
+         * Maximum downward acceleration that the elevator can achieve, used to
+         * generate the trapezoidal motion profile for downward motion.
          */
         public LinearAcceleration maxDownwardAcceleration;
 
@@ -313,6 +324,8 @@ public class BasedElevator extends SubsystemBase {
     private ElevatorFeedforward feedforward;
     private TrapezoidProfile downProfile;
     private TrapezoidProfile upProfile;
+    
+    private double outputState = 0;
 
     private boolean absolutePositionSeeded = false;
 
@@ -326,6 +339,7 @@ public class BasedElevator extends SubsystemBase {
         this.config = config;
 
         motors = new BasedMotor[config.motors.length];
+
         for (int i = 0; i < config.motors.length; i++) {
             motors[i] = new BasedMotor(config, config.motors[i]);
         }
@@ -399,6 +413,8 @@ public class BasedElevator extends SubsystemBase {
      * Immediately stops all motors of the elevator.
      */
     private void stopMotors() {
+        outputState = 0;
+
         for (BasedMotor motor : motors) {
             motor.stop();
         }
@@ -420,6 +436,8 @@ public class BasedElevator extends SubsystemBase {
             stopMotors();
         }
 
+        outputState = feedforwardVoltage.in(Volts);
+
         for (BasedMotor motor : motors) {
             motor.run(feedbackTarget, feedforwardVoltage);
         }
@@ -437,6 +455,8 @@ public class BasedElevator extends SubsystemBase {
             Voltage voltage = voltageSupplier.get();
 
             if (safeToMoveInDirection(voltage.in(Volts))) {
+                outputState = voltage.in(Volts);
+
                 for (BasedMotor motor : motors) {
                     motor.setVoltage(voltage);
                 }
@@ -639,6 +659,10 @@ public class BasedElevator extends SubsystemBase {
             absolutePositionSeeded = true;
 
             setPosition(absolutePosition);
+        }
+
+        if (!safeToMoveInDirection(outputState)) {
+            stopMotors();
         }
     }
 }
