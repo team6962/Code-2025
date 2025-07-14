@@ -758,6 +758,7 @@ public class BasedElevator extends SubsystemBase {
             Commands.waitSeconds(1.0),
             calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
             stopOnce(),
-            Commands.waitSeconds(1.0));
+            Commands.waitSeconds(1.0)
+        );
   }
 }

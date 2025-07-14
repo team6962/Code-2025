@@ -373,7 +373,7 @@ public final class Constants {
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(41.50);
-    public static final Distance MAX_HEIGHT = Meters.of(200);//Inches.of(70.65);
+    public static final Distance MAX_HEIGHT = Inches.of(70.65);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
