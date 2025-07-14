@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -23,10 +24,12 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class BasedElevator extends SubsystemBase {
     /**
@@ -236,6 +239,14 @@ public class BasedElevator extends SubsystemBase {
     }
 
     public static class SimConfig {
+        public SimConfig(
+            DCMotor motor,
+            Mass mass
+        ) {
+            this.motor = motor;
+            this.mass = mass;
+        }
+
         public DCMotor motor;
         public Mass mass;
     }
@@ -336,7 +347,7 @@ public class BasedElevator extends SubsystemBase {
     
     private double outputState = 0;
 
-    private boolean absolutePositionSeeded = false;
+    private boolean absolutePositionSeeded = true; // TODO
 
     /**
      * Create a BasedElevator with the given configuration.
@@ -344,7 +355,9 @@ public class BasedElevator extends SubsystemBase {
      * feedforward gains, motor configurations, limit switch configurations, and
      * elevator dimensions.
      */
-    public BasedElevator(Config config) {
+    public BasedElevator(String name, Config config) {
+        setName(name);
+
         this.config = config;
 
         motors = new BasedMotor[config.motors.length];
@@ -375,7 +388,7 @@ public class BasedElevator extends SubsystemBase {
         Logger.logMeasure(getName() + "/position", this::getPosition);
         Logger.logMeasure(getName() + "/velocity", this::getVelocity);
         Logger.logBoolean(getName() + "/seeded", () -> absolutePositionSeeded);
-        
+
         Logger.logMeasure(getName() + "/minPosition", this::getMinPosition);
         Logger.logMeasure(getName() + "/maxPosition", this::getMaxPosition);
 
@@ -427,6 +440,10 @@ public class BasedElevator extends SubsystemBase {
      */
     public Command stop() {
         return run(this::stopMotors);
+    }
+
+    public Command stopOnce() {
+        return runOnce(this::stopMotors);
     }
 
     /**
@@ -486,6 +503,10 @@ public class BasedElevator extends SubsystemBase {
         });
     }
 
+    public Command applyVoltage(Voltage voltage) {
+        return applyVoltage(() -> voltage);
+    }
+
     /**
      * Apply a voltage to the motors of the elevator, with gravity compensation.
      * @param voltage The voltage to apply to the motors, as a Voltage.
@@ -503,7 +524,7 @@ public class BasedElevator extends SubsystemBase {
      * @param dutyCycle The duty cycle to apply to the motors, as a double.
      * @return A command that applies the duty cycle to the motors of the elevator.
      */
-    public Command applyDutyCycleWithGravityCompensation(double dutyCycle) {
+    public Command moveDutyCycle(double dutyCycle) {
         return applyVoltageWithGravityCompensation(Volts.of(dutyCycle * 12.0));
     }
 
@@ -542,7 +563,7 @@ public class BasedElevator extends SubsystemBase {
                 clampedTarget.in(Meters), targetVelocity.in(MetersPerSecond)
             );
 
-            private double startTime;
+            private Timer timer = new Timer();
 
             @Override
             public void initialize() {
@@ -550,12 +571,12 @@ public class BasedElevator extends SubsystemBase {
                     getPosition().in(Meters), getVelocity().in(MetersPerSecond)
                 );
 
-                startTime = Timer.getFPGATimestamp();
+                timer.restart();
             }
 
             @Override
             public void execute() {
-                double currentTime = Timer.getFPGATimestamp() - startTime;
+                double currentTime = timer.get();
 
                 TrapezoidProfile profile = goalState.position < initialState.position ? downProfile : upProfile;
 
@@ -572,6 +593,9 @@ public class BasedElevator extends SubsystemBase {
                 );
 
                 Voltage feedforwardVoltage = Volts.of(feedforward.calculateWithVelocities(currentState.velocity, nextState.velocity));
+
+                Logger.log(BasedElevator.this.getName() + "/feedforwardVoltage", feedforwardVoltage.in(Volts));
+                Logger.log(BasedElevator.this.getName() + "/feedbackTarget", currentState.position);
 
                 runMotors(Meters.of(currentState.position), feedforwardVoltage);
             }
@@ -685,4 +709,55 @@ public class BasedElevator extends SubsystemBase {
             stopMotors();
         }
     }
+
+    public Voltage getAppliedVoltage() {
+        double appliedVoltageSum = 0;
+
+        for (BasedMotor motor : motors) {
+            appliedVoltageSum += motor.getDutyCycle() * motor.getBusVoltage();
+        }
+
+        return Volts.of(appliedVoltageSum / motors.length);
+    }
+
+    public Command calibrate() {
+        SysIdRoutine calibrationRoutine =
+            new SysIdRoutine(
+                new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(6.0), Seconds.of(2.5)),
+                new SysIdRoutine.Mechanism(
+                    voltage -> {
+                        Logger.log(BasedElevator.this.getName() + "/calibrationVoltage", voltage.in(Volts));
+                        
+                        if (safeToMoveInDirection(voltage.in(Volts))) {
+                            outputState = voltage.in(Volts);
+
+                            for (BasedMotor motor : motors) {
+                                motor.setVoltage(voltage);
+                            }
+                        } else {
+                            stopMotors();
+                        }
+                    },
+                    log ->
+                        log.motor("elevator")
+                            .voltage(getAppliedVoltage())
+                            .linearPosition(getPosition())
+                            .linearVelocity(getVelocity()),
+                    this));
+
+        return Commands.sequence(
+            Commands.waitSeconds(1.0),
+            calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+            stopOnce(),
+            Commands.waitSeconds(1.0),
+            calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+            stopOnce(),
+            Commands.waitSeconds(1.0),
+            calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+            stopOnce(),
+            Commands.waitSeconds(1.0),
+            calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+            stopOnce(),
+            Commands.waitSeconds(1.0));
+  }
 }

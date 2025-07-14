@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 
 public interface Elevator extends Subsystem {
@@ -12,39 +13,65 @@ public interface Elevator extends Subsystem {
 
   public Command hold();
 
-  public Command stow();
+  public default Command stow() {
+    return moveTo(ELEVATOR.STOW_HEIGHT);
+  }
 
-  public Command coralL1();
+  public default Command coralL1() {
+    return moveTo(ELEVATOR.CORAL.L1_HEIGHT);
+  }
 
-  public Command coralL2();
+  public default Command coralL2() {
+    return moveTo(ELEVATOR.CORAL.L2_HEIGHT);
+  }
 
-  public Command coralL3();
+  public default Command coralL3() {
+    return moveTo(ELEVATOR.CORAL.L3_HEIGHT);
+  }
 
-  public Command coralL4();
+  public default Command coralL4() {
+    return moveTo(ELEVATOR.CORAL.L4_HEIGHT);
+  }
 
-  public Command coralIntake();
+  public default Command coralIntake() {
+    return moveTo(ELEVATOR.CORAL.INTAKE_HEIGHT);
+  }
 
-  public Command algaeGround();
+  public default Command algaeGround() {
+    return moveTo(ELEVATOR.ALGAE.GROUND_HEIGHT);
+  }
 
-  public Command algaeL2();
+  public default Command algaeL2() {
+    return moveTo(ELEVATOR.ALGAE.L2_HEIGHT);
+  }
 
-  public Command algaeL3();
+  public default Command algaeL3() {
+    return moveTo(ELEVATOR.ALGAE.L3_HEIGHT);
+  }
 
-  public Command algaeBarge();
+  public default Command algaeBarge() {
+    return moveTo(ELEVATOR.ALGAE.BARGE_HEIGHT);
+  }
 
-  public Command algaeProcessor();
+  public default Command algaeProcessor() {
+    return moveTo(ELEVATOR.ALGAE.PROCESSOR_HEIGHT);
+  }
 
-  public Distance getAverageHeight();
+  public Distance getPosition();
 
-  public Distance getMaxHeight();
+  public Distance getMaxPosition();
 
-  public Distance getMinHeight();
+  public Distance getMinPosition();
 
-  public Command move(double speed);
+  public Command moveDutyCycle(double speed);
 
-  public Command up();
+  public default Command up() {
+      return this.moveDutyCycle(ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
+  }
 
-  public Command down();
+  public default Command down() {
+      return this.moveDutyCycle(-ELEVATOR.FINE_CONTROL_DUTY_CYCLE);
+  }
 
   public boolean atPosition(Distance height);
 

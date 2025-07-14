@@ -14,9 +14,15 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,10 +37,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
+import frc.robot.util.hardware.motion.BasedElevator;
+import frc.robot.util.hardware.motion.BasedElevator.LimitSwitchConfig;
+import frc.robot.util.hardware.motion.BasedElevator.LimitSwitchWiring;
+import frc.robot.util.hardware.motion.BasedElevator.MotorConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -343,7 +349,7 @@ public final class Constants {
   public static final class ELEVATOR {
     public static final Mass MASS_OF_ELEVATOR_AND_MANIPULATOR_EXCEPT_FIRST_STAGE = Pounds.of(21.2896736);
     public static final double GEARING = 6.3;
-    public static final Distance CYCLE_HEIGHT = Inches.of(2.16 * Math.PI); // CALCULATE
+    public static final Distance SPROCKET_RADIUS = Inches.of(1.074); // CALCULATE
     public static final Distance TOLERANCE = Inches.of(0.5);
     public static final Distance Bhobe_HEIGHT = Inches.of(1);
     public static final boolean LEFT_INVERTED = true;
@@ -353,21 +359,21 @@ public final class Constants {
       public static final double kI = 0.0;
       public static final double kD = 0.0;
       public static final double kS = 0.9;
-      public static final double kG = 0.0;
-      public static final double kV = 0.0;
-      public static final double kA = 0.0;
+      public static final double kG = 12.0;
+      public static final double kV = 10.0;
+      public static final double kA = 0.2;
     }
 
     public static final double FINE_CONTROL_DUTY_CYCLE = 0.2;
     //CHANGE
-    public static final LinearVelocity MAX_UPWARD_VELOCITY = InchesPerSecond.of(0.5); // inches per second
+    public static final LinearVelocity MAX_UPWARD_VELOCITY = InchesPerSecond.of(12.0); // inches per second
     public static final LinearAcceleration MAX_UPWARD_ACCELERATION = InchesPerSecond.per(Seconds).of(0.5); // inches per second squared
-    public static final LinearVelocity MAX_DOWNWARD_VELOCITY = InchesPerSecond.of(0.5); // inches per second
+    public static final LinearVelocity MAX_DOWNWARD_VELOCITY = InchesPerSecond.of(12.0); // inches per second
     public static final LinearAcceleration MAX_DOWNWARD_ACCELERATION = InchesPerSecond.per(Seconds).of(0.5); // inches per second squared
 
     // HEIGHT IS MEASURED FROM THE GROUND TO THE TOP OF THE ELEVATOR
     public static final Distance BASE_HEIGHT = Inches.of(41.50);
-    public static final Distance MAX_HEIGHT = Inches.of(70.65);
+    public static final Distance MAX_HEIGHT = Meters.of(200);//Inches.of(70.65);
     public static final Distance MIN_HEIGHT = BASE_HEIGHT;
     public static final Distance STOW_HEIGHT = BASE_HEIGHT;
     public static final Distance MAX_UNLIMITED_HEIGHT = Inches.of(41.0); // AVERAGE
@@ -395,6 +401,41 @@ public final class Constants {
     public static final class CURRENT {
       public static final Current FREE_LIMIT = Amps.of(80);
       public static final Current STALL_LIMIT = Amps.of(60);
+    }
+
+    public static final BasedElevator.Config CONFIG = new BasedElevator.Config(
+        ELEVATOR.PROFILE.kP,
+        ELEVATOR.PROFILE.kI,
+        ELEVATOR.PROFILE.kD,
+        ELEVATOR.PROFILE.kS,
+        ELEVATOR.PROFILE.kG,
+        ELEVATOR.PROFILE.kV,
+        ELEVATOR.PROFILE.kA,
+        ELEVATOR.MAX_UPWARD_VELOCITY,
+        ELEVATOR.MAX_UPWARD_ACCELERATION,
+        ELEVATOR.MAX_DOWNWARD_VELOCITY,
+        ELEVATOR.MAX_DOWNWARD_ACCELERATION,
+        ELEVATOR.MIN_HEIGHT,
+        ELEVATOR.MAX_HEIGHT,
+        ELEVATOR.GEARING, // gearReduction
+        /*CHANGE*/ELEVATOR.SPROCKET_RADIUS, // sprocketRadius
+        new MotorConfig[] {
+            new MotorConfig("LEFT_ELEVATOR_MOTOR", CAN.ELEVATOR_LEFT, ELEVATOR.LEFT_INVERTED), // Left Motor
+            new MotorConfig("RIGHT_ELEVATOR_MOTOR", CAN.ELEVATOR_RIGHT, ELEVATOR.RIGHT_INVERTED) // Right Motor
+        },
+        ELEVATOR.CURRENT.FREE_LIMIT, // freeCurrentLimit
+        ELEVATOR.CURRENT.STALL_LIMIT, // stallCurrentLimit
+        ELEVATOR.TOLERANCE, // tolerance
+        new LimitSwitchConfig(DIO.ELEVATOR_FLOOR_LIMIT, LimitSwitchWiring.NormallyOpen, true), // floorLimitSwitch
+        new LimitSwitchConfig(DIO.ELEVATOR_CEIL_LIMIT, LimitSwitchWiring.NormallyClosed, false) // ceilLimitSwitch
+    );
+
+    // TODO: Make this better
+    static {
+      CONFIG.simulation = new BasedElevator.SimConfig(
+        DCMotor.getNEO(1),
+        ELEVATOR.MASS_OF_ELEVATOR_AND_MANIPULATOR_EXCEPT_FIRST_STAGE
+      );
     }
   }
 

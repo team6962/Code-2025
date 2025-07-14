@@ -79,12 +79,12 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public Distance getAverageHeight() {
+  public Distance getPosition() {
     return Meters.of(0.0);
   }
 
   @Override
-  public Command move(double speed) {
+  public Command moveDutyCycle(double speed) {
     return CommandUtils.noneWithRequirements(this);
   }
 
@@ -99,12 +99,12 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
-  public Distance getMaxHeight() {
+  public Distance getMaxPosition() {
     return Meters.of(Double.POSITIVE_INFINITY);
   }
 
   @Override
-  public Distance getMinHeight() {
+  public Distance getMinPosition() {
     return Meters.of(Double.NEGATIVE_INFINITY);
   }
 

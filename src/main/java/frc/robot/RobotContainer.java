@@ -33,11 +33,13 @@ import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.RealElevator;
+import frc.robot.subsystems.elevator.TrueElevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
+import frc.robot.util.hardware.motion.SimElevator;
 import frc.robot.util.software.Dashboard.AutonChooser;
 import java.io.InputStream;
 import java.util.Properties;
@@ -125,7 +127,7 @@ public class RobotContainer {
     ledStrip = new LEDs();
 
     manipulator = new Manipulator();
-    elevator = Elevator.create();
+    elevator = TrueElevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
@@ -198,7 +200,9 @@ public class RobotContainer {
 
     // return auto;
 
-    return ((RealElevator) elevator).sysId();
+    return ((SimElevator) elevator).calibrate();
+
+    // return ((RealElevator) elevator).sysId();
 
     // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new
     // Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));

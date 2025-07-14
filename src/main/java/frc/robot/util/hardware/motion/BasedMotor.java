@@ -71,6 +71,10 @@ public class BasedMotor extends SubsystemBase {
         return motor.getAppliedOutput();
     }
 
+    public double getBusVoltage() {
+        return motor.getBusVoltage();
+    }
+
     public Current getOutputCurrent() {
         return Amps.of(motor.getOutputCurrent());
     }

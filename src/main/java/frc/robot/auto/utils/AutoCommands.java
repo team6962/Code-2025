@@ -124,9 +124,9 @@ public class AutoCommands {
                     "towards ready",
                     Commands.parallel(
                         elevator
-                            .move(1.0)
+                            .moveDutyCycle(1.0)
                             .until(
-                                () -> elevator.getAverageHeight().gt(ELEVATOR.AUTO.READY_HEIGHT)),
+                                () -> elevator.getPosition().gt(ELEVATOR.AUTO.READY_HEIGHT)),
                         manipulator.pivot.hold(),
                         manipulator.grabber.stop())),
                 // Finely position the elevator at the maximum safe height,
@@ -192,8 +192,8 @@ public class AutoCommands {
                 // Move the elevator down at maximum speed until it gets
                 // under the safe height to drive at.
                 Commands.parallel(
-                        elevator.move(-1.0), manipulator.pivot.hold(), manipulator.grabber.stop())
-                    .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                        elevator.moveDutyCycle(-1.0), manipulator.pivot.hold(), manipulator.grabber.stop())
+                    .until(() -> elevator.getPosition().lt(ELEVATOR.AUTO.READY_HEIGHT))
                     .withTimeout(0.1))));
   }
 

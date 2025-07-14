@@ -47,7 +47,7 @@ public class SafeSubsystems extends SubsystemBase {
             Commands.none(),
             manipulator.pivot.safe(),
             () ->
-                (targetHeight.minus(elevator.getAverageHeight()).abs(Inches)
+                (targetHeight.minus(elevator.getPosition()).abs(Inches)
                     < ELEVATOR.TOLERANCE.abs(Inches)));
     Command safeElevatorCommand =
         new ConditionalCommand(
@@ -55,7 +55,7 @@ public class SafeSubsystems extends SubsystemBase {
                 Commands.none(),
                 () ->
                     targetHeight.lte(ELEVATOR.BASE_HEIGHT)
-                        && elevator.getAverageHeight().gt(ELEVATOR.CORAL.L3_HEIGHT))
+                        && elevator.getPosition().gt(ELEVATOR.CORAL.L3_HEIGHT))
             .andThen(elevatorCommand);
     return Commands.sequence(safeMoveCommand, safeElevatorCommand, manipulatorCommand);
   }
@@ -72,7 +72,7 @@ public class SafeSubsystems extends SubsystemBase {
   @Override
   public void periodic() {
     if (Constants.SAFETIES_ENABLED) {
-      Distance elevatorHeight = elevator.getAverageHeight();
+      Distance elevatorHeight = elevator.getPosition();
       Angle minAngle = calcSafeMinAngle(elevatorHeight);
       Angle maxAngle = calcSafeMaxAngle(elevatorHeight);
 

@@ -125,7 +125,7 @@ public class DualLinearActuator extends SubsystemBase {
     rightEncoder.setPosition(baseHeight.in(Meters));
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
-    Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
+    Logger.logNumber(this.getName() + "/height", () -> getPosition().in(Meters));
     // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
     // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
 
@@ -177,19 +177,19 @@ public class DualLinearActuator extends SubsystemBase {
     return Meters.of(rightEncoder.getPosition());
   }
 
-  public Distance getAverageHeight() {
+  public Distance getPosition() {
     return getLeftHeight().plus(getRightHeight()).div(2);
   }
 
-  public Distance getMaxHeight() {
+  public Distance getMaxPosition() {
     return maxHeight;
   }
 
-  public Distance getMinHeight() {
+  public Distance getMinPosition() {
     return minHeight;
   }
 
-  public Command move(double speed) {
+  public Command moveDutyCycle(double speed) {
     return runEnd(() -> moveSpeed(speed), this::stopMotors);
   }
 
@@ -203,11 +203,11 @@ public class DualLinearActuator extends SubsystemBase {
   }
 
   public Command up() {
-    return move(0.2);
+    return moveDutyCycle(0.2);
   }
 
   public Command down() {
-    return move(-0.1);
+    return moveDutyCycle(-0.1);
   }
 
   public boolean unsafeMoveDown() {
@@ -223,7 +223,7 @@ public class DualLinearActuator extends SubsystemBase {
 
   public boolean atPosition(Distance height) {
     if (height == null) return true;
-    return debouncer.calculate(getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
+    return debouncer.calculate(getPosition().minus(height).abs(Meters) < tolerance.in(Meters));
   }
 
   public boolean doneMoving() {
@@ -243,7 +243,7 @@ public class DualLinearActuator extends SubsystemBase {
     targetHeight = clampHeight(requestedHeight);
     if (targetHeight == null) return; // If we havent set a target Height yet, do nothing
 
-    if (!canMoveInDirection(requestedHeight.minus(getAverageHeight()).in(Meters))) {
+    if (!canMoveInDirection(requestedHeight.minus(getPosition()).in(Meters))) {
       if (!triggeredFloorLimit() && triggeredCeilingLimit()) {
         leftMotor.setVoltage(kG);
         rightMotor.setVoltage(kG);
@@ -307,7 +307,7 @@ public class DualLinearActuator extends SubsystemBase {
   public Command _hold() {
     return Commands.defer(
         () -> {
-          Distance position = getAverageHeight();
+          Distance position = getPosition();
 
           return this.run(() -> moveToImmediate(position));
         },

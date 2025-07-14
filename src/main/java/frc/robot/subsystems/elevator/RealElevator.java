@@ -48,7 +48,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
         Constants.ELEVATOR.PROFILE.kP,
         Constants.ELEVATOR.PROFILE.kS,
         Constants.ELEVATOR.GEARING,
-        Constants.ELEVATOR.CYCLE_HEIGHT,
+        Constants.ELEVATOR.SPROCKET_RADIUS.times(2 * Math.PI),
         ELEVATOR.BASE_HEIGHT,
         ELEVATOR.MIN_HEIGHT,
         ELEVATOR.MAX_HEIGHT,
@@ -79,7 +79,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
   public Command hold() {
     return Commands.defer(
         () -> {
-          Distance position = getAverageHeight();
+          Distance position = getPosition();
 
           return this.run(() -> moveToImmediate(position));
         },
@@ -172,7 +172,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
                                         + rightMotor.getAppliedOutput()
                                             * rightMotor.getBusVoltage())
                                     / 2.0))
-                        .linearPosition(getAverageHeight())
+                        .linearPosition(getPosition())
                         .linearVelocity(
                             MetersPerSecond.of(
                                 (leftMotor.getEncoder().getVelocity()

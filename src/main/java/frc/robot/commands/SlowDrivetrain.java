@@ -30,8 +30,8 @@ public class SlowDrivetrain extends Command {
   @Override
   public void execute() {
     LinearVelocity maxSpeed = swerveDrive.getConstants().maxDriveSpeed();
-    Double scaleFactor = (elevator.getAverageHeight().div(elevator.getMaxHeight())).magnitude();
-    if (elevator.getAverageHeight().lt(ELEVATOR.MAX_UNLIMITED_HEIGHT)) {
+    Double scaleFactor = (elevator.getPosition().div(elevator.getMaxPosition())).magnitude();
+    if (elevator.getPosition().lt(ELEVATOR.MAX_UNLIMITED_HEIGHT)) {
       scaleFactor = 1.0;
     } else {
       scaleFactor = 1.0 - scaleFactor;
