@@ -53,8 +53,12 @@ public final class SwerveConstants {
             new Motor(
                 DCMotor.getKrakenX60(1),
                 new Slot0Configs()
-                    .withKP(50)
-                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
+                    .withKV(2.6535)
+                    .withKA(0.21856)
+                    .withKP(40.901)
+                    .withKD(3.4641)
+                    .withKS(0.197)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign),
                 Amps.of(60)),
             chassisType == ChassisType.COMPETITION ? Wheel.BILLET.withDiameter(Inches.of(3.824)) : Wheel.COLSON,
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))

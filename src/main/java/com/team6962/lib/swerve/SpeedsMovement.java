@@ -1,8 +1,11 @@
 package com.team6962.lib.swerve;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -135,7 +138,7 @@ public class SpeedsMovement implements SwerveMovement {
             MetersPerSecond.of(targetState.speedMetersPerSecond)
           )
         ),
-        SwerveMovement.positionVoltage.withPosition(
+        SwerveMovement.motionMagicExpoVoltage.withPosition(
           targetState.angle.getRotations()
         )
       );

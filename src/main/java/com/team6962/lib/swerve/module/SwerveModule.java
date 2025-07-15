@@ -1,9 +1,9 @@
 package com.team6962.lib.swerve.module;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -22,9 +22,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -40,7 +37,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -123,7 +119,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
 
     CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
-
+    
     CTREUtils.check(
         steerConfig.apply(
             new MotorOutputConfigs()
@@ -142,6 +138,17 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withFusedCANcoder(steerEncoder)
                 .withRotorToSensorRatio(config.gearing().steer())));
 
+    CTREUtils.check(
+      steerConfig.apply(
+          new MotionMagicConfigs()
+              .withMotionMagicExpo_kV(1.0 * 0.75)// 2.65350, 0.1229
+              .withMotionMagicExpo_kA(0.8 * 0.75))); // 0.21855, 0.1
+    // CTREUtils.check(
+    //   steerConfig.apply(
+    //       new MotionMagicConfigs()
+    //           .withMotionMagicCruiseVelocity(1)
+    //           .withMotionMagicAcceleration(5)));
+
     CTREUtils.check(driveMotor.setPosition(Rotations.of(0)));
 
     setName(getModuleName(corner.index) + " Swerve Module");
@@ -157,6 +164,13 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     StatusChecks.under(this).add("Steer Encoder", steerEncoder);
 
     setupStatusSignals();
+
+    Logger.logNumber(getName() + "/steerVelocity", () -> CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond));
+    // Logger.logNumber(getName() + "/steerAcceleration", () -> CTREUtils.unwrap(steerMotor.getAcceleration()).in(RotationsPerSecondPerSecond));
+
+    Logger.logNumber(getName() + "/feedforwardExpectedVoltage", () ->
+      2.6535 * CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond) +
+      0.21856 * CTREUtils.unwrap(steerMotor.getAcceleration()).in(RotationsPerSecondPerSecond));
   }
 
   /**
