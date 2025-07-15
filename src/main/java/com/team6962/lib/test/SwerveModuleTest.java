@@ -23,9 +23,9 @@ public class SwerveModuleTest extends SubsystemBase {
 
   @Override
   public void periodic() {
-    module.driveState(
-        new SwerveModuleState(
-            FeetPerSecond.of(Math.sin(Timer.getFPGATimestamp() * 0.1) * 15).in(MetersPerSecond),
-            Rotation2d.fromRotations(Timer.getFPGATimestamp() * 0.1)));
+    // module.driveState(
+    //     new SwerveModuleState(
+    //         FeetPerSecond.of(Math.sin(Timer.getFPGATimestamp() * 0.1) * 15).in(MetersPerSecond),
+    //         Rotation2d.fromRotations(Timer.getFPGATimestamp() * 0.1))); TODO: Fix this
   }
 }

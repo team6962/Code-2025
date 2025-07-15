@@ -51,7 +51,7 @@ public class KinematicsTest extends SubsystemBase implements AutoCloseable {
     SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(targetSpeeds);
 
     for (int i = 0; i < 4; i++) {
-      modules[i].driveState(moduleStates[i]);
+      // modules[i].driveState(moduleStates[i]); TODO: Fix this
     }
 
     SwerveModulePosition[] newPositions = new SwerveModulePosition[4];

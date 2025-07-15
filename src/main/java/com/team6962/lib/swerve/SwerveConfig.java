@@ -500,6 +500,11 @@ public class SwerveConfig {
         movement.in(MetersPerSecond) / wheel.radius().in(Meters) * gearing.drive);
   }
 
+  public AngularAcceleration driveMotorMechanismToRotor(LinearAcceleration movement) {
+    return RadiansPerSecondPerSecond.of(
+        movement.in(MetersPerSecondPerSecond) / wheel.radius().in(Meters) * gearing.drive);
+  }
+
   public Angle steerMotorRotorToMechanism(Angle movement) {
     return movement.div(gearing.steer);
   }
