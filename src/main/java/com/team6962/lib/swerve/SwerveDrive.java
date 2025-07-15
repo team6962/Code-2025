@@ -859,56 +859,60 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command calibrateWheelSize() {
-    return Commands.defer(() -> new Command() {
-      Angle initialGyroAngle;
-      Angle[] initialWheelAngles = new Angle[4];
+    return calibrateWheelSize(Seconds.of(10));
+  }
 
-      @Override
-      public void initialize() {
-        initialGyroAngle = getContinuousGyroscopeAngle();
-
-        for (int i = 0; i < 4; i++) {
-          initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
-        }
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        Angle gyroAngleChange = Rotations.of(getContinuousGyroscopeAngle().minus(initialGyroAngle).in(Rotations));
-        Distance driveRadius = getConstants().chassis().driveRadius();
-
-        Logger.log("Swerve Drive/Wheel Size Calibration/Gyro Angle Change", gyroAngleChange);
-
-        Angle[] wheelAngleChanges = new Angle[4];
-
-        for (int i = 0; i < 4; i++) {
-          wheelAngleChanges[i] = Rotations.of(getModules()[i].getDriveWheelAngle().minus(initialWheelAngles[i]).abs(Rotations));
-
-          Logger.log("Swerve Drive/Wheel Size Calibration/Wheel Angle Change " + SwerveModule.getModuleName(i), wheelAngleChanges[i]);
-        }
-
-        Distance[] wheelDiameters = new Distance[4];
-
-        for (int i = 0; i < 4; i++) {
-          wheelDiameters[i] = driveRadius.times(gyroAngleChange.div(wheelAngleChanges[i])).times(2);
-
-          Logger.log("Swerve Drive/Wheel Size Calibration/Diameter " + SwerveModule.getModuleName(i), wheelDiameters[i]);
-        }
-
-        Distance averageDiameter = Meters.of(0);
-
-        for (Distance diameter : wheelDiameters) {
-          averageDiameter = averageDiameter.plus(diameter);
-        }
-
-        averageDiameter = averageDiameter.div(4);
-
-        Logger.log("Swerve Drive/Wheel Size Calibration/Average Diameter", averageDiameter);
-      }
-    }, Set.of()).alongWith(Commands.sequence(
+  public Command calibrateWheelSize(Time timeout) {
+    return Commands.sequence(
       Commands.waitSeconds(1),
-      drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))).withTimeout(10),
+      Commands.defer(() -> new Command() {
+        Angle initialGyroAngle;
+        Angle[] initialWheelAngles = new Angle[4];
+
+        @Override
+        public void initialize() {
+          initialGyroAngle = getContinuousGyroscopeAngle();
+
+          for (int i = 0; i < 4; i++) {
+            initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
+          }
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+          Angle gyroAngleChange = Rotations.of(getContinuousGyroscopeAngle().minus(initialGyroAngle).in(Rotations));
+          Distance driveRadius = getConstants().chassis().driveRadius();
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Gyro Angle Change", gyroAngleChange);
+
+          Angle[] wheelAngleChanges = new Angle[4];
+
+          for (int i = 0; i < 4; i++) {
+            wheelAngleChanges[i] = Rotations.of(getModules()[i].getDriveWheelAngle().minus(initialWheelAngles[i]).abs(Rotations));
+
+            Logger.log("Swerve Drive/Wheel Size Calibration/Wheel Angle Change " + SwerveModule.getModuleName(i), wheelAngleChanges[i]);
+          }
+
+          Distance[] wheelDiameters = new Distance[4];
+
+          for (int i = 0; i < 4; i++) {
+            wheelDiameters[i] = driveRadius.times(gyroAngleChange.div(wheelAngleChanges[i])).times(2);
+
+            Logger.log("Swerve Drive/Wheel Size Calibration/Diameter " + SwerveModule.getModuleName(i), wheelDiameters[i]);
+          }
+
+          Distance averageDiameter = Meters.of(0);
+
+          for (Distance diameter : wheelDiameters) {
+            averageDiameter = averageDiameter.plus(diameter);
+          }
+
+          averageDiameter = averageDiameter.div(4);
+
+          Logger.log("Swerve Drive/Wheel Size Calibration/Average Diameter", averageDiameter);
+        }
+      }, Set.of()).withTimeout(timeout),
       Commands.waitSeconds(1)
-    ));
+    ).deadlineFor(drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))));
   }
 }

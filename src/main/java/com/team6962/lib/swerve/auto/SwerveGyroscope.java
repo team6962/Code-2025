@@ -47,6 +47,7 @@ public class SwerveGyroscope extends SubsystemBase {
 
     Logger.logSwerveModulePositions(getName() + "/moduleDeltas", moduleDeltasSupplier);
     Logger.logMeasure(getName() + "/absoluteHeading", this::getAbsoluteHeading);
+    Logger.logBoolean(getName() + "/connected", () -> navx != null && navx.isConnected());
   }
 
   private void connectNavX() {
