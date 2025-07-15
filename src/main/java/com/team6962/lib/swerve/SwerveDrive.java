@@ -915,4 +915,23 @@ public class SwerveDrive extends SwerveCore {
       Commands.waitSeconds(1)
     ).deadlineFor(drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))));
   }
+
+  public Command followChoreoPath(String name) {
+    PathPlannerPath path;
+
+    try {
+      path = PathPlannerPath.fromChoreoTrajectory(name);
+    } catch (Exception e) {
+      return Commands.none();
+    }
+
+    return Commands.sequence(
+      pathfindTo(path.getStartingHolonomicPose().orElseGet(this::getEstimatedPose)),
+      Commands.defer(() -> {
+        autoBuilder.setOutput(this::moveRobotRelative);
+
+        return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
+      }, Set.of(useMotion()))
+    );
+  }
 }

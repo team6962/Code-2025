@@ -81,6 +81,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private boolean isNeutralCoast = false;
   protected boolean isCalibrating = false;
 
+  private SwerveModuleState lastTargetState;
+
   public void configureModule(SwerveConfig config, SwerveModule.Corner corner) {
     this.constants = config;
     this.corner = corner;
@@ -147,6 +149,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     setName(getModuleName(corner.index) + " Swerve Module");
 
     Logger.logSwerveModuleState(getName() + "/measuredState", this::getState);
+    Logger.logSwerveModuleState(getName() + "/targetState", () -> lastTargetState);
     Logger.logSwerveModulePosition(getName() + "/measuredPosition", this::getPosition);
     Logger.logMeasure(getName() + "/consumedCurrent", this::getConsumedCurrent);
     Logger.logMeasure(getName() + "/driveWheelAngle", this::getDriveWheelAngle);
@@ -309,6 +312,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
       targetState = new SwerveModuleState(0, targetState.angle);
     }
+
+    lastTargetState = targetState;
 
     // Logger.log(getName() + "/targetState", targetState);
 

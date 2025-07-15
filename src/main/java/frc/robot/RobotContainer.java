@@ -196,9 +196,11 @@ public class RobotContainer {
 
     // return autonomous.createAutonomousCommand();
 
-    Command auto = autoGen.getCommand();
+    // Command auto = autoGen.getCommand();
 
-    return auto;
+    // return auto;
+
+    return swerveDrive.followChoreoPath("anti-madtown");
 
     // return swerveDrive.calibrateWheelSize();
 

@@ -49,13 +49,13 @@ public final class SwerveConstants {
                     .withKI(0.1)
                     .withKV(0.117)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
-                Amps.of(60)),
+                Amps.of(250)),
             new Motor(
                 DCMotor.getKrakenX60(1),
                 new Slot0Configs()
                     .withKP(50)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
-                Amps.of(60)),
+                Amps.of(250)),
             Wheel.COLSON,
             // chassisType == ChassisType.COMPETITION ? Wheel.BILLET.withDiameter(Inches.of(3.824)) : Wheel.COLSON,
             new DriveGains(new PIDConstants(1.0, 0.0, 0.2), new PIDConstants(1.0, 0.0, 0.2))
