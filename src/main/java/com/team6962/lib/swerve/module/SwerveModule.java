@@ -40,9 +40,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -71,6 +73,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private StatusSignal<Angle> steerAngleIn;
   private StatusSignal<AngularVelocity> driveSpeedIn;
   private StatusSignal<AngularVelocity> steerVelocityIn;
+  private StatusSignal<AngularAcceleration> driveAccelerationIn;
+  private StatusSignal<AngularAcceleration> steerAccelerationIn;
   private StatusSignal<Current> driveCurrentIn;
   private StatusSignal<Current> steerCurrentIn;
 
@@ -231,6 +235,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     steerAngleIn = steerMotor.getPosition();
     driveSpeedIn = driveMotor.getVelocity();
     steerVelocityIn = steerMotor.getVelocity();
+    driveAccelerationIn = driveMotor.getAcceleration();
+    steerAccelerationIn = steerMotor.getAcceleration();
     driveCurrentIn = driveMotor.getSupplyCurrent();
     steerCurrentIn = steerMotor.getSupplyCurrent();
   }
@@ -241,6 +247,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         steerAngleIn,
         driveSpeedIn,
         steerVelocityIn,
+        driveAccelerationIn,
+        steerAccelerationIn,
         driveCurrentIn,
         steerCurrentIn);
   }
@@ -254,21 +262,49 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(drivePositionIn));
   }
 
+  /**
+   * Gets the current angle of the drive wheel.
+   * 
+   * @return The current {@link Angle} of the drive wheel.
+   */
   public Angle getDriveWheelAngle() {
     return CTREUtils.unwrap(drivePositionIn).div(constants.gearing().drive());
   }
 
   /**
-   * Gets the current speed of the drive motor.
+   * Gets the current linear velocity of the drive motor.
    *
    * @return The current {@link LinearVelocity}
    */
-  public LinearVelocity getDriveSpeed() {
+  public LinearVelocity getDriveVelocity() {
     return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveSpeedIn));
   }
 
+  /**
+   * Gets the current angular velocity of the drive wheel.
+   *
+   * @return The current {@link AngularVelocity} of the drive wheel.
+   */
   public AngularVelocity getDriveWheelAngularVelocity() {
     return CTREUtils.unwrap(driveSpeedIn).div(constants.gearing().drive());
+  }
+
+  /**
+   * Gets the current linear acceleration of the drive motor.
+   *
+   * @return The current {@link LinearAcceleration}
+   */
+  public LinearAcceleration getDriveAcceleration() {
+    return constants.driveMotorRotorToMechanism(CTREUtils.unwrap(driveAccelerationIn));
+  }
+
+  /**
+   * Gets the current angular acceleration of the drive wheel.
+   *
+   * @return The current {@link AngularAcceleration} of the drive wheel.
+   */
+  public AngularAcceleration getDriveWheelAngularAcceleration() {
+    return CTREUtils.unwrap(driveAccelerationIn).div(constants.gearing().drive());
   }
 
   /**
@@ -287,6 +323,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    */
   public AngularVelocity getSteerVelocity() {
     return CTREUtils.unwrap(steerVelocityIn);
+  }
+
+  public AngularAcceleration getSteerAcceleration() {
+    return CTREUtils.unwrap(steerAccelerationIn);
   }
 
   /**
@@ -348,7 +388,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
    * @return The measured {@link SwerveModuleState}
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveSpeed(), new Rotation2d(getSteerAngle()));
+    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getSteerAngle()));
   }
 
   /**
@@ -394,7 +434,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return calibrateMotor(
         "drive",
         getDriveMotor(),
-        log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveSpeed()));
+        log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveVelocity()));
   }
 
   private Command calibrateMotor(

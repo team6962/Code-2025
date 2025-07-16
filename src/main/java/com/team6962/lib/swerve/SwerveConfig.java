@@ -491,6 +491,11 @@ public class SwerveConfig {
         movement.in(RadiansPerSecond) / gearing.drive * wheel.radius().in(Meters));
   }
 
+  public LinearAcceleration driveMotorRotorToMechanism(AngularAcceleration movement) {
+    return MetersPerSecondPerSecond.of(
+        movement.in(RadiansPerSecondPerSecond) / gearing.drive * wheel.radius().in(Meters));
+  }
+
   public Angle driveMotorMechanismToRotor(Distance movement) {
     return Radians.of(movement.in(Meters) / wheel.radius().in(Meters) * gearing.drive);
   }
@@ -513,11 +518,19 @@ public class SwerveConfig {
     return movement.div(gearing.steer);
   }
 
+  public AngularAcceleration steerMotorRotorToMechanism(AngularAcceleration movement) {
+    return movement.div(gearing.steer);
+  }
+
   public Angle steerMotorMechanismToRotor(Angle movement) {
     return movement.times(gearing.steer);
   }
 
   public AngularVelocity steerMotorMechanismToRotor(AngularVelocity movement) {
+    return movement.times(gearing.steer);
+  }
+
+  public AngularAcceleration steerMotorMechanismToRotor(AngularAcceleration movement) {
     return movement.times(gearing.steer);
   }
 
