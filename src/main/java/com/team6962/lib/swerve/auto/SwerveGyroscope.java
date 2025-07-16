@@ -54,7 +54,7 @@ public class SwerveGyroscope extends SubsystemBase {
     // Try to instantiate an AHRS instance that connects to the roboRIO's
     // builtin NavX gyroscope
     try {
-      navx = new AHRS(NavXComType.kMXP_SPI);
+      navx = new AHRS(NavXComType.kUSB2);
     } catch (RuntimeException e) {
       DriverStation.reportError("Failed to initialize NavX-MXP Gyroscope: " + e.getMessage(), true);
       System.err.print("Failed to initialize NavX-MXP Gyroscope: ");
