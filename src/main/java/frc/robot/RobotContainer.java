@@ -197,9 +197,9 @@ public class RobotContainer {
 
     // Command auto = autoGen.getCommand();
 
-    // return auto;
+    return autoGen.getCommand();
 
-    return swerveDrive.followChoreoPath("rahul's favorite path");
+    // return swerveDrive.followChoreoPath("rahul's favorite path");
 
     // return swerveDrive.calibrateDriveMotors();
     // return swerveDrive.getModules()[0].calibrateSteerMotor().repeatedly();
