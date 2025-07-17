@@ -1,9 +1,7 @@
 package com.team6962.lib.swerve;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
@@ -34,6 +32,7 @@ public class SpeedsMovement implements SwerveMovement {
   private SwerveModuleState[] states;
   private ChassisSpeeds speeds;
   private SwerveDriveKinematics kinematics;
+  private SwerveModuleState[] executedStates = new SwerveModuleState[4];
 
   /**
    * Creates a new SwerveMovement object.
@@ -111,6 +110,15 @@ public class SpeedsMovement implements SwerveMovement {
   }
 
   @Override
+  public void log() {
+    for (int i = 0; i < 4; i++) {
+      if (executedStates[i] != null) {
+        Logger.log(SwerveModule.getModuleName(i) + " Swerve Module/targetState", executedStates[i]);
+      }
+    }
+  }
+
+  @Override
   public void execute(SwerveCore drivetrain) {
     SwerveModule[] modules = drivetrain.getModules();
     LinearVelocity maxLinearVelocity = drivetrain.getMaxDriveSpeed();
@@ -132,8 +140,10 @@ public class SpeedsMovement implements SwerveMovement {
         targetState = new SwerveModuleState(0, targetState.angle);
       }
 
+      executedStates[i] = targetState;
+
       module.drive(
-        SwerveMovement.velocityVoltage.withVelocity(
+        SwerveMovement.motionMagicVelocityVoltage.withVelocity(
           module.getDrivetrainConstants().driveMotorMechanismToRotor(
             MetersPerSecond.of(targetState.speedMetersPerSecond)
           )

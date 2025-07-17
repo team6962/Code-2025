@@ -3,7 +3,6 @@ package com.team6962.lib.swerve.module;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -104,6 +103,14 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new CurrentLimitsConfigs()
                 .withSupplyCurrentLimit(config.driveMotor().maxCurrent())
                 .withSupplyCurrentLimitEnable(true)));
+    
+    CTREUtils.check(
+      driveConfig.apply(
+        new MotionMagicConfigs()
+          .withMotionMagicCruiseVelocity(85)
+          .withMotionMagicAcceleration(125)
+      )
+    );
 
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), config.canBus());
 
@@ -144,8 +151,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(
       steerConfig.apply(
           new MotionMagicConfigs()
-              .withMotionMagicExpo_kV(1.0 * 0.75)// 2.65350, 0.1229
-              .withMotionMagicExpo_kA(0.8 * 0.75))); // 0.21855, 0.1
+              .withMotionMagicExpo_kV(2.7626 * 0.75)
+              .withMotionMagicExpo_kA(0.3453 * 0.75)));
     // CTREUtils.check(
     //   steerConfig.apply(
     //       new MotionMagicConfigs()
@@ -161,6 +168,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     Logger.logMeasure(getName() + "/consumedCurrent", this::getConsumedCurrent);
     Logger.logMeasure(getName() + "/driveWheelAngle", this::getDriveWheelAngle);
     Logger.logMeasure(getName() + "/driveWheelAngularVelocity", this::getDriveWheelAngularVelocity);
+    Logger.logMeasure(getName() + "/driveRotorVelocity", () -> CTREUtils.unwrap(driveSpeedIn));
 
     StatusChecks.under(this).add("Drive Motor", driveMotor);
     StatusChecks.under(this).add("Steer Motor", steerMotor);
@@ -169,11 +177,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     setupStatusSignals();
 
     Logger.logNumber(getName() + "/steerVelocity", () -> CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond));
-    // Logger.logNumber(getName() + "/steerAcceleration", () -> CTREUtils.unwrap(steerMotor.getAcceleration()).in(RotationsPerSecondPerSecond));
-
-    Logger.logNumber(getName() + "/feedforwardExpectedVoltage", () ->
-      2.6535 * CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond) +
-      0.21856 * CTREUtils.unwrap(steerMotor.getAcceleration()).in(RotationsPerSecondPerSecond));
   }
 
   /**
@@ -242,7 +245,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void refreshStatusSignals() {
-    BaseStatusSignal.refreshAll(
+    CTREUtils.check(BaseStatusSignal.refreshAll(
         drivePositionIn,
         steerAngleIn,
         driveSpeedIn,
@@ -250,7 +253,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         driveAccelerationIn,
         steerAccelerationIn,
         driveCurrentIn,
-        steerCurrentIn);
+        steerCurrentIn));
   }
 
   /**
@@ -325,9 +328,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return CTREUtils.unwrap(steerVelocityIn);
   }
 
-  public AngularAcceleration getSteerAcceleration() {
-    return CTREUtils.unwrap(steerAccelerationIn);
-  }
+  // Removed because getAcceleration() wasn't working
+  // public AngularAcceleration getSteerAcceleration() {
+  //   return steerAcceleration;
+  // }
 
   /**
    * Gets the current current consumed by the module.
@@ -441,7 +445,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
       String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(Volts.per(Second).of(2), Volts.of(7), Seconds.of(8)),
+            new SysIdRoutine.Config(Volts.per(Second).of(0.5), Volts.of(7), Seconds.of(20)),
             new SysIdRoutine.Mechanism(
                 voltage -> motor.setControl(new VoltageOut(voltage.in(Volts))),
                 log ->

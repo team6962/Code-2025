@@ -44,20 +44,23 @@ public final class SwerveConstants {
             new Motor(
                 DCMotor.getKrakenX60(1),
                 new Slot0Configs()
-                    .withKP(0.01)
+                    .withKP(0.1)
+                    .withKI(0.01)
                     .withKD(0.01)
-                    .withKI(0.1)
-                    .withKV(0.117)
-                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign),
+                    .withKV(0.118)
+                    .withKA(0.0045)
+                    .withKS(0.17)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign),
                 Amps.of(250)),
             new Motor(
                 DCMotor.getKrakenX60(1),
                 new Slot0Configs()
-                    .withKV(2.6535)
-                    .withKA(0.21856)
-                    .withKP(40.901)
-                    .withKD(3.4641)
-                    .withKS(0.197)
+                    .withKS(0.282)
+                    .withKV(2.6)
+                    .withKA(0.03)
+                    .withKP(18.592)
+                    .withKI(0.0)
+                    .withKD(0.972)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign),
                 Amps.of(60)),
             Wheel.COLSON,

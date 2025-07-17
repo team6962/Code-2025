@@ -3,10 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -16,10 +13,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -207,6 +200,17 @@ public class RobotContainer {
     // return auto;
 
     return swerveDrive.followChoreoPath("rahul's favorite path");
+
+    // return swerveDrive.calibrateDriveMotors();
+    // return swerveDrive.getModules()[0].calibrateSteerMotor().repeatedly();
+    // return swerveDrive.drive(new ChassisSpeeds(0.5, 0, 0));
+
+    // return swerveDrive.staticVoltage(Volts.of(6), Volts.of(0), true);
+
+    // return Commands.repeatingSequence(
+    //   swerveDrive.staticVoltage(Volts.of(6), Volts.of(0), true).withTimeout(5),
+    //   Commands.waitSeconds(3)
+    // );
 
     // return swerveDrive.calibrateWheelSize();
 

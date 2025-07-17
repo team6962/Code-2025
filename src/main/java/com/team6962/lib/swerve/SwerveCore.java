@@ -40,7 +40,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
   private SwerveDriveKinematics kinematics;
   private SwerveConfig constants;
 
-  private SwerveMovement currentMovement;
+  protected SwerveMovement currentMovement;
   private LinearVelocity maxSpeed;
 
   public SwerveCore(SwerveConfig constants) {
@@ -67,6 +67,12 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     Logger.logPose("Swerve Drive/robotPose", poseEstimator::getEstimatedPose);
 
     maxSpeed = constants.maxDriveSpeed();
+
+    Logger.addUpdate(getName() + "/movement", () -> {
+      if (currentMovement != null) {
+        currentMovement.log();
+      }
+    });
   }
   
   public LinearVelocity getMaxDriveSpeed() {

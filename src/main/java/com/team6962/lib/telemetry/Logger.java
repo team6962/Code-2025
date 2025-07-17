@@ -52,7 +52,6 @@ import frc.robot.Constants.RobotVersion;
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");
   private static List<Updatable> updates = new LinkedList<>();
-  private static List<Updatable> onceUpdates = new LinkedList<>();
   private static Notifier notifier = new Notifier(Logger::update);
   private static Field2d field2d = new Field2d();
   private static double threadLastPing = Timer.getFPGATimestamp();
@@ -70,7 +69,7 @@ public class Logger extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.log("Logger/bhobeKilledMe", Timer.getFPGATimestamp() - threadLastPing > 1.0);
+    Logger.log("Logger/notifierAlive", Timer.getFPGATimestamp() - threadLastPing < 0.25);
   }
 
   public static void start(Time period) {

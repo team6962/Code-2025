@@ -12,11 +12,13 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -51,6 +53,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -1028,5 +1031,61 @@ public class SwerveDrive extends SwerveCore {
         return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
       }, Set.of(useMotion()))
     );
+  }
+
+  private static class ConstantSteerDriveVoltageMovement implements SwerveMovement {
+    private Voltage steerVoltage = Volts.of(0);
+    private Voltage driveVoltage = Volts.of(0);
+    private boolean singleModule = false;
+
+    public ConstantSteerDriveVoltageMovement withSteerVoltage(Voltage voltage) {
+      this.steerVoltage = voltage;
+      return this;
+    }
+
+    public ConstantSteerDriveVoltageMovement withDriveVoltage(Voltage voltage) {
+      this.driveVoltage = voltage;
+      return this;
+    }
+
+    public ConstantSteerDriveVoltageMovement withSingleModule(boolean singleModule) {
+      this.singleModule = singleModule;
+      return this;
+    }
+
+    @Override
+    public void execute(SwerveCore drivetrain) {
+      for (SwerveModule module : drivetrain.getModules()) {
+        if (singleModule && module.getModuleCorner().index != 0) {
+          module.drive(
+            new VoltageOut(0),
+            new VoltageOut(0)
+          );
+
+          continue;
+        }
+
+        Logger.log(SwerveModule.getModuleName(module.getModuleCorner().index) + " Swerve Module/targetAngle", Rotations.of(Math.round(module.getSteerAngle().in(Rotations))));
+
+        module.drive(
+          new VoltageOut(driveVoltage),
+          new VoltageOut(steerVoltage)
+        );
+      }
+    }
+
+    @Override
+    public SwerveMovement cleared() {
+      return null;
+    }
+  }
+
+  public Command constantSteerDriveVoltage(Voltage steerVoltage, Voltage driveVoltage, boolean singleModule) {
+    ConstantSteerDriveVoltageMovement movement = new ConstantSteerDriveVoltageMovement()
+      .withSteerVoltage(steerVoltage)
+      .withDriveVoltage(driveVoltage)
+      .withSingleModule(singleModule);
+
+    return Commands.run(() -> { currentMovement = movement; });
   }
 }
