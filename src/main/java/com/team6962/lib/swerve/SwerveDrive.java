@@ -1088,4 +1088,42 @@ public class SwerveDrive extends SwerveCore {
 
     return Commands.run(() -> { currentMovement = movement; });
   }
+
+  private PositionDeltaMovement createPositionDeltaMovement(Twist2d twist) {
+    SwerveModuleState[] states = getKinematics().toSwerveModuleStates(new ChassisSpeeds(
+      twist.dx, twist.dy, twist.dtheta
+    ));
+
+    SwerveModulePosition[] initial = getModulePositions();
+    SwerveModulePosition[] deltas = KinematicsUtils.toModulePositions(states, Seconds.of(1));
+    double[] relativeVelocities = KinematicsUtils.getVelocitiesMetersPerSecond(states);
+
+    return new PositionDeltaMovement(initial, deltas, relativeVelocities);
+  }
+
+  private SwerveModuleState[] getAlignedStates(Twist2d twist) {
+    SwerveModuleState[] states = getKinematics().toSwerveModuleStates(new ChassisSpeeds(
+      twist.dx, twist.dy, twist.dtheta
+    ));
+
+    return KinematicsUtils.getStoppedStates(states);
+  }
+
+  public Command driveTwist(Supplier<Twist2d> twist) {
+    return Commands.sequence(
+      driveModules(() -> getAlignedStates(twist.get()))
+        .until(() -> KinematicsUtils.isSimilarAngles(getModuleStates(), getAlignedStates(twist.get()), Degrees.of(3))),
+      Commands.run(() -> {
+        currentMovement = createPositionDeltaMovement(twist.get());
+      }, useMotion())
+    );
+  }
+
+  public Command driveTwistToPose(Pose2d targetPose) {
+    return driveTwist(() -> getEstimatedPose().log(targetPose))
+      .alongWith(Commands.run(() -> {
+        Logger.getField().getObject("Target Pose").setPose(targetPose);
+      }))
+      .until(() -> isWithinToleranceOf(targetPose, Inches.of(0.5), Degrees.of(1)));
+  }
 }

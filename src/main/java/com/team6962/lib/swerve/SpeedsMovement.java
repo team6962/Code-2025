@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.LinearVelocity;
 
@@ -31,18 +30,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 public class SpeedsMovement implements SwerveMovement {
   private SwerveModuleState[] states;
   private ChassisSpeeds speeds;
-  private SwerveDriveKinematics kinematics;
   private SwerveModuleState[] executedStates = new SwerveModuleState[4];
-
-  /**
-   * Creates a new SwerveMovement object.
-   *
-   * @param kinematics The SwerveDriveKinematics object that will be used to convert {@link
-   *     ChassisSpeeds} into {@link SwerveModuleState}s
-   */
-  public SpeedsMovement(SwerveDriveKinematics kinematics) {
-    this.kinematics = kinematics;
-  }
 
   /**
    * Sets the swerve module states of the movement, overriding any previous states or speeds.
@@ -89,7 +77,7 @@ public class SpeedsMovement implements SwerveMovement {
    *
    * @return The swerve module states of the movement.
    */
-  public SwerveModuleState[] getStates() {
+  private SwerveModuleState[] getStates(SwerveCore drivetrain) {
     if (speeds != null) {
       Pose2d origin = new Pose2d();
 
@@ -103,7 +91,7 @@ public class SpeedsMovement implements SwerveMovement {
       ChassisSpeeds adjustedSpeeds =
           new ChassisSpeeds(twist.dx / 0.02, twist.dy / 0.02, twist.dtheta / 0.02);
 
-      states = kinematics.toSwerveModuleStates(adjustedSpeeds);
+      states = drivetrain.getKinematics().toSwerveModuleStates(adjustedSpeeds);
     }
 
     return states;
@@ -122,7 +110,7 @@ public class SpeedsMovement implements SwerveMovement {
   public void execute(SwerveCore drivetrain) {
     SwerveModule[] modules = drivetrain.getModules();
     LinearVelocity maxLinearVelocity = drivetrain.getMaxDriveSpeed();
-    SwerveModuleState[] states = getStates();
+    SwerveModuleState[] states = getStates(drivetrain);
 
     if (states == null) {
       states = KinematicsUtils.getStoppedStates(drivetrain.getModuleStates());

@@ -56,6 +56,16 @@ public final class KinematicsUtils {
     return states;
   }
 
+  public static double[] getVelocitiesMetersPerSecond(SwerveModuleState[] states) {
+    double[] velocities = new double[states.length];
+
+    for (int i = 0; i < states.length; i++) {
+      velocities[i] = states[i].speedMetersPerSecond;
+    }
+
+    return velocities;
+  }
+
   public static SwerveModulePosition[] difference(
       SwerveModulePosition[] newPositions, SwerveModulePosition[] oldPositions) {
     SwerveModulePosition[] differences = new SwerveModulePosition[newPositions.length];

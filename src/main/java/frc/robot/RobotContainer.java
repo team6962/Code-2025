@@ -13,6 +13,8 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -198,6 +200,8 @@ public class RobotContainer {
     // Command auto = autoGen.getCommand();
 
     return autoGen.getCommand();
+
+    // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
 
     // return swerveDrive.calibrateWheelSize();
 

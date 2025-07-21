@@ -62,7 +62,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     poseEstimator =
         new PoseEstimator(kinematics, () -> getModulePositions(), () -> getModuleStates());
 
-    currentMovement = new SpeedsMovement(kinematics);
+    currentMovement = new SpeedsMovement();
 
     Logger.logPose("Swerve Drive/robotPose", poseEstimator::getEstimatedPose);
 
@@ -165,7 +165,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
   /** Should be called after CommandScheduler.run() to mimimize latency. */
   public void latePeriodic() {
     if (currentMovement == null) {
-      currentMovement = new SpeedsMovement(kinematics);
+      currentMovement = new SpeedsMovement();
     }
 
     currentMovement.execute(this);
@@ -175,7 +175,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
   private SpeedsMovement moveSpeeds() {
     if (!(currentMovement instanceof SpeedsMovement)) {
-      currentMovement = new SpeedsMovement(kinematics);
+      currentMovement = new SpeedsMovement();
     }
 
     return (SpeedsMovement) currentMovement;
