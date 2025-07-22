@@ -15,6 +15,7 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,8 +37,6 @@ public class DualLinearActuator extends SubsystemBase {
   private DigitalInput ceilingLimit, floorLimit;
   private Distance baseHeight, minHeight, maxHeight, tolerance;
   private boolean moving = false;
-
-  private Debouncer debouncer = new Debouncer(0.1);
 
   private Distance spoolHeight;
 
@@ -209,7 +208,7 @@ public class DualLinearActuator extends SubsystemBase {
 
   public boolean inRange(Distance height) {
     if (height == null) return true;
-    return debouncer.calculate(getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters));
+    return getAverageHeight().minus(height).abs(Meters) < tolerance.in(Meters);
   }
 
   public boolean doneMoving() {

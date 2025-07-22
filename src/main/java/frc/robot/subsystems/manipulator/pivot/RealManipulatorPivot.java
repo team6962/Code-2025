@@ -1,5 +1,6 @@
 package frc.robot.subsystems.manipulator.pivot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -43,6 +44,11 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
     // setDefaultCommand(pivotTo(() -> stopAngle));
 
     setDefaultCommand(hold());
+  }
+
+  @Override
+  public Angle getAngle() {
+      return getAbsolutePosition();
   }
 
   @Override
@@ -109,7 +115,8 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   @Override
   public Command algaeBargeSetup() {
-    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.AIM_ANGLE);
+    return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.AIM_ANGLE)
+      .until(() -> getAngle().gt(MANIPULATOR_PIVOT.MAX_ANGLE.minus(Degrees.of(1))));
   }
 
   @Override

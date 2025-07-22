@@ -2,7 +2,9 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Inches;
 
+import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -105,27 +107,23 @@ public class PieceCombos {
   public Command algaeBargeSetup() {
     return safeSubsystems
         .safeMoveCommand(
-            elevator.algaeBarge(), manipulator.pivot.algaeBargeSetup(), ELEVATOR.ALGAE.BARGE_HEIGHT)
-        .withName("BARGE SETUP");
+            elevator.algaeBarge(),
+            manipulator.pivot.algaeBargeSetup(),
+            ELEVATOR.ALGAE.BARGE_HEIGHT
+        )
+          .withName("BARGE SETUP");
   }
 
   public Command algaeBargeShoot() {
-    return Commands.either(
-        manipulator
-            .pivot
-            .algaeBargeSetup()
-            .andThen(
-                manipulator.pivot.algaeBargeSetup(),
-                manipulator
-                    .pivot
-                    .algaeBargeShoot()
-                    .deadlineFor(
-                        Commands.sequence(
-                            // Commands.waitUntil(() ->
-                            // manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
-                            manipulator.grabber.dropAlgae()))),
-        Commands.print("not at barge height"),
-        () -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
+    return Commands.sequence(
+      manipulator.pivot.algaeBargeSetup(),
+      manipulator.pivot.algaeBargeShoot()
+        .deadlineFor(
+          Commands.sequence(
+            // Commands.waitUntil(() ->
+            // manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
+            manipulator.grabber.dropAlgae()))
+    ).onlyIf(() -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
   }
 
   public Command algaeProcessor() {
