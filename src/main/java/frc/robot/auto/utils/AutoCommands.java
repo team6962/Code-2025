@@ -256,7 +256,7 @@ public class AutoCommands {
                   )));
   }
 
-  public Command alignFace(int face, boolean endWithinTolerance) {
+  public Command alignV3Face(int face, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
@@ -267,7 +267,7 @@ public class AutoCommands {
             )));
   }
 
-  public Command alignV3Face(int face, boolean endWithinTolerance) {
+  public Command alignFace(int face, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
@@ -282,7 +282,7 @@ public class AutoCommands {
           int pole = getClosestReefPole(swerveDrive.getEstimatedPose(), pattern);
           Pose2d polePose = ReefPositioning.getCoralPlacePose(pole);
 
-          return alignPole(pole, false, false)
+          return alignV3Pole(pole, false, false)
             .alongWith(
               Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(polePose, Inches.of(1), Degrees.of(3)))
                 .andThen(rumble.get()));
