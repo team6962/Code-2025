@@ -40,11 +40,11 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a().whileTrue(autonomous.alignToClosestFaceTeleop());
+    driver.a().whileTrue(autonomous.alignV3ToClosestFaceTeleop());
     driver
         .b()
         .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
+            autonomous.alignV3ToClosestPoleTeleop(
                 AutoCommands.PolePattern.RIGHT,
                 () ->
                     rumbleBoth()
@@ -54,7 +54,7 @@ public class Controls {
     driver
         .x()
         .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
+            autonomous.alignV3ToClosestPoleTeleop(
                 AutoCommands.PolePattern.LEFT,
                 () ->
                     rumbleBoth()

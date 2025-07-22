@@ -1123,7 +1123,6 @@ public class SwerveDrive extends SwerveCore {
     return driveTwist(() -> getEstimatedPose().log(targetPose))
       .alongWith(Commands.run(() -> {
         Logger.getField().getObject("Target Pose").setPose(targetPose);
-      }))
-      .until(() -> isWithinToleranceOf(targetPose, Inches.of(0.5), Degrees.of(1)));
+      }));
   }
 }
