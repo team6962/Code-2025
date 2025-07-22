@@ -7,6 +7,8 @@ import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
 import java.util.function.Supplier;
 
 public interface ManipulatorPivot extends Subsystem {
+  public Angle getAngle();
+
   public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance);
 
   public Command pivotTo(Supplier<Angle> angleSupplier);

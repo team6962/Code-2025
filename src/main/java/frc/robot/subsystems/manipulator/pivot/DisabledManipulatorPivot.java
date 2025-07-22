@@ -3,84 +3,112 @@ package frc.robot.subsystems.manipulator.pivot;
 import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import static edu.wpi.first.units.Units.Radians;
+
 import java.util.function.Supplier;
 
 public class DisabledManipulatorPivot implements ManipulatorPivot {
-  public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
+  @Override
+  public Angle getAngle() {
+      return Radians.of(0);
+  }
+  
+  @Override
+public Command pivotTo(Supplier<Angle> angleSupplier, Angle tolerance) {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command pivotTo(Supplier<Angle> angleSupplier) {
+  @Override
+public Command pivotTo(Supplier<Angle> angleSupplier) {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command hold() {
+  @Override
+public Command hold() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command coralIntake() {
+  @Override
+public Command coralIntake() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command coralL1() {
+  @Override
+public Command coralL1() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command coralL23() {
+  @Override
+public Command coralL23() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command coralL4() {
+  @Override
+public Command coralL4() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeReef() {
+  @Override
+public Command algaeReef() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeBargeSetup() {
+  @Override
+public Command algaeBargeSetup() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeBargeShoot() {
+  @Override
+public Command algaeBargeShoot() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeProcessor() {
+  @Override
+public Command algaeProcessor() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command algaeGround() {
+  @Override
+public Command algaeGround() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command stow() {
+  @Override
+public Command stow() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command safe(Angle tolerance) {
+  @Override
+public Command safe(Angle tolerance) {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command safe() {
+  @Override
+public Command safe() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command stop() {
+  @Override
+public Command stop() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command up() {
+  @Override
+public Command up() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public Command down() {
+  @Override
+public Command down() {
     return CommandUtils.noneWithRequirements(this);
   }
 
-  public boolean inRange(Angle angle) {
+  @Override
+public boolean inRange(Angle angle) {
     return true;
   }
 
-  public void setMinMaxAngle(Angle min, Angle max) {}
+  @Override
+public void setMinMaxAngle(Angle min, Angle max) {}
 }
