@@ -38,11 +38,11 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -346,6 +346,37 @@ public class Logger extends SubsystemBase {
     log(key + "/txFullCount", canStatus.txFullCount);
     log(key + "/receiveErrorCount", canStatus.receiveErrorCount);
     log(key + "/transmitErrorCount", canStatus.transmitErrorCount);
+  }
+
+  public static void logXBoxController(String key, XboxController controller) {
+    addUpdate(key, () -> logXBoxControllerOnce(key, controller));
+  }
+
+  public static void logXBoxControllerOnce(String key, XboxController controller) {
+    log(key + "/port", controller.getPort());
+  
+    log(key + "/joystickLeftX", controller.getLeftX());
+    log(key + "/joystickLeftY", controller.getLeftY());
+    log(key + "/joystickRightX", controller.getRightX());
+    log(key + "/joystickRightY", controller.getRightY());
+    
+    log(key + "/bumperLeft", controller.getLeftBumperButton());
+    log(key + "/bumperRight", controller.getRightBumperButton());
+    log(key + "/triggerLeft", controller.getLeftTriggerAxis());
+    log(key + "/triggerRight", controller.getRightTriggerAxis());
+
+    log(key + "/buttonA", controller.getAButton());
+    log(key + "/buttonB", controller.getBButton());
+    log(key + "/buttonX", controller.getXButton());
+    log(key + "/buttonY", controller.getYButton());
+
+    log(key + "/buttonStart", controller.getStartButton());
+    log(key + "/buttonBack", controller.getBackButton());
+    log(key + "/joystickButtonLeft", controller.getLeftStickButton());
+    log(key + "/joystickButtonRight", controller.getRightStickButton());
+
+    log(key + "/pov", controller.getPOV() == -1 ? -1 : -controller.getPOV() + 90);
+    log(key + "/povRaw", controller.getPOV());
   }
 
   public static void logRoboRIO(String key) {

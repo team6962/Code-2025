@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.team6962.lib.swerve.SwerveDrive;
+import com.team6962.lib.telemetry.Logger;
+
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -77,7 +80,14 @@ public class Controls {
     driver.povRight(); // USED
     driver.leftTrigger(); // USED
     driver.rightTrigger(); // USED
-    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driver.getHID()));
+
+    XboxController driverHID = driver.getHID();
+    XboxController operatorHID = operator.getHID();
+
+    Logger.logXBoxController("Controllers/Driver", driverHID);
+    Logger.logXBoxController("Controllers/Operator", operatorHID);
+
+    swerveDrive.setDefaultCommand(new XBoxSwerve(swerveDrive, driverHID));
 
     // Operator
     // Button to L2-L4, and Barge Height
