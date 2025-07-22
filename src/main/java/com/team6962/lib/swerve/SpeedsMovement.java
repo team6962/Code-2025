@@ -12,7 +12,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * Represents a movement that a swerve drive can take over a single control loop cycle.
@@ -130,15 +133,16 @@ public class SpeedsMovement implements SwerveMovement {
 
       executedStates[i] = targetState;
 
+      AngularVelocity driveVelocity = module.getDrivetrainConstants().driveMotorMechanismToRotor(
+        MetersPerSecond.of(targetState.speedMetersPerSecond)
+      );
+
+      Angle steerAngle = targetState.angle.getMeasure();
+
       module.drive(
-        SwerveMovement.motionMagicVelocityVoltage.withVelocity(
-          module.getDrivetrainConstants().driveMotorMechanismToRotor(
-            MetersPerSecond.of(targetState.speedMetersPerSecond)
-          )
-        ),
-        SwerveMovement.motionMagicExpoVoltage.withPosition(
-          targetState.angle.getRotations()
-        )
+        SwerveMovement.motionMagicVelocityVoltage.withVelocity(driveVelocity),
+        RobotBase.isReal() ? SwerveMovement.motionMagicExpoVoltage.withPosition(steerAngle) :
+        SwerveMovement.positionVoltage.withPosition(steerAngle)
       );
     }
   }
