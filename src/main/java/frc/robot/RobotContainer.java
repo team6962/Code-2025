@@ -13,8 +13,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -27,9 +25,11 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
+import frc.robot.auto.choreo.AutonomousV3;
 import frc.robot.auto.pipeline.AutoGeneration;
 import frc.robot.auto.utils.AutoCommands;
 import frc.robot.auto.utils.AutoPaths;
@@ -70,6 +70,7 @@ public class RobotContainer {
   public final Elevator elevator;
   public final Hang hang;
   public final AutoCommands autonomous;
+  public final AutonomousV3 auto;
   public final Algae algaeDetector;
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
@@ -132,6 +133,7 @@ public class RobotContainer {
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
     autonomous = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
+    auto = new AutonomousV3(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
@@ -157,6 +159,8 @@ public class RobotContainer {
     statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
+
+    // System.out.println(ReefPositioning.getCoralPlacePose(3));
 
     // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
 
@@ -199,7 +203,9 @@ public class RobotContainer {
 
     // Command auto = autoGen.getCommand();
 
-    return autoGen.getCommand();
+    // return autoGen.getCommand();
+
+    return auto.createSideAutonomous(AutonomousV3.Side.LEFT);
 
     // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
 
