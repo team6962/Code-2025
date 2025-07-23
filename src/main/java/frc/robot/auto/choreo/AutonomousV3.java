@@ -8,11 +8,13 @@ import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Field.CoralStation;
+import frc.robot.Constants.Field;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
 import frc.robot.Constants.Constants.ELEVATOR;
@@ -51,6 +53,32 @@ public class AutonomousV3 {
         }
     }
 
+    public Pose2d getSideAutonomousStartPose(Side side) {
+        double leftSideY = 5.814218521118164;
+        double leftSideRotationRads = -2.51279668554423;
+
+        return new Pose2d(
+            7.075444221496582,
+            side == Side.LEFT ? leftSideY : (Field.WIDTH - leftSideY),
+            Rotation2d.fromRadians(side == Side.LEFT ? leftSideRotationRads : -leftSideRotationRads)
+        );
+    }
+
+    public Pose2d getMiddleAutonomousStartPose() {
+        return new Pose2d(7.23, 4.19, Rotation2d.fromDegrees(180));
+    }
+
+    public Command prepareAutonomous(Pose2d startPose) {
+        return Commands.sequence(
+            swerveDrive.pathfindTo(startPose),
+            swerveDrive.driveTwistToPose(startPose)
+                .withDeadline(Commands.sequence(
+                    Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(startPose, Inches.of(0.5), Degrees.of(3))),
+                    Commands.waitSeconds(1)
+                ))
+        );
+    }
+
     public Command createSideAutonomous(Side side) {
         return Commands.sequence(
             swerveDrive.followChoreoPath("side-place-0-" + side.id)
@@ -70,21 +98,31 @@ public class AutonomousV3 {
             placeCoral(new CoralPosition(side == Side.LEFT ? 3 : 8, 4))
         );
     }
-    
+
+    private static Pose2d BARGE_THROW_POSE = new Pose2d(7.408452033996582, 4.844626426696777, Rotation2d.fromDegrees(0));
+
     public Command createMiddleAutonomous() {
         return Commands.sequence(
-            swerveDrive.followChoreoPath("middle-coral-place")
+            Commands.waitSeconds(1),
+            annotate("middle-coral-place", swerveDrive.followChoreoPath("middle-coral-place"))
                 .deadlineFor(Commands.parallel(elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold())),
-            placeCoral(new CoralPosition(0, 4)),
-            Commands.deadline(manipulator.pivot.stow(), elevator.hold(), manipulator.grabber.stop()),
-            pickupAlgae(0),
-            swerveDrive.followChoreoPath("middle-algae-place")
+            annotate("place coral", placeCoral(new CoralPosition(0, 4))),
+            annotate("safe manipulator pivot", Commands.deadline(manipulator.pivot.safe(), elevator.hold(), manipulator.grabber.stop())),
+            annotate("pickup algae", pickupAlgae(0)),
+            annotate("middle-algae-place", swerveDrive.followChoreoPath("middle-algae-place"))
                 .deadlineFor(Commands.parallel(elevator.hold(), manipulator.pivot.hold(), manipulator.grabber.hold())),
-            pieceCombos.algaeBargeSetup(),
-            pieceCombos.algaeBargeShoot(),
+            annotate("align to barge",
+                swerveDrive.driveTwistToPose(BARGE_THROW_POSE) // Barge throw pose
+                    .until(() -> swerveDrive.isWithinToleranceOf(BARGE_THROW_POSE, Inches.of(4), Degrees.of(3)))
+            ),
+            annotate("algae barge setup", CommandUtils.selectByMode(pieceCombos.algaeBargeSetup(), Commands.waitSeconds(0.5))),
+            annotate("algae barge shoot", CommandUtils.selectByMode(pieceCombos.algaeBargeShoot(), Commands.waitSeconds(0.5))),
             Commands.sequence(
-                Commands.waitUntil(() -> elevator.getAverageHeight().lt(ELEVATOR.CORAL.L4_HEIGHT)),
-                swerveDrive.followChoreoPath("middle-teleop-setup")
+                annotate("lower elevator", CommandUtils.selectByMode(
+                    Commands.waitUntil(() -> elevator.getAverageHeight().lt(ELEVATOR.CORAL.L4_HEIGHT)),
+                    Commands.waitSeconds(0.25)
+                )),
+                annotate("middle-teleop-setup", swerveDrive.followChoreoPath("middle-teleop-setup"))
             ).alongWith(
                 Commands.sequence(pieceCombos.stow(), pieceCombos.hold()),
                 manipulator.grabber.hold()
@@ -94,20 +132,31 @@ public class AutonomousV3 {
 
     private Command pickupAlgae(int face) {
         Pose2d alignPose = ReefPositioning.getAlgaeAlignPose(face);
-        Pose2d placePose = ReefPositioning.getAlgaePlacePose(face);
+        Pose2d pickupPose = ReefPositioning.getAlgaePickupPose(face);
 
         return Commands.sequence(
-            manipulator.pivot.safe(),
+            annotate("manipulator pivot safe", manipulator.pivot.safe()),
             Commands.parallel(
-                swerveDrive.driveTwistToPose(alignPose),
-                Commands.deadline(elevator.algaeL2(), manipulator.pivot.hold(), manipulator.grabber.stop())
+                annotate("twist to align",
+                    swerveDrive.driveTwistToPose(alignPose)
+                        .until(() -> swerveDrive.isWithinToleranceOf(alignPose, Inches.of(2), Degrees.of(6)))
+                ),
+                annotate("elevator to algae l2", CommandUtils.selectByMode(
+                    Commands.deadline(elevator.algaeL2(), manipulator.pivot.hold(), manipulator.grabber.stop()),
+                    Commands.waitSeconds(0.5)
+                ))
             ),
-            Commands.parallel(pieceCombos.algaeL2(), manipulator.grabber.hold()),
-            Commands.deadline(
-                manipulator.grabber.intakeAlgae(),
-                swerveDrive.driveTwistToPose(placePose),
-                pieceCombos.algaeL2()
-            )
+            annotate("manipulator to algae l2", Commands.deadline(
+                CommandUtils.selectByMode(manipulator.pivot.algaeReef(), Commands.waitSeconds(0.2)),
+                elevator.hold(),
+                manipulator.grabber.hold()
+            )),
+            annotate("twist to pickup", Commands.deadline(
+                CommandUtils.selectByMode(manipulator.grabber.intakeAlgae(), Commands.waitSeconds(0.5)),
+                swerveDrive.driveTwistToPose(pickupPose),
+                elevator.hold(),
+                manipulator.pivot.hold()
+            ))
         );
     }
 
