@@ -25,7 +25,7 @@ public final class ReefPositioning {
   public static final Distance ROBOT_TO_EDGE_ALIGN_CORAL =
       ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(6));
 
-  public static final Distance ROBOT_TO_EDGE_PLACE_ALGAE =
+  public static final Distance ROBOT_TO_EDGE_PICKUP_ALGAE =
       SWERVE.CONFIG.chassis().outerLength().div(2);
   public static final Distance ROBOT_TO_EDGE_ALIGN_ALGAE =
       ROBOT_TO_EDGE_PLACE_CORAL.plus(Inches.of(8));
@@ -38,8 +38,8 @@ public final class ReefPositioning {
       new Translation2d(
           REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN_CORAL).in(Meters), BETWEEN_POLES.div(2).in(Meters));
 
-  public static final Translation2d PLACE_ALGAE_RELATIVE =
-      new Translation2d(REEF_TO_EDGE.plus(ROBOT_TO_EDGE_PLACE_ALGAE).in(Meters), 0);
+  public static final Translation2d PICKUP_ALGAE_RELATIVE =
+      new Translation2d(REEF_TO_EDGE.plus(ROBOT_TO_EDGE_PICKUP_ALGAE).in(Meters), 0);
 
   public static final Translation2d ALIGN_ALGAE_RELATIVE =
       new Translation2d(REEF_TO_EDGE.plus(ROBOT_TO_EDGE_ALIGN_ALGAE).in(Meters), 0);
@@ -113,8 +113,8 @@ public final class ReefPositioning {
         Rotation2d.fromDegrees(180)); // 180
   }
 
-  public static Pose2d getAlgaePlacePose(int face) {
-    return rotatePose(getFacePose(PLACE_ALGAE_RELATIVE, face), Rotation2d.fromDegrees(180));
+  public static Pose2d getAlgaePickupPose(int face) {
+    return rotatePose(getFacePose(PICKUP_ALGAE_RELATIVE, face), Rotation2d.fromDegrees(180));
   }
 
   public static Pose2d getAlgaeAlignPose(int face) {

@@ -142,6 +142,11 @@ public class RealElevator extends DualLinearActuator implements Elevator {
   }
 
   @Override
+  public Command ready() {
+      return setHeight(ELEVATOR.AUTO.READY_HEIGHT);
+  }
+
+  @Override
   public Command rezeroAtBottom() {
     return this.run(this::unsafeMoveDown).until(this::triggeredFloorLimit);
   }

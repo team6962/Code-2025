@@ -273,9 +273,9 @@ public class AutoCommands {
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
           swerveDrive
-          .driveTwistToPose(ReefPositioning.getAlgaePlacePose(face))
+          .driveTwistToPose(ReefPositioning.getAlgaePickupPose(face))
             .until(() -> endWithinTolerance && swerveDrive.isWithinToleranceOf(
-              ReefPositioning.getAlgaePlacePose(face), Inches.of(1), Degrees.of(3)
+              ReefPositioning.getAlgaePickupPose(face), Inches.of(1), Degrees.of(3)
             )));
   }
 
@@ -284,7 +284,7 @@ public class AutoCommands {
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
             swerveDrive
-                .alignTo(ReefPositioning.getAlgaePlacePose(face))
+                .alignTo(ReefPositioning.getAlgaePickupPose(face))
                 .withEndWithinTolerance(endWithinTolerance));
   }
 

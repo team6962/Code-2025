@@ -84,6 +84,11 @@ public class DisabledElevator extends SubsystemBase implements Elevator {
   }
 
   @Override
+  public Command ready() {
+    return CommandUtils.noneWithRequirements(this);
+  }
+
+  @Override
   public Command rezeroAtBottom() {
     return CommandUtils.noneWithRequirements(this);
   }

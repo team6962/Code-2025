@@ -1023,14 +1023,11 @@ public class SwerveDrive extends SwerveCore {
       return Commands.none();
     }
 
-    return Commands.sequence(
-      pathfindTo(path.getStartingHolonomicPose().orElseGet(this::getEstimatedPose)),
-      Commands.defer(() -> {
-        autoBuilder.setOutput(this::moveRobotRelative);
+    return Commands.defer(() -> {
+      autoBuilder.setOutput(this::moveRobotRelative);
 
-        return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
-      }, Set.of(useMotion()))
-    );
+      return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
+    }, Set.of(useMotion()));
   }
 
   private static class ConstantSteerDriveVoltageMovement implements SwerveMovement {

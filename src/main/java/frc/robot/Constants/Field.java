@@ -6,6 +6,11 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,10 +22,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants.Constants.TEAM_COLOR;
 import frc.robot.util.CachedRobotState;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,8 +34,8 @@ import java.util.function.Supplier;
 public final class Field {
   public static final AprilTagFieldLayout FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-  public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // meters
-  public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // meters
+  public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // 8.052 meters
+  public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // 17.548 meters
 
   public static enum CoralStation {
     LEFT(true),
