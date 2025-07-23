@@ -79,9 +79,9 @@ public class AutonomousV3 {
         );
     }
 
-    public Command createSideAutonomous(Side side) {
+    public Command createSideAutonomous(Side side, boolean startInMiddle) {
         return Commands.sequence(
-            swerveDrive.followChoreoPath("side-place-0-" + side.id)
+            swerveDrive.followChoreoPath("side-place-0-" + side.id + (startInMiddle ? "-middle" : ""))
                 .deadlineFor(Commands.parallel(elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold())),
             placeCoral(new CoralPosition(side == Side.LEFT ? 1 : 10, 4)),
             swerveDrive.followChoreoPath("side-intake-1-" + side.id)
