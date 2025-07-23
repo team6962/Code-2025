@@ -207,10 +207,12 @@ public class RobotContainer {
 
     // return autoGen.getCommand();
 
-    return Commands.sequence(
-      auto.prepareAutonomous(auto.getMiddleAutonomousStartPose()),
-      auto.createMiddleAutonomous()
-    );
+    return auto.prepareAutonomous(auto.getMiddleAutonomousStartPose());
+
+    // return Commands.sequence(
+    //   auto.prepareAutonomous(auto.getMiddleAutonomousStartPose()),
+    //   auto.createMiddleAutonomous()
+    // );
 
     // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
 

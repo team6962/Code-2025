@@ -13,11 +13,11 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.Field.CoralStation;
+import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Field;
+import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
-import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
@@ -68,13 +68,20 @@ public class AutonomousV3 {
         return new Pose2d(7.23, 4.19, Rotation2d.fromDegrees(180));
     }
 
+    public Pose2d getMiddleSideAutonomousStartPose() {
+        return new Pose2d(
+            7.23,
+            4.026,
+            Rotation2d.fromDegrees(180)
+        );
+    }
+
     public Command prepareAutonomous(Pose2d startPose) {
         return Commands.sequence(
             swerveDrive.pathfindTo(startPose),
             swerveDrive.driveTwistToPose(startPose)
                 .withDeadline(Commands.sequence(
-                    Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(startPose, Inches.of(0.5), Degrees.of(3))),
-                    Commands.waitSeconds(1)
+                    Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(startPose, Inches.of(0.5), Degrees.of(3)))
                 ))
         );
     }
