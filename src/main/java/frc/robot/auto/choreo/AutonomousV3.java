@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.StationPositioning;
+import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
@@ -67,6 +68,46 @@ public class AutonomousV3 {
             swerveDrive.followChoreoPath("side-place-2-" + side.id)
                 .deadlineFor(intakeThenRaiseElevator()),
             placeCoral(new CoralPosition(side == Side.LEFT ? 3 : 8, 4))
+        );
+    }
+    
+    public Command createMiddleAutonomous() {
+        return Commands.sequence(
+            swerveDrive.followChoreoPath("middle-coral-place")
+                .deadlineFor(Commands.parallel(elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold())),
+            placeCoral(new CoralPosition(0, 4)),
+            Commands.deadline(manipulator.pivot.stow(), elevator.hold(), manipulator.grabber.stop()),
+            pickupAlgae(0),
+            swerveDrive.followChoreoPath("middle-algae-place")
+                .deadlineFor(Commands.parallel(elevator.hold(), manipulator.pivot.hold(), manipulator.grabber.hold())),
+            pieceCombos.algaeBargeSetup(),
+            pieceCombos.algaeBargeShoot(),
+            Commands.sequence(
+                Commands.waitUntil(() -> elevator.getAverageHeight().lt(ELEVATOR.CORAL.L4_HEIGHT)),
+                swerveDrive.followChoreoPath("middle-teleop-setup")
+            ).alongWith(
+                Commands.sequence(pieceCombos.stow(), pieceCombos.hold()),
+                manipulator.grabber.hold()
+            )
+        );
+    }
+
+    private Command pickupAlgae(int face) {
+        Pose2d alignPose = ReefPositioning.getAlgaeAlignPose(face);
+        Pose2d placePose = ReefPositioning.getAlgaePlacePose(face);
+
+        return Commands.sequence(
+            manipulator.pivot.safe(),
+            Commands.parallel(
+                swerveDrive.driveTwistToPose(alignPose),
+                Commands.deadline(elevator.algaeL2(), manipulator.pivot.hold(), manipulator.grabber.stop())
+            ),
+            Commands.parallel(pieceCombos.algaeL2(), manipulator.grabber.hold()),
+            Commands.deadline(
+                manipulator.grabber.intakeAlgae(),
+                swerveDrive.driveTwistToPose(placePose),
+                pieceCombos.algaeL2()
+            )
         );
     }
 

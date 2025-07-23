@@ -206,7 +206,7 @@ public class RobotContainer {
 
     // return autoGen.getCommand();
 
-    return auto.createSideAutonomous(AutonomousV3.Side.RIGHT);
+    return auto.createMiddleAutonomous();
 
     // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
 
