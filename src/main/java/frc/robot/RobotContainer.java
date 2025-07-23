@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.Field;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
@@ -205,7 +206,7 @@ public class RobotContainer {
 
     // return autoGen.getCommand();
 
-    return auto.createSideAutonomous(AutonomousV3.Side.LEFT);
+    return auto.createSideAutonomous(AutonomousV3.Side.RIGHT);
 
     // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
 

@@ -33,8 +33,8 @@ import java.util.function.Supplier;
 public final class Field {
   public static final AprilTagFieldLayout FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-  public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // meters
-  public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // meters
+  public static final double WIDTH = FIELD_LAYOUT.getFieldWidth(); // 8.052 meters
+  public static final double LENGTH = FIELD_LAYOUT.getFieldLength(); // 17.548 meters
 
   public static enum CoralStation {
     LEFT(true),
