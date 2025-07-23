@@ -25,7 +25,7 @@ public class AutonomousV3 {
     private SwerveDrive swerveDrive;
     private Manipulator manipulator;
     private Elevator elevator;
-    private PieceCombos pieceCombos;;
+    private PieceCombos pieceCombos;
 
     public AutonomousV3(
         SwerveDrive swerveDrive,
@@ -53,16 +53,28 @@ public class AutonomousV3 {
 
     public Command createSideAutonomous(Side side) {
         return Commands.sequence(
-            swerveDrive.followChoreoPath("side-place-0-" + side.id),
+            swerveDrive.followChoreoPath("side-place-0-" + side.id)
+                .deadlineFor(Commands.parallel(elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold())),
             placeCoral(new CoralPosition(side == Side.LEFT ? 1 : 10, 4)),
-            swerveDrive.followChoreoPath("side-intake-1-" + side.id),
-            intakeCoral(side.station, 1, Seconds.of(0.25)),
-            swerveDrive.followChoreoPath("side-place-1-" + side.id),
+            swerveDrive.followChoreoPath("side-intake-1-" + side.id)
+                .deadlineFor(pieceCombos.intakeCoral()),
+            intakeCoral(side.station, 1, Seconds.of(0.75)),
+            swerveDrive.followChoreoPath("side-place-1-" + side.id)
+                .deadlineFor(intakeThenRaiseElevator()),
             placeCoral(new CoralPosition(side == Side.LEFT ? 4 : 7, 4)),
-            swerveDrive.followChoreoPath("side-intake-2-" + side.id),
-            intakeCoral(side.station, 1, Seconds.of(0.25)),
-            swerveDrive.followChoreoPath("side-place-2-" + side.id),
+            swerveDrive.followChoreoPath("side-intake-2-" + side.id)
+                .deadlineFor(pieceCombos.intakeCoral()),
+            intakeCoral(side.station, 1, Seconds.of(0.75)),
+            swerveDrive.followChoreoPath("side-place-2-" + side.id)
+                .deadlineFor(intakeThenRaiseElevator()),
             placeCoral(new CoralPosition(side == Side.LEFT ? 3 : 8, 4))
+        );
+    }
+
+    private Command intakeThenRaiseElevator() {
+        return Commands.sequence(
+            pieceCombos.intakeCoral(),
+            Commands.parallel(elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold())
         );
     }
 
@@ -100,37 +112,32 @@ public class AutonomousV3 {
             CommandUtils.onlyIf(
                 () -> RobotBase.isSimulation() || (manipulator.grabber.hasCoral() && manipulator.grabber.isCoralClear()),
                 Commands.sequence(
-                // Move the elevator and manipulator to the correct placing
-                // position, aligning at the same time.
-                annotate("position mechanisms for place and align", Commands.deadline(
-                    CommandUtils.selectByMode(pieceCombos.coral(position.level), Commands.waitSeconds(0.25)),
-                    swerveDrive.driveTwistToPose(placePose))),
-                // Finish aligning while holding the elevator and
-                // manipulator in the same place.
-                annotate("align", Commands.deadline(
-                    swerveDrive.driveTwistToPose(placePose)
-                        .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(1), Degrees.of(4))),
-                    pieceCombos.holdCoral())),
-                // Drop the coral while keeping the elevator and manipulator
-                // in place.
-                annotate("drop coral", manipulator
-                    .grabber
-                    .dropCoral()
-                    .deadlineFor(manipulator.pivot.hold(), elevator.hold())),
-                // Stow the pivot
-                annotate("stow pivot", Commands.deadline(
-                    CommandUtils.selectByMode(
-                    manipulator.pivot.stow(),
-                    Commands.waitSeconds(0.1)
-                    ),
-                    elevator.hold(),
-                    manipulator.grabber.stop()
-                )),
-                // Move the elevator down at maximum speed until it gets
-                // under the safe height to drive at.
-                annotate("lower elevator", Commands.parallel(elevator.move(-1.0), manipulator.pivot.hold(), manipulator.grabber.stop())
-                    .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
-                    .withTimeout(0.1))
+                    // Move the elevator and manipulator to the correct placing
+                    // position, aligning at the same time.
+                    annotate("position mechanisms for place and align", Commands.deadline(
+                        CommandUtils.selectByMode(pieceCombos.coral(position.level), Commands.waitSeconds(0.25)),
+                        swerveDrive.driveTwistToPose(placePose))),
+                    // Finish aligning while holding the elevator and
+                    // manipulator in the same place.
+                    annotate("align", Commands.deadline(
+                        swerveDrive.driveTwistToPose(placePose)
+                            .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.5), Degrees.of(3))),
+                        pieceCombos.holdCoral())),
+                    // Drop the coral while keeping the elevator and manipulator
+                    // in place.
+                    annotate("drop coral", manipulator
+                        .grabber
+                        .dropCoral()
+                        .deadlineFor(manipulator.pivot.hold(), elevator.hold())),
+                    // Stow the pivot
+                    annotate("stow pivot", Commands.deadline(
+                        CommandUtils.selectByMode(
+                        manipulator.pivot.stow(),
+                        Commands.waitSeconds(0.1)
+                        ),
+                        elevator.hold(),
+                        manipulator.grabber.stop()
+                    ))
                 )
             )
         );
