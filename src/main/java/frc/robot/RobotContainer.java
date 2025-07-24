@@ -13,6 +13,7 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -32,6 +33,7 @@ import frc.robot.Constants.Constants.AUTO;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.choreo.AutonomousV3;
+import frc.robot.auto.choreo.AutonomousV3.Side;
 import frc.robot.auto.pipeline.AutoGeneration;
 import frc.robot.auto.utils.AutoCommands;
 import frc.robot.auto.utils.AutoPaths;
@@ -71,8 +73,8 @@ public class RobotContainer {
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
-  public final AutoCommands autonomous;
-  public final AutonomousV3 auto;
+  public final AutoCommands autov2;
+  public final AutonomousV3 autov3;
   public final Algae algaeDetector;
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
@@ -134,8 +136,8 @@ public class RobotContainer {
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
-    autonomous = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
-    auto = new AutonomousV3(swerveDrive, manipulator, elevator, pieceCombos);
+    autov2 = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
+    autov3 = new AutonomousV3(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
     // // collisionDetector = new CollisionDetector();
@@ -143,11 +145,11 @@ public class RobotContainer {
     // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
-    Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autonomous, pieceCombos);
+    Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
 
     autoGen =
         new AutoGeneration(
-            autonomous,
+            autov2,
             AUTO.SLEEP_TIME,
             AUTO.WORK_TIME,
             () ->
@@ -188,80 +190,38 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return autonomous.createDemoAutonomousCommand();
-    // return Commands.defer(() -> {
-    //   // System.out.println("Generating auto command");
+    // AUTO ROUTINES - Uncomment the one you want to run
 
-    //   // return autoGen.generate();
+    // 1. Start in the middle of the field, then score 3 coral on the right side.
+    // return autov3.createSideAutonomous(Side.RIGHT, true);
 
-    //   GeneratedAuto auto = new GeneratedAuto(autonomous,
-    // AutoParams.get(swerveDrive.getEstimatedPose(), manipulator.coral.hasGamePiece()));
-    //   auto.setup();
+    // 2. Start in the middle of the field, then score 3 coral on the left side.
+    // return autov3.createSideAutonomous(Side.LEFT, true);
 
-    //   return auto.getCommand();
-    // }, Set.of(swerveDrive, elevator, manipulator.coral, manipulator.pivot));
+    // 3. Start on the right side of the field, then score 3 coral on the right side.
+    // return autov3.createSideAutonomous(Side.RIGHT, false);
 
-    // return autonomous.createAutonomousCommand();
+    // 4. Start on the left side of the field, then score 3 coral on the left side.
+    // return autov3.createSideAutonomous(Side.LEFT, false);
 
-    // Command auto = autoGen.getCommand();
+    // 5. Start in the middle field, score preloaded coral on the back face then
+    //    throw the algae on the back face into the barge.
+    // return autov3.createMiddleAutonomous();
 
-    // return autoGen.getCommand();
-
-    return auto.prepareAutonomous(auto.getMiddleAutonomousStartPose());
-
-    // return Commands.sequence(
-    //   auto.prepareAutonomous(auto.getMiddleAutonomousStartPose()),
-    //   auto.createMiddleAutonomous()
-    // );
-
-    // return swerveDrive.driveTwistToPose(new Pose2d(3, 1, Rotation2d.fromDegrees(30)));
-
-    // return swerveDrive.calibrateWheelSize();
-
-    // return swerveDrive.followChoreoPath("rahul's favorite path");
-
-    // return swerveDrive.calibrateDriveMotors();
-    // return swerveDrive.getModules()[0].calibrateSteerMotor().repeatedly();
+    // 6. Drive foreward until astop
     // return swerveDrive.drive(new ChassisSpeeds(0.5, 0, 0));
 
-    // return swerveDrive.staticVoltage(Volts.of(6), Volts.of(0), true);
+    // 7. Do nothing
+    return Commands.none();
 
-    // return Commands.repeatingSequence(
-    //   swerveDrive.staticVoltage(Volts.of(6), Volts.of(0), true).withTimeout(5),
-    //   Commands.waitSeconds(3)
-    // );
+    // 8. Old autonomous
+    // return autoGen.getCommand();
 
+    ////////////////////////////////////////////////////////////////////////////
+    // OTHER COMMANDS - Do not use in matches
+
+    // 9. Calibrate wheel size for odometry
     // return swerveDrive.calibrateWheelSize();
-
-    // return swerveDrive.pathfindToPrecomputed(new Pose2d(1, 1, Rotation2d.fromDegrees(0)), new
-    // Pose2d(6.5, 6.5, Rotation2d.fromDegrees(70)));
-
-    // return swerveDrive.pathfindBetweenWaypoints(
-    //   new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-    //   new Pose2d(
-    //     Math.random() * 5, Math.random() * 3,
-    //     Rotation2d.fromRotations(Math.random())
-    //   ),
-    //   Rotation2d.fromDegrees(0),
-    //   Rotation2d.fromRotations(Math.random()),
-    //   MetersPerSecond.of(0),
-    //   MetersPerSecond.of(1)
-    // );
-
-    // return swerveDrive.drive(new ChassisSpeeds(0, 0, 100000));
-
-    // return swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(60));
-
-    // return Commands.sequence(
-    //   // elevator.calibrate()
-    //   manipulator.pivot.calibrate()
-    // );
-
-    // return Commands.sequence(
-    // elevator.calibrate()
-    // manipulator.pivot.calibrate());
-    // return hang.stow();
-    // return Commands.run(() -> {});
   }
 
   public static double getVoltage() {

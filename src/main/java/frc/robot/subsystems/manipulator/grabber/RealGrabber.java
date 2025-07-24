@@ -109,6 +109,17 @@ public class RealGrabber extends Grabber {
     return setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED);
   }
 
+  @Override
+  public Command repositionCoral() {
+    return Commands.sequence(
+      setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED)
+        .until(() -> !isCoralClear()),
+      setDutyCycle(MANIPULATOR.CORAL_REPOSITION_SPEED)
+        .until(() -> isCoralClear()),
+      stopOnce()
+    );
+  }
+
   public boolean detectedAlgae() {
     return detectedAlgae;
   }

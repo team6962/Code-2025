@@ -128,8 +128,7 @@ public class AutonomousV3 {
                 annotate("lower elevator", CommandUtils.selectByMode(
                     Commands.waitUntil(() -> elevator.getAverageHeight().lt(ELEVATOR.CORAL.L4_HEIGHT)),
                     Commands.waitSeconds(0.25)
-                )),
-                annotate("middle-teleop-setup", swerveDrive.followChoreoPath("middle-teleop-setup"))
+                ))
             ).alongWith(
                 Commands.sequence(pieceCombos.stow(), pieceCombos.hold()),
                 manipulator.grabber.hold()
@@ -212,13 +211,18 @@ public class AutonomousV3 {
                     // position, aligning at the same time.
                     annotate("position mechanisms for place and align", Commands.deadline(
                         CommandUtils.selectByMode(pieceCombos.coral(position.level), Commands.waitSeconds(0.25)),
-                        swerveDrive.driveTwistToPose(placePose))),
+                        swerveDrive.driveTwistToPose(placePose),
+                        manipulator.grabber.repositionCoral())),
                     // Finish aligning while holding the elevator and
                     // manipulator in the same place.
                     annotate("align", Commands.deadline(
                         swerveDrive.driveTwistToPose(placePose)
-                            .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.5), Degrees.of(3))),
-                        pieceCombos.holdCoral())),
+                            .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.5), Degrees.of(4))),
+                        pieceCombos.holdCoral()
+                    )),
+                    annotate("reposition coral", Commands.deadline(
+                        manipulator.grabber.repositionCoral(), pieceCombos.hold()
+                    )),
                     // Drop the coral while keeping the elevator and manipulator
                     // in place.
                     annotate("drop coral", manipulator

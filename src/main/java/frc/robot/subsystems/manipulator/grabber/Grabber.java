@@ -52,6 +52,8 @@ public abstract class Grabber extends SubsystemBase {
 
   public abstract Command stop();
 
+  public abstract Command repositionCoral();
+
   public boolean isCoralClear() {
     return false;
   }

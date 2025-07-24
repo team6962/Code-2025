@@ -45,6 +45,8 @@ public interface ManipulatorPivot extends Subsystem {
 
   public Command down();
 
+  public boolean doneMoving();
+
   public boolean inRange(Angle angle);
 
   public void setMinMaxAngle(Angle min, Angle max);

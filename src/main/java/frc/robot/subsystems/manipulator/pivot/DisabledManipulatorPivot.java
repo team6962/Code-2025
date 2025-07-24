@@ -105,7 +105,12 @@ public Command down() {
   }
 
   @Override
-public boolean inRange(Angle angle) {
+  public boolean inRange(Angle angle) {
+    return true;
+  }
+
+  @Override
+  public boolean doneMoving() {
     return true;
   }
 

@@ -12,9 +12,15 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -26,10 +32,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -412,7 +414,7 @@ public final class Constants {
     public static final class CORAL {
       public static final Angle L1_ANGLE = Degrees.of(-10.0);
       public static final Angle L23_ANGLE = Degrees.of(-22.35);
-      public static final Angle L4_ANGLE = Degrees.of(-42.5);
+      public static final Angle L4_ANGLE = Degrees.of(-48.5);
       public static final Angle INTAKE_ANGLE = Degrees.of(-22.0);
     }
 
@@ -476,6 +478,7 @@ public final class Constants {
     public static final double CORAL_IN_SPEED = 0.3;
     public static final double CORAL_SLOW_IN_SPEED = 0.1;
     public static final double CORAL_ADJUST_SPEED = -0.1;
+    public static final double CORAL_REPOSITION_SPEED = 0.05;
     public static final double CORAL_HOLD_SPEED = -0.0;
     public static final Time CORAL_ADJUST_TIME = Seconds.of(0.1);
 

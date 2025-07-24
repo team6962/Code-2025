@@ -2,6 +2,8 @@ package frc.robot.subsystems.manipulator.grabber;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -120,5 +122,10 @@ public class SimGrabber extends Grabber {
   @Override
   public Command stop() {
     return waitTimeCommand(stopTime);
+  }
+
+  @Override
+  public Command repositionCoral() {
+      return CommandUtils.noneWithRequirements(this);
   }
 }
