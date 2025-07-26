@@ -217,7 +217,7 @@ public class AutonomousV3 {
                     // manipulator in the same place.
                     annotate("align", Commands.deadline(
                         swerveDrive.driveTwistToPose(placePose)
-                            .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.5), Degrees.of(4))),
+                                .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.85), Degrees.of(4))),
                         pieceCombos.holdCoral()
                     )),
                     annotate("reposition coral", Commands.deadline(

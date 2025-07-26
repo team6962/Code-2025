@@ -226,7 +226,7 @@ public class Controls {
           for (int i = 0; i < 12; i++) {
             Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
 
-            if (swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.5), Degrees.of(3))) {
+            if (swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.85), Degrees.of(4))) {
               poseCorrect = true;
               break;
             }
