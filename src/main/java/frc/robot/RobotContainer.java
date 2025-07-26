@@ -84,8 +84,6 @@ public class RobotContainer {
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
-  private final AutoGeneration autoGen;
-
   // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   // private SteerModuleTest steerModuleTest = new SteerModuleTest();
@@ -146,15 +144,6 @@ public class RobotContainer {
 
     // // Configure the trigger bindings
     Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
-
-    autoGen =
-        new AutoGeneration(
-            autov2,
-            AUTO.SLEEP_TIME,
-            AUTO.WORK_TIME,
-            () ->
-                AutoPaths.PlanParameters.fromAutoChooser(
-                    manipulator.grabber.hasCoral(), swerveDrive.getEstimatedPose()));
 
     // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
