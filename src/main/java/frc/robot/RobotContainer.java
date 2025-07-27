@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.choreo.AutonomousV3;
+import frc.robot.auto.choreo.AutonomousV3.Side;
 import frc.robot.auto.utils.AutoCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
@@ -72,6 +73,7 @@ public class RobotContainer {
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
+  private final Command autonomousCommand;
   // public final ManipulatorSafeties manipulatorSafeties;
   // private final CollisionDetector collisionDetector;
 
@@ -169,9 +171,11 @@ public class RobotContainer {
     // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
 
     Logger.start(Milliseconds.of(20));
+
+    autonomousCommand = createAutonomousCommand();
   }
 
-  public Command getAutonomousCommand() {
+  private Command createAutonomousCommand() {
     // AUTO ROUTINES - Uncomment the one you want to run
 
     // 1. Start in the middle of the field, then score 3 coral on the right side.
@@ -181,7 +185,7 @@ public class RobotContainer {
     // return autov3.createSideAutonomous(Side.LEFT, true);
 
     // 3. Start on the right side of the field, then score 3 coral on the right side.
-    // return autov3.createSideAutonomous(Side.RIGHT, false);
+    return autov3.createSideAutonomous(Side.RIGHT, false);
 
     // 4. Start on the left side of the field, then score 3 coral on the left side.
     // return autov3.createSideAutonomous(Side.LEFT, false);
@@ -194,7 +198,7 @@ public class RobotContainer {
     // return swerveDrive.drive(new ChassisSpeeds(0.5, 0, 0));
 
     // 7. Do nothing
-    return Commands.none();
+    // return Commands.none();
 
     // 8. Old autonomous
     // return autoGen.getCommand();
@@ -204,6 +208,10 @@ public class RobotContainer {
 
     // 9. Calibrate wheel size for odometry
     // return swerveDrive.calibrateWheelSize();
+  }
+
+  public Command getAutonomousCommand() {
+    return autonomousCommand;
   }
 
   public static double getVoltage() {
