@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.choreo.AutonomousV3;
@@ -185,10 +184,10 @@ public class RobotContainer {
     // return autov3.createSideAutonomous(Side.LEFT, true);
 
     // 3. Start on the right side of the field, then score 3 coral on the right side.
-    return autov3.createSideAutonomous(Side.RIGHT, false);
+    // return autov3.createSideAutonomous(Side.RIGHT, false);
 
     // 4. Start on the left side of the field, then score 3 coral on the left side.
-    // return autov3.createSideAutonomous(Side.LEFT, false);
+    return autov3.createSideAutonomous(Side.LEFT, false);
 
     // 5. Start in the middle field, score preloaded coral on the back face then
     //    throw the algae on the back face into the barge.

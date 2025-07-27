@@ -209,10 +209,10 @@ public class AutonomousV3 {
                 Commands.sequence(
                     // Move the elevator and manipulator to the correct placing
                     // position, aligning at the same time.
-                    annotate("position mechanisms for place and align", Commands.deadline(
+                    annotate("position mechanisms for place", Commands.deadline(
                         CommandUtils.selectByMode(pieceCombos.coral(position.level), Commands.waitSeconds(0.25)),
-                        swerveDrive.driveTwistToPose(placePose),
-                        manipulator.grabber.repositionCoral())),
+                        manipulator.grabber.repositionCoral()
+                    )),
                     // Finish aligning while holding the elevator and
                     // manipulator in the same place.
                     annotate("align", Commands.deadline(
