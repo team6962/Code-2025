@@ -64,19 +64,19 @@ public final class Constants {
     }
 
     public static boolean isHangEnabled() {
-      return false;
+      return HANG;
     }
 
     public static boolean isManipulatorEnabled() {
-      return MANIPULATOR && RobotVersion.isV2();
+      return MANIPULATOR;
     }
 
     public static boolean isElevatorEnabled() {
-      return ELEVATOR && RobotVersion.isV2();
+      return ELEVATOR;
     }
 
     public static boolean isFunnelEnabled() {
-      return FUNNEL && RobotVersion.isV2();
+      return FUNNEL;
     }
   }
 
