@@ -1,7 +1,8 @@
-package com.team6962.lib.swerve;
+package com.team6962.lib.swerve.movement;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.team6962.lib.swerve.SwerveCore;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;

@@ -1,4 +1,4 @@
-package com.team6962.lib.swerve;
+package com.team6962.lib.swerve.movement;
 
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.team6962.lib.swerve.SwerveCore;
 
 public interface SwerveMovement {
     public static PositionVoltage positionVoltage = new PositionVoltage(0);

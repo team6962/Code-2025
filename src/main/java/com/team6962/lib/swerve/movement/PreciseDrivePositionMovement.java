@@ -1,9 +1,10 @@
-package com.team6962.lib.swerve;
+package com.team6962.lib.swerve.movement;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import com.team6962.lib.swerve.SwerveCore;
 import com.team6962.lib.swerve.module.SwerveModule;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,12 +15,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.util.software.MathUtils;
 
-public class PositionDeltaMovement implements SwerveMovement {
+public class PreciseDrivePositionMovement implements SwerveMovement {
     private SwerveModulePosition[] initialPositions;
     private SwerveModulePosition[] positionDeltas;
     private double[] relativeVelocities;
 
-    public PositionDeltaMovement(
+    public PreciseDrivePositionMovement(
         SwerveModulePosition[] initialPositions,
         SwerveModulePosition[] positionDeltas,
         double[] relativeVelocities

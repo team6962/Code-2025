@@ -6,13 +6,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -24,6 +22,8 @@ import com.team6962.lib.prepath.CustomPathfindingCommand;
 import com.team6962.lib.swerve.auto.AutoBuilderWrapper;
 import com.team6962.lib.swerve.auto.PathPrecomputing;
 import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.swerve.movement.ConstantVoltageMovement;
+import com.team6962.lib.swerve.movement.PreciseDrivePositionMovement;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
@@ -505,63 +505,16 @@ public class SwerveDrive extends SwerveCore {
     }, Set.of(useMotion()));
   }
 
-  private static class ConstantSteerDriveVoltageMovement implements SwerveMovement {
-    private Voltage steerVoltage = Volts.of(0);
-    private Voltage driveVoltage = Volts.of(0);
-    private boolean singleModule = false;
-
-    public ConstantSteerDriveVoltageMovement withSteerVoltage(Voltage voltage) {
-      this.steerVoltage = voltage;
-      return this;
-    }
-
-    public ConstantSteerDriveVoltageMovement withDriveVoltage(Voltage voltage) {
-      this.driveVoltage = voltage;
-      return this;
-    }
-
-    public ConstantSteerDriveVoltageMovement withSingleModule(boolean singleModule) {
-      this.singleModule = singleModule;
-      return this;
-    }
-
-    @Override
-    public void execute(SwerveCore drivetrain) {
-      for (SwerveModule module : drivetrain.getModules()) {
-        if (singleModule && module.getModuleCorner().index != 0) {
-          module.drive(
-            new VoltageOut(0),
-            new VoltageOut(0)
-          );
-
-          continue;
-        }
-
-        Logger.log(SwerveModule.getModuleName(module.getModuleCorner().index) + " Swerve Module/targetAngle", Rotations.of(Math.round(module.getSteerAngle().in(Rotations))));
-
-        module.drive(
-          new VoltageOut(driveVoltage),
-          new VoltageOut(steerVoltage)
-        );
-      }
-    }
-
-    @Override
-    public SwerveMovement cleared() {
-      return null;
-    }
-  }
-
-  public Command constantSteerDriveVoltage(Voltage steerVoltage, Voltage driveVoltage, boolean singleModule) {
-    ConstantSteerDriveVoltageMovement movement = new ConstantSteerDriveVoltageMovement()
+  public Command constantVoltage(Voltage steerVoltage, Voltage driveVoltage, boolean singleModule) {
+    ConstantVoltageMovement movement = new ConstantVoltageMovement()
       .withSteerVoltage(steerVoltage)
       .withDriveVoltage(driveVoltage)
       .withSingleModule(singleModule);
 
-    return Commands.run(() -> { currentMovement = movement; });
+    return Commands.run(() -> { currentMovement = movement; }, useMotion());
   }
 
-  private PositionDeltaMovement createPositionDeltaMovement(Twist2d twist) {
+  private PreciseDrivePositionMovement createPositionDeltaMovement(Twist2d twist) {
     SwerveModuleState[] states = getKinematics().toSwerveModuleStates(new ChassisSpeeds(
       twist.dx, twist.dy, twist.dtheta
     ));
@@ -570,7 +523,7 @@ public class SwerveDrive extends SwerveCore {
     SwerveModulePosition[] deltas = KinematicsUtils.toModulePositions(states, Seconds.of(1));
     double[] relativeVelocities = KinematicsUtils.getVelocitiesMetersPerSecond(states);
 
-    return new PositionDeltaMovement(initial, deltas, relativeVelocities);
+    return new PreciseDrivePositionMovement(initial, deltas, relativeVelocities);
   }
 
   private SwerveModuleState[] getAlignedStates(Twist2d twist) {

@@ -4,6 +4,8 @@ import com.team6962.lib.swerve.auto.PoseEstimator;
 import com.team6962.lib.swerve.auto.RobotCoordinates;
 import com.team6962.lib.swerve.module.SimulatedModule;
 import com.team6962.lib.swerve.module.SwerveModule;
+import com.team6962.lib.swerve.movement.SpeedsMovement;
+import com.team6962.lib.swerve.movement.SwerveMovement;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
