@@ -8,7 +8,7 @@ import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-import com.team6962.lib.prepath.CustomLocalADStar;
+import com.team6962.lib.swerve.prepath.CustomLocalADStar;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
 import edu.wpi.first.math.geometry.Pose2d;

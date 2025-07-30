@@ -1,4 +1,4 @@
-package com.team6962.lib.prepath;
+package com.team6962.lib.swerve.prepath;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;

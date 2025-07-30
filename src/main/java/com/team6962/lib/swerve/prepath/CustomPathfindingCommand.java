@@ -1,4 +1,4 @@
-package com.team6962.lib.prepath;
+package com.team6962.lib.swerve.prepath;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
