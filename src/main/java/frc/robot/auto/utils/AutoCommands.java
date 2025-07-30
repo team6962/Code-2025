@@ -4,13 +4,15 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
-import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,8 +25,6 @@ import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class AutoCommands {
   private SwerveDrive swerveDrive;
@@ -250,25 +250,13 @@ public class AutoCommands {
                 : ReefPositioning.getCoralPlacePose(pole))
         .andThen(
             swerveDrive
-                .alignTo(ReefPositioning.getCoralPlacePose(pole), Inches.of(0.5), Degrees.of(2))
-                .withEndWithinTolerance(endWithinTolerance));
-  }
-
-  public Command alignV3Pole(int pole, boolean endWithinTolerance, boolean useAlignPose) {
-    return swerveDrive
-        .pathfindTo(
-            useAlignPose
-                ? ReefPositioning.getCoralAlignPose(pole)
-                : ReefPositioning.getCoralPlacePose(pole))
-        .andThen(
-            swerveDrive
                 .driveTwistToPose(ReefPositioning.getCoralPlacePose(pole))
                   .until(() -> endWithinTolerance && swerveDrive.isWithinToleranceOf(
                     ReefPositioning.getCoralPlacePose(pole), Inches.of(1), Degrees.of(3)
                   )));
   }
 
-  public Command alignV3Face(int face, boolean endWithinTolerance) {
+  public Command alignFace(int face, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
@@ -279,29 +267,6 @@ public class AutoCommands {
             )));
   }
 
-  public Command alignFace(int face, boolean endWithinTolerance) {
-    return swerveDrive
-        .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
-        .andThen(
-            swerveDrive
-                .alignTo(ReefPositioning.getAlgaePickupPose(face))
-                .withEndWithinTolerance(endWithinTolerance));
-  }
-
-  public Command alignV3ToClosestPoleTeleop(PolePattern pattern, Supplier<Command> rumble) {
-    return Commands.defer(
-        () -> {
-          int pole = getClosestReefPole(swerveDrive.getEstimatedPose(), pattern);
-          Pose2d polePose = ReefPositioning.getCoralPlacePose(pole);
-
-          return alignV3Pole(pole, false, false)
-            .alongWith(
-              Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(polePose, Inches.of(1), Degrees.of(3)))
-                .andThen(rumble.get()));
-        },
-        Set.of(swerveDrive.useMotion()));
-  }
-
   public Command alignToClosestPoleTeleop(PolePattern pattern, Supplier<Command> rumble) {
     return Commands.defer(
         () -> {
@@ -309,27 +274,10 @@ public class AutoCommands {
           Pose2d polePose = ReefPositioning.getCoralPlacePose(pole);
 
           return alignPole(pole, false, false)
-              .alongWith(
-                  Commands.waitUntil(
-                          () ->
-                              polePose
-                                          .getTranslation()
-                                          .getDistance(
-                                              swerveDrive.getEstimatedPose().getTranslation())
-                                      < Units.inchesToMeters(1)
-                                  && MeasureMath.minAbsDifference(
-                                              polePose.getRotation(),
-                                              swerveDrive.getEstimatedHeading())
-                                          .getDegrees()
-                                      < 3)
-                      .andThen(rumble.get()));
+            .alongWith(
+              Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(polePose, Inches.of(1), Degrees.of(3)))
+                .andThen(rumble.get()));
         },
-        Set.of(swerveDrive.useMotion()));
-  }
-
-  public Command alignV3ToClosestFaceTeleop() {
-    return Commands.defer(
-        () -> alignV3Face(getClosestReefFace(swerveDrive.getEstimatedPose()), false),
         Set.of(swerveDrive.useMotion()));
   }
 
