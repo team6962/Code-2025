@@ -6,7 +6,6 @@ import com.team6962.lib.swerve.SwerveCore;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -121,11 +120,11 @@ public class SpeedsMovement implements SwerveMovement {
     } else {
       KinematicsUtils.desaturateWheelSpeeds(states, maxLinearVelocity);
     }
-    
+
     for (int i = 0; i < 4; i++) {
       SwerveModule module = modules[i];
       SwerveModuleState targetState = states[i];
-      
+
       targetState = SwerveModule.optimizeStateForTalon(targetState, module.getSteerAngle());
 
       if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
@@ -134,17 +133,18 @@ public class SpeedsMovement implements SwerveMovement {
 
       executedStates[i] = targetState;
 
-      AngularVelocity driveVelocity = module.getDrivetrainConstants().driveMotorMechanismToRotor(
-        MetersPerSecond.of(targetState.speedMetersPerSecond)
-      );
+      AngularVelocity driveVelocity =
+          module
+              .getDrivetrainConstants()
+              .driveMotorMechanismToRotor(MetersPerSecond.of(targetState.speedMetersPerSecond));
 
       Angle steerAngle = targetState.angle.getMeasure();
 
       module.drive(
-        SwerveMovement.motionMagicVelocityVoltage.withVelocity(driveVelocity),
-        RobotBase.isReal() ? SwerveMovement.motionMagicExpoVoltage.withPosition(steerAngle) :
-        SwerveMovement.positionVoltage.withPosition(steerAngle)
-      );
+          SwerveMovement.motionMagicVelocityVoltage.withVelocity(driveVelocity),
+          RobotBase.isReal()
+              ? SwerveMovement.motionMagicExpoVoltage.withPosition(steerAngle)
+              : SwerveMovement.positionVoltage.withPosition(steerAngle));
     }
   }
 
@@ -153,7 +153,7 @@ public class SpeedsMovement implements SwerveMovement {
   public SpeedsMovement cleared() {
     states = null;
     speeds = null;
-    
+
     return this;
   }
 }

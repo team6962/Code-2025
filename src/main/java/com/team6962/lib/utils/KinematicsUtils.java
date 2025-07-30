@@ -1,7 +1,6 @@
 package com.team6962.lib.utils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -91,19 +90,18 @@ public final class KinematicsUtils {
     return scaled;
   }
 
-  public static SwerveModuleState[] multiply(
-      SwerveModuleState[] states, double scalar) {
+  public static SwerveModuleState[] multiply(SwerveModuleState[] states, double scalar) {
     SwerveModuleState[] scaled = new SwerveModuleState[states.length];
 
     for (int i = 0; i < states.length; i++) {
-      scaled[i] =
-          new SwerveModuleState(states[i].speedMetersPerSecond * scalar, states[i].angle);
+      scaled[i] = new SwerveModuleState(states[i].speedMetersPerSecond * scalar, states[i].angle);
     }
 
     return scaled;
   }
 
-  public static SwerveModulePosition[] add(SwerveModulePosition[] positions1, SwerveModulePosition[] positions2) {
+  public static SwerveModulePosition[] add(
+      SwerveModulePosition[] positions1, SwerveModulePosition[] positions2) {
     if (positions1.length != positions2.length) {
       throw new IllegalArgumentException("Arrays must be of the same length");
     }
@@ -113,8 +111,7 @@ public final class KinematicsUtils {
     for (int i = 0; i < positions1.length; i++) {
       sum[i] =
           new SwerveModulePosition(
-              positions1[i].distanceMeters + positions2[i].distanceMeters,
-              positions1[i].angle);
+              positions1[i].distanceMeters + positions2[i].distanceMeters, positions1[i].angle);
     }
 
     return sum;
@@ -259,7 +256,8 @@ public final class KinematicsUtils {
     return translation.getAngle();
   }
 
-  public static boolean isSimilarAngles(SwerveModuleState[] states1, SwerveModuleState[] states2, Angle tolerance) {
+  public static boolean isSimilarAngles(
+      SwerveModuleState[] states1, SwerveModuleState[] states2, Angle tolerance) {
     if (states1.length != states2.length) {
       throw new IllegalArgumentException("States arrays must be of the same length");
     }

@@ -9,16 +9,18 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team6962.lib.swerve.SwerveCore;
 
 public interface SwerveMovement {
-    public static PositionVoltage positionVoltage = new PositionVoltage(0);
-    public static VelocityVoltage velocityVoltage = new VelocityVoltage(0);
-    public static MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0);
-    public static MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
-    public static DynamicMotionMagicVoltage dynamicMotionMagicVoltage = new DynamicMotionMagicVoltage(0, 0, 0, 0);
-    public static MotionMagicVelocityVoltage motionMagicVelocityVoltage = new MotionMagicVelocityVoltage(0);
-    
-    public default void log() {
-    }
+  public static PositionVoltage positionVoltage = new PositionVoltage(0);
+  public static VelocityVoltage velocityVoltage = new VelocityVoltage(0);
+  public static MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0);
+  public static MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
+  public static DynamicMotionMagicVoltage dynamicMotionMagicVoltage =
+      new DynamicMotionMagicVoltage(0, 0, 0, 0);
+  public static MotionMagicVelocityVoltage motionMagicVelocityVoltage =
+      new MotionMagicVelocityVoltage(0);
 
-    public void execute(SwerveCore drivetrain);
-    public SwerveMovement cleared();
+  public default void log() {}
+
+  public void execute(SwerveCore drivetrain);
+
+  public SwerveMovement cleared();
 }

@@ -4,13 +4,9 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -25,6 +21,8 @@ import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class AutoCommands {
   private SwerveDrive swerveDrive;
@@ -104,108 +102,123 @@ public class AutoCommands {
     Pose2d placePose = ReefPositioning.getCoralPlacePose(position.pole);
 
     return Commands.sequence(
-      // Drive to the coral pole with Pathplanner, moving the elevator and
-      // manipulator early if possible.
-      Commands.deadline(
-        // Pathfind to the alignment pose
-        annotate("pathfind align", swerveDrive.pathfindToPrecomputed(previousPose, alignPose)),
-        // Run a sequence of movements to prepare the elevator and
-        // manipulator early, that will immediately end when the robot
-        // gets to the alignment pose.
-        Commands.sequence(
-          // Intake coral if we haven't got already. This is for if
-          // the preloaded coral isn't fully inside the manipulator.
-          CommandUtils.onlyIf(
-              () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
-              annotate("intake coral", pieceCombos.intakeCoral())),
-          // Move the elevator at maximum speed until it gets to the
-          // maximum safe height to drive at full speed without
-          // tipping over.
-          annotate(
-              "towards ready",
-              Commands.parallel(
-                  elevator
-                      .move(1.0)
-                      .until(
-                          () -> elevator.getAverageHeight().gt(ELEVATOR.AUTO.READY_HEIGHT)),
-                  manipulator.pivot.hold(),
-                  manipulator.grabber.stop())),
-          // Finely position the elevator at the maximum safe height,
-          // then keep it there until the robot is near to the
-          // alignment pose and slow enough to raise the elevator higher.
-          Commands.sequence(
-                  annotate("to ready", pieceCombos.readyL3()),
-                  annotate("hold ready", pieceCombos.holdCoral()))
-              .until(
-                  () ->
-                      swerveDrive
-                                  .getEstimatedPose()
-                                  .getTranslation()
-                                  .getDistance(alignPose.getTranslation())
-                              < 2.0
-                          && KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds())
-                                  .getNorm()
-                              < 3.0),
-          // Move the elevator to the maximum height to prepare for
-          // placing, then hold it there. This command is wrapped in a
-          // deadline so this sequence will end if the robot when to
-          // the reef pole.
-          annotate("move l4", pieceCombos.coralL4()),
-          annotate("hold l4", pieceCombos.holdCoral())
-        )
-      ),
-      // In case the robot got to the coral pole before it was done intake,
-      // continue intaking until a coral is in the manipulator and clear of
-      // the funnel.
-      CommandUtils.onlyIf(
-              () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
-              annotate("intake coral", pieceCombos.intakeCoral()))
-          .withTimeout(1.0),
-      // Continue intaking the coral in case the coral hasn't reached the
-      // "has coral" beam break but has gotten to "coral clear"
-      CommandUtils.onlyIf(
-          () -> RobotBase.isReal() && !manipulator.grabber.hasCoral() && !manipulator.grabber.isCoralClear(),
-          annotate("intake coral because coral clear", pieceCombos.intakeCoral())),
-      // If the robot has coral, align to the place pose, raise the
-      // elevator, and drop it. Otherwise, end the command, skipping this
-      // pole.
-      CommandUtils.onlyIf(
-        () -> RobotBase.isSimulation() || (manipulator.grabber.hasCoral() && manipulator.grabber.isCoralClear()),
-        Commands.sequence(
-          // Move the elevator and manipulator to the L4 placing
-          // position, aligning at the same time.
-          annotate("move to l4 and align", Commands.deadline(
-              CommandUtils.selectByMode(pieceCombos.coralL4(), Commands.waitSeconds(0.25)),
-              swerveDrive.driveTwistToPose(placePose))),
-          // Finish aligning while holding the elevator and
-          // manipulator in the same place.
-          annotate("align", Commands.deadline(
-              swerveDrive.driveTwistToPose(placePose)
-                .until(() -> swerveDrive.isWithinToleranceOf(placePose, Inches.of(1), Degrees.of(4))),
-              pieceCombos.holdCoral())),
-          // Drop the coral while keeping the elevator and manipulator
-          // in place.
-          annotate("drop coral", manipulator
-              .grabber
-              .dropCoral()
-              .deadlineFor(manipulator.pivot.hold(), elevator.hold())),
-          // Stow the pivot
-          annotate("stow pivot", Commands.deadline(
-            CommandUtils.selectByMode(
-              manipulator.pivot.stow(),
-              Commands.waitSeconds(0.1)
-            ),
-            elevator.hold(),
-            manipulator.grabber.stop()
-          )),
-          // Move the elevator down at maximum speed until it gets
-          // under the safe height to drive at.
-          annotate("lower elevator", Commands.parallel(elevator.move(-1.0), manipulator.pivot.hold(), manipulator.grabber.stop())
-              .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
-              .withTimeout(0.1))
-        )
-      )
-    );
+        // Drive to the coral pole with Pathplanner, moving the elevator and
+        // manipulator early if possible.
+        Commands.deadline(
+            // Pathfind to the alignment pose
+            annotate("pathfind align", swerveDrive.pathfindToPrecomputed(previousPose, alignPose)),
+            // Run a sequence of movements to prepare the elevator and
+            // manipulator early, that will immediately end when the robot
+            // gets to the alignment pose.
+            Commands.sequence(
+                // Intake coral if we haven't got already. This is for if
+                // the preloaded coral isn't fully inside the manipulator.
+                CommandUtils.onlyIf(
+                    () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
+                    annotate("intake coral", pieceCombos.intakeCoral())),
+                // Move the elevator at maximum speed until it gets to the
+                // maximum safe height to drive at full speed without
+                // tipping over.
+                annotate(
+                    "towards ready",
+                    Commands.parallel(
+                        elevator
+                            .move(1.0)
+                            .until(
+                                () -> elevator.getAverageHeight().gt(ELEVATOR.AUTO.READY_HEIGHT)),
+                        manipulator.pivot.hold(),
+                        manipulator.grabber.stop())),
+                // Finely position the elevator at the maximum safe height,
+                // then keep it there until the robot is near to the
+                // alignment pose and slow enough to raise the elevator higher.
+                Commands.sequence(
+                        annotate("to ready", pieceCombos.readyL3()),
+                        annotate("hold ready", pieceCombos.holdCoral()))
+                    .until(
+                        () ->
+                            swerveDrive
+                                        .getEstimatedPose()
+                                        .getTranslation()
+                                        .getDistance(alignPose.getTranslation())
+                                    < 2.0
+                                && KinematicsUtils.getTranslation(swerveDrive.getEstimatedSpeeds())
+                                        .getNorm()
+                                    < 3.0),
+                // Move the elevator to the maximum height to prepare for
+                // placing, then hold it there. This command is wrapped in a
+                // deadline so this sequence will end if the robot when to
+                // the reef pole.
+                annotate("move l4", pieceCombos.coralL4()),
+                annotate("hold l4", pieceCombos.holdCoral()))),
+        // In case the robot got to the coral pole before it was done intake,
+        // continue intaking until a coral is in the manipulator and clear of
+        // the funnel.
+        CommandUtils.onlyIf(
+                () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
+                annotate("intake coral", pieceCombos.intakeCoral()))
+            .withTimeout(1.0),
+        // Continue intaking the coral in case the coral hasn't reached the
+        // "has coral" beam break but has gotten to "coral clear"
+        CommandUtils.onlyIf(
+            () ->
+                RobotBase.isReal()
+                    && !manipulator.grabber.hasCoral()
+                    && !manipulator.grabber.isCoralClear(),
+            annotate("intake coral because coral clear", pieceCombos.intakeCoral())),
+        // If the robot has coral, align to the place pose, raise the
+        // elevator, and drop it. Otherwise, end the command, skipping this
+        // pole.
+        CommandUtils.onlyIf(
+            () ->
+                RobotBase.isSimulation()
+                    || (manipulator.grabber.hasCoral() && manipulator.grabber.isCoralClear()),
+            Commands.sequence(
+                // Move the elevator and manipulator to the L4 placing
+                // position, aligning at the same time.
+                annotate(
+                    "move to l4 and align",
+                    Commands.deadline(
+                        CommandUtils.selectByMode(
+                            pieceCombos.coralL4(), Commands.waitSeconds(0.25)),
+                        swerveDrive.driveTwistToPose(placePose))),
+                // Finish aligning while holding the elevator and
+                // manipulator in the same place.
+                annotate(
+                    "align",
+                    Commands.deadline(
+                        swerveDrive
+                            .driveTwistToPose(placePose)
+                            .until(
+                                () ->
+                                    swerveDrive.isWithinToleranceOf(
+                                        placePose, Inches.of(1), Degrees.of(4))),
+                        pieceCombos.holdCoral())),
+                // Drop the coral while keeping the elevator and manipulator
+                // in place.
+                annotate(
+                    "drop coral",
+                    manipulator
+                        .grabber
+                        .dropCoral()
+                        .deadlineFor(manipulator.pivot.hold(), elevator.hold())),
+                // Stow the pivot
+                annotate(
+                    "stow pivot",
+                    Commands.deadline(
+                        CommandUtils.selectByMode(
+                            manipulator.pivot.stow(), Commands.waitSeconds(0.1)),
+                        elevator.hold(),
+                        manipulator.grabber.stop())),
+                // Move the elevator down at maximum speed until it gets
+                // under the safe height to drive at.
+                annotate(
+                    "lower elevator",
+                    Commands.parallel(
+                            elevator.move(-1.0),
+                            manipulator.pivot.hold(),
+                            manipulator.grabber.stop())
+                        .until(() -> elevator.getAverageHeight().lt(ELEVATOR.AUTO.READY_HEIGHT))
+                        .withTimeout(0.1)))));
   }
 
   // Autonomous Commands in Teleop
@@ -251,20 +264,28 @@ public class AutoCommands {
         .andThen(
             swerveDrive
                 .driveTwistToPose(ReefPositioning.getCoralPlacePose(pole))
-                  .until(() -> endWithinTolerance && swerveDrive.isWithinToleranceOf(
-                    ReefPositioning.getCoralPlacePose(pole), Inches.of(1), Degrees.of(3)
-                  )));
+                .until(
+                    () ->
+                        endWithinTolerance
+                            && swerveDrive.isWithinToleranceOf(
+                                ReefPositioning.getCoralPlacePose(pole),
+                                Inches.of(1),
+                                Degrees.of(3))));
   }
 
   public Command alignFace(int face, boolean endWithinTolerance) {
     return swerveDrive
         .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
         .andThen(
-          swerveDrive
-          .driveTwistToPose(ReefPositioning.getAlgaePickupPose(face))
-            .until(() -> endWithinTolerance && swerveDrive.isWithinToleranceOf(
-              ReefPositioning.getAlgaePickupPose(face), Inches.of(1), Degrees.of(3)
-            )));
+            swerveDrive
+                .driveTwistToPose(ReefPositioning.getAlgaePickupPose(face))
+                .until(
+                    () ->
+                        endWithinTolerance
+                            && swerveDrive.isWithinToleranceOf(
+                                ReefPositioning.getAlgaePickupPose(face),
+                                Inches.of(1),
+                                Degrees.of(3))));
   }
 
   public Command alignToClosestPoleTeleop(PolePattern pattern, Supplier<Command> rumble) {
@@ -274,9 +295,12 @@ public class AutoCommands {
           Pose2d polePose = ReefPositioning.getCoralPlacePose(pole);
 
           return alignPole(pole, false, false)
-            .alongWith(
-              Commands.waitUntil(() -> swerveDrive.isWithinToleranceOf(polePose, Inches.of(1), Degrees.of(3)))
-                .andThen(rumble.get()));
+              .alongWith(
+                  Commands.waitUntil(
+                          () ->
+                              swerveDrive.isWithinToleranceOf(
+                                  polePose, Inches.of(1), Degrees.of(3)))
+                      .andThen(rumble.get()));
         },
         Set.of(swerveDrive.useMotion()));
   }

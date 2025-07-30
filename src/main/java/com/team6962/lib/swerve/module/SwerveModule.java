@@ -7,8 +7,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Consumer;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
@@ -30,7 +28,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -49,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.Consumer;
 
 /** A swerve module, consisting of a drive motor, a steer motor, and a steer encoder. */
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -102,14 +100,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
             new CurrentLimitsConfigs()
                 .withSupplyCurrentLimit(config.driveMotor().maxCurrent())
                 .withSupplyCurrentLimitEnable(true)));
-    
+
     CTREUtils.check(
-      driveConfig.apply(
-        new MotionMagicConfigs()
-          .withMotionMagicCruiseVelocity(85)
-          .withMotionMagicAcceleration(125)
-      )
-    );
+        driveConfig.apply(
+            new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(85)
+                .withMotionMagicAcceleration(125)));
 
     steerEncoder = new CANcoder(moduleConstants.steerEncoderId(), config.canBus());
 
@@ -128,7 +124,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(steerConfig.apply(new TalonFXConfiguration()));
 
     CTREUtils.check(steerConfig.apply(config.steerMotor().gains()));
-    
+
     CTREUtils.check(
         steerConfig.apply(
             new MotorOutputConfigs()
@@ -148,10 +144,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                 .withRotorToSensorRatio(config.gearing().steer())));
 
     CTREUtils.check(
-      steerConfig.apply(
-          new MotionMagicConfigs()
-              .withMotionMagicExpo_kV(2.7626 * 0.75)
-              .withMotionMagicExpo_kA(0.3453 * 0.75)));
+        steerConfig.apply(
+            new MotionMagicConfigs()
+                .withMotionMagicExpo_kV(2.7626 * 0.75)
+                .withMotionMagicExpo_kA(0.3453 * 0.75)));
 
     CTREUtils.check(driveMotor.setPosition(Rotations.of(0)));
 
@@ -170,7 +166,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     setupStatusSignals();
 
-    Logger.logNumber(getName() + "/steerVelocity", () -> CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond));
+    Logger.logNumber(
+        getName() + "/steerVelocity",
+        () -> CTREUtils.unwrap(steerMotor.getVelocity()).in(RotationsPerSecond));
   }
 
   /**
@@ -239,15 +237,16 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void refreshStatusSignals() {
-    CTREUtils.check(BaseStatusSignal.refreshAll(
-        drivePositionIn,
-        steerAngleIn,
-        driveSpeedIn,
-        steerVelocityIn,
-        driveAccelerationIn,
-        steerAccelerationIn,
-        driveCurrentIn,
-        steerCurrentIn));
+    CTREUtils.check(
+        BaseStatusSignal.refreshAll(
+            drivePositionIn,
+            steerAngleIn,
+            driveSpeedIn,
+            steerVelocityIn,
+            driveAccelerationIn,
+            steerAccelerationIn,
+            driveCurrentIn,
+            steerCurrentIn));
   }
 
   /**
@@ -261,7 +260,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   /**
    * Gets the current angle of the drive wheel.
-   * 
+   *
    * @return The current {@link Angle} of the drive wheel.
    */
   public Angle getDriveWheelAngle() {
@@ -404,8 +403,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         log -> log.linearPosition(getDrivePosition()).linearVelocity(getDriveVelocity()));
   }
 
-  private Command calibrateMotor(
-      String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
+  private Command calibrateMotor(String motorName, TalonFX motor, Consumer<MotorLog> logEncoder) {
     SysIdRoutine calibrationRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.per(Second).of(0.5), Volts.of(7), Seconds.of(20)),

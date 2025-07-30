@@ -143,7 +143,7 @@ public class RealElevator extends DualLinearActuator implements Elevator {
 
   @Override
   public Command ready() {
-      return setHeight(ELEVATOR.AUTO.READY_HEIGHT);
+    return setHeight(ELEVATOR.AUTO.READY_HEIGHT);
   }
 
   @Override

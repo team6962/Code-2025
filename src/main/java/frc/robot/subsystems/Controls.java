@@ -3,12 +3,9 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
-import java.util.function.BooleanSupplier;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -22,7 +19,6 @@ import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Constants.ReefPositioning;
 import frc.robot.auto.choreo.AutonomousV3;
-import frc.robot.auto.choreo.AutonomousV3.Side;
 import frc.robot.auto.utils.AutoCommands;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
@@ -30,6 +26,7 @@ import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+import java.util.function.BooleanSupplier;
 
 public class Controls {
   public static final CommandXboxController operator =
@@ -144,7 +141,10 @@ public class Controls {
         .whileTrue(
             pieceCombos
                 .intakeAlgaeOrShootCoral()
-                .andThen(rumbleBoth().alongWith(LEDs.setStateCommand(LEDs.State.GOOD)))); // drop coral/intake algae
+                .andThen(
+                    rumbleBoth()
+                        .alongWith(
+                            LEDs.setStateCommand(LEDs.State.GOOD)))); // drop coral/intake algae
     operator.leftBumper().whileTrue(pieceCombos.algaeBargeShoot()); // shoot barge
     operator
         .leftTrigger()
@@ -158,52 +158,50 @@ public class Controls {
   }
 
   public static Command autoscore(
-    SwerveDrive swerveDrive,
-    Elevator elevator,
-    Manipulator manipulator,
-    PieceCombos pieceCombos,
-    int level
-  ) {
+      SwerveDrive swerveDrive,
+      Elevator elevator,
+      Manipulator manipulator,
+      PieceCombos pieceCombos,
+      int level) {
     return Commands.sequence(
-      Commands.parallel(
-        pieceCombos.coral(level),
-        Commands.waitUntil(() -> {
-          if (level == 1) return false;
+        Commands.parallel(
+            pieceCombos.coral(level),
+            Commands.waitUntil(
+                () -> {
+                  if (level == 1) return false;
 
-          boolean poseCorrect = false;
+                  boolean poseCorrect = false;
 
-          for (int i = 0; i < 12; i++) {
-            Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
+                  for (int i = 0; i < 12; i++) {
+                    Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
 
-            if (swerveDrive.isWithinToleranceOf(placePose, Inches.of(0.85), Degrees.of(4))) {
-              poseCorrect = true;
-              break;
-            }
-          }
+                    if (swerveDrive.isWithinToleranceOf(
+                        placePose, Inches.of(0.85), Degrees.of(4))) {
+                      poseCorrect = true;
+                      break;
+                    }
+                  }
 
-          if (!poseCorrect) return false;
+                  if (!poseCorrect) return false;
 
-          Distance targetHeight =
-            level == 2 ? ELEVATOR.CORAL.L2_HEIGHT :
-            level == 3 ? ELEVATOR.CORAL.L3_HEIGHT :
-            ELEVATOR.CORAL.L4_HEIGHT;
-          
-          if (!elevator.inRange(targetHeight)) return false;
+                  Distance targetHeight =
+                      level == 2
+                          ? ELEVATOR.CORAL.L2_HEIGHT
+                          : level == 3 ? ELEVATOR.CORAL.L3_HEIGHT : ELEVATOR.CORAL.L4_HEIGHT;
 
-          Angle targetAngle = 
-            level == 2 || level == 3 ? MANIPULATOR_PIVOT.CORAL.L23_ANGLE :
-            MANIPULATOR_PIVOT.CORAL.L4_ANGLE;
-          
-          if (MeasureMath.minAbsDifference(manipulator.pivot.getAngle(), targetAngle).gte(Degrees.of(2))) return false;
+                  if (!elevator.inRange(targetHeight)) return false;
 
-          return true;
-        })
-      ),
-      Commands.parallel(
-        pieceCombos.coral(level),
-        manipulator.grabber.dropCoral()
-      )
-    );
+                  Angle targetAngle =
+                      level == 2 || level == 3
+                          ? MANIPULATOR_PIVOT.CORAL.L23_ANGLE
+                          : MANIPULATOR_PIVOT.CORAL.L4_ANGLE;
+
+                  if (MeasureMath.minAbsDifference(manipulator.pivot.getAngle(), targetAngle)
+                      .gte(Degrees.of(2))) return false;
+
+                  return true;
+                })),
+        Commands.parallel(pieceCombos.coral(level), manipulator.grabber.dropCoral()));
   }
 
   private static Command rumble(CommandXboxController controller) {

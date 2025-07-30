@@ -45,7 +45,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   @Override
   public Angle getAngle() {
-      return getAbsolutePosition();
+    return getAbsolutePosition();
   }
 
   @Override
@@ -113,7 +113,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
   @Override
   public Command algaeBargeSetup() {
     return pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.BARGE.AIM_ANGLE)
-      .until(() -> getAngle().gt(MANIPULATOR_PIVOT.MAX_ANGLE.minus(Degrees.of(1))));
+        .until(() -> getAngle().gt(MANIPULATOR_PIVOT.MAX_ANGLE.minus(Degrees.of(1))));
   }
 
   @Override

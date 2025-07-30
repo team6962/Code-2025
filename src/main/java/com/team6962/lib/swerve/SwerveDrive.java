@@ -7,10 +7,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -28,7 +24,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,6 +44,9 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -423,56 +421,85 @@ public class SwerveDrive extends SwerveCore {
 
   public Command calibrateWheelSize(Time timeout) {
     return Commands.sequence(
-      Commands.waitSeconds(1),
-      Commands.defer(() -> new Command() {
-        Angle initialGyroAngle;
-        Angle[] initialWheelAngles = new Angle[4];
+            Commands.waitSeconds(1),
+            Commands.defer(
+                    () ->
+                        new Command() {
+                          Angle initialGyroAngle;
+                          Angle[] initialWheelAngles = new Angle[4];
 
-        @Override
-        public void initialize() {
-          initialGyroAngle = getContinuousGyroscopeAngle();
+                          @Override
+                          public void initialize() {
+                            initialGyroAngle = getContinuousGyroscopeAngle();
 
-          for (int i = 0; i < 4; i++) {
-            initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
-          }
-        }
+                            for (int i = 0; i < 4; i++) {
+                              initialWheelAngles[i] = getModules()[i].getDriveWheelAngle();
+                            }
+                          }
 
-        @Override
-        public void end(boolean interrupted) {
-          Angle gyroAngleChange = Rotations.of(getContinuousGyroscopeAngle().minus(initialGyroAngle).in(Rotations));
-          Distance driveRadius = getConstants().chassis().driveRadius();
+                          @Override
+                          public void end(boolean interrupted) {
+                            Angle gyroAngleChange =
+                                Rotations.of(
+                                    getContinuousGyroscopeAngle()
+                                        .minus(initialGyroAngle)
+                                        .in(Rotations));
+                            Distance driveRadius = getConstants().chassis().driveRadius();
 
-          Logger.log("Swerve Drive/Wheel Size Calibration/Gyro Angle Change", gyroAngleChange);
+                            Logger.log(
+                                "Swerve Drive/Wheel Size Calibration/Gyro Angle Change",
+                                gyroAngleChange);
 
-          Angle[] wheelAngleChanges = new Angle[4];
+                            Angle[] wheelAngleChanges = new Angle[4];
 
-          for (int i = 0; i < 4; i++) {
-            wheelAngleChanges[i] = Rotations.of(getModules()[i].getDriveWheelAngle().minus(initialWheelAngles[i]).abs(Rotations));
+                            for (int i = 0; i < 4; i++) {
+                              wheelAngleChanges[i] =
+                                  Rotations.of(
+                                      getModules()[i]
+                                          .getDriveWheelAngle()
+                                          .minus(initialWheelAngles[i])
+                                          .abs(Rotations));
 
-            Logger.log("Swerve Drive/Wheel Size Calibration/Wheel Angle Change " + SwerveModule.getModuleName(i), wheelAngleChanges[i]);
-          }
+                              Logger.log(
+                                  "Swerve Drive/Wheel Size Calibration/Wheel Angle Change "
+                                      + SwerveModule.getModuleName(i),
+                                  wheelAngleChanges[i]);
+                            }
 
-          Distance[] wheelDiameters = new Distance[4];
+                            Distance[] wheelDiameters = new Distance[4];
 
-          for (int i = 0; i < 4; i++) {
-            wheelDiameters[i] = driveRadius.times(gyroAngleChange.div(wheelAngleChanges[i])).times(2);
+                            for (int i = 0; i < 4; i++) {
+                              wheelDiameters[i] =
+                                  driveRadius
+                                      .times(gyroAngleChange.div(wheelAngleChanges[i]))
+                                      .times(2);
 
-            Logger.log("Swerve Drive/Wheel Size Calibration/Diameter " + SwerveModule.getModuleName(i), wheelDiameters[i]);
-          }
+                              Logger.log(
+                                  "Swerve Drive/Wheel Size Calibration/Diameter "
+                                      + SwerveModule.getModuleName(i),
+                                  wheelDiameters[i]);
+                            }
 
-          Distance averageDiameter = Meters.of(0);
+                            Distance averageDiameter = Meters.of(0);
 
-          for (Distance diameter : wheelDiameters) {
-            averageDiameter = averageDiameter.plus(diameter);
-          }
+                            for (Distance diameter : wheelDiameters) {
+                              averageDiameter = averageDiameter.plus(diameter);
+                            }
 
-          averageDiameter = averageDiameter.div(4);
+                            averageDiameter = averageDiameter.div(4);
 
-          Logger.log("Swerve Drive/Wheel Size Calibration/Average Diameter", averageDiameter);
-        }
-      }, Set.of()).withTimeout(timeout),
-      Commands.waitSeconds(1)
-    ).deadlineFor(drive(Rotation2d.fromDegrees(getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))));
+                            Logger.log(
+                                "Swerve Drive/Wheel Size Calibration/Average Diameter",
+                                averageDiameter);
+                          }
+                        },
+                    Set.of())
+                .withTimeout(timeout),
+            Commands.waitSeconds(1))
+        .deadlineFor(
+            drive(
+                Rotation2d.fromDegrees(
+                    getConstants().maxRotationSpeed().div(8).in(DegreesPerSecond))));
   }
 
   public Command followChoreoPath(String name) {
@@ -484,26 +511,32 @@ public class SwerveDrive extends SwerveCore {
       return Commands.none();
     }
 
-    return Commands.defer(() -> {
-      autoBuilder.setOutput(this::moveRobotRelative);
+    return Commands.defer(
+        () -> {
+          autoBuilder.setOutput(this::moveRobotRelative);
 
-      return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
-    }, Set.of(useMotion()));
+          return CommandUtils.withRequirements(AutoBuilder.followPath(path), useMotion());
+        },
+        Set.of(useMotion()));
   }
 
   public Command constantVoltage(Voltage steerVoltage, Voltage driveVoltage, boolean singleModule) {
-    ConstantVoltageMovement movement = new ConstantVoltageMovement()
-      .withSteerVoltage(steerVoltage)
-      .withDriveVoltage(driveVoltage)
-      .withSingleModule(singleModule);
+    ConstantVoltageMovement movement =
+        new ConstantVoltageMovement()
+            .withSteerVoltage(steerVoltage)
+            .withDriveVoltage(driveVoltage)
+            .withSingleModule(singleModule);
 
-    return Commands.run(() -> { currentMovement = movement; }, useMotion());
+    return Commands.run(
+        () -> {
+          currentMovement = movement;
+        },
+        useMotion());
   }
 
   private PreciseDrivePositionMovement createPositionDeltaMovement(Twist2d twist) {
-    SwerveModuleState[] states = getKinematics().toSwerveModuleStates(new ChassisSpeeds(
-      twist.dx, twist.dy, twist.dtheta
-    ));
+    SwerveModuleState[] states =
+        getKinematics().toSwerveModuleStates(new ChassisSpeeds(twist.dx, twist.dy, twist.dtheta));
 
     SwerveModulePosition[] initial = getModulePositions();
     SwerveModulePosition[] deltas = KinematicsUtils.toModulePositions(states, Seconds.of(1));
@@ -513,27 +546,32 @@ public class SwerveDrive extends SwerveCore {
   }
 
   private SwerveModuleState[] getAlignedStates(Twist2d twist) {
-    SwerveModuleState[] states = getKinematics().toSwerveModuleStates(new ChassisSpeeds(
-      twist.dx, twist.dy, twist.dtheta
-    ));
+    SwerveModuleState[] states =
+        getKinematics().toSwerveModuleStates(new ChassisSpeeds(twist.dx, twist.dy, twist.dtheta));
 
     return KinematicsUtils.getStoppedStates(states);
   }
 
   public Command driveTwist(Supplier<Twist2d> twist) {
     return Commands.sequence(
-      driveModules(() -> getAlignedStates(twist.get()))
-        .until(() -> KinematicsUtils.isSimilarAngles(getModuleStates(), getAlignedStates(twist.get()), Degrees.of(3))),
-      Commands.run(() -> {
-        currentMovement = createPositionDeltaMovement(twist.get());
-      }, useMotion())
-    );
+        driveModules(() -> getAlignedStates(twist.get()))
+            .until(
+                () ->
+                    KinematicsUtils.isSimilarAngles(
+                        getModuleStates(), getAlignedStates(twist.get()), Degrees.of(3))),
+        Commands.run(
+            () -> {
+              currentMovement = createPositionDeltaMovement(twist.get());
+            },
+            useMotion()));
   }
 
   public Command driveTwistToPose(Pose2d targetPose) {
     return driveTwist(() -> getEstimatedPose().log(targetPose))
-      .alongWith(Commands.run(() -> {
-        Logger.getField().getObject("Target Pose").setPose(targetPose);
-      }));
+        .alongWith(
+            Commands.run(
+                () -> {
+                  Logger.getField().getObject("Target Pose").setPose(targetPose);
+                }));
   }
 }

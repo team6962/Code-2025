@@ -12,15 +12,9 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.team6962.lib.swerve.SwerveConfig;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -32,6 +26,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -196,12 +194,14 @@ public final class Constants {
               .minus(Radians.of(-0.003))
               .minus(Radians.of(-0.012))), // Back Left
       new SwerveConfig.Module(
-          13, 23, 33, Radians.of(0.01540734641).minus(Radians.of(0.08577796077)).plus(Radians.of(0.04290734641))), // Back Right
+          13,
+          23,
+          33,
+          Radians.of(0.01540734641)
+              .minus(Radians.of(0.08577796077))
+              .plus(Radians.of(0.04290734641))), // Back Right
       new SwerveConfig.Module( // Front Right (Test)
-          14,
-          24,
-          34,
-          Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))),
+          14, 24, 34, Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))),
       new SwerveConfig.Module( // Front Left (Test)
           15,
           25,

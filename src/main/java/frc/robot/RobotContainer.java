@@ -5,14 +5,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Milliseconds;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -41,6 +37,8 @@ import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.util.software.Dashboard.AutonChooser;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -121,7 +119,8 @@ public class RobotContainer {
     hang = Hang.create();
 
     // // Configure the trigger bindings
-    Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
+    Controls.configureBindings(
+        swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
 
     NetworkTableEntry refreshButtonEntry =
         NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
@@ -196,8 +195,7 @@ public class RobotContainer {
 
   public void disabledInit() {}
 
-  public void testInit() {
-  }
+  public void testInit() {}
 
   private final void logGitProperties(DataLog log) {
     // Load git properties from classpath

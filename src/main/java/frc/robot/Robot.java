@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;

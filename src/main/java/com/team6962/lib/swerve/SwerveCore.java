@@ -70,13 +70,15 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
     maxSpeed = constants.maxDriveSpeed();
 
-    Logger.addUpdate(getName() + "/movement", () -> {
-      if (currentMovement != null) {
-        currentMovement.log();
-      }
-    });
+    Logger.addUpdate(
+        getName() + "/movement",
+        () -> {
+          if (currentMovement != null) {
+            currentMovement.log();
+          }
+        });
   }
-  
+
   public LinearVelocity getMaxDriveSpeed() {
     return maxSpeed;
   }

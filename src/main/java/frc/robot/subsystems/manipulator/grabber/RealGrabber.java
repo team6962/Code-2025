@@ -88,12 +88,11 @@ public class RealGrabber extends Grabber {
     return Commands.sequence(
         setDutyCycle(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
         setDutyCycle(MANIPULATOR.CORAL_SLOW_IN_SPEED)
-          .withDeadline(
-              Commands.sequence(
-                  Commands.waitUntil(this::isCoralClear), Commands.waitSeconds(0.0)))
-          .onlyIf(() -> !hasCoral || !coralClear),
-        stopOnce()
-      );
+            .withDeadline(
+                Commands.sequence(
+                    Commands.waitUntil(this::isCoralClear), Commands.waitSeconds(0.0)))
+            .onlyIf(() -> !hasCoral || !coralClear),
+        stopOnce());
   }
 
   @Override
@@ -112,12 +111,9 @@ public class RealGrabber extends Grabber {
   @Override
   public Command repositionCoral() {
     return Commands.sequence(
-      setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED)
-        .until(() -> !isCoralClear()),
-      setDutyCycle(MANIPULATOR.CORAL_REPOSITION_SPEED)
-        .until(() -> isCoralClear()),
-      stopOnce()
-    );
+        setDutyCycle(MANIPULATOR.CORAL_ADJUST_SPEED).until(() -> !isCoralClear()),
+        setDutyCycle(MANIPULATOR.CORAL_REPOSITION_SPEED).until(() -> isCoralClear()),
+        stopOnce());
   }
 
   public boolean detectedAlgae() {
