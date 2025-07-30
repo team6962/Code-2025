@@ -2,14 +2,8 @@ package com.team6962.lib.swerve;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -37,8 +31,6 @@ import com.team6962.lib.utils.MeasureMath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -46,15 +38,12 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -355,167 +344,6 @@ public class SwerveDrive extends SwerveCore {
   //     Commands.waitSeconds(1.0)
   //   );
   // }
-
-  public Command moveTowards(Translation2d target, LinearVelocity speed, Distance distance) {
-    return Commands.defer(
-        () -> {
-          Translation2d offset = target.minus(getEstimatedPose().getTranslation());
-
-          if (Math.abs(offset.getX()) <= 1e-6 && Math.abs(offset.getY()) <= 1e-6) {
-            return Commands.waitTime(distance.div(speed));
-          } else {
-            return drive(offset.times(speed.in(MetersPerSecond) / offset.getNorm()))
-                .withTimeout(distance.div(speed));
-          }
-        },
-        Set.of(useTranslation()));
-  }
-
-  public Command driveTrapezoidalTo(
-      Translation2d target,
-      LinearVelocity maxVelocity,
-      LinearAcceleration maxAcceleration,
-      LinearVelocity targetEndVelocity,
-      Distance positionTolerance,
-      boolean timeLimit) {
-    return new TrapezoidalTranslationCommand(
-        () -> target,
-        maxVelocity,
-        maxAcceleration,
-        targetEndVelocity,
-        positionTolerance,
-        timeLimit);
-  }
-
-  public TrapezoidalTranslationCommand driveTrapezoidalTo(Translation2d target) {
-    SwerveConfig config = getConstants();
-
-    return new TrapezoidalTranslationCommand(
-        () -> target,
-        config.maxDriveSpeed(),
-        config.maxLinearAcceleration(),
-        config.maxDriveSpeed(),
-        Inches.of(4),
-        true);
-  }
-
-  public class TrapezoidalTranslationCommand extends Command {
-    private Supplier<Translation2d> targetSupplier;
-    private Translation2d targetTranslation;
-
-    public LinearVelocity maxVelocity;
-    public LinearAcceleration maxAcceleration;
-
-    public Distance positionTolerance;
-    public LinearVelocity targetEndVelocity;
-
-    public boolean timeLimit;
-
-    private TrapezoidProfile profile;
-    private Timer timer = new Timer();
-    private Time endTime;
-
-    public TrapezoidalTranslationCommand(
-        Supplier<Translation2d> targetSupplier,
-        LinearVelocity maxVelocity,
-        LinearAcceleration maxAcceleration,
-        LinearVelocity targetEndVelocity,
-        Distance positionTolerance,
-        boolean timeLimit) {
-      this.targetSupplier = targetSupplier;
-      this.maxVelocity = maxVelocity;
-      this.maxAcceleration = maxAcceleration;
-      this.positionTolerance = positionTolerance;
-      this.targetEndVelocity = targetEndVelocity;
-      this.timeLimit = timeLimit;
-
-      addRequirements(useTranslation());
-    }
-
-    public TrapezoidalTranslationCommand withMaxVelocity(LinearVelocity maxVelocity) {
-      this.maxVelocity = maxVelocity;
-      return this;
-    }
-
-    public TrapezoidalTranslationCommand withMaxAcceleration(LinearAcceleration maxAcceleration) {
-      this.maxAcceleration = maxAcceleration;
-      return this;
-    }
-
-    public TrapezoidalTranslationCommand withPositionTolerance(Distance positionTolerance) {
-      this.positionTolerance = positionTolerance;
-      return this;
-    }
-
-    public TrapezoidalTranslationCommand withTargetEndVelocity(LinearVelocity targetEndVelocity) {
-      this.targetEndVelocity = targetEndVelocity;
-      return this;
-    }
-
-    public TrapezoidalTranslationCommand withTimeLimit(boolean timeLimit) {
-      this.timeLimit = timeLimit;
-      return this;
-    }
-
-    @Override
-    public void initialize() {
-      this.profile =
-          new TrapezoidProfile(
-              new TrapezoidProfile.Constraints(
-                  maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
-
-      targetTranslation = targetSupplier.get();
-
-      timer.restart();
-
-      endTime = null;
-    }
-
-    @Override
-    public void execute() {
-      Translation2d currentTranslation = getEstimatedPose().getTranslation();
-      Translation2d error = targetTranslation.minus(currentTranslation);
-      Translation2d errorUnit = error.div(error.getNorm());
-
-      double currentScalarDistance = error.getNorm();
-      double targetScalarDistance = 0;
-
-      Translation2d currentSpeeds = KinematicsUtils.getTranslation(getEstimatedSpeeds());
-      double currentScalarSpeed =
-          currentSpeeds.getX() * errorUnit.getX() + currentSpeeds.getY() * errorUnit.getY();
-
-      TrapezoidProfile.State state =
-          profile.calculate(
-              timer.get(),
-              new TrapezoidProfile.State(currentScalarDistance, -currentScalarSpeed),
-              new TrapezoidProfile.State(
-                  targetScalarDistance, -targetEndVelocity.in(MetersPerSecond)));
-
-      if (timeLimit && endTime == null) {
-        endTime = Seconds.of(profile.timeLeftUntil(0));
-      }
-
-      // Logger.log(
-      //     "Swerve Drive/Trapezoidal Translation Command/currentDistance", currentScalarDistance);
-      // Logger.log("Swerve Drive/Trapezoidal Translation Command/currentSpeed",
-      // -currentScalarSpeed);
-      // Logger.log(
-      //     "Swerve Drive/Trapezoidal Translation Command/targetDistance", targetScalarDistance);
-      // Logger.log(
-      //     "Swerve Drive/Trapezoidal Translation Command/targetSpeed",
-      //     -targetEndVelocity.in(MetersPerSecond));
-      // Logger.log("Swerve Drive/Trapezoidal Translation Command/nextVelocity", -state.velocity);
-
-      moveFieldRelative(errorUnit.times(-state.velocity));
-    }
-
-    @Override
-    public boolean isFinished() {
-      return ((endTime != null) && Seconds.of(timer.get()).gt(endTime))
-          || getEstimatedPose().getTranslation().getDistance(targetTranslation)
-              < positionTolerance.in(Meters);
-    }
-  }
 
   public Command pathfindBetweenWaypoints(
       Pose2d startPose,
