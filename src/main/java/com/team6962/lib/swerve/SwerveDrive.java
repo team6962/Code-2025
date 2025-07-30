@@ -300,20 +300,6 @@ public class SwerveDrive extends SwerveCore {
     return isWithinToleranceOf(() -> target, toleranceDistance, toleranceAngle);
   }
 
-  public Command cancelDrive() {
-    return Commands.run(
-        () -> {
-          if (translationSubsystem.getCurrentCommand() != null) {
-            translationSubsystem.getCurrentCommand().cancel();
-          }
-
-          if (rotationSubsysem.getCurrentCommand() != null) {
-            rotationSubsysem.getCurrentCommand().cancel();
-          }
-        },
-        useMotion());
-  }
-
   public Command pathfindBetweenWaypoints(
       Pose2d startPose,
       Pose2d endPose,
