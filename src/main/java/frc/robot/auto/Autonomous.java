@@ -1,4 +1,4 @@
-package frc.robot.auto.choreo;
+package frc.robot.auto;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -23,13 +23,13 @@ import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 
-public class AutonomousV3 {
+public class Autonomous {
   private SwerveDrive swerveDrive;
   private Manipulator manipulator;
   private Elevator elevator;
   private PieceCombos pieceCombos;
 
-  public AutonomousV3(
+  public Autonomous(
       SwerveDrive swerveDrive,
       Manipulator manipulator,
       Elevator elevator,
@@ -118,23 +118,23 @@ public class AutonomousV3 {
   public Command createMiddleAutonomous() {
     return Commands.sequence(
         Commands.waitSeconds(1),
-        annotate("middle-coral-place", swerveDrive.followChoreoPath("middle-coral-place"))
+        CommandUtils.annotate("middle-coral-place", swerveDrive.followChoreoPath("middle-coral-place"))
             .deadlineFor(
                 Commands.parallel(
                     elevator.ready().repeatedly(),
                     manipulator.pivot.hold(),
                     manipulator.grabber.hold())),
-        annotate("place coral", placeCoral(new CoralPosition(0, 4))),
-        annotate(
+        CommandUtils.annotate("place coral", placeCoral(new CoralPosition(0, 4))),
+        CommandUtils.annotate(
             "safe manipulator pivot",
             Commands.deadline(
                 manipulator.pivot.safe(), elevator.hold(), manipulator.grabber.stop())),
-        annotate("pickup algae", pickupAlgae(0)),
-        annotate("middle-algae-place", swerveDrive.followChoreoPath("middle-algae-place"))
+        CommandUtils.annotate("pickup algae", pickupAlgae(0)),
+        CommandUtils.annotate("middle-algae-place", swerveDrive.followChoreoPath("middle-algae-place"))
             .deadlineFor(
                 Commands.parallel(
                     elevator.hold(), manipulator.pivot.hold(), manipulator.grabber.hold())),
-        annotate(
+        CommandUtils.annotate(
             "align to barge",
             swerveDrive
                 .driveTwistToPose(BARGE_THROW_POSE) // Barge throw pose
@@ -142,14 +142,14 @@ public class AutonomousV3 {
                     () ->
                         swerveDrive.isWithinToleranceOf(
                             BARGE_THROW_POSE, Inches.of(4), Degrees.of(3)))),
-        annotate(
+        CommandUtils.annotate(
             "algae barge setup",
             CommandUtils.selectByMode(pieceCombos.algaeBargeSetup(), Commands.waitSeconds(0.5))),
-        annotate(
+        CommandUtils.annotate(
             "algae barge shoot",
             CommandUtils.selectByMode(pieceCombos.algaeBargeShoot(), Commands.waitSeconds(0.5))),
         Commands.sequence(
-                annotate(
+                CommandUtils.annotate(
                     "lower elevator",
                     CommandUtils.selectByMode(
                         Commands.waitUntil(
@@ -165,9 +165,9 @@ public class AutonomousV3 {
     Pose2d pickupPose = ReefPositioning.getAlgaePickupPose(face);
 
     return Commands.sequence(
-        annotate("manipulator pivot safe", manipulator.pivot.safe()),
+        CommandUtils.annotate("manipulator pivot safe", manipulator.pivot.safe()),
         Commands.parallel(
-            annotate(
+            CommandUtils.annotate(
                 "twist to align",
                 swerveDrive
                     .driveTwistToPose(alignPose)
@@ -175,19 +175,19 @@ public class AutonomousV3 {
                         () ->
                             swerveDrive.isWithinToleranceOf(
                                 alignPose, Inches.of(2), Degrees.of(6)))),
-            annotate(
+            CommandUtils.annotate(
                 "elevator to algae l2",
                 CommandUtils.selectByMode(
                     Commands.deadline(
                         elevator.algaeL2(), manipulator.pivot.hold(), manipulator.grabber.stop()),
                     Commands.waitSeconds(0.5)))),
-        annotate(
+        CommandUtils.annotate(
             "manipulator to algae l2",
             Commands.deadline(
                 CommandUtils.selectByMode(manipulator.pivot.algaeReef(), Commands.waitSeconds(0.2)),
                 elevator.hold(),
                 manipulator.grabber.hold())),
-        annotate(
+        CommandUtils.annotate(
             "twist to pickup",
             Commands.deadline(
                 CommandUtils.selectByMode(
@@ -204,12 +204,6 @@ public class AutonomousV3 {
             elevator.ready().repeatedly(), manipulator.pivot.hold(), manipulator.grabber.hold()));
   }
 
-  private Command annotate(String name, Command command) {
-    return command.deadlineFor(
-        Commands.startEnd(
-            () -> System.out.println("start: " + name), () -> System.out.println("end: " + name)));
-  }
-
   public Command placeCoral(CoralPosition position) {
     if (position.level == 1) {
       throw new IllegalArgumentException("Cannot place coral at level 1 during autonomous");
@@ -224,7 +218,7 @@ public class AutonomousV3 {
         // stuck if it failed to pick up coral.
         CommandUtils.onlyIf(
                 () -> !manipulator.grabber.hasCoral() || !manipulator.grabber.isCoralClear(),
-                annotate("intake coral", pieceCombos.intakeCoral()))
+                CommandUtils.annotate("intake coral", pieceCombos.intakeCoral()))
             .withTimeout(1.0),
         // Continue intaking in case the coral hasn't reached the "has
         // coral" beam break but has gotten to "coral clear"
@@ -233,7 +227,7 @@ public class AutonomousV3 {
                 RobotBase.isReal()
                     && !manipulator.grabber.hasCoral()
                     && !manipulator.grabber.isCoralClear(),
-            annotate("intake coral because coral clear", pieceCombos.intakeCoral())),
+            CommandUtils.annotate("intake coral because coral clear", pieceCombos.intakeCoral())),
         // If the robot has coral, align to the place pose, raise the
         // elevator, and drop it. Otherwise, end the command, skipping this
         // pole.
@@ -244,7 +238,7 @@ public class AutonomousV3 {
             Commands.sequence(
                 // Move the elevator and manipulator to the correct placing
                 // position, aligning at the same time.
-                annotate(
+                CommandUtils.annotate(
                     "position mechanisms for place",
                     Commands.deadline(
                         CommandUtils.selectByMode(
@@ -252,7 +246,7 @@ public class AutonomousV3 {
                         manipulator.grabber.repositionCoral())),
                 // Finish aligning while holding the elevator and
                 // manipulator in the same place.
-                annotate(
+                CommandUtils.annotate(
                     "align",
                     Commands.deadline(
                         swerveDrive
@@ -262,19 +256,19 @@ public class AutonomousV3 {
                                     swerveDrive.isWithinToleranceOf(
                                         placePose, Inches.of(0.85), Degrees.of(4))),
                         pieceCombos.holdCoral())),
-                annotate(
+                CommandUtils.annotate(
                     "reposition coral",
                     Commands.deadline(manipulator.grabber.repositionCoral(), pieceCombos.hold())),
                 // Drop the coral while keeping the elevator and manipulator
                 // in place.
-                annotate(
+                CommandUtils.annotate(
                     "drop coral",
                     manipulator
                         .grabber
                         .dropCoral()
                         .deadlineFor(manipulator.pivot.hold(), elevator.hold())),
                 // Stow the pivot
-                annotate(
+                CommandUtils.annotate(
                     "stow pivot",
                     Commands.deadline(
                         CommandUtils.selectByMode(

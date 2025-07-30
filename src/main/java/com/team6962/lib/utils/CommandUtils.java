@@ -21,6 +21,13 @@ public final class CommandUtils {
     return command;
   }
 
+  public static Command annotate(String name, Command command) {
+    return command.deadlineFor(Commands.startEnd(
+      () -> System.out.println("start: " + name),
+      () -> System.out.println("end: " + name)
+    ));
+  }
+
   public static Command selectByMode(Command realCommand, Command simCommand) {
     return RobotBase.isReal() ? realCommand : simCommand;
   }

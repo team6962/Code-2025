@@ -18,8 +18,8 @@ import frc.robot.Constants.Constants.DEVICES;
 import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.Constants.ReefPositioning;
-import frc.robot.auto.choreo.AutonomousV3;
-import frc.robot.auto.utils.AutoCommands;
+import frc.robot.auto.AutoAlign;
+import frc.robot.auto.Autonomous;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.drive.XBoxSwerve;
 import frc.robot.subsystems.LEDs.LEDs;
@@ -39,8 +39,8 @@ public class Controls {
       Elevator elevator,
       Manipulator manipulator,
       Hang hang,
-      AutoCommands autonomous,
-      AutonomousV3 v3,
+      AutoAlign autonomous,
+      Autonomous v3,
       PieceCombos pieceCombos) {
 
     // Driver
@@ -59,7 +59,7 @@ public class Controls {
         .b()
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
-                AutoCommands.PolePattern.RIGHT,
+                AutoAlign.PolePattern.RIGHT,
                 () ->
                     rumbleBoth()
                         .repeatedly()
@@ -69,7 +69,7 @@ public class Controls {
         .x()
         .whileTrue(
             autonomous.alignToClosestPoleTeleop(
-                AutoCommands.PolePattern.LEFT,
+                AutoAlign.PolePattern.LEFT,
                 () ->
                     rumbleBoth()
                         .repeatedly()

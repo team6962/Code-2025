@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
-import frc.robot.auto.choreo.AutonomousV3;
-import frc.robot.auto.choreo.AutonomousV3.Side;
-import frc.robot.auto.utils.AutoCommands;
+import frc.robot.auto.AutoAlign;
+import frc.robot.auto.Autonomous;
+import frc.robot.auto.Autonomous.Side;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
 import frc.robot.subsystems.Controls;
@@ -64,8 +64,8 @@ public class RobotContainer {
   public final Manipulator manipulator;
   public final Elevator elevator;
   public final Hang hang;
-  public final AutoCommands autov2;
-  public final AutonomousV3 autov3;
+  public final AutoAlign autoAlign;
+  public final Autonomous autov3;
   public final Algae algaeDetector;
   private final LEDs ledStrip;
   public final PieceCombos pieceCombos;
@@ -112,14 +112,14 @@ public class RobotContainer {
     elevator = Elevator.create();
     safeties = new SafeSubsystems(elevator, manipulator);
     pieceCombos = new PieceCombos(elevator, manipulator, safeties);
-    autov2 = new AutoCommands(swerveDrive, manipulator, elevator, pieceCombos);
-    autov3 = new AutonomousV3(swerveDrive, manipulator, elevator, pieceCombos);
+    autoAlign = new AutoAlign(swerveDrive);
+    autov3 = new Autonomous(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
 
     // // Configure the trigger bindings
     Controls.configureBindings(
-        swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
+        swerveDrive, elevator, manipulator, hang, autoAlign, autov3, pieceCombos);
 
     NetworkTableEntry refreshButtonEntry =
         NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
