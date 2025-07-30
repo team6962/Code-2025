@@ -59,9 +59,6 @@ public class SwerveDrive extends SwerveCore {
   /** Subsystem for rotation commands to require. */
   private SubsystemBase rotationSubsysem = new SubsystemBase() {};
 
-  /** Subsystem for max speed commands to require. */
-  private SubsystemBase maxSpeedSubsystem = new SubsystemBase() {};
-
   private AutoBuilderWrapper autoBuilder = new AutoBuilderWrapper();
 
   private PathPrecomputing pathPrecomputing;
@@ -86,8 +83,6 @@ public class SwerveDrive extends SwerveCore {
         getConstants().driveGains().pathController(),
         getConstants().pathRobotConfig(),
         () -> false);
-
-    maxSpeedSubsystem.setDefaultCommand(limitSpeed(getConstants().maxDriveSpeed()));
   }
 
   @Override
@@ -111,18 +106,6 @@ public class SwerveDrive extends SwerveCore {
 
   public SubsystemBase[] useMotion() {
     return new SubsystemBase[] {translationSubsystem, rotationSubsysem};
-  }
-
-  public SubsystemBase useMaxSpeed() {
-    return maxSpeedSubsystem;
-  }
-
-  public Command limitSpeed(Supplier<LinearVelocity> maxSpeed) {
-    return Commands.run(() -> setMaxDriveSpeed(maxSpeed.get()), useMaxSpeed());
-  }
-
-  public Command limitSpeed(LinearVelocity maxSpeed) {
-    return limitSpeed(() -> maxSpeed);
   }
 
   public LinearVelocity getLinearDriveVelocity(double powerFraction) {
