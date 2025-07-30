@@ -181,10 +181,6 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     return (SpeedsMovement) currentMovement;
   }
 
-  public void moveProfiledPositionMovement(ProfiledPositionMovement movement) {
-    currentMovement = movement;
-  }
-
   public void moveRobotRelative(SwerveModuleState[] states) {
     moveSpeeds().setStates(states);
   }
