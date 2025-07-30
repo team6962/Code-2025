@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.temp.Constants;
-import frc.robot.temp.Constants.ELEVATOR;
-import frc.robot.temp.Constants.MANIPULATOR_PIVOT;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.ELEVATOR;
+import frc.robot.constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 

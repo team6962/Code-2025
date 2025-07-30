@@ -8,7 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.temp.Constants.NEO;
+import frc.robot.constants.Constants.NEO;
 import java.util.function.Supplier;
 
 public final class SparkMaxUtil {

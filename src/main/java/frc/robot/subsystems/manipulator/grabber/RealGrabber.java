@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import frc.robot.temp.Constants.CAN;
-import frc.robot.temp.Constants.DIO;
-import frc.robot.temp.Constants.MANIPULATOR;
+import frc.robot.constants.Constants.CAN;
+import frc.robot.constants.Constants.DIO;
+import frc.robot.constants.Constants.MANIPULATOR;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealGrabber extends Grabber {

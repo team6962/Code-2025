@@ -1,4 +1,4 @@
-package frc.robot.temp;
+package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;

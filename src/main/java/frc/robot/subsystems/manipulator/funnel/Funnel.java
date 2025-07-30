@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.temp.Constants.ENABLED_SYSTEMS;
+import frc.robot.constants.Constants.ENABLED_SYSTEMS;
 
 public abstract class Funnel extends SubsystemBase {
   public Funnel() {

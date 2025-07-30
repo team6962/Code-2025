@@ -14,8 +14,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.temp.Constants.ALGAE;
-import frc.robot.temp.Constants.LIMELIGHT;
+import frc.robot.constants.Constants.ALGAE;
+import frc.robot.constants.Constants.LIMELIGHT;
 
 public class Algae {
   private static final double MAX_FOV_RATIO = Math.PI / 2;
