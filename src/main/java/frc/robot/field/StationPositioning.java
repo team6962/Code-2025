@@ -1,4 +1,4 @@
-package frc.robot.Constants;
+package frc.robot.field;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -8,10 +8,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants.Constants.SWERVE;
-import frc.robot.Constants.Field.CoralStation;
 
 public final class StationPositioning {
   private StationPositioning() {}
+
+  public static enum CoralStation {
+    LEFT(true),
+    RIGHT(false);
+
+    public final Pose2d pose;
+
+    CoralStation(boolean reflect) {
+      this.pose = getCenterIntakePose(reflect);
+    }
+  }
 
   private static final Rotation2d STATION_FRONT_ANGLE = Rotation2d.fromDegrees(144.011392);
   private static final Distance STATION_OFFSET_X = Inches.of(65.828076);

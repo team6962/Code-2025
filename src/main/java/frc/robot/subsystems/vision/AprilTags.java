@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants.LIMELIGHT;
-import frc.robot.Constants.Field;
+import frc.robot.field.Field;
 import frc.robot.util.CachedRobotState;
 import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;

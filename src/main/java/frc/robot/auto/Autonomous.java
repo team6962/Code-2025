@@ -14,12 +14,12 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Constants.ELEVATOR;
-import frc.robot.Constants.Field;
-import frc.robot.Constants.Field.CoralStation;
-import frc.robot.Constants.ReefPositioning;
-import frc.robot.Constants.ReefPositioning.CoralPosition;
-import frc.robot.Constants.StationPositioning;
 import frc.robot.commands.PieceCombos;
+import frc.robot.field.Field;
+import frc.robot.field.ReefPositioning;
+import frc.robot.field.StationPositioning;
+import frc.robot.field.ReefPositioning.CoralPosition;
+import frc.robot.field.StationPositioning.CoralStation;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
 

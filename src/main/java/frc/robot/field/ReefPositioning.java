@@ -1,4 +1,4 @@
-package frc.robot.Constants;
+package frc.robot.field;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;

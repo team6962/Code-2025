@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants.Field;
+import frc.robot.field.Field;
 import frc.robot.util.CachedRobotState;
 import java.util.Optional;
 
