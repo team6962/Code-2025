@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.vision;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;

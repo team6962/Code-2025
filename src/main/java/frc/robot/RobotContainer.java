@@ -37,9 +37,9 @@ import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
-import frc.robot.subsystems.vision.Algae;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
+import frc.robot.vision.Algae;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
