@@ -46,7 +46,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import frc.robot.temp.Constants.ENABLED_SYSTEMS;
 
 public class Logger extends SubsystemBase {
   private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Logs");

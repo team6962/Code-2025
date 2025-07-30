@@ -8,8 +8,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.StatusChecks;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Constants.CAN;
-import frc.robot.Constants.Constants.MANIPULATOR;
+import frc.robot.temp.Constants.CAN;
+import frc.robot.temp.Constants.MANIPULATOR;
 import frc.robot.util.hardware.SparkMaxUtil;
 
 public class RealFunnel extends Funnel {

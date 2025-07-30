@@ -3,7 +3,7 @@ package frc.robot.subsystems.manipulator.pivot;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants.Constants.ENABLED_SYSTEMS;
+import frc.robot.temp.Constants.ENABLED_SYSTEMS;
 import java.util.function.Supplier;
 
 public interface ManipulatorPivot extends Subsystem {

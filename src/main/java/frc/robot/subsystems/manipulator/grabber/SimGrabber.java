@@ -6,7 +6,7 @@ import com.team6962.lib.utils.CommandUtils;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.Constants.MANIPULATOR;
+import frc.robot.temp.Constants.MANIPULATOR;
 
 public class SimGrabber extends Grabber {
   private boolean hasCoral = true;
