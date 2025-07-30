@@ -52,7 +52,6 @@ public class AprilTags extends SubsystemBase {
               Logger.log("/PoseEstimates/" + id + "/isMegaTag2", estimate.isMegaTag2);
               Logger.log("/PoseEstimates/" + id + "/tagSpan", estimate.tagSpan);
               Logger.log("/PoseEstimates/" + id + "/latency", estimate.latency);
-              // Logger.logObject("/PoseEstimates/" + id + "/rawFiducials", estimate.rawFiducials);
             } else {
               Logger.log("/PoseEstimates/" + id + "/pose", new Pose2d());
               Logger.log("/PoseEstimates/" + id + "/timestamp", 0);
@@ -61,7 +60,6 @@ public class AprilTags extends SubsystemBase {
               Logger.log("/PoseEstimates/" + id + "/isMegaTag2", false);
               Logger.log("/PoseEstimates/" + id + "/tagSpan", 0);
               Logger.log("/PoseEstimates/" + id + "/latency", 0);
-              // Logger.log("/PoseEstimates/" + id + "/rawFiducials", "null");
             }
           }
         });

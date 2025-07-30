@@ -112,7 +112,7 @@ public final class AutoPaths {
       List<CoralPosition> targets = new LinkedList<>();
 
       for (int i : AutonChooser.reefFaces()) {
-        int pole1 = (6 - i * 2 + 12) % 12; // ((6 - i * 2) % 12 + 12) % 12
+        int pole1 = (6 - i * 2 + 12) % 12;
         int pole2 = (5 - i * 2 + 12) % 12;
 
         targets.add(new CoralPosition(pole1, 4));

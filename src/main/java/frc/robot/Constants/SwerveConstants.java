@@ -18,6 +18,7 @@ import com.team6962.lib.swerve.SwerveConfig.Gearing;
 import com.team6962.lib.swerve.SwerveConfig.Module;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Preferences;
 
@@ -123,7 +124,3 @@ public final class SwerveConstants {
     };
   }
 }
-// case 0 -> "Front Left";
-// case 1 -> "Front Right";
-// case 2 -> "Back Left";
-// case 3 -> "Back Right";

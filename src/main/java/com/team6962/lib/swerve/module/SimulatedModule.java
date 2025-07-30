@@ -54,8 +54,6 @@ public class SimulatedModule extends SwerveModule {
 
       steerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-      // Logger.log(getName() + "/steerSimInVolts", -steerSimState.getMotorVoltage());
-
       steerMotorSim.setInputVoltage(-steerSimState.getMotorVoltage());
       steerMotorSim.update(delta.in(Seconds));
 
@@ -81,24 +79,12 @@ public class SimulatedModule extends SwerveModule {
     public void update() {
       TalonFXSimState driveSimState = getDriveMotor().getSimState();
 
-      // Logger.log(getName() + "/driveSimInputVoltage", driveSimState.getMotorVoltage());
-
       driveSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
       driveMotorSim.setInputVoltage(driveSimState.getMotorVoltage());
       driveMotorSim.update(delta.in(Seconds));
 
       double gearing = getDrivetrainConstants().gearing().drive();
-
-      // Logger.log(
-      //     getName() + "/driveSimRotorPosition",
-      // driveMotorSim.getAngularPosition().times(gearing));
-      // Logger.log(
-      //     getName() + "/driveSimRotorVelocity",
-      // driveMotorSim.getAngularVelocity().times(gearing));
-      // Logger.log(
-      //     getName() + "/driveSimRotorAcceleration",
-      //     driveMotorSim.getAngularAcceleration().times(gearing));
 
       CTREUtils.check(
           driveSimState.setRawRotorPosition(driveMotorSim.getAngularPosition().times(gearing)));

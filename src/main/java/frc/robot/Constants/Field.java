@@ -108,9 +108,7 @@ public final class Field {
   }
 
   public static final Pose2d getFacePose(int face) {
-    Pose2d tagPose = getTagPose(getReefAprilTagsByFace().get(face)).get().toPose2d();
-    // return tagPose.rotateBy(Rotation2d.fromDegrees(180));
-    return tagPose;
+    return getTagPose(getReefAprilTagsByFace().get(face)).get().toPose2d();
   }
 
   public static final Pose2d getPolePose(int face, Pole pole) {

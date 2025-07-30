@@ -6,13 +6,13 @@ package frc.robot.commands;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.StatusChecks;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
 
-/** An example command that uses an example subsystem. */
 public class PrematchChecks extends SequentialCommandGroup {
   private final SwerveDrive swerveDrive;
   private final Elevator elevator;
@@ -36,7 +36,6 @@ public class PrematchChecks extends SequentialCommandGroup {
         manipulator.pivot.safe(),
         elevator.rezeroAtBottom(),
         Commands.waitSeconds(1.0),
-        // combos.coralL1(),
         Commands.waitSeconds(1.0),
         combos.coralL2(),
         Commands.waitSeconds(1.0),

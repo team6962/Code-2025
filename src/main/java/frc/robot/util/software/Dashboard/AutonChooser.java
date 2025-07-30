@@ -22,17 +22,14 @@ public final class AutonChooser {
 
   public static boolean startingAlgae() {
     return table.getEntry("Starting Algae").getBoolean(false);
-    // return startingAlgae.getEntry().getBoolean(false);
   }
 
   public static boolean leftCoralStation() {
     return table.getEntry("Left Station").getBoolean(false);
-    // return leftCoral.getEntry().getBoolean(false);
   }
 
   public static boolean rightCoralStation() {
     return table.getEntry("Right Station").getBoolean(false);
-    // return rightCoral.getEntry().getBoolean(false);
   }
 
   public static List<Integer> reefFaces() {
@@ -42,9 +39,6 @@ public final class AutonChooser {
       if (table.getEntry("Face " + (i + 1)).getBoolean(false)) {
         reefFaces.add(i);
       }
-      // if (reefOptions.get(i).getEntry().getBoolean(false)) {
-      //   reefFaces.add(i);
-      // }
     }
 
     return reefFaces;

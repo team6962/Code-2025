@@ -36,7 +36,6 @@ import frc.robot.util.hardware.SparkMaxUtil;
 
 public class PivotController extends SubsystemBase {
   private Angle targetAngle = Degrees.of(0);
-  // State setpointState;
   private double kS = 0.0;
   // Onboard spark max PID controller. Runs at 1kHz
   private SparkClosedLoopController pid;
@@ -75,22 +74,14 @@ public class PivotController extends SubsystemBase {
       boolean reversed) {
 
     setName(name);
-    // feedforward = new ArmFeedforward(kS, 0.0, 0.0, 0.0);
-    // profile = new TrapezoidProfile(
-    //   new Constraints(maxVelocity, maxAcceleration)
-    // );
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motor = new SparkMax(motorCAN, MotorType.kBrushless);
     encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
 
-    // motor.getAbsoluteEncoder();
-
-    // absoluteEncoder = new DutyCycleEncoder(absoluteEncoderDIO, 1.0, absolutePositionOffset);
-
     absoluteEncoder = motor.getAbsoluteEncoder();
-    // motorConfig.absoluteEncoder.zeroCentered(false);
+
     motorConfig.absoluteEncoder.zeroOffset(absolutePositionOffset);
 
     this.kS = kS;
@@ -107,7 +98,6 @@ public class PivotController extends SubsystemBase {
     SparkMaxUtil.saveAndLog(this, motor, motorConfig);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
-    // statusChecks.add("absoluteEncoderConnected", () -> absoluteEncoder.isConnected());
     statusChecks.add("absoluteEncoderUpdated", () -> absoluteEncoder.getPosition() != 0.0);
     statusChecks.add("motor", motor);
 
@@ -136,8 +126,6 @@ public class PivotController extends SubsystemBase {
     Logger.logNumber(this.getName() + "/angle/min", () -> getMinAngle().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/max", () -> getMaxAngle().in(Rotations));
 
-    // Logger.logBoolean(this.getName() + "/encoderConnected", absoluteEncoder::isConnected);
-
     RobotContainer.disabledPeriodic.subscribe(this::disabledPeriodic);
   }
 
@@ -146,7 +134,6 @@ public class PivotController extends SubsystemBase {
   }
 
   public void seedEncoder() {
-    // Logger.log(this.getName() + "/lastSeeded", Timer.getFPGATimestamp());
     encoder.setPosition(getAbsolutePosition().in(Rotations));
   }
 
@@ -154,27 +141,10 @@ public class PivotController extends SubsystemBase {
     if (requestedAngle == null) return; // If we havent set a target angle yet, do nothing
     targetAngle = clampAngle(requestedAngle);
 
-    // if (!absoluteEncoder.isConnected()) {
-    //   motor.stopMotor();
-    //   return;
-    // }
-
-    // encoder.setPosition(getPosition().in(Rotations));
-
     // Set onboard PID controller to follow
 
     if (RobotBase.isSimulation())
       sim.setInputVoltage(simPID.calculate(sim.getAngleRads(), targetAngle.in(Radians)) * 12.0);
-
-    // System.out.println(Math.signum(targetAngle.getRadians() - getPosition().getRadians()));
-    // System.out.println("kS: " + kS);
-    // System.out.println(feedforward.calculate(setpointState.position, setpointState.velocity));
-
-    // if (targetAngle.gt(Degrees.of(90).minus(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET))) {
-    //   targetAngle = targetAngle.minus(MANIPULATOR_PIVOT.BACKLASH);
-    // } else {
-    //   targetAngle = targetAngle.plus(MANIPULATOR_PIVOT.BACKLASH);
-    // }
 
     if (canMoveInDirection(targetAngle.minus(getRelativePosition()).in(Rotations))) {
       pid.setReference(
@@ -185,10 +155,6 @@ public class PivotController extends SubsystemBase {
     } else {
       motor.stopMotor();
     }
-
-    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0,
-    // kS);
-    // pid.setReference(achievableAngle.in(Rotations), ControlType.kPosition);]
 
     if (Robot.isSimulation()) sim.update(Robot.getLoopTime());
   }
@@ -273,8 +239,6 @@ public class PivotController extends SubsystemBase {
 
   public Angle getRelativePosition() {
     return Rotations.of(encoder.getPosition());
-
-    // if (Robot.isSimulation()) return Radians.of(sim.getAngleRads());
   }
 
   public Angle getRawAbsolutePosition() {

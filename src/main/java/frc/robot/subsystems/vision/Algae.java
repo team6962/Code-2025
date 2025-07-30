@@ -62,10 +62,6 @@ public class Algae {
     algaePosition =
         robotPosition.getTranslation().plus(relativePosition.rotateBy(robotPosition.getRotation()));
 
-    if (!RobotState.isDisabled()) {
-      // LEDs.setState(LEDs.State.CAN_SEE_ALGAE);
-    }
-
     return algaePosition;
   }
 

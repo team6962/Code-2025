@@ -27,23 +27,6 @@ public final class SparkMaxUtil {
     config.smartCurrentLimit(stallCurrentLimit, freeCurrentLimit);
     config.openLoopRampRate(NEO.SAFE_RAMP_RATE);
     config.inverted(inverted);
-
-    // String logPath = "motor" + motor.getDeviceId() + "/";
-
-    // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
-    // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
-    // Logger.autoLog(subsystem, logPath + "setOutput",        () -> motor.get());
-    // Logger.autoLog(subsystem, logPath + "appliedOutput",    () -> motor.getAppliedOutput());
-    // Logger.autoLog(subsystem, logPath + "appliedVoltage",   () -> motor.getBusVoltage() *
-    // motor.getAppliedOutput());
-    // Logger.autoLog(subsystem, logPath + "powerWatts",       () -> motor.getBusVoltage() *
-    // motor.getAppliedOutput() * motor.getOutputCurrent());
-    // Logger.autoLog(subsystem, logPath + "motorTemperature", () -> motor.getMotorTemperature());
-    // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
-    // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
-
-    // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <=
-    // NEO.SAFE_TEMPERATURE);
   }
 
   private static void configure(Supplier<REVLibError> config, SparkMax motor) {
@@ -65,37 +48,6 @@ public final class SparkMaxUtil {
     configure(config, inverted, idleMode, 10, 40);
   }
 
-  public static void configureCANStatusFrames(
-      SparkMax motor, boolean velocityTemperatureVoltageCurrent, boolean position) {
-    configureCANStatusFrames(
-        motor, velocityTemperatureVoltageCurrent, position, false, false, false, false);
-  }
-
-  public static void configureCANStatusFrames(
-      SparkMax motor,
-      boolean velocityTemperatureVoltageCurrent,
-      boolean position,
-      boolean analogSensor,
-      boolean alternateEncoder,
-      boolean absoluteEncoderPosition,
-      boolean absoluteEncoderVelocity) {
-
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10), motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1,
-    // velocityTemperatureVoltageCurrent ? 20 : 250), motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, position ? 250 : 250),
-    // motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, analogSensor ? 20 :
-    // 250), motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, alternateEncoder ? 20 :
-    // 250), motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, absoluteEncoderPosition
-    // ? 20 : 250), motor);
-    // configure(() -> motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, absoluteEncoderVelocity
-    // ? 20 : 250), motor);
-    // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-  }
-
   public static void configurePID(
       SparkMaxConfig config,
       double kP,
@@ -106,16 +58,11 @@ public final class SparkMaxUtil {
       double maxValue,
       boolean wrap) {
     config.closedLoop.p(kP).i(kI).d(kD);
-    // .velocityFF(kV / 12.0);
-    // .minOutput(minValue)
-    // .maxOutput(maxValue);
 
     if (wrap) {
       config.closedLoop.positionWrappingEnabled(true);
       config.closedLoop.positionWrappingInputRange(-Math.PI, Math.PI);
     }
-
-    // new TunableNumber(subsystem, "PID " + motor.getDeviceId(), pid::setP, 0.0);
   }
 
   public static void configureEncoder(SparkMaxConfig config, double encoderConversionFactor) {
@@ -134,21 +81,5 @@ public final class SparkMaxUtil {
   public static void saveAndLog(String name, SparkMax motor, SparkMaxConfig config) {
     configure(() -> motor.setCANTimeout(0), motor);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // Logger.autoLog(subsystem, logPath + "current",          () -> motor.getOutputCurrent());
-    // Logger.autoLog(subsystem, logPath + "voltage",          () -> motor.getBusVoltage());
-    // Logger.autoLog(subsystem, logPath + "setOutput",        () -> motor.get());
-    // Logger.autoLog(subsystem, logPath + "appliedOutput",    () -> motor.getAppliedOutput());
-    // Logger.autoLog(subsystem, logPath + "appliedVoltage",   () -> motor.getBusVoltage() *
-    // motor.getAppliedOutput());
-    // Logger.autoLog(subsystem, logPath + "powerWatts",       () -> motor.getBusVoltage() *
-    // motor.getAppliedOutput() * motor.getOutputCurrent());
-    // Logger.autoLog(subsystem, logPath + "motorTemperature", () -> motor.getMotorTemperature());
-    // Logger.autoLog(subsystem, logPath + "position",         () -> encoder.getPosition());
-    // Logger.autoLog(subsystem, logPath + "velocity",         () -> encoder.getVelocity());
-
-    // StatusChecks.addCheck(subsystem, logPath + "isTooHot", () -> motor.getMotorTemperature() <=
-    // NEO.SAFE_TEMPERATURE);
-    // configure(() -> motor.burnFlash(), motor);
   }
 }

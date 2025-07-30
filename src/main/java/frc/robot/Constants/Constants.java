@@ -201,7 +201,7 @@ public final class Constants {
           14,
           24,
           34,
-          Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))), // -2.439
+          Radians.of(-2.439 - Math.PI / 4).plus(ALL_OFFSET).minus(Degrees.of(15.46))),
       new SwerveConfig.Module( // Front Left (Test)
           15,
           25,
@@ -209,14 +209,14 @@ public final class Constants {
           Radians.of(-0.440 + Math.PI / 2 + Math.PI / 4)
               .plus(ALL_OFFSET)
               .minus(Degrees.of(12.83))
-              .plus(Degrees.of(.35))), // -0.440
+              .plus(Degrees.of(.35))),
       new SwerveConfig.Module( // Back Right (Test)
           16,
           26,
           36,
           Radians.of(-1.842 - Math.PI / 2 - 3.0 / 4.0 * Math.PI)
               .plus(ALL_OFFSET)
-              .minus(Degrees.of(15.82))), // -1.842
+              .minus(Degrees.of(15.82))),
       new SwerveConfig.Module( // Back Left (Test)
           17,
           27,
@@ -224,7 +224,7 @@ public final class Constants {
           Radians.of(-1.049 - Math.PI + 3.0 / 4.0 * Math.PI)
               .plus(ALL_OFFSET)
               .minus(Degrees.of(14.41))
-              .minus(Degrees.of(.88))), // -1.049
+              .minus(Degrees.of(.88))),
       new SwerveConfig.Module(18, 28, 38, Degrees.of(0)),
     };
 
@@ -308,23 +308,6 @@ public final class Constants {
       return STATS.stallTorqueNewtonMeters / STATS.stallCurrentAmps * currentLimit;
     }
   }
-
-  // public static final class AUTONOMOUS {
-  //   public static final double ACCELERATION_REDUCTION =
-  // ((SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION * SWERVE_DRIVE.ROBOT_MASS +
-  // ((SWERVE_DRIVE.PHYSICS.ROTATIONAL_INERTIA * SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION) /
-  // SWERVE_DRIVE.PHYSICS.DRIVE_RADIUS)) / (9.80 * SWERVE_DRIVE.ROBOT_MASS *
-  // SWERVE_DRIVE.FRICTION_COEFFICIENT));
-
-  //   public static final PathConstraints DEFAULT_PATH_CONSTRAINTS =
-  //       new PathConstraints(
-  //         SWERVE_DRIVE.PHYSICS.MAX_LINEAR_VELOCITY,
-  //         SWERVE_DRIVE.PHYSICS.MAX_LINEAR_ACCELERATION / ACCELERATION_REDUCTION,
-  //         SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_VELOCITY,
-  //         SWERVE_DRIVE.PHYSICS.MAX_ANGULAR_ACCELERATION / ACCELERATION_REDUCTION
-  //       );
-  //   }
-  // }
 
   public static final class HANG { // Adjust these as needed
     public static final Current MAX_CURRENT = Amps.of(80);
@@ -432,28 +415,12 @@ public final class Constants {
 
     public static final NavigableMap<Distance, Angle> MIN_ANGLES;
 
-    // static {
-    //   MIN_ANGLES = new TreeMap<>();
-    //   MIN_ANGLES.put(Inches.of(45), SAFE_MIN_ANGLE);
-    //   MIN_ANGLES.put(Inches.of(55), Degrees.of(-90.0));
-    //   MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
-    // }
-
     static {
       MIN_ANGLES = new TreeMap<>();
       MIN_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), MIN_ANGLE);
     }
 
     public static final NavigableMap<Distance, Angle> MAX_ANGLES;
-
-    // static {
-    //   MAX_ANGLES = new TreeMap<>();
-    //   MAX_ANGLES.put(Inches.of(39), MAX_ANGLE);
-    //   MAX_ANGLES.put(Inches.of(43), Degrees.of(22.0));
-    //   MAX_ANGLES.put(Inches.of(48), Degrees.of(-6.0));
-    //   MAX_ANGLES.put(Inches.of(81.5), SAFE_MAX_ANGLE);
-    //   MAX_ANGLES.put(Inches.of(Double.POSITIVE_INFINITY), Degrees.of(22.0));
-    // }
 
     static {
       MAX_ANGLES = new TreeMap<>();
@@ -507,7 +474,6 @@ public final class Constants {
   // LED
   public static final class LED {
     public static final Distance Spacing = Meters.of(1 / 60.0);
-    // public static final int length = 31;
     public static final int port = 9;
     public static final int SIDE_STRIP_HEIGHT = 56;
   }

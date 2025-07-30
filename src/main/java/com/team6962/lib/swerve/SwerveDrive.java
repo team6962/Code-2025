@@ -95,7 +95,7 @@ public class SwerveDrive extends SwerveCore {
   @Override
   public void periodic() {
     Field2d field = Logger.getField();
-    // Logger.log("Swerve Drive/AlgaePosition", );
+
     field.setRobotPose(getEstimatedPose());
 
     FieldObject2d modules = field.getObject("Swerve Modules");
@@ -314,37 +314,6 @@ public class SwerveDrive extends SwerveCore {
         useMotion());
   }
 
-  // public Command calibrate() {
-  //   SysIdRoutine calibrationRoutine = new SysIdRoutine(
-  //     new SysIdRoutine.Config(Volts.per(Second).of(4.0), Volts.of(2.0), Seconds.of(3.0)),
-  //     new SysIdRoutine.Mechanism(
-  //       voltage -> drive(new ChassisSpeeds(voltage.in(Volts) / 12.0 * , 0, 0)),
-  //       log -> log.motor("elevator")
-  //           .voltage(Volts.of((
-  //             leftMotor.getAppliedOutput() * leftMotor.getBusVoltage() +
-  //             rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()) / 2.0))
-  //           .linearPosition(getAverageHeight())
-  //           .linearVelocity(MetersPerSecond.of((leftMotor.getEncoder().getVelocity() +
-  // rightMotor.getEncoder().getVelocity()) / 2)),
-  //       this));
-
-  //   return Commands.sequence(
-  //     Commands.waitSeconds(1.0),
-  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
-  //     Commands.waitSeconds(1.0),
-  //     calibrationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
-  //     Commands.waitSeconds(1.0),
-  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
-  //     Commands.waitSeconds(1.0),
-  //     calibrationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
-  //     Commands.runOnce(() -> { leftMotor.stopMotor(); rightMotor.stopMotor(); }),
-  //     Commands.waitSeconds(1.0)
-  //   );
-  // }
-
   public Command pathfindBetweenWaypoints(
       Pose2d startPose,
       Pose2d endPose,
@@ -458,24 +427,6 @@ public class SwerveDrive extends SwerveCore {
           }
 
           return pathfindToPose;
-
-          // PathPlannerPath precomputedPath = precompute.getPath();
-
-          // if (precomputedPath != null && precompute.isStartPoseNear(getEstimatedPose())) {
-          //   return CommandUtils.withRequirements(new FollowPathCommand(
-          //     precomputedPath,
-          //     this::getEstimatedPose,
-          //     () -> fieldToRobot(getEstimatedSpeeds()),
-          //     (speeds, ff) -> {
-          //       moveRobotRelative(speeds);
-          //     },
-          //     getConstants().driveGains().pathController(),
-          //     getConstants().pathRobotConfig(),
-          //     () -> false
-          //   ), useMotion());
-          // } else {
-          //   return pathfindTo(endPose);
-          // }
         },
         Set.of(useMotion()));
   }

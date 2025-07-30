@@ -44,7 +44,6 @@ public class XBoxSwerve extends Command {
   public XBoxSwerve(SwerveDrive swerveDrive, XboxController xboxController) {
     this.swerveDrive = swerveDrive;
     this.controller = xboxController;
-    // controller.setRumble(RumbleType.kBothRumble, 1.0);
     addRequirements(swerveDrive);
 
     MAX_DRIVE_VELOCITY =
@@ -155,11 +154,6 @@ public class XBoxSwerve extends Command {
     // Zero heading when Y is pressed
     if (controller.getYButton()) {
       swerveDrive.resetHeadingEstimate(Rotation2d.fromDegrees(0));
-    }
-
-    if (controller.getAButton()) {
-      // swerveDrive.goToNearestPose(List.of(Field.AUTO_MOVE_POSITIONS.values().toArray(new Pose2d[]
-      // {})), controller).schedule();
     }
 
     if (RobotBase.isSimulation()) {

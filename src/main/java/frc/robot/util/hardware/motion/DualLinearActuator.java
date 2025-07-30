@@ -111,14 +111,8 @@ public class DualLinearActuator extends SubsystemBase {
 
     Logger.logNumber(this.getName() + "/targetHeight", () -> getTargetHeight().in(Meters));
     Logger.logNumber(this.getName() + "/height", () -> getAverageHeight().in(Meters));
-    // Logger.logNumber(this.getName() + "/leftHeight", () -> getLeftHeight().in(Meters));
-    // Logger.logNumber(this.getName() + "/rightHeight", () -> getRightHeight().in(Meters));
-
+ 
     Logger.logBoolean(this.getName() + "/doneMoving", this::doneMoving);
-
-    // Logger.logNumber(this.getName() + "/cycleDelta", () -> getCycleDelta().in(Meters));
-    // Logger.logNumber(this.getName() + "/cyclesCompleted", () -> cyclesCompleted);
-    // Logger.logNumber(this.getName() + "/cycledHeight", () -> calculateHeight().in(Meters));
 
     Logger.logBoolean(this.getName() + "/limits/ceil", ceilingLimit::get);
     Logger.logBoolean(this.getName() + "/limits/floor", () -> !floorLimit.get());
@@ -132,8 +126,6 @@ public class DualLinearActuator extends SubsystemBase {
     Logger.logNumber(
         this.getName() + "/motors/right/dutycycle", () -> rightMotor.getAppliedOutput());
     Logger.logBoolean(this.getName() + "/moving", () -> moving);
-
-    // Logger.logNumber(this.getName() + "/offset", () -> encoderOffset);
 
     StatusChecks.Category statusChecks = StatusChecks.under(this);
     statusChecks.add("leftMotor", leftMotor);

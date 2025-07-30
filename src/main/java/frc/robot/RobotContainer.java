@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ReefPositioning;
 import frc.robot.Constants.Constants.CAN;
 import frc.robot.Constants.Constants.SWERVE;
 import frc.robot.auto.choreo.AutonomousV3;
@@ -62,7 +61,6 @@ public class RobotContainer {
     return instance;
   }
 
-  // The robot's subsystems and commands
   public final SwerveDrive swerveDrive;
   public final Manipulator manipulator;
   public final Elevator elevator;
@@ -74,18 +72,8 @@ public class RobotContainer {
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   private final Command autonomousCommand;
-  // public final ManipulatorSafeties manipulatorSafeties;
-  // private final CollisionDetector collisionDetector;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
-
-  // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
-
-  // private SteerModuleTest steerModuleTest = new SteerModuleTest();
-
-  // private DriveModuleTest test;
-
-  // private SwerveModuleTest swerveModuleTest = new SwerveModuleTest();
 
   SwerveModule module;
 
@@ -96,7 +84,6 @@ public class RobotContainer {
     var log = DataLogManager.getLog();
     DriverStation.startDataLog(log, true);
     logGitProperties(log);
-    // Logger.autoLog("PDH", PDH);
 
     CachedRobotState.init();
 
@@ -113,7 +100,6 @@ public class RobotContainer {
     statusChecks.add("Joystick 0", () -> DriverStation.isJoystickConnected(0));
     statusChecks.add("Joystick 1", () -> DriverStation.isJoystickConnected(1));
     statusChecks.add("Battery Voltage", () -> RobotController.getBatteryVoltage() > 12.0);
-    // statusChecks.add("RSL", () -> RobotController.getRSLState());
     statusChecks.add("Loop Time", () -> Robot.getComputeTime() <= 0.02);
     statusChecks.add("3V3 Enabled", () -> RobotController.getEnabled3V3());
     statusChecks.add("5V Enabled", () -> RobotController.getEnabled5V());
@@ -133,42 +119,16 @@ public class RobotContainer {
     autov3 = new AutonomousV3(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
-    // // collisionDetector = new CollisionDetector();
-
-    // System.out.println(swerveDrive);
 
     // // Configure the trigger bindings
     Controls.configureBindings(swerveDrive, elevator, manipulator, hang, autov2, autov3, pieceCombos);
 
-    // module = new SwerveModule();
     NetworkTableEntry refreshButtonEntry =
         NetworkTableInstance.getDefault().getTable("StatusChecks").getEntry("refreshButton");
 
     statusChecks.timestampAdd("timerChecker", () -> Timer.getFPGATimestamp());
 
     refreshButtonEntry.setBoolean(false);
-
-    // System.out.println(ReefPositioning.getCoralPlacePose(3));
-
-    // module.configureModule(Constants.SWERVE.CONFIG, Corner.FRONT_LEFT);
-
-    // AprilTags.printConfig(Constants.LIMELIGHT.APRILTAG_CAMERA_POSES);
-
-    // Pathfinding.ensureInitialized();
-
-    // swerveModuleTest = new SwerveModuleTest();
-
-    // new Talon10Test();
-
-    // steerModuleTest = new SteerModuleTest();
-
-    // test = new DriveModuleTest();
-
-    // ChassisSpeeds testSpeeds = new ChassisSpeeds(0, 0, 1);
-
-    // Logger.log("conversionTest/speeds", testSpeeds);
-    // Logger.log("conversionTest/states",
-    // KinematicsUtils.kinematicsFromChassis(Constants.SWERVE.CHASSIS).toSwerveModuleStates(testSpeeds));
 
     Logger.start(Milliseconds.of(20));
 
@@ -227,47 +187,16 @@ public class RobotContainer {
   }
 
   public void latePeriodic() {
-    swerveDrive.latePeriodic(); // TODO: Uncomment before use
-
-    // Pose2d[] poses;
-
-    // Translation2d algae =
-    //     Algae.getAlgaePosition("limelight-algae", swerveDrive, LIMELIGHT.ALGAE_CAMERA_POSITION);
-
-    // if (algae != null) {
-    //   poses = new Pose2d[] {new Pose2d(algae, new Rotation2d())};
-    // } else {
-    //   poses = new Pose2d[0];
-    // }
-
-    // Logger.getField().getObject("Algae").setPoses(poses);
+    swerveDrive.latePeriodic();
   }
 
   public void disabledPeriodic() {
-    // System.out.println(new Translation2d(0.0,0.0));
-    // System.out.println((Algae.getAlgaePosition(LIMELIGHT.ALGAE_CAMERA_NAME, swerveDrive,
-    // LIMELIGHT.ALGAE_CAMERA_POSITION)));
-
-    // autoGen.work();
-
     disabledPeriodic.run();
   }
 
   public void disabledInit() {}
 
   public void testInit() {
-    // module.calibrateSteerMotor(RobotController.getMeasureBatteryVoltage(),
-    // Amps.of(60)).schedule();
-
-    // Commands.sequence(manipulator.pivot.safe(), elevator.rezeroAtBottom()).schedule();
-
-    // Command checks = new PrematchChecks(swerveDrive, elevator, manipulator, null);
-    // checks.schedule();
-
-    // elevator.rezeroAtBottom().schedule();
-    // LEDs.setStateCommand(LEDs.State.ENABLED).schedule();;
-
-    // swerveDrive.getModules()[0].calibrateSteerMotor(Amps.of(80)).schedule();
   }
 
   private final void logGitProperties(DataLog log) {

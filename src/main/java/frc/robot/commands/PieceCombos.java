@@ -118,11 +118,7 @@ public class PieceCombos {
     return Commands.sequence(
       manipulator.pivot.algaeBargeSetup(),
       manipulator.pivot.algaeBargeShoot()
-        .deadlineFor(
-          Commands.sequence(
-            // Commands.waitUntil(() ->
-            // manipulator.pivot.inRange(MANIPULATOR_PIVOT.ALGAE.BARGE.RELEASE_ANGLE)),
-            manipulator.grabber.dropAlgae()))
+        .deadlineFor(manipulator.grabber.dropAlgae())
     ).onlyIf(() -> elevator.inRange(ELEVATOR.ALGAE.BARGE_HEIGHT));
   }
 

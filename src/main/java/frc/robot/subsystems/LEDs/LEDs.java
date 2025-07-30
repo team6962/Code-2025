@@ -39,15 +39,6 @@ public class LEDs extends SubsystemBase {
     HAS_CORAL,
     GOOD,
     CAN_SEE_ALGAE
-    // HAS_CORAL,
-    // CAN_SEE_ALGAE,
-    // AIMING_PROCESSOR,
-    // SCORING_PROCESSOR,
-    // AIMING_BARGE,
-    // SCORING_BARGE,
-    // AIMING_REEF,
-    // SCORING_REEF,
-    // HANG
   }
 
   public static final Color WHITE = new Color(255, 255, 255);

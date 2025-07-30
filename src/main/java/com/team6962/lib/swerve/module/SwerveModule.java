@@ -17,7 +17,6 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -153,11 +152,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
           new MotionMagicConfigs()
               .withMotionMagicExpo_kV(2.7626 * 0.75)
               .withMotionMagicExpo_kA(0.3453 * 0.75)));
-    // CTREUtils.check(
-    //   steerConfig.apply(
-    //       new MotionMagicConfigs()
-    //           .withMotionMagicCruiseVelocity(1)
-    //           .withMotionMagicAcceleration(5)));
 
     CTREUtils.check(driveMotor.setPosition(Rotations.of(0)));
 
@@ -328,7 +322,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return CTREUtils.unwrap(steerVelocityIn);
   }
 
-  // Removed because getAcceleration() wasn't working
+  // Temporarily removed because getAcceleration() isn't working
+  // TODO: Add after Phoenix 6 update
   // public AngularAcceleration getSteerAcceleration() {
   //   return steerAcceleration;
   // }
@@ -353,38 +348,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(driveMotor.setControl(driveRequest));
     CTREUtils.check(steerMotor.setControl(steerRequest));
   }
-
-  /**
-   * Drives the module to a given state.
-   *
-   * @param targetState The desired state to drive to
-   */
-  // public void driveState(SwerveModuleState targetState) {
-  //   if (isCalibrating) return;
-  //   if (isNeutralCoast) {
-  //     driveMotor.setNeutralMode(NeutralModeValue.Brake);
-  //     steerMotor.setNeutralMode(NeutralModeValue.Brake);
-
-  //     isNeutralCoast = false;
-  //   }
-
-  //   targetState = optimizeStateForTalon(targetState, getSteerAngle());
-
-  //   if (Math.abs(targetState.speedMetersPerSecond) < 1e-13) {
-  //     targetState = new SwerveModuleState(0, targetState.angle);
-  //   }
-
-  //   // Logger.log(getName() + "/targetState", targetState);
-
-  //   CTREUtils.check(
-  //       driveMotor.setControl(
-  //           driveSpeedOut.withVelocity(
-  //               constants.driveMotorMechanismToRotor(
-  //                   MetersPerSecond.of(targetState.speedMetersPerSecond)))));
-
-  //   CTREUtils.check(
-  //       steerMotor.setControl(steerAngleOut.withPosition(targetState.angle.getRotations())));
-  // }
 
   /**
    * Gets the current state of the module.
@@ -563,25 +526,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     return new Translation2d(
         (cornerIndex < 2 ? 1. : -1.) * chassis.wheelBase().in(Meters) / 2.,
         (cornerIndex % 2 == 0 ? 1. : -1.) * chassis.trackWidth().in(Meters) / 2.);
-  }
-
-  public static Slot0Configs invertGains(Slot0Configs configs) {
-    return new Slot0Configs()
-        .withKP(-configs.kP)
-        .withKI(-configs.kI)
-        .withKD(-configs.kD)
-        .withKS(configs.kS)
-        .withKV(-configs.kV)
-        .withKA(-configs.kA)
-        .withKG(-configs.kG);
-  }
-
-  public static Angle optimizeSteerAngle(Angle targetAngle, Angle currentAngle) {
-    return targetAngle;
-    // TODO: Add back in?
-    // Angle difference = MeasureMath.minDifference(targetAngle, currentAngle);
-
-    // return currentAngle.plus(difference);
   }
 
   public static SwerveModuleState optimizeStateForTalon(

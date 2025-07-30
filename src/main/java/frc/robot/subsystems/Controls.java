@@ -119,23 +119,6 @@ public class Controls {
     operator.x().onTrue(pieceCombos.coralL3());
     operator.y().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 4));
 
-    // operator.a().onTrue(elevator.coralL1());
-    // operator.b().onTrue(elevator.coralL2());
-    // operator.x().onTrue(elevator.coralL3());
-    // operator.y().onTrue(elevator.coralL4());
-
-    // operator.y().onTrue(manipulator.pivot.safe().andThen(elevator.coralL4().alongWith(manipulator.pivot.coralL4())));
-
-    // operator.y().onTrue(elevator.algaeBarge().andThen(manipulator.pivot.algaeBarge()));
-    // operator.a().onTrue(manipulator.pivot.coralL1());
-    // operator.b().onTrue(manipulator.pivot.coralL23());
-    // operator.x().onTrue(manipulator.pivot.coralL4());
-    // operator.y().onTrue(manipulator.pivot.stow());
-    // operator.start().onTrue(pieceCombos.stow()); // assume this is processor height
-    // operator.back().onTrue(elevator.algaeGround());
-    // operator.leftStick().onTrue(elevator.algaeL2());
-    // operator.rightStick().onTrue(elevator.algaeL3());
-
     operator.povUp().whileTrue(elevator.up());
     operator.povDown().whileTrue(elevator.down());
     operator.povRight().whileTrue(manipulator.pivot.up());
@@ -172,40 +155,6 @@ public class Controls {
                 .andThen(
                     LEDs.setStateCommand(LEDs.State.GOOD)) // ✅ Only runs when button is pressed
             );
-
-    // operator.povUp().onTrue(hang.deploy());
-    // operator.povDown().onTrue(hang.hang().onlyIf(() -> DriverStation.getMatchTime() >
-    // TIMING.ENDGAME_START.in(Seconds)));
-    // operator.rightStick().onTrue(hang.stow());
-    // operator.leftBumper().whileTrue(manipulator.algae.action());
-    // operator.leftTrigger().whileTrue(manipulator.algae.action());
-
-    // ShuffleboardTab driverTab = DriverDashboard.getTab();
-
-    // driverTab
-    //     .addBoolean("Has Coral", () -> manipulator.grabber.hasCoral())
-    //     .withWidget(BuiltInWidgets.kBooleanBox)
-    //     .withPosition(0, 0)
-    //     .withSize(2, 2)
-    //     .withProperties(Map.of("min", 0, "max", 100));
-
-    // driverTab
-    //     .addBoolean("Has Algae", () -> manipulator.grabber.hasAlgae())
-    //     .withWidget(BuiltInWidgets.kBooleanBox)
-    //     .withPosition(2, 0)
-    //     .withSize(2, 2)
-    //     .withProperties(Map.of("min", 0, "max", 100));
-
-    // driverTab.addDouble("Battery Capacity", () -> Constants.SWERVE_DRIVE.BATTERY_VOLTAGE <
-    // RobotContainer.getVoltage() ? 100.0 : (RobotContainer.getTotalCurrent() /
-    // ((Constants.SWERVE_DRIVE.BATTERY_VOLTAGE - RobotContainer.getVoltage()) /
-    // (Constants.SWERVE_DRIVE.BATTERY_RESISTANCE)) * 100.0))
-    //   .withWidget(BuiltInWidgets.kDial)
-    //   .withPosition(3, 2)
-    //   .withSize(2, 2)
-    //   .withProperties(Map.of("min", 0, "max", 100));
-
-    // new OperatorFineControls(elevator, manipulator, operator.getHID()).schedule();
   }
 
   public static Command autoscore(
