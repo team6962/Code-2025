@@ -4,9 +4,13 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -16,13 +20,11 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.ReefPositioning.CoralPosition;
 import frc.robot.Constants.StationPositioning;
-import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class AutoCommands {
   private SwerveDrive swerveDrive;

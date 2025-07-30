@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.utils.CommandUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
@@ -16,8 +17,8 @@ import frc.robot.Constants.Constants.ELEVATOR;
 import frc.robot.Constants.Field;
 import frc.robot.Constants.Field.CoralStation;
 import frc.robot.Constants.ReefPositioning;
+import frc.robot.Constants.ReefPositioning.CoralPosition;
 import frc.robot.Constants.StationPositioning;
-import frc.robot.auto.utils.AutoPaths.CoralPosition;
 import frc.robot.commands.PieceCombos;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.manipulator.Manipulator;

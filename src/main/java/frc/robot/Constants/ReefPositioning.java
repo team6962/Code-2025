@@ -128,4 +128,33 @@ public final class ReefPositioning {
   private static Pose2d rotatePose(Pose2d pose, Rotation2d rotation) {
     return new Pose2d(pose.getTranslation(), pose.getRotation().plus(rotation));
   }
+
+  public static class CoralPosition {
+    /** Coral pole ranging from 0-11. */
+    public final int pole;
+
+    /** Coral level ranging from 1-4. */
+    public final int level;
+
+    public CoralPosition(int pole, int level) {
+      if (pole < 0 || pole > 11) {
+        pole = (pole % 12 + 12) % 12;
+      }
+
+      if (level < 1 || level > 4) {
+        System.out.println("Coral level is out of range");
+        level = 2;
+      }
+
+      this.pole = pole;
+      this.level = level;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof CoralPosition
+          && ((CoralPosition) obj).pole == pole
+          && ((CoralPosition) obj).level == level;
+    }
+  }
 }
