@@ -133,7 +133,10 @@ public class Controls {
                 .intakeCoral()
                 .andThen(
                     Commands.parallel(
-                        rumbleBoth(), LEDs.setStateCommand(LEDs.State.GOOD)))); // big right paddle
+                        rumbleBoth(),
+                        LEDs.setStateCommand(LEDs.State.GOOD),
+                        pieceCombos.coralL2()
+                    ))); // big right paddle
 
     operator.rightBumper().whileTrue(manipulator.grabber.adjustCoral()); // intake coral
     operator
