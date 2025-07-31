@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.Time;
 import frc.robot.util.CachedRobotState;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 
@@ -104,6 +105,13 @@ public final class Constants {
   // Exposure: 750
   // Sensor Gain: 10
   public static final class LIMELIGHT {
+    public static final Set<String> APRILTAG_CAMERA_IDS = Set.of(
+      "limelight-ftag",
+      "limelight-btag",
+      "limelight-rtag",
+      "limelight-ltag"
+    );
+
     // x is front-to-back
     // y is left-to-right
     // z it top-to-bottom
