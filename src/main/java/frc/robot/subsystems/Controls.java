@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 
 import com.team6962.lib.swerve.SwerveDrive;
@@ -19,6 +20,7 @@ import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.auto.AutoAlign;
 import frc.robot.auto.Autonomous;
+import frc.robot.auto.AutoAlign.PolePattern;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.XBoxSwerve;
 import frc.robot.field.ReefPositioning;
@@ -112,8 +114,8 @@ public class Controls {
     // Algae ground Height
 
     operator.a().onTrue(pieceCombos.coralL1());
-    operator.b().onTrue(pieceCombos.coralL2());
-    operator.x().onTrue(pieceCombos.coralL3());
+    operator.b().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 2));
+    operator.x().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 3));
     operator.y().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 4));
 
     operator.povUp().whileTrue(elevator.up());
@@ -160,51 +162,63 @@ public class Controls {
             );
   }
 
-  public static Command autoscore(
+  private static boolean isNearCoralPole(SwerveDrive swerveDrive, Distance translationTolerance, Angle rotationTolerance, PolePattern pattern) {
+    for (int i = pattern.start; i < 12; i += pattern.increment) {
+      Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
+
+      if (swerveDrive.isWithinToleranceOf(placePose, translationTolerance, rotationTolerance)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private static Command autoscore(
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
       PieceCombos pieceCombos,
       int level) {
     return Commands.sequence(
-        Commands.parallel(
-            pieceCombos.coral(level),
-            Commands.waitUntil(
-                () -> {
-                  if (level == 1) return false;
+      Commands.deadline(
+        Commands.waitUntil(() -> {
+          return (driver.getHID().getBButton() || driver.getHID().getXButton()) && isNearCoralPole(
+              swerveDrive, Feet.of(2), Degrees.of(45),
+              driver.getHID().getBButton() ? PolePattern.RIGHT : PolePattern.LEFT
+            );
+        }),
+        level == 2 ? pieceCombos.coralL2() : pieceCombos.readyL3()
+      ),
+      Commands.parallel(
+        pieceCombos.coral(level),
+        Commands.waitUntil(
+          () -> {
+            if (level == 1) return false;
 
-                  boolean poseCorrect = false;
+            if (!isNearCoralPole(swerveDrive, Inches.of(0.85), Degrees.of(4), PolePattern.ALL)) return false;
 
-                  for (int i = 0; i < 12; i++) {
-                    Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
+            Distance targetHeight =
+                level == 2
+                    ? ELEVATOR.CORAL.L2_HEIGHT
+                    : level == 3 ? ELEVATOR.CORAL.L3_HEIGHT : ELEVATOR.CORAL.L4_HEIGHT;
 
-                    if (swerveDrive.isWithinToleranceOf(
-                        placePose, Inches.of(0.85), Degrees.of(4))) {
-                      poseCorrect = true;
-                      break;
-                    }
-                  }
+            if (!elevator.inRange(targetHeight)) return false;
 
-                  if (!poseCorrect) return false;
+            Angle targetAngle =
+                level == 2 || level == 3
+                    ? MANIPULATOR_PIVOT.CORAL.L23_ANGLE
+                    : MANIPULATOR_PIVOT.CORAL.L4_ANGLE;
 
-                  Distance targetHeight =
-                      level == 2
-                          ? ELEVATOR.CORAL.L2_HEIGHT
-                          : level == 3 ? ELEVATOR.CORAL.L3_HEIGHT : ELEVATOR.CORAL.L4_HEIGHT;
+            if (MeasureMath.minAbsDifference(manipulator.pivot.getAngle(), targetAngle)
+                .gte(Degrees.of(2))) return false;
 
-                  if (!elevator.inRange(targetHeight)) return false;
-
-                  Angle targetAngle =
-                      level == 2 || level == 3
-                          ? MANIPULATOR_PIVOT.CORAL.L23_ANGLE
-                          : MANIPULATOR_PIVOT.CORAL.L4_ANGLE;
-
-                  if (MeasureMath.minAbsDifference(manipulator.pivot.getAngle(), targetAngle)
-                      .gte(Degrees.of(2))) return false;
-
-                  return true;
-                })),
-        Commands.parallel(pieceCombos.coral(level), manipulator.grabber.dropCoral()));
+            return true;
+          }
+        )
+      ),
+      Commands.parallel(pieceCombos.coral(level), manipulator.grabber.dropCoral())
+    );
   }
 
   private static Command rumble(CommandXboxController controller) {
