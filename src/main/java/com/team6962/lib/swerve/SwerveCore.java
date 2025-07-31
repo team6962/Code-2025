@@ -142,11 +142,6 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestamp, visionMeasurementStdDevs);
   }
 
-  public void addVisionMeasurement(
-      Pose2d visionRobotPoseMeters, Time timestamp) {
-    poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestamp);
-  }
-
   public void addVisionHeading(Rotation2d visionHeading) {
     poseEstimator.addVisionHeading(visionHeading);
   }
@@ -169,10 +164,6 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
   public Angle getContinuousGyroscopeAngle() {
     return poseEstimator.getContinuousGyroscopeAngle();
-  }
-
-  public PoseEstimator getPoseEstimator() {
-    return poseEstimator;
   }
 
   /** Should be called after CommandScheduler.run() to mimimize latency. */

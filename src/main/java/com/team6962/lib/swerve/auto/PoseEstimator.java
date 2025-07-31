@@ -2,12 +2,9 @@ package com.team6962.lib.swerve.auto;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.Supplier;
-
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.RotationUtils;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,6 +20,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants.LIMELIGHT;
+import frc.robot.vision.AprilTags;
+
+import java.util.function.Supplier;
 
 /**
  * {@code PoseEstimator} is a class that estimates the pose of a swerve drive robot using a
@@ -75,7 +76,7 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
 
     poseEstimator.updateWithTime(
         timestamp.in(Seconds), RotationUtils.fromAngle(gyroscope.getHeading()), modulePositions);
-    // AprilTags.injectVisionData(LIMELIGHT.APRILTAG_CAMERA_POSES, this);
+    AprilTags.injectVisionData(LIMELIGHT.APRILTAG_CAMERA_POSES, this);
     chassisVelocity =
         kinematics.toTwist2d(
             KinematicsUtils.toModulePositions(moduleStatesSupplier.get(), Seconds.of(1.0)));
@@ -83,10 +84,6 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
     positionChanges = KinematicsUtils.difference(modulePositions, lastPositions);
 
     lastPositions = modulePositions;
-  }
-
-  public SwerveGyroscope getGyroscope() {
-    return gyroscope;
   }
 
   public Angle getContinuousGyroscopeAngle() {
@@ -97,12 +94,6 @@ public class PoseEstimator extends SubsystemBase implements RobotCoordinates {
       Pose2d visionRobotPoseMeters, Time timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestamp.in(Seconds), visionMeasurementStdDevs);
-  }
-
-  public void addVisionMeasurement(
-      Pose2d visionRobotPoseMeters, Time timestamp) {
-    poseEstimator.addVisionMeasurement(
-        visionRobotPoseMeters, timestamp.in(Seconds));
   }
 
   public void resetPoseEstimate(Pose2d expectedFieldPose) {
