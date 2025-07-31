@@ -25,21 +25,22 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.Constants.CAN;
-import frc.robot.constants.Constants.SWERVE;
 import frc.robot.auto.AutoAlign;
 import frc.robot.auto.Autonomous;
 import frc.robot.auto.Autonomous.Side;
 import frc.robot.commands.PieceCombos;
 import frc.robot.commands.SafeSubsystems;
+import frc.robot.constants.Constants.CAN;
+import frc.robot.constants.Constants.SWERVE;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.vision.Algae;
+import frc.robot.vision.MegaTag2;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,6 +72,7 @@ public class RobotContainer {
   public final PieceCombos pieceCombos;
   public final SafeSubsystems safeties;
   private final Command autonomousCommand;
+  private final MegaTag2 megaTag2;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
@@ -116,6 +118,7 @@ public class RobotContainer {
     autov3 = new Autonomous(swerveDrive, manipulator, elevator, pieceCombos);
     algaeDetector = new Algae();
     hang = Hang.create();
+    megaTag2 = new MegaTag2(swerveDrive);
 
     // // Configure the trigger bindings
     Controls.configureBindings(
