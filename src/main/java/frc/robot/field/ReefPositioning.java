@@ -129,6 +129,10 @@ public final class ReefPositioning {
     return new Pose2d(pose.getTranslation(), pose.getRotation().plus(rotation));
   }
 
+  public static int getAlgaeHeight(int face) {
+    return face % 2 + 2;
+  }
+
   public static class CoralPosition {
     /** Coral pole ranging from 0-11. */
     public final int pole;

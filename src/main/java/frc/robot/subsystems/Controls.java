@@ -28,6 +28,8 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.manipulator.Manipulator;
+
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class Controls {
@@ -41,8 +43,8 @@ public class Controls {
       Elevator elevator,
       Manipulator manipulator,
       Hang hang,
-      AutoAlign autonomous,
-      Autonomous v3,
+      AutoAlign autoAlign,
+      Autonomous autonomous,
       PieceCombos pieceCombos) {
 
     // Driver
@@ -56,11 +58,11 @@ public class Controls {
     // Button to move to left/right reef (dpad left right)
     // Button for aligning to algae on the reef (dpad up)
 
-    driver.a().whileTrue(autonomous.alignToClosestFaceTeleop());
+    driver.a().whileTrue(autoAlign.alignToClosestFaceTeleop());
     driver
         .b()
         .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
+            autoAlign.alignToClosestPoleTeleop(
                 AutoAlign.PolePattern.RIGHT,
                 () ->
                     rumbleBoth()
@@ -70,13 +72,13 @@ public class Controls {
     driver
         .x()
         .whileTrue(
-            autonomous.alignToClosestPoleTeleop(
+            autoAlign.alignToClosestPoleTeleop(
                 AutoAlign.PolePattern.LEFT,
                 () ->
                     rumbleBoth()
                         .repeatedly()
                         .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
-    driver.y();
+    driver.y().whileTrue(autograbAlgae(swerveDrive, elevator, manipulator, pieceCombos, autoAlign));
     driver.start().onTrue(pieceCombos.stow());
     driver.back().whileTrue(swerveDrive.park());
     driver.leftBumper();
@@ -114,9 +116,9 @@ public class Controls {
     // Algae ground Height
 
     operator.a().onTrue(pieceCombos.coralL1());
-    operator.b().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 2));
-    operator.x().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 3));
-    operator.y().onTrue(autoscore(swerveDrive, elevator, manipulator, pieceCombos, 4));
+    operator.b().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 2));
+    operator.x().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 3));
+    operator.y().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 4));
 
     operator.povUp().whileTrue(elevator.up());
     operator.povDown().whileTrue(elevator.down());
@@ -174,7 +176,7 @@ public class Controls {
     return false;
   }
 
-  private static Command autoscore(
+  private static Command autoscoreCoral(
       SwerveDrive swerveDrive,
       Elevator elevator,
       Manipulator manipulator,
@@ -219,6 +221,57 @@ public class Controls {
       ),
       Commands.parallel(pieceCombos.coral(level), manipulator.grabber.dropCoral())
     );
+  }
+
+  public static Command autograbAlgae(
+    SwerveDrive swerveDrive,
+    Elevator elevator,
+    Manipulator manipulator,
+    PieceCombos pieceCombos,
+    AutoAlign autoAlign
+  ) {
+    return Commands.defer(() -> {
+      int face = autoAlign.getClosestReefFace(swerveDrive.getEstimatedPose());
+      int level = ReefPositioning.getAlgaeHeight(face);
+
+      return Commands.sequence(
+        Commands.deadline(
+          swerveDrive
+            .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
+            .andThen(swerveDrive.driveTwistToPose(ReefPositioning.getAlgaeAlignPose(face)))
+              .until(() -> swerveDrive.isWithinToleranceOf(ReefPositioning.getAlgaeAlignPose(face), Inches.of(3), Degrees.of(10))),
+          Commands.sequence(
+            Commands.deadline(
+              manipulator.pivot.stow().until(() -> manipulator.pivot.getAngle().gt(Degrees.of(-10))),
+              elevator.hold()
+            ),
+            Commands.parallel(
+              (level == 2 ? elevator.algaeL2() : elevator.ready()).andThen(elevator.hold()),
+              manipulator.pivot.hold()
+            )
+          )
+        ),
+        manipulator.pivot.stow().until(() -> manipulator.pivot.getAngle().gt(Degrees.of(-10))).deadlineFor(elevator.hold()),
+        Commands.deadline(
+          level == 2 ? elevator.algaeL2() : elevator.algaeL3(),
+          manipulator.pivot.hold()
+        ),
+        Commands.deadline(
+          manipulator.grabber.intakeAlgae(),  
+          manipulator.pivot.algaeReef().andThen(manipulator.pivot.hold()),
+          swerveDrive.driveTwistToPose(ReefPositioning.getAlgaePickupPose(face)),
+          elevator.hold()
+        ),
+        swerveDrive.driveTwistToPose(ReefPositioning.getAlgaeAlignPose(face))
+          .deadlineFor(
+            manipulator.pivot.pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.HOLD_ANGLE),
+            elevator.ready(),
+            manipulator.grabber.holdAlgae().repeatedly()
+          )
+          .until(() -> swerveDrive.isWithinToleranceOf(ReefPositioning.getAlgaeAlignPose(face), Inches.of(3), Degrees.of(30))),
+        Commands.runOnce(() -> manipulator.grabber.expectAlgae(true))
+      );
+    }, Set.of(swerveDrive.useRotation(), swerveDrive.useTranslation(), elevator, manipulator));
   }
 
   private static Command rumble(CommandXboxController controller) {
