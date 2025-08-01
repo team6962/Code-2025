@@ -2,8 +2,7 @@ package frc.robot.vision;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
@@ -20,23 +19,9 @@ import io.limelightvision.LimelightHelpers;
 import io.limelightvision.LimelightHelpers.PoseEstimate;
 import io.limelightvision.LimelightHelpers.RawFiducial;
 
-/**
- * The MegaTag2 class is responsible for pose estimation using a combination
- * of MegaTag1 and MegaTag2.
- */
 public class MegaTag2 extends SubsystemBase {
     private SwerveDrive swerveDrive;
-
-    /**
-     * Pose estimator used to find field-relative headings with MegaTag1.
-     */
     private SwerveDrivePoseEstimator megaTag1PoseEstimator;
-
-    /**
-     * Map from limelight ids to most recent MegaTag2-generated pose estimates,
-     * used for logging.
-     */
-    private Map<String, Pose2d> megaTag2PoseEstimates = new HashMap<>(LIMELIGHT.APRILTAG_CAMERA_IDS.size());
 
     public MegaTag2(SwerveDrive swerveDrive) {
         this.swerveDrive = swerveDrive;
@@ -47,8 +32,6 @@ public class MegaTag2 extends SubsystemBase {
             KinematicsUtils.blankModulePositions(4),
             new Pose2d()
         );
-
-        Logger.addUpdate("poseEstimationData", this::logPoseEstimationData);
     }
 
     @Override
@@ -58,33 +41,25 @@ public class MegaTag2 extends SubsystemBase {
         addVisionEstimates();
     }
 
-    private void logPoseEstimationData() {
-        for (String cameraId : LIMELIGHT.APRILTAG_CAMERA_IDS) {
-            PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
+    // 1. Get pose estimates from MegaTag1
+    // 2. Filter out bad pose estimates
+    // 3. Add offset to gyroscope angle
 
-            Logger.log("PoseEstimation/" + cameraId + "/pose", estimate.pose);
-            Logger.log("PoseEstimation/" + cameraId + "/latency", estimate.latency);
-            Logger.log("PoseEstimation/" + cameraId + "/tagCount", estimate.tagCount);
-            Logger.log("PoseEstimation/" + cameraId + "/timestampSeconds", estimate.timestampSeconds);
-
-            for (RawFiducial fiducial : estimate.rawFiducials) {
-                Logger.log("PoseEstimation/" + cameraId + "/tags/" + fiducial.id + "/ambiguity", fiducial.ambiguity);
-                Logger.log("PoseEstimation/" + cameraId + "/tags/" + fiducial.id + "/distToCamera", fiducial.distToCamera);
-                Logger.log("PoseEstimation/" + cameraId + "/tags/" + fiducial.id + "/tagArea", fiducial.ta);
-            }
-
-            Logger.log("PoseEstimation/" + cameraId + "/accurate", isEstimateAccurate(estimate));
-        }
-    }
-
-    /**
-     * Gives MegaTag2 field-relative gyroscope angles detected by MegaTag1.
-     */
     public void seedGyroscopeAngle() {
-        for (String cameraId : LIMELIGHT.APRILTAG_CAMERA_IDS) {
+        Set<String> cameraIds = LIMELIGHT.APRILTAG_CAMERA_POSES.keySet();
+
+        for (String cameraId : cameraIds) {
             PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
             
-            if (!isEstimateAccurate(estimate)) continue;
+            for (RawFiducial fiducial : estimate.rawFiducials) {
+                Logger.log("Fiducials/" + cameraId + "/" + fiducial.id + "/ambiguity", fiducial.ambiguity);
+                Logger.log("Fiducials/" + cameraId + "/" + fiducial.id + "/distToCamera", fiducial.distToCamera);
+                Logger.log("Fiducials/" + cameraId + "/" + fiducial.id + "/tagArea", fiducial.ta);
+            }
+
+            if (!isEstimateGood(estimate)) continue;
+
+            Logger.getField().getObject("Estimate from " + cameraId).setPose(estimate.pose);
 
             megaTag1PoseEstimator.addVisionMeasurement(
                 estimate.pose,
@@ -100,7 +75,9 @@ public class MegaTag2 extends SubsystemBase {
 
         Rotation2d fieldRelativeHeading = megaTag1PoseEstimator.getEstimatedPosition().getRotation();
 
-        for (String cameraId : LIMELIGHT.APRILTAG_CAMERA_IDS) {
+        Logger.getField().getObject("Field Relative Heading").setPose(megaTag1PoseEstimator.getEstimatedPosition());
+
+        for (String cameraId : cameraIds) {
             LimelightHelpers.SetRobotOrientation(
                 cameraId,
                 fieldRelativeHeading.getDegrees(),
@@ -113,12 +90,7 @@ public class MegaTag2 extends SubsystemBase {
         }
     }
 
-    /**
-     * Checks if a pose estimate is roughly accurate.
-     * @param estimate The pose estimate to check the accuracy of.
-     * @return True if it's somewhat accurate.
-     */
-    public boolean isEstimateAccurate(PoseEstimate estimate) {
+    public boolean isEstimateGood(PoseEstimate estimate) {
         for (RawFiducial fiducial : estimate.rawFiducials) {
             if (fiducial.ambiguity < 0.4) return true;
         }
@@ -126,18 +98,20 @@ public class MegaTag2 extends SubsystemBase {
         return false;
     }
 
-    /**
-     * Adds vision measurements from MegaTag2 to the swerve drive pose
-     * estimator.
-     */
+    // 4. Get pose estimates from MegaTag2
+    // 5. Filter out bad pose estimates
+    // 6. Send MegaTag2 estimates to swerve
+
     public void addVisionEstimates() {
-        for (String cameraId : LIMELIGHT.APRILTAG_CAMERA_IDS) {
+        Set<String> cameraIds = LIMELIGHT.APRILTAG_CAMERA_POSES.keySet();
+
+        for (String cameraId : cameraIds) {
             PoseEstimate estimate = CachedRobotState.isBlue().orElse(false) ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId) :
                 LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(cameraId);
             
-            if (!isEstimateAccurate(estimate)) continue;
+            if (!isEstimateGood(estimate)) continue;
 
-            megaTag2PoseEstimates.put(cameraId, estimate.pose);
+            Logger.getField().getObject("MegaTag2 estimate from " + cameraId).setPose(estimate.pose);
 
             swerveDrive.addVisionMeasurement(
                 estimate.pose,
