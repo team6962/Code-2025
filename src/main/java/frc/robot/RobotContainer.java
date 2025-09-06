@@ -5,6 +5,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -179,7 +180,12 @@ public class RobotContainer {
     // 9. Calibrate wheel size for odometry
     // return swerveDrive.calibrateWheelSize();
 
-    return swerveDrive.driveTo(new Pose2d(0, 0, Rotation2d.fromDegrees(0))).andThen(swerveDrive.followChoreoPath("Drive X - Path 1"));
+    Pose2d initialPose = new Pose2d();
+
+    return swerveDrive.driveTo(initialPose)
+      .until(() -> swerveDrive.isWithinToleranceOf(initialPose, Inches.of(1), Degrees.of(5)))
+      .andThen(Commands.waitSeconds(3))
+      .andThen(swerveDrive.followChoreoPath("Drive X - Path 1"));
   }
 
   public Command getAutonomousCommand() {
