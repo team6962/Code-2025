@@ -179,7 +179,7 @@ public class RobotContainer {
     // 9. Calibrate wheel size for odometry
     // return swerveDrive.calibrateWheelSize();
 
-    return swerveDrive.followChoreoPath("Drive X - Path 1");
+    return swerveDrive.driveTo(new Pose2d(0, 0, Rotation2d.fromDegrees(0))).andThen(swerveDrive.followChoreoPath("Drive X - Path 1"));
   }
 
   public Command getAutonomousCommand() {
