@@ -46,14 +46,9 @@ public final class ElevatorConstants {
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final SlotConfigs coralSlot = new SlotConfigs()
         .withKP(6)
-        .withKI(0.3)
-        .withKD(1)
-        .withKG(0.93)
-        .withKV(3.13)
-        .withKA(0.0795)
         .withKS(0.2605)
         .withGravityType(GravityTypeValue.Elevator_Static)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final SlotConfigs algaeSlot = new SlotConfigs()
         .withKP(6)
         .withKI(0.3)
