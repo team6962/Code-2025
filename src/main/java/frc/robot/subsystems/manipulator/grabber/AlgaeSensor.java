@@ -50,11 +50,11 @@ public class AlgaeSensor extends SubsystemBase {
     }
 
     public boolean hasAlgae() {
-        return hasAlgae;
+        return false;
     }
 
     public boolean isAlgaeFullyIntaked() {
-        return fullyIntaked;
+        return false;
     }
 
     @Override

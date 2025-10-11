@@ -256,7 +256,7 @@ public class IntakePivot extends SubsystemBase {
 
         applyLimitsToControlRequest(controlRequest);
         applyFeedforwardToControlRequest(controlRequest);
-        CTREUtils.check(motor.setControl(controlRequest));
+        // CTREUtils.check(motor.setControl(controlRequest));
     }
 
     private void applyFeedforwardToControlRequest(ControlRequest request) {

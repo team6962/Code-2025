@@ -41,14 +41,9 @@ public final class ElevatorConstants {
 
     public static final SlotConfigs emptySlot = new SlotConfigs()
         .withKP(6)
-        .withKI(0.3)
-        .withKD(1)
-        .withKG(0.8195)
-        .withKV(3.13)
-        .withKA(0.079)
         .withKS(0.2605)
         .withGravityType(GravityTypeValue.Elevator_Static)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final SlotConfigs coralSlot = new SlotConfigs()
         .withKP(6)
         .withKI(0.3)
@@ -70,8 +65,8 @@ public final class ElevatorConstants {
         .withGravityType(GravityTypeValue.Elevator_Static)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
     public static final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(2)
-            .withMotionMagicAcceleration(3);
+        .withMotionMagicCruiseVelocity(2.5)
+        .withMotionMagicAcceleration(5);
     public static final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
             .withSupplyCurrentLimit(90)
             .withSupplyCurrentLimitEnable(true);
