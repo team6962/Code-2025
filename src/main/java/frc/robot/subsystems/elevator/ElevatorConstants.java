@@ -45,7 +45,7 @@ public final class ElevatorConstants {
         .withKD(1)
         .withKS(0.2605)
         .withGravityType(GravityTypeValue.Elevator_Static)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     public static final SlotConfigs coralSlot = new SlotConfigs()
         .withKP(6)
         .withKI(0.3)
