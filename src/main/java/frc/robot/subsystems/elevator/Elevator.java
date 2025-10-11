@@ -16,7 +16,6 @@ import com.ctre.phoenix6.configs.Slot2Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -179,7 +178,7 @@ public class Elevator extends SubsystemBase {
         
         Distance clampedPosition = MeasureMath.clamp(position, ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT);
 
-        var controlRequest = new PositionVoltage(clampedPosition.in(Meters));
+        var controlRequest = new MotionMagicVoltage(clampedPosition.in(Meters));
 
         setLimits(controlRequest);
         

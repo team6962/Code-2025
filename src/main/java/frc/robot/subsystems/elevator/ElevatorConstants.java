@@ -41,9 +41,14 @@ public final class ElevatorConstants {
 
     public static final SlotConfigs emptySlot = new SlotConfigs()
         .withKP(6)
+        .withKI(0.3)
+        .withKD(1)
+        .withKG(0.8195)
+        .withKV(3.13)
+        .withKA(0.079)
         .withKS(0.2605)
         .withGravityType(GravityTypeValue.Elevator_Static)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
     public static final SlotConfigs coralSlot = new SlotConfigs()
         .withKP(6)
         .withKI(0.3)
@@ -81,6 +86,6 @@ public final class ElevatorConstants {
     public static final int DIO_CEILING_PORT = 0;
 
     public static final Voltage KG = Volts.of(0.8195);
-    public static final Voltage FINE_CONTROL_UP = KG.plus(Volts.of(1));
-    public static final Voltage FINE_CONTROL_DOWN = KG.minus(Volts.of(1));
+    public static final Voltage FINE_CONTROL_UP = KG.plus(Volts.of(2.645));
+    public static final Voltage FINE_CONTROL_DOWN = KG.minus(Volts.of(-1.006));
 }
