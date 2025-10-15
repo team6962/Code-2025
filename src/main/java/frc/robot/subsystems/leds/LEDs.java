@@ -144,18 +144,19 @@ public class LEDs extends SubsystemBase {
 
     }
 
-    if (CachedRobotState.isDisabled() && AprilTags.changingHeading) {
-      state = State.DEFAULT;
-    } else {
-      state = (CachedRobotState.isAutonomous() && CachedRobotState.isEnabled()) ? (
-        CachedRobotState.isBlue().orElse(false)
-          ? State.AUTO_BLUE
-          : State.AUTO_RED
-      ) : (
-        CachedRobotState.isBlue().orElse(false)
-          ? State.TELEOP_BLUE
-          : State.TELEOP_RED
-      );
-    }
+    state = State.DEFAULT; // just for the club fair
+    // if (CachedRobotState.isDisabled() && AprilTags.changingHeading) {
+    //   state = State.DEFAULT;
+    // } else {
+    //   state = (CachedRobotState.isAutonomous() && CachedRobotState.isEnabled()) ? (
+    //     CachedRobotState.isBlue().orElse(false)
+    //       ? State.AUTO_BLUE
+    //       : State.AUTO_RED
+    //   ) : (
+    //     CachedRobotState.isBlue().orElse(false)
+    //       ? State.TELEOP_BLUE
+    //       : State.TELEOP_RED
+    //   );
+    // }
   }
 }
