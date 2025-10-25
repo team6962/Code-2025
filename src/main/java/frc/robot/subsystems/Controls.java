@@ -33,7 +33,6 @@ import frc.robot.field.ReefPositioning;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeSensors.CoralLocation;
-import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.manipulator.Manipulator;
 
 public class Controls {
@@ -80,7 +79,6 @@ public class Controls {
         .andThen(
           rumbleBoth()
             .repeatedly()
-            .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
         )
     );
     driver
@@ -90,8 +88,7 @@ public class Controls {
                 AutoAlign.PolePattern.RIGHT,
                 () ->
                     rumbleBoth()
-                        .repeatedly()
-                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
+                        .repeatedly()));
 
     driver
         .x()
@@ -100,20 +97,17 @@ public class Controls {
                 AutoAlign.PolePattern.LEFT,
                 () ->
                     rumbleBoth()
-                        .repeatedly()
-                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
+                        .repeatedly()));
     driver.y().whileTrue(autograbAlgae2(swerveDrive, elevator, manipulator, pieceCombos, autoAlign));
     driver.start().whileTrue(autoAlign.alignToClosestL1Teleop(
       AutoAlign.PolePattern.LEFT,
       () -> rumbleBoth()
         .repeatedly()
-        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
     ));
     driver.back().whileTrue(autoAlign.alignToClosestL1Teleop(
       AutoAlign.PolePattern.RIGHT,
       () -> rumbleBoth()
         .repeatedly()
-        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
     ));
 
     // driver.leftBumper();
@@ -126,10 +120,7 @@ public class Controls {
         ))
         .andThen(rumbleOperator()),
       Commands.waitUntil(() -> intake.sensors.getCoralLocation() == CoralLocation.INTAKE)
-        .andThen(Commands.parallel(
-            rumbleDriver(),
-            LEDs.setStateCommand(LEDs.State.GOOD)
-        ))
+        .andThen(rumbleDriver())
     ));
     driver.leftStick().whileTrue(intake.intake());
     driver.povCenter(); // USED
@@ -195,9 +186,7 @@ public class Controls {
             pieceCombos
                 .intakeAlgaeOrShootCoral()
                 .andThen(
-                    rumbleBoth()
-                        .alongWith(
-                            LEDs.setStateCommand(LEDs.State.GOOD)))); // drop coral/intake algae
+                    rumbleBoth())); // drop coral/intake algae
     
     // Left Bumper - Backup barge
     operator.leftBumper().onTrue(
@@ -215,9 +204,7 @@ public class Controls {
         .whileTrue(
             manipulator
                 .grabber
-                .dropAlgae()
-                .andThen(
-                    LEDs.setStateCommand(LEDs.State.GOOD)) // ✅ Only runs when button is pressed
+                .dropAlgae() // ✅ Only runs when button is pressed
             );
   }
 

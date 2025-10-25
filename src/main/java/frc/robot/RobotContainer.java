@@ -3,9 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import java.io.InputStream;
@@ -17,7 +14,6 @@ import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -45,12 +41,10 @@ import frc.robot.field.StationPositioning.CoralStation;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.vision.Algae;
-import frc.robot.vision.CoralDetection;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -83,6 +77,7 @@ public class RobotContainer {
   public final Intake intake;
   public final Controls controls;
   public final AutoChooser autoChooser;
+  public final LEDs leds;
 
   private static PowerDistribution PDH = new PowerDistribution(CAN.PDH, ModuleType.kRev);
 
@@ -118,7 +113,6 @@ public class RobotContainer {
     Logger.logEnabledSystems();
 
     swerveDrive = new SwerveDrive(SWERVE.CONFIG);
-    new LEDs();
     controls = new Controls(swerveDrive);
 
     manipulator = new Manipulator();
@@ -130,6 +124,7 @@ public class RobotContainer {
     algaeDetector = new Algae();
     intake = new Intake(manipulator.grabber);
     groundAuto = new GroundAuto(this);
+    leds = new LEDs(this);
 
     // // Configure the trigger bindings
     controls.configureBindings(
