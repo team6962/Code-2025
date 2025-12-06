@@ -94,8 +94,7 @@ public class DisabledManipulatorPivot implements ManipulatorPivot {
   }
 
   @Override
-  public void setMinMaxAngle(Angle min, Angle max) {
-  }
+  public void setMinMaxAngle(Angle min, Angle max) {}
 
   @Override
   public boolean inRange(Angle angle) {

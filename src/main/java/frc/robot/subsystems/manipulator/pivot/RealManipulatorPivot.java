@@ -7,8 +7,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.Constants.CAN;
 import frc.robot.constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.util.hardware.motion.PivotController;
+import java.util.function.BooleanSupplier;
 
 @SuppressWarnings("deprecation")
 public class RealManipulatorPivot extends PivotController implements ManipulatorPivot {
@@ -24,7 +23,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   public RealManipulatorPivot(BooleanSupplier hasAlgae) {
     super(
-        "Manipulator Pivot", 
+        "Manipulator Pivot",
         CAN.MANIPULATOR_PIVOT,
         MANIPULATOR_PIVOT.ABSOLUTE_POSITION_OFFSET.in(Rotations),
         MANIPULATOR_PIVOT.PROFILE.kP,
@@ -36,7 +35,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
         MANIPULATOR_PIVOT.MAX_ANGLE,
         MANIPULATOR_PIVOT.TOLERANCE,
         MANIPULATOR_PIVOT.INVERTED);
-    
+
     this.hasAlgae = hasAlgae;
   }
 
@@ -88,7 +87,11 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   @Override
   public Command stow() {
-    return pivotTo(() -> hasAlgae.getAsBoolean() ? MANIPULATOR_PIVOT.ALGAE.HOLD_ANGLE : MANIPULATOR_PIVOT.STOW_ANGLE);
+    return pivotTo(
+        () ->
+            hasAlgae.getAsBoolean()
+                ? MANIPULATOR_PIVOT.ALGAE.HOLD_ANGLE
+                : MANIPULATOR_PIVOT.STOW_ANGLE);
   }
 
   @Override
@@ -102,8 +105,7 @@ public class RealManipulatorPivot extends PivotController implements Manipulator
 
   @Override
   public boolean inRange(Angle angle) {
-    return getPosition().minus(angle).abs(Rotations)
-        < MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
+    return getPosition().minus(angle).abs(Rotations) < MANIPULATOR_PIVOT.TOLERANCE.in(Rotations);
   }
 
   @Override

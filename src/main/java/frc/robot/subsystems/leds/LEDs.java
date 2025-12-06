@@ -87,19 +87,18 @@ public class LEDs extends SubsystemBase {
   private static LEDPattern createDiscontinuousGradient(
       Color from, Color to, Frequency scrollSpeed) {
     return LEDPattern.gradient(
-      LEDPattern.GradientType.kDiscontinuous,
-      convertVisibleColorToDriverColor(from),
-      convertVisibleColorToDriverColor(to)
-    ).scrollAtRelativeSpeed(scrollSpeed);
+            LEDPattern.GradientType.kDiscontinuous,
+            convertVisibleColorToDriverColor(from),
+            convertVisibleColorToDriverColor(to))
+        .scrollAtRelativeSpeed(scrollSpeed);
   }
 
-  private static LEDPattern createContinuousGradient(
-      Color from, Color to, Frequency scrollSpeed) {
+  private static LEDPattern createContinuousGradient(Color from, Color to, Frequency scrollSpeed) {
     return LEDPattern.gradient(
-      LEDPattern.GradientType.kContinuous,
-      convertVisibleColorToDriverColor(from),
-      convertVisibleColorToDriverColor(to)
-    ).scrollAtRelativeSpeed(scrollSpeed);
+            LEDPattern.GradientType.kContinuous,
+            convertVisibleColorToDriverColor(from),
+            convertVisibleColorToDriverColor(to))
+        .scrollAtRelativeSpeed(scrollSpeed);
   }
 
   private static void apply(LEDPattern pattern) {
@@ -127,10 +126,16 @@ public class LEDs extends SubsystemBase {
         apply(createDiscontinuousGradient(new Color(255, 100, 0), ANTARES_YELLOW, Hertz.of(2)));
         break;
       case AUTO_BLUE:
-        apply(createDiscontinuousGradient(new Color(0, 255, 100), new Color(0, 255, 255), Hertz.of(2)));
+        apply(
+            createDiscontinuousGradient(
+                new Color(0, 255, 100), new Color(0, 255, 255), Hertz.of(2)));
         break;
       case TELEOP_RED:
-        apply(createDiscontinuousGradient(new Color(1., 0.35, 0.1), new Color(1., 222. / 242. * 0.8, 139. / 242.), Hertz.of(0.5)));
+        apply(
+            createDiscontinuousGradient(
+                new Color(1., 0.35, 0.1),
+                new Color(1., 222. / 242. * 0.8, 139. / 242.),
+                Hertz.of(0.5)));
         break;
       case TELEOP_BLUE:
         apply(createDiscontinuousGradient(ANTARES_BLUE_BRIGHT, BLUE, Hertz.of(1.25)));
@@ -139,23 +144,18 @@ public class LEDs extends SubsystemBase {
         apply(createContinuousGradient(ANTARES_YELLOW, ORANGE, Hertz.of(1)));
         break;
       case GOOD:
-        apply(createContinuousGradient(new Color(125, 0, 255), new Color(255, 75, 125), Hertz.of(1)));
+        apply(
+            createContinuousGradient(new Color(125, 0, 255), new Color(255, 75, 125), Hertz.of(1)));
         break;
-
     }
 
     if (CachedRobotState.isDisabled() && AprilTags.changingHeading) {
       state = State.DEFAULT;
     } else {
-      state = (CachedRobotState.isAutonomous() && CachedRobotState.isEnabled()) ? (
-        CachedRobotState.isBlue().orElse(false)
-          ? State.AUTO_BLUE
-          : State.AUTO_RED
-      ) : (
-        CachedRobotState.isBlue().orElse(false)
-          ? State.TELEOP_BLUE
-          : State.TELEOP_RED
-      );
+      state =
+          (CachedRobotState.isAutonomous() && CachedRobotState.isEnabled())
+              ? (CachedRobotState.isBlue().orElse(false) ? State.AUTO_BLUE : State.AUTO_RED)
+              : (CachedRobotState.isBlue().orElse(false) ? State.TELEOP_BLUE : State.TELEOP_RED);
     }
   }
 }

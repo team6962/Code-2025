@@ -8,7 +8,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,15 +52,14 @@ public class RealGrabber extends Grabber {
 
   private Command run(double speed) {
     return startEnd(
-      () -> {
-        running = true;
-        motor.set(speed);
-      },
-      () -> {
-        running = false;
-        motor.set(getStoppedSpeed());
-      }
-    );
+        () -> {
+          running = true;
+          motor.set(speed);
+        },
+        () -> {
+          running = false;
+          motor.set(getStoppedSpeed());
+        });
   }
 
   private double getStoppedSpeed() {
@@ -89,9 +87,10 @@ public class RealGrabber extends Grabber {
   @Override
   public Command intakeCoral() {
     return Commands.sequence(
-      run(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
-      run(MANIPULATOR.CORAL_SLOW_IN_SPEED).until(this::isCoralClear).onlyIf(() -> !hasCoral || !coralClear)
-    );
+        run(MANIPULATOR.CORAL_IN_SPEED).until(this::hasCoral),
+        run(MANIPULATOR.CORAL_SLOW_IN_SPEED)
+            .until(this::isCoralClear)
+            .onlyIf(() -> !hasCoral || !coralClear));
   }
 
   @Override
@@ -111,23 +110,17 @@ public class RealGrabber extends Grabber {
   public Command repositionCoral() {
     return Commands.sequence(
         run(MANIPULATOR.CORAL_ADJUST_SPEED).until(() -> !isCoralClear()),
-        run(MANIPULATOR.CORAL_REPOSITION_SPEED).until(() -> isCoralClear())
-      );
+        run(MANIPULATOR.CORAL_REPOSITION_SPEED).until(() -> isCoralClear()));
   }
 
   @Override
   public Command intakeAlgae() {
-    return run(MANIPULATOR.ALGAE_IN_SPEED)
-        .until(this::isAlgaeFullyIntaked);
+    return run(MANIPULATOR.ALGAE_IN_SPEED).until(this::isAlgaeFullyIntaked);
   }
 
   @Override
   public Command dropAlgae() {
-    return Commands.either(
-      Commands.none(),
-      run(MANIPULATOR.ALGAE_OUT_SPEED),
-      () -> hasCoral()
-    );
+    return Commands.either(Commands.none(), run(MANIPULATOR.ALGAE_OUT_SPEED), () -> hasCoral());
   }
 
   @Override

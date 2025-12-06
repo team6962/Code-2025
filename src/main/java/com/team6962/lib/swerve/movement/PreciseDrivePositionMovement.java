@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import com.team6962.lib.swerve.SwerveCore;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.units.measure.Angle;
@@ -120,8 +119,8 @@ public class PreciseDrivePositionMovement implements SwerveMovement {
         Angle targetAngle = targets[i].angle.getMeasure();
 
         module.drive(
-          SwerveMovement.motionMagicVelocityVoltage.withVelocity(0),
-          SwerveMovement.motionMagicExpoVoltage.withPosition(targetAngle));
+            SwerveMovement.motionMagicVelocityVoltage.withVelocity(0),
+            SwerveMovement.motionMagicExpoVoltage.withPosition(targetAngle));
       }
 
       return;

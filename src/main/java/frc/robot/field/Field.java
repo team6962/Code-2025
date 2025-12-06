@@ -3,12 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.field;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import frc.robot.util.CachedRobotState;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

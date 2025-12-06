@@ -2,12 +2,10 @@ package com.team6962.lib.swerve.movement;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import com.ctre.phoenix6.controls.NeutralOut;
 import com.team6962.lib.swerve.SwerveCore;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -83,14 +81,16 @@ public class SpeedsMovement implements SwerveMovement {
   private SwerveModuleState[] getStates(SwerveCore drivetrain) {
     if (speeds != null) {
       ChassisSpeeds outputSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-      
+
       Translation2d translation = KinematicsUtils.getTranslation(outputSpeeds);
-      
+
       // TODO: Use data from testing to improve this
-      translation = translation.rotateBy(Rotation2d.fromRadians(-outputSpeeds.omegaRadiansPerSecond * 0.142));
+      translation =
+          translation.rotateBy(Rotation2d.fromRadians(-outputSpeeds.omegaRadiansPerSecond * 0.142));
 
       outputSpeeds =
-          new ChassisSpeeds(translation.getX(), translation.getY(), outputSpeeds.omegaRadiansPerSecond);
+          new ChassisSpeeds(
+              translation.getX(), translation.getY(), outputSpeeds.omegaRadiansPerSecond);
 
       states = drivetrain.getKinematics().toSwerveModuleStates(outputSpeeds);
     }
@@ -117,10 +117,7 @@ public class SpeedsMovement implements SwerveMovement {
       for (int i = 0; i < 4; i++) {
         SwerveModule module = modules[i];
 
-        module.drive(
-          SwerveMovement.neutralOut,
-          SwerveMovement.neutralOut
-        );
+        module.drive(SwerveMovement.neutralOut, SwerveMovement.neutralOut);
       }
 
       return;

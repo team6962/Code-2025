@@ -11,10 +11,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -34,7 +30,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.CommandUtils;
 import com.team6962.lib.utils.KinematicsUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,6 +52,9 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The main class for the swerve drive system. This class extends {@link SwerveCore} to provide the
@@ -561,9 +559,11 @@ public class SwerveDrive extends SwerveCore {
 
   public Command drivePreciselyTo(Pose2d targetPose) {
     return driveTwist(() -> getEstimatedPose().log(targetPose))
-      .deadlineFor(Commands.run(() -> {
-        Logger.getField().getObject("Target Pose").setPose(targetPose);
-      }));
+        .deadlineFor(
+            Commands.run(
+                () -> {
+                  Logger.getField().getObject("Target Pose").setPose(targetPose);
+                }));
   }
 
   private class ProfiledDriveCommand extends Command {
@@ -573,9 +573,9 @@ public class SwerveDrive extends SwerveCore {
     private double startTime;
 
     public ProfiledDriveCommand(
-      HolonomicPositionController.State targetState, // TODO: Convert to supplier or make wrapper methods use Commands.defer
-      HolonomicPositionController controller
-    ) {
+        HolonomicPositionController.State
+            targetState, // TODO: Convert to supplier or make wrapper methods use Commands.defer
+        HolonomicPositionController controller) {
       this.targetState = targetState;
       this.controller = controller;
 
@@ -611,30 +611,34 @@ public class SwerveDrive extends SwerveCore {
 
     @Override
     public void end(boolean interrupted) {
-        controller.close();
+      controller.close();
     }
   }
 
-  public Command driveQuicklyTo(HolonomicPositionController.State targetState, LinearVelocity maxVelocity) {
-    return new ProfiledDriveCommand(targetState, new HolonomicPositionController(
-      new TrapezoidProfile.Constraints(
-        maxVelocity.in(MetersPerSecond),
-        getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2),
-      new TrapezoidProfile.Constraints(
-        getConstants().maxRotationSpeed().in(RadiansPerSecond),
-        getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2)
-    ))
-      .deadlineFor(Commands.run(() -> {
-        Logger.getField().getObject("Target Pose").setPose(targetState.position);
-      }));
+  public Command driveQuicklyTo(
+      HolonomicPositionController.State targetState, LinearVelocity maxVelocity) {
+    return new ProfiledDriveCommand(
+            targetState,
+            new HolonomicPositionController(
+                new TrapezoidProfile.Constraints(
+                    maxVelocity.in(MetersPerSecond),
+                    getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2),
+                new TrapezoidProfile.Constraints(
+                    getConstants().maxRotationSpeed().in(RadiansPerSecond),
+                    getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2)))
+        .deadlineFor(
+            Commands.run(
+                () -> {
+                  Logger.getField().getObject("Target Pose").setPose(targetState.position);
+                }));
   }
 
-  public Command driveQuicklyTo(Pose2d targetPose, ChassisSpeeds targetSpeeds, LinearVelocity maxVelocity) {
-    return driveQuicklyTo(new HolonomicPositionController.State(targetPose, targetSpeeds), maxVelocity);
+  public Command driveQuicklyTo(
+      Pose2d targetPose, ChassisSpeeds targetSpeeds, LinearVelocity maxVelocity) {
+    return driveQuicklyTo(
+        new HolonomicPositionController.State(targetPose, targetSpeeds), maxVelocity);
   }
 
   public Command driveQuicklyTo(Pose2d targetPose, LinearVelocity maxVelocity) {
@@ -642,21 +646,22 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command driveQuicklyTo(HolonomicPositionController.State targetState) {
-    return new ProfiledDriveCommand(targetState, new HolonomicPositionController(
-      new TrapezoidProfile.Constraints(
-        getConstants().maxDriveSpeed().in(MetersPerSecond),
-        getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2),
-      new TrapezoidProfile.Constraints(
-        getConstants().maxRotationSpeed().in(RadiansPerSecond),
-        getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2)
-    ))
-      .deadlineFor(Commands.run(() -> {
-        Logger.getField().getObject("Target Pose").setPose(targetState.position);
-      }));
+    return new ProfiledDriveCommand(
+            targetState,
+            new HolonomicPositionController(
+                new TrapezoidProfile.Constraints(
+                    getConstants().maxDriveSpeed().in(MetersPerSecond),
+                    getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2),
+                new TrapezoidProfile.Constraints(
+                    getConstants().maxRotationSpeed().in(RadiansPerSecond),
+                    getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2)))
+        .deadlineFor(
+            Commands.run(
+                () -> {
+                  Logger.getField().getObject("Target Pose").setPose(targetState.position);
+                }));
   }
 
   public Command driveQuicklyTo(Pose2d targetPose, ChassisSpeeds targetSpeeds) {
@@ -668,40 +673,42 @@ public class SwerveDrive extends SwerveCore {
   }
 
   public Command driveQuicklyToState(Supplier<HolonomicPositionController.State> targetState) {
-    ProfiledDriveCommand profiledDriveCommand = new ProfiledDriveCommand(targetState.get(), new HolonomicPositionController(
-      new TrapezoidProfile.Constraints(
-        getConstants().maxDriveSpeed().in(MetersPerSecond),
-        getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2),
-      new TrapezoidProfile.Constraints(
-        getConstants().maxRotationSpeed().in(RadiansPerSecond),
-        getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)
-      ),
-      new PIDConstraints(1.0, 0.0, 0.2)
-    ));
+    ProfiledDriveCommand profiledDriveCommand =
+        new ProfiledDriveCommand(
+            targetState.get(),
+            new HolonomicPositionController(
+                new TrapezoidProfile.Constraints(
+                    getConstants().maxDriveSpeed().in(MetersPerSecond),
+                    getConstants().maxLinearAcceleration().in(MetersPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2),
+                new TrapezoidProfile.Constraints(
+                    getConstants().maxRotationSpeed().in(RadiansPerSecond),
+                    getConstants().maxAngularAcceleration().in(RadiansPerSecondPerSecond)),
+                new PIDConstraints(1.0, 0.0, 0.2)));
 
-    return profiledDriveCommand.deadlineFor(Commands.run(() -> {
-      profiledDriveCommand.setTarget(targetState.get());
-      Logger.getField().getObject("Target Pose").setPose(targetState.get().position);
-    }));
+    return profiledDriveCommand.deadlineFor(
+        Commands.run(
+            () -> {
+              profiledDriveCommand.setTarget(targetState.get());
+              Logger.getField().getObject("Target Pose").setPose(targetState.get().position);
+            }));
   }
 
   public Command driveQuicklyTo(Supplier<Pose2d> targetPose, Supplier<ChassisSpeeds> targetSpeeds) {
-    return driveQuicklyToState(() -> new HolonomicPositionController.State(targetPose.get(), targetSpeeds.get()));
+    return driveQuicklyToState(
+        () -> new HolonomicPositionController.State(targetPose.get(), targetSpeeds.get()));
   }
 
   public Command driveQuicklyTo(Supplier<Pose2d> targetPose) {
-    return driveQuicklyToState(() -> new HolonomicPositionController.State(targetPose.get(), new ChassisSpeeds()));
+    return driveQuicklyToState(
+        () -> new HolonomicPositionController.State(targetPose.get(), new ChassisSpeeds()));
   }
 
   public Command driveTo(Pose2d targetPose, ChassisSpeeds targetSpeeds) {
     return Commands.either(
-      drivePreciselyTo(targetPose),
-      driveQuicklyTo(targetPose, targetSpeeds)
-        .andThen(drivePreciselyTo(targetPose)),
-      () -> isWithinToleranceOf(targetPose, Inches.of(15), Degrees.of(30))
-    );
+        drivePreciselyTo(targetPose),
+        driveQuicklyTo(targetPose, targetSpeeds).andThen(drivePreciselyTo(targetPose)),
+        () -> isWithinToleranceOf(targetPose, Inches.of(15), Degrees.of(30)));
   }
 
   public Command driveTo(Pose2d targetPose) {

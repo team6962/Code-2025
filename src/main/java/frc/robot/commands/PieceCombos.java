@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import com.team6962.lib.utils.CommandUtils;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -57,15 +56,13 @@ public class PieceCombos {
 
   public Command readyL3() {
     return safeSubsystems
-        .safeMoveCommand(
-            elevator.ready(), manipulator.stow(), ELEVATOR.AUTO.READY_HEIGHT)
+        .safeMoveCommand(elevator.ready(), manipulator.stow(), ELEVATOR.AUTO.READY_HEIGHT)
         .withName("READY L3");
   }
 
   public Command readyL2() {
     return safeSubsystems
-        .safeMoveCommand(
-            elevator.coralL2(), manipulator.stow(), ELEVATOR.AUTO.READY_HEIGHT)
+        .safeMoveCommand(elevator.coralL2(), manipulator.stow(), ELEVATOR.AUTO.READY_HEIGHT)
         .withName("READY L3");
   }
 
@@ -107,10 +104,11 @@ public class PieceCombos {
   public Command algaeBargeShoot() {
     return Commands.sequence(
             manipulator.pivot.algaeBargeSetup(),
-            manipulator.pivot.algaeBargeShoot().deadlineFor(Commands.sequence(
-              Commands.waitSeconds(0.15),
-              manipulator.grabber.dropAlgae())
-            ))
+            manipulator
+                .pivot
+                .algaeBargeShoot()
+                .deadlineFor(
+                    Commands.sequence(Commands.waitSeconds(0.15), manipulator.grabber.dropAlgae())))
         .onlyIf(() -> elevator.isNear(ELEVATOR.ALGAE.BARGE_HEIGHT));
   }
 

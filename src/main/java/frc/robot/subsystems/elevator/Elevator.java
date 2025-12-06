@@ -24,7 +24,6 @@ import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.MechanismLogger;
 import com.team6962.lib.utils.CTREUtils;
 import com.team6962.lib.utils.MeasureMath;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -44,317 +43,359 @@ import frc.robot.subsystems.manipulator.grabber.Grabber;
 import frc.robot.util.software.MathUtils;
 
 public class Elevator extends SubsystemBase {
-    protected TalonFX leftMotor;
-    protected TalonFX rightMotor;
+  protected TalonFX leftMotor;
+  protected TalonFX rightMotor;
 
-    protected DigitalInput bottomLimitSwitch;
-    protected DigitalInput topLimitSwitch;
+  protected DigitalInput bottomLimitSwitch;
+  protected DigitalInput topLimitSwitch;
 
-    protected ControlRequest controlRequest;
+  protected ControlRequest controlRequest;
 
-    protected boolean elevatorZeroed = false;
-    protected Distance targetPosition = Inches.of(0);
-    private Distance commandTarget = Inches.of(0);
+  protected boolean elevatorZeroed = false;
+  protected Distance targetPosition = Inches.of(0);
+  private Distance commandTarget = Inches.of(0);
 
-    private StatusSignal<Angle> positionSignal;
-    private StatusSignal<AngularVelocity> velocitySignal;
-    private StatusSignal<Current> supplyCurrentLeft;
-    private StatusSignal<Current> supplyCurrentRight;
-    private StatusSignal<Current> statorCurrentLeft;
-    private StatusSignal<Current> statorCurrentRight;
-    private StatusSignal<Voltage> motorVoltageLeft;
-    private StatusSignal<Voltage> motorVoltageRight;
-    private StatusSignal<Double> profilePositionSignal;
+  private StatusSignal<Angle> positionSignal;
+  private StatusSignal<AngularVelocity> velocitySignal;
+  private StatusSignal<Current> supplyCurrentLeft;
+  private StatusSignal<Current> supplyCurrentRight;
+  private StatusSignal<Current> statorCurrentLeft;
+  private StatusSignal<Current> statorCurrentRight;
+  private StatusSignal<Voltage> motorVoltageLeft;
+  private StatusSignal<Voltage> motorVoltageRight;
+  private StatusSignal<Double> profilePositionSignal;
 
-    private Grabber grabber;
+  private Grabber grabber;
 
-    public Elevator(Grabber grabber) {
-        this.grabber = grabber;
+  public Elevator(Grabber grabber) {
+    this.grabber = grabber;
 
-        leftMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR_ID, "drivetrain"); // Replace with actual CAN ID
-        rightMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR_ID, "drivetrain"); // Replace with actual CAN ID
+    leftMotor =
+        new TalonFX(ElevatorConstants.LEFT_MOTOR_ID, "drivetrain"); // Replace with actual CAN ID
+    rightMotor =
+        new TalonFX(ElevatorConstants.RIGHT_MOTOR_ID, "drivetrain"); // Replace with actual CAN ID
 
-        bottomLimitSwitch = new DigitalInput(ElevatorConstants.DIO_FLOOR_PORT); // Replace with actual DIO port
-        topLimitSwitch = new DigitalInput(ElevatorConstants.DIO_CEILING_PORT); // Replace with actual DIO port
+    bottomLimitSwitch =
+        new DigitalInput(ElevatorConstants.DIO_FLOOR_PORT); // Replace with actual DIO port
+    topLimitSwitch =
+        new DigitalInput(ElevatorConstants.DIO_CEILING_PORT); // Replace with actual DIO port
 
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration()
+    TalonFXConfiguration talonFXConfiguration =
+        new TalonFXConfiguration()
             .withSlot0(Slot0Configs.from(ElevatorConstants.emptySlot))
             .withSlot1(Slot1Configs.from(ElevatorConstants.coralSlot))
             .withSlot2(Slot2Configs.from(ElevatorConstants.algaeSlot))
             .withMotionMagic(ElevatorConstants.motionMagicConfigs)
             .withCurrentLimits(ElevatorConstants.currentLimitsConfigs)
             .withMotorOutput(ElevatorConstants.motorOutputConfigs)
-            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(ElevatorConstants.SENSOR_MECHANISM_RATIO)); // Assuming 1:1 ratio, adjust if necessary
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withSensorToMechanismRatio(
+                        ElevatorConstants
+                            .SENSOR_MECHANISM_RATIO)); // Assuming 1:1 ratio, adjust if necessary
 
-        talonFXConfiguration.MotorOutput.Inverted = ElevatorConstants.LEFT_MOTOR_INVERTED_VALUE; // Set inversion for left motor
-        CTREUtils.check(leftMotor.getConfigurator().apply(talonFXConfiguration));
+    talonFXConfiguration.MotorOutput.Inverted =
+        ElevatorConstants.LEFT_MOTOR_INVERTED_VALUE; // Set inversion for left motor
+    CTREUtils.check(leftMotor.getConfigurator().apply(talonFXConfiguration));
 
-        talonFXConfiguration.MotorOutput.Inverted = ElevatorConstants.RIGHT_MOTOR_INVERTED_VALUE; // Set inversion for left motor
-        CTREUtils.check(rightMotor.getConfigurator().apply(talonFXConfiguration));
+    talonFXConfiguration.MotorOutput.Inverted =
+        ElevatorConstants.RIGHT_MOTOR_INVERTED_VALUE; // Set inversion for left motor
+    CTREUtils.check(rightMotor.getConfigurator().apply(talonFXConfiguration));
 
-        initStatusSignals();
+    initStatusSignals();
 
-        Logger.logMeasure("NewElevator/position", this::getPosition);
-        Logger.logMeasure("NewElevator/velocity", this::getVelocity);
-        Logger.logMeasure("NewElevator/commandTarget", () -> commandTarget);
-        Logger.logBoolean("NewElevator/topLimitSwitchTriggered", this::topLimitSwitchTriggered);
-        Logger.logBoolean("NewElevator/bottomLimitSwitchTriggered", this::bottomLimitSwitchTriggered);
-        Logger.logMeasure("NewElevator/supplyCurrentLeft", () -> supplyCurrentLeft.getValue());
-        Logger.logMeasure("NewElevator/supplyCurrentRight", () -> supplyCurrentRight.getValue());
-        Logger.logMeasure("NewElevator/statorCurrentLeft", () -> statorCurrentLeft.getValue());
-        Logger.logMeasure("NewElevator/statorCurrentRight", () -> statorCurrentRight.getValue());
-        Logger.logMeasure("NewElevator/voltageLeft", () -> motorVoltageLeft.getValue());
-        Logger.logMeasure("NewElevator/voltageRight", () -> motorVoltageRight.getValue());
-        Logger.logMeasure("NewElevator/targetPosition", () -> targetPosition);
-        Logger.logMeasure("NewElevator/profilePosition", () -> Meters.of(profilePositionSignal.getValue()));
+    Logger.logMeasure("NewElevator/position", this::getPosition);
+    Logger.logMeasure("NewElevator/velocity", this::getVelocity);
+    Logger.logMeasure("NewElevator/commandTarget", () -> commandTarget);
+    Logger.logBoolean("NewElevator/topLimitSwitchTriggered", this::topLimitSwitchTriggered);
+    Logger.logBoolean("NewElevator/bottomLimitSwitchTriggered", this::bottomLimitSwitchTriggered);
+    Logger.logMeasure("NewElevator/supplyCurrentLeft", () -> supplyCurrentLeft.getValue());
+    Logger.logMeasure("NewElevator/supplyCurrentRight", () -> supplyCurrentRight.getValue());
+    Logger.logMeasure("NewElevator/statorCurrentLeft", () -> statorCurrentLeft.getValue());
+    Logger.logMeasure("NewElevator/statorCurrentRight", () -> statorCurrentRight.getValue());
+    Logger.logMeasure("NewElevator/voltageLeft", () -> motorVoltageLeft.getValue());
+    Logger.logMeasure("NewElevator/voltageRight", () -> motorVoltageRight.getValue());
+    Logger.logMeasure("NewElevator/targetPosition", () -> targetPosition);
+    Logger.logMeasure(
+        "NewElevator/profilePosition", () -> Meters.of(profilePositionSignal.getValue()));
 
-        MechanismRoot2d root = MechanismLogger.getRoot("Elevator", -6, 39.457496 - ElevatorConstants.MIN_HEIGHT.in(Inches) + 1);
-        MechanismLigament2d ligament = MechanismLogger.getLigament("Elevator Top", ElevatorConstants.MIN_HEIGHT.in(Inches), 90, 6, new Color8Bit(255, 0, 0));
-        
-        root.append(ligament);
+    MechanismRoot2d root =
+        MechanismLogger.getRoot(
+            "Elevator", -6, 39.457496 - ElevatorConstants.MIN_HEIGHT.in(Inches) + 1);
+    MechanismLigament2d ligament =
+        MechanismLogger.getLigament(
+            "Elevator Top",
+            ElevatorConstants.MIN_HEIGHT.in(Inches),
+            90,
+            6,
+            new Color8Bit(255, 0, 0));
 
-        MechanismLogger.addDynamicLength(ligament, () -> getPosition().minus(Inches.of(1)));
+    root.append(ligament);
 
-        MechanismRoot2d carriage = MechanismLogger.getRoot("Manipulator Pivot");
+    MechanismLogger.addDynamicLength(ligament, () -> getPosition().minus(Inches.of(1)));
 
-        MechanismLogger.addDyanmicPosition(
-            carriage,
-            () -> Inches.of(-9.495),
-            () -> Inches.of(MathUtils.map(getPosition().in(Inches), ElevatorConstants.MIN_HEIGHT.in(Inches), ElevatorConstants.MAX_HEIGHT.in(Inches), 9.825, 67.717005))
-        );
-    }
+    MechanismRoot2d carriage = MechanismLogger.getRoot("Manipulator Pivot");
 
-    private void initStatusSignals() {
-        positionSignal = leftMotor.getPosition();
-        velocitySignal = leftMotor.getVelocity();
-        supplyCurrentLeft = leftMotor.getSupplyCurrent();
-        supplyCurrentRight = rightMotor.getSupplyCurrent();
-        statorCurrentLeft = leftMotor.getStatorCurrent();
-        statorCurrentRight = rightMotor.getStatorCurrent();
-        motorVoltageLeft = leftMotor.getMotorVoltage();
-        motorVoltageRight = rightMotor.getMotorVoltage();
-        profilePositionSignal = leftMotor.getClosedLoopReference();
+    MechanismLogger.addDyanmicPosition(
+        carriage,
+        () -> Inches.of(-9.495),
+        () ->
+            Inches.of(
+                MathUtils.map(
+                    getPosition().in(Inches),
+                    ElevatorConstants.MIN_HEIGHT.in(Inches),
+                    ElevatorConstants.MAX_HEIGHT.in(Inches),
+                    9.825,
+                    67.717005)));
+  }
 
-        CTREUtils.check(BaseStatusSignal.setUpdateFrequencyForAll(
+  private void initStatusSignals() {
+    positionSignal = leftMotor.getPosition();
+    velocitySignal = leftMotor.getVelocity();
+    supplyCurrentLeft = leftMotor.getSupplyCurrent();
+    supplyCurrentRight = rightMotor.getSupplyCurrent();
+    statorCurrentLeft = leftMotor.getStatorCurrent();
+    statorCurrentRight = rightMotor.getStatorCurrent();
+    motorVoltageLeft = leftMotor.getMotorVoltage();
+    motorVoltageRight = rightMotor.getMotorVoltage();
+    profilePositionSignal = leftMotor.getClosedLoopReference();
+
+    CTREUtils.check(
+        BaseStatusSignal.setUpdateFrequencyForAll(
             Hertz.of(50),
-            positionSignal, velocitySignal, supplyCurrentLeft, supplyCurrentRight,
-            statorCurrentLeft, statorCurrentRight, motorVoltageLeft, motorVoltageRight,
-            profilePositionSignal
-        ));
+            positionSignal,
+            velocitySignal,
+            supplyCurrentLeft,
+            supplyCurrentRight,
+            statorCurrentLeft,
+            statorCurrentRight,
+            motorVoltageLeft,
+            motorVoltageRight,
+            profilePositionSignal));
 
-        CTREUtils.check(ParentDevice.optimizeBusUtilizationForAll(leftMotor, rightMotor));
-    }
+    CTREUtils.check(ParentDevice.optimizeBusUtilizationForAll(leftMotor, rightMotor));
+  }
 
-    private void refreshStatusSignals() {
-        BaseStatusSignal.refreshAll(
-            positionSignal, velocitySignal, supplyCurrentLeft, supplyCurrentRight,
-            statorCurrentLeft, statorCurrentRight, motorVoltageLeft, motorVoltageRight,
-            profilePositionSignal
-        );
-    }
+  private void refreshStatusSignals() {
+    BaseStatusSignal.refreshAll(
+        positionSignal,
+        velocitySignal,
+        supplyCurrentLeft,
+        supplyCurrentRight,
+        statorCurrentLeft,
+        statorCurrentRight,
+        motorVoltageLeft,
+        motorVoltageRight,
+        profilePositionSignal);
+  }
 
-    public Distance getPosition() {
-        return Meters.of(BaseStatusSignal.getLatencyCompensatedValueAsDouble(positionSignal, velocitySignal));
-    }
+  public Distance getPosition() {
+    return Meters.of(
+        BaseStatusSignal.getLatencyCompensatedValueAsDouble(positionSignal, velocitySignal));
+  }
 
-    public LinearVelocity getVelocity() {
-        return MetersPerSecond.of(velocitySignal.getValueAsDouble());
-    }
+  public LinearVelocity getVelocity() {
+    return MetersPerSecond.of(velocitySignal.getValueAsDouble());
+  }
 
-    public boolean isNear(Distance position) {
-        return getPosition().isNear(position, ElevatorConstants.TOLERANCE);
-    }
+  public boolean isNear(Distance position) {
+    return getPosition().isNear(position, ElevatorConstants.TOLERANCE);
+  }
 
-    protected boolean topLimitSwitchTriggered() {
-        return topLimitSwitch.get();
-    }
+  protected boolean topLimitSwitchTriggered() {
+    return topLimitSwitch.get();
+  }
 
-    protected boolean bottomLimitSwitchTriggered() {
-        return !bottomLimitSwitch.get();
-    }
+  protected boolean bottomLimitSwitchTriggered() {
+    return !bottomLimitSwitch.get();
+  }
 
-    private void startPositionControl(Distance position, boolean hold) {
-        targetPosition = position;
-        
-        Distance clampedPosition = MeasureMath.clamp(position, ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT);
+  private void startPositionControl(Distance position, boolean hold) {
+    targetPosition = position;
 
-        MotionMagicVoltage controlRequest = new MotionMagicVoltage(clampedPosition.in(Meters));
-        // VelocityVoltage controlRequest = new VelocityVoltage(InchesPerSecond.of(6).in(MetersPerSecond));
+    Distance clampedPosition =
+        MeasureMath.clamp(position, ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT);
 
-        // 0.145
-        // 0.1524
+    MotionMagicVoltage controlRequest = new MotionMagicVoltage(clampedPosition.in(Meters));
+    // VelocityVoltage controlRequest = new
+    // VelocityVoltage(InchesPerSecond.of(6).in(MetersPerSecond));
 
-        setLimits(controlRequest);
-        
-        if (grabber.hasCoral()) controlRequest.Slot = 1;
-        else if (grabber.hasAlgae()) controlRequest.Slot = 2;
-        else controlRequest.Slot = 0;
-        
-        this.controlRequest = controlRequest;
+    // 0.145
+    // 0.1524
 
-        leftMotor.setControl(controlRequest);
-        rightMotor.setControl(controlRequest);
-    }
+    setLimits(controlRequest);
 
-    public Command moveToPosition(Distance position) {
-        Command moveToCommand = new Command() {
-            @Override
-            public void initialize() {
-                commandTarget = position;
-                startPositionControl(position, false);
+    if (grabber.hasCoral()) controlRequest.Slot = 1;
+    else if (grabber.hasAlgae()) controlRequest.Slot = 2;
+    else controlRequest.Slot = 0;
+
+    this.controlRequest = controlRequest;
+
+    leftMotor.setControl(controlRequest);
+    rightMotor.setControl(controlRequest);
+  }
+
+  public Command moveToPosition(Distance position) {
+    Command moveToCommand =
+        new Command() {
+          @Override
+          public void initialize() {
+            commandTarget = position;
+            startPositionControl(position, false);
+          }
+
+          @Override
+          public void end(boolean interrupted) {
+            commandTarget = Inches.of(0);
+
+            if (!isNear(position)) {
+              startPositionControl(getPosition(), true);
+            } else {
+              startPositionControl(position, true);
             }
+          }
 
-            @Override
-            public void end(boolean interrupted) {
-                commandTarget = Inches.of(0);
-
-                if (!isNear(position)) {
-                    startPositionControl(getPosition(), true);
-                } else {
-                    startPositionControl(position, true);
-                }
-            }
-
-            @Override
-            public boolean isFinished() {
-                return isNear(position);
-            }
+          @Override
+          public boolean isFinished() {
+            return isNear(position);
+          }
         };
 
-        moveToCommand.addRequirements(this);
+    moveToCommand.addRequirements(this);
 
-        return moveToCommand;
+    return moveToCommand;
+  }
+
+  private Command moveVoltage(Voltage voltage) {
+    return startEnd(
+        () -> {
+          VoltageOut controlRequest = new VoltageOut(voltage);
+
+          leftMotor.setControl(controlRequest);
+          rightMotor.setControl(controlRequest);
+          this.controlRequest = controlRequest;
+        },
+        () -> startPositionControl(getPosition(), true));
+  }
+
+  public Command fineControlUp() {
+    return moveVoltage(ElevatorConstants.FINE_CONTROL_UP);
+  }
+
+  public Command fineControlDown() {
+    return moveVoltage(ElevatorConstants.FINE_CONTROL_DOWN);
+  }
+
+  @Override
+  public void periodic() {
+    refreshStatusSignals();
+
+    if (bottomLimitSwitchTriggered() && !elevatorZeroed) {
+      CTREUtils.check(leftMotor.setPosition(ElevatorConstants.MIN_HEIGHT.in(Meters)));
+      CTREUtils.check(rightMotor.setPosition(ElevatorConstants.MIN_HEIGHT.in(Meters)));
+
+      elevatorZeroed = true;
+
+      startPositionControl(ElevatorConstants.MIN_HEIGHT, true);
+
+      return;
     }
 
-    private Command moveVoltage(Voltage voltage) {
-        return startEnd(
-            () -> {
-                VoltageOut controlRequest = new VoltageOut(voltage);
-
-                leftMotor.setControl(controlRequest);
-                rightMotor.setControl(controlRequest);
-                this.controlRequest = controlRequest;
-            },
-            () -> startPositionControl(getPosition(), true)
-        );
+    if (RobotState.isDisabled()) {
+      startPositionControl(getPosition(), true);
     }
 
-    public Command fineControlUp() {
-        return moveVoltage(ElevatorConstants.FINE_CONTROL_UP);
+    if (controlRequest != null) {
+      controlRequest = setLimits(controlRequest);
+
+      CTREUtils.check(leftMotor.setControl(controlRequest));
+      CTREUtils.check(rightMotor.setControl(controlRequest));
     }
+  }
 
-    public Command fineControlDown() {
-        return moveVoltage(ElevatorConstants.FINE_CONTROL_DOWN);
+  private ControlRequest setLimits(ControlRequest request) {
+    return setLimits(
+        request, topLimitSwitchTriggered() || !elevatorZeroed, bottomLimitSwitchTriggered());
+  }
+
+  private static ControlRequest setLimits(
+      ControlRequest request, boolean forward, boolean reverse) {
+    if (request instanceof MotionMagicVoltage r) {
+      return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
+    } else if (request instanceof VoltageOut r) {
+      return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
+    } else if (request instanceof VelocityVoltage r) {
+      return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
+    } else {
+      return request;
     }
-    
-    @Override
-    public void periodic() {
-        refreshStatusSignals();
+  }
 
-        if (bottomLimitSwitchTriggered() && !elevatorZeroed) {
-            CTREUtils.check(leftMotor.setPosition(ElevatorConstants.MIN_HEIGHT.in(Meters)));
-            CTREUtils.check(rightMotor.setPosition(ElevatorConstants.MIN_HEIGHT.in(Meters)));
+  public Command stow() {
+    return moveToPosition(Constants.ELEVATOR.STOW_HEIGHT);
+  }
 
-            elevatorZeroed = true;
+  public Command coralL1() {
+    return moveToPosition(Constants.ELEVATOR.CORAL.L1_HEIGHT);
+  }
 
-            startPositionControl(ElevatorConstants.MIN_HEIGHT, true);
+  public Command coralL2() {
+    return moveToPosition(Constants.ELEVATOR.CORAL.L2_HEIGHT);
+  }
 
-            return;
-        }
-        
-        if (RobotState.isDisabled()) {
-            startPositionControl(getPosition(), true);
-        }
+  public Command coralL3() {
+    return moveToPosition(Constants.ELEVATOR.CORAL.L3_HEIGHT);
+  }
 
-        if (controlRequest != null) {
-            controlRequest = setLimits(controlRequest);
-            
-            CTREUtils.check(leftMotor.setControl(controlRequest));
-            CTREUtils.check(rightMotor.setControl(controlRequest));
-        }
-    }
+  public Command coralL4() {
+    return moveToPosition(Constants.ELEVATOR.CORAL.L4_HEIGHT);
+  }
 
-    private ControlRequest setLimits(ControlRequest request) {
-        return setLimits(request, topLimitSwitchTriggered() || !elevatorZeroed, bottomLimitSwitchTriggered());
-    }
+  public Command coralIntake() {
+    return moveToPosition(Constants.ELEVATOR.CORAL.INTAKE_HEIGHT);
+  }
 
-    private static ControlRequest setLimits(ControlRequest request, boolean forward, boolean reverse) {
-        if (request instanceof MotionMagicVoltage r) {
-            return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
-        } else if (request instanceof VoltageOut r) {
-            return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
-        } else if (request instanceof VelocityVoltage r) {
-            return r.withLimitForwardMotion(forward).withLimitReverseMotion(reverse);
-        } else {
-            return request;
-        }
-    }
+  public Command algaeL2() {
+    return moveToPosition(Constants.ELEVATOR.ALGAE.L2_HEIGHT);
+  }
 
-    public Command stow() {
-        return moveToPosition(Constants.ELEVATOR.STOW_HEIGHT);
-    }
+  public Command algaeL3() {
+    return moveToPosition(Constants.ELEVATOR.ALGAE.L3_HEIGHT);
+  }
 
-    public Command coralL1() {
-        return moveToPosition(Constants.ELEVATOR.CORAL.L1_HEIGHT);
-    }
+  public Command algaeBarge() {
+    return moveToPosition(Constants.ELEVATOR.ALGAE.BARGE_HEIGHT);
+  }
 
-    public Command coralL2() {
-        return moveToPosition(Constants.ELEVATOR.CORAL.L2_HEIGHT);
-    }
+  public Command ready() {
+    return moveToPosition(Constants.ELEVATOR.AUTO.READY_HEIGHT);
+  }
 
-    public Command coralL3() {
-        return moveToPosition(Constants.ELEVATOR.CORAL.L3_HEIGHT);
-    }
+  public Command launchBarge() {
+    return moveToPosition(Constants.ELEVATOR.MIN_HEIGHT)
+        .andThen(moveVoltage(Volts.of(12)).until(() -> getPosition().gte(Inches.of(62.5))))
+        .andThen(moveVoltage(Volts.of(-6)).until(() -> getVelocity().lte(InchesPerSecond.of(2))));
+  }
 
-    public Command coralL4() {
-        return moveToPosition(Constants.ELEVATOR.CORAL.L4_HEIGHT);
-    }
+  public Command coral(int level) {
+    return switch (level) {
+      case 1 -> coralL1();
+      case 2 -> coralL2();
+      case 3 -> coralL3();
+      case 4 -> coralL4();
+      default -> throw new IllegalArgumentException("Invalid coral level: " + level);
+    };
+  }
 
-    public Command coralIntake() {
-        return moveToPosition(Constants.ELEVATOR.CORAL.INTAKE_HEIGHT);
-    }
+  public Command algae(int level) {
+    return switch (level) {
+      case 2 -> algaeL2();
+      case 3 -> algaeL3();
+      default -> throw new IllegalArgumentException("Invalid algae level: " + level);
+    };
+  }
 
-    public Command algaeL2() {
-        return moveToPosition(Constants.ELEVATOR.ALGAE.L2_HEIGHT);
-    }
-
-    public Command algaeL3() {
-        return moveToPosition(Constants.ELEVATOR.ALGAE.L3_HEIGHT);
-    }
-
-    public Command algaeBarge() {
-        return moveToPosition(Constants.ELEVATOR.ALGAE.BARGE_HEIGHT);
-    }
-
-    public Command ready() {
-        return moveToPosition(Constants.ELEVATOR.AUTO.READY_HEIGHT);
-    }
-
-    public Command launchBarge() {
-        return moveToPosition(Constants.ELEVATOR.MIN_HEIGHT)
-            .andThen(moveVoltage(Volts.of(12)).until(() -> getPosition().gte(Inches.of(62.5))))
-            .andThen(moveVoltage(Volts.of(-6)).until(() -> getVelocity().lte(InchesPerSecond.of(2))));
-    }
-
-    public Command coral(int level) {
-        return switch (level) {
-            case 1 -> coralL1();
-            case 2 -> coralL2();
-            case 3 -> coralL3();
-            case 4 -> coralL4();
-            default -> throw new IllegalArgumentException("Invalid coral level: " + level);
-        };
-    }
-
-    public Command algae(int level) {
-        return switch (level) {
-            case 2 -> algaeL2();
-            case 3 -> algaeL3();
-            default -> throw new IllegalArgumentException("Invalid algae level: " + level);
-        };
-    }
-
-    public static Elevator create(Grabber grabber) {
-        return RobotBase.isReal() ? new Elevator(grabber) : new SimElevator(grabber);
-    }
+  public static Elevator create(Grabber grabber) {
+    return RobotBase.isReal() ? new Elevator(grabber) : new SimElevator(grabber);
+  }
 }
