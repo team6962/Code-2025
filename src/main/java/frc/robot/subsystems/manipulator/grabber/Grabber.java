@@ -1,14 +1,12 @@
 package frc.robot.subsystems.manipulator.grabber;
 
-import java.util.Set;
-
 import com.team6962.lib.telemetry.Logger;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants.ENABLED_SYSTEMS;
+import java.util.Set;
 
 public abstract class Grabber extends SubsystemBase {
   public Grabber() {
@@ -20,7 +18,9 @@ public abstract class Grabber extends SubsystemBase {
   }
 
   public abstract boolean hasCoral();
+
   public abstract boolean hasAlgae();
+
   public abstract boolean isAlgaeFullyIntaked();
 
   public Command coralMagicButton() {

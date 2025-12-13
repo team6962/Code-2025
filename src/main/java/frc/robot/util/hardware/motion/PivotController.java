@@ -3,8 +3,6 @@ package frc.robot.util.hardware.motion;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.util.function.Supplier;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -16,7 +14,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotState;
@@ -24,11 +21,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants.MANIPULATOR_PIVOT;
 import frc.robot.util.hardware.SparkMaxUtil;
+import java.util.function.Supplier;
 
 /**
- * Uses a Spark Max motor controller with a NEO brushless motor and a Rev
- * Through-Bore absolute encoder to control the angle of a pivoting arm.
- * 
+ * Uses a Spark Max motor controller with a NEO brushless motor and a Rev Through-Bore absolute
+ * encoder to control the angle of a pivoting arm.
+ *
  * @deprecated Do not use after the 2025 season.
  */
 public class PivotController extends SubsystemBase {
@@ -99,7 +97,9 @@ public class PivotController extends SubsystemBase {
     Logger.logNumber(this.getName() + "/duty/applied", () -> motor.getAppliedOutput());
     Logger.logNumber(this.getName() + "/duty/pid", () -> motor.get());
 
-    Logger.logNumber(this.getName() + "/angle/target", () -> targetPosition == null ? 0 : targetPosition.in(Rotations));
+    Logger.logNumber(
+        this.getName() + "/angle/target",
+        () -> targetPosition == null ? 0 : targetPosition.in(Rotations));
     Logger.logNumber(this.getName() + "/angle/relative", () -> getPosition().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/absolute", () -> getAbsolutePosition().in(Rotations));
     Logger.logNumber(this.getName() + "/angle/raw", () -> getRawAbsolutePosition().in(Rotations));
@@ -113,17 +113,17 @@ public class PivotController extends SubsystemBase {
 
   public Command pivotTo(Supplier<Angle> targetSupplier, Angle tolerance) {
     return startEnd(
-      () -> pivotTowards(targetSupplier.get()),
-      () -> {
-        if (doneMoving(tolerance)) {
-          targetPosition = targetSupplier.get();
-        } else {
-          targetPosition = getPosition();
-        }
+            () -> pivotTowards(targetSupplier.get()),
+            () -> {
+              if (doneMoving(tolerance)) {
+                targetPosition = targetSupplier.get();
+              } else {
+                targetPosition = getPosition();
+              }
 
-        pivotTowards(targetPosition);
-      }
-    ).until(() -> doneMoving(tolerance));
+              pivotTowards(targetPosition);
+            })
+        .until(() -> doneMoving(tolerance));
   }
 
   public Command pivotTo(Supplier<Angle> angleSupplier) {
@@ -186,7 +186,8 @@ public class PivotController extends SubsystemBase {
   }
 
   public double calculateKG(Angle currentAngle) {
-    return kG * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
+    return kG
+        * Math.cos(MANIPULATOR_PIVOT.CENTER_OF_MASS_OFFSET.in(Radians) + currentAngle.in(Radians));
   }
 
   private Angle wrapAngle(Angle angle) {

@@ -12,157 +12,168 @@ import frc.robot.subsystems.intake.rollers.IntakeRollers;
 import frc.robot.subsystems.manipulator.grabber.Grabber;
 
 /**
- * The ground coral intake subsystem, which pulls coral off of the ground and
- * into the robot. This subsystem consists of two controllable subsystems: the
- * intake rollers, which spin to pull coral in, and the intake pivot, which
- * pivots the rollers down to the ground to intake coral and up to stow the
- * intake where it won't hit anything.
+ * The ground coral intake subsystem, which pulls coral off of the ground and into the robot. This
+ * subsystem consists of two controllable subsystems: the intake rollers, which spin to pull coral
+ * in, and the intake pivot, which pivots the rollers down to the ground to intake coral and up to
+ * stow the intake where it won't hit anything.
+ *
  * <h3>Controlling the Intake</h3>
- * Generally, the intake should be only controlled via the {@link #intake()} and
- * {@link #stow()} methods, which return {@link Command Commands}. The
- * intake() command will lower the pivot and run the rollers until a piece of
- * coral has been detected to have completely passed through the intake. The
- * stow() command will raise the pivot to its stowed position, where it won't
- * hit anything.
+ *
+ * Generally, the intake should be only controlled via the {@link #intake()} and {@link #stow()}
+ * methods, which return {@link Command Commands}. The intake() command will lower the pivot and run
+ * the rollers until a piece of coral has been detected to have completely passed through the
+ * intake. The stow() command will raise the pivot to its stowed position, where it won't hit
+ * anything.
+ *
  * <h3>Getting the Intake's State</h3>
- * The {@link #coralInIntake()} method can be used to check whether the intake
- * currently has a piece of coral in it. This is primarily useful in autonomous,
- * where the autonomous code may want to wait until the intake's beam break
- * sensor has detected a piece of coral before driving to score the coral.
+ *
+ * The {@link #coralInIntake()} method can be used to check whether the intake currently has a piece
+ * of coral in it. This is primarily useful in autonomous, where the autonomous code may want to
+ * wait until the intake's beam break sensor has detected a piece of coral before driving to score
+ * the coral.
+ *
  * <h3>Simulation</h3>
- * This class is compatible with both real and simulated hardware. In
- * simulation, the Intake will automatically switch to using simulated versions
- * of the rollers, pivot, and sensor subsystems that fully simulate the physics
- * and device behavior of those subsystems.
+ *
+ * This class is compatible with both real and simulated hardware. In simulation, the Intake will
+ * automatically switch to using simulated versions of the rollers, pivot, and sensor subsystems
+ * that fully simulate the physics and device behavior of those subsystems.
  */
 public class Intake extends SubsystemBase {
-    public final IntakeRollers rollers;
-    public final IntakePivot pivot;
-    public final Indexer indexer;
-    public final IntakeSensors sensors;
+  public final IntakeRollers rollers;
+  public final IntakePivot pivot;
+  public final Indexer indexer;
+  public final IntakeSensors sensors;
 
-    /**
-     * Creates a new Intake subsystem.
-     */
-    public Intake(Grabber grabber) {
-        indexer = new Indexer();
-        rollers = new IntakeRollers();
-        sensors = new IntakeSensors(grabber, indexer);
+  /** Creates a new Intake subsystem. */
+  public Intake(Grabber grabber) {
+    indexer = new Indexer();
+    rollers = new IntakeRollers();
+    sensors = new IntakeSensors(grabber, indexer);
 
-        if (RobotBase.isSimulation()) {
-            pivot = new IntakePivotSim(sensors);
-        } else {
-            pivot = new IntakePivot(sensors);
-        }
+    if (RobotBase.isSimulation()) {
+      pivot = new IntakePivotSim(sensors);
+    } else {
+      pivot = new IntakePivot(sensors);
     }
+  }
 
-    /**
-     * Returns a command that intakes a piece of coral from the ground. This
-     * command will lower the pivot and run the rollers until a piece of coral
-     * has been detected to have completely passed through the intake, and it is
-     * safe to raise the intake again.
-     * @return the command that intakes a piece of coral from the ground
-     */
-    public Command intake() {
-        Command command = Commands.parallel(
+  /**
+   * Returns a command that intakes a piece of coral from the ground. This command will lower the
+   * pivot and run the rollers until a piece of coral has been detected to have completely passed
+   * through the intake, and it is safe to raise the intake again.
+   *
+   * @return the command that intakes a piece of coral from the ground
+   */
+  public Command intake() {
+    Command command =
+        Commands.parallel(
             rollers.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER),
-            pivot.deploy().until(() -> sensors.getCoralLocation() == CoralLocation.INTAKE || sensors.getCoralLocation() == CoralLocation.INDEXER),
-            indexer.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER)
-        );
+            pivot
+                .deploy()
+                .until(
+                    () ->
+                        sensors.getCoralLocation() == CoralLocation.INTAKE
+                            || sensors.getCoralLocation() == CoralLocation.INDEXER),
+            indexer.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER));
 
-        if (RobotBase.isSimulation()) {
-            command = command.deadlineFor(Commands.sequence(
-                Commands.waitSeconds(0.25),
-                Commands.runOnce(() -> sensors.simIntakeCoral()),
-                Commands.waitSeconds(0.5),
-                Commands.runOnce(() -> sensors.simIndexCoral())
-            ));
-        }
-
-        return command;
+    if (RobotBase.isSimulation()) {
+      command =
+          command.deadlineFor(
+              Commands.sequence(
+                  Commands.waitSeconds(0.25),
+                  Commands.runOnce(() -> sensors.simIntakeCoral()),
+                  Commands.waitSeconds(0.5),
+                  Commands.runOnce(() -> sensors.simIndexCoral())));
     }
 
-    public Command intakeVertical() {
-        Command command = Commands.parallel(
+    return command;
+  }
+
+  public Command intakeVertical() {
+    Command command =
+        Commands.parallel(
             rollers.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER),
-            pivot.deployVertical().until(() -> sensors.getCoralLocation() == CoralLocation.INTAKE || sensors.getCoralLocation() == CoralLocation.INDEXER),
-            indexer.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER)
-        );
+            pivot
+                .deployVertical()
+                .until(
+                    () ->
+                        sensors.getCoralLocation() == CoralLocation.INTAKE
+                            || sensors.getCoralLocation() == CoralLocation.INDEXER),
+            indexer.intake().until(() -> sensors.getCoralLocation() == CoralLocation.INDEXER));
 
-        if (RobotBase.isSimulation()) {
-            command = command.deadlineFor(Commands.sequence(
-                Commands.waitSeconds(0.25),
-                Commands.runOnce(() -> sensors.simIntakeCoral()),
-                Commands.waitSeconds(0.5),
-                Commands.runOnce(() -> sensors.simIndexCoral())
-            ));
-        }
-
-        return command;
+    if (RobotBase.isSimulation()) {
+      command =
+          command.deadlineFor(
+              Commands.sequence(
+                  Commands.waitSeconds(0.25),
+                  Commands.runOnce(() -> sensors.simIntakeCoral()),
+                  Commands.waitSeconds(0.5),
+                  Commands.runOnce(() -> sensors.simIndexCoral())));
     }
 
-    /**
-     * Returns a command that drops a piece of coral from the indexer onto the
-     * ground. This command will stow the pivot, run the indexer in
-     * reverse until the coral has exited the robot, and then run the indexer
-     * for a short time to ensure the coral is fully clear of the robot.
-     * @return the command that drops a piece of coral from the indexer
-     */
-    public Command drop() {
-        Command command = Commands.either(
-            Commands.sequence(
-                pivot.stow(),
-                indexer.drop()
-            ),
-            Commands.parallel(
-                pivot.deploy(),
-                indexer.drop(),
-                rollers.drop()
-            ),
-            () -> sensors.getCoralLocation() == CoralLocation.INDEXER || sensors.getCoralLocation() == CoralLocation.TRANSFER_TO_MANIPULATOR
-        ).finallyDo(() -> sensors.setCoralDropped());
+    return command;
+  }
 
-        if (RobotBase.isSimulation()) {
-            command = command.deadlineFor(Commands.sequence(
-                Commands.waitSeconds(0.25),
-                Commands.runOnce(() -> sensors.simDropCoral())
-            ));
-        }
+  /**
+   * Returns a command that drops a piece of coral from the indexer onto the ground. This command
+   * will stow the pivot, run the indexer in reverse until the coral has exited the robot, and then
+   * run the indexer for a short time to ensure the coral is fully clear of the robot.
+   *
+   * @return the command that drops a piece of coral from the indexer
+   */
+  public Command drop() {
+    Command command =
+        Commands.either(
+                Commands.sequence(pivot.stow(), indexer.drop()),
+                Commands.parallel(pivot.deploy(), indexer.drop(), rollers.drop()),
+                () ->
+                    sensors.getCoralLocation() == CoralLocation.INDEXER
+                        || sensors.getCoralLocation() == CoralLocation.TRANSFER_TO_MANIPULATOR)
+            .finallyDo(() -> sensors.setCoralDropped());
 
-        return command;
+    if (RobotBase.isSimulation()) {
+      command =
+          command.deadlineFor(
+              Commands.sequence(
+                  Commands.waitSeconds(0.25), Commands.runOnce(() -> sensors.simDropCoral())));
     }
 
-    /**
-     * Returns a command that stows the intake by raising the pivot to its
-     * stowed position, where it won't hit anything.
-     * @return the command that stows the intake
-     */
-    public Command stow() {
-        return pivot.stow();
+    return command;
+  }
+
+  /**
+   * Returns a command that stows the intake by raising the pivot to its stowed position, where it
+   * won't hit anything.
+   *
+   * @return the command that stows the intake
+   */
+  public Command stow() {
+    return pivot.stow();
+  }
+
+  public Command transfer() {
+    Command command =
+        indexer.intake().until(() -> sensors.getCoralLocation() == CoralLocation.OUTSIDE);
+
+    if (RobotBase.isSimulation()) {
+      command =
+          command.deadlineFor(
+              Commands.sequence(
+                  Commands.waitSeconds(0.25), Commands.runOnce(() -> sensors.simTransferCoral())));
     }
 
-    public Command transfer() {
-        Command command = indexer.intake()
-            .until(() -> sensors.getCoralLocation() == CoralLocation.OUTSIDE);
+    return command;
+  }
 
-        if (RobotBase.isSimulation()) {
-            command = command.deadlineFor(Commands.sequence(
-                Commands.waitSeconds(0.25),
-                Commands.runOnce(() -> sensors.simTransferCoral())
-            ));
-        }
+  public CoralLocation getCoralLocation() {
+    return sensors.getCoralLocation();
+  }
 
-        return command;
-    }
-
-    public CoralLocation getCoralLocation() {
-        return sensors.getCoralLocation();
-    }
-    
-    @Override
-    public void periodic() {
-        // if (rollers.getCurrentCommand() == null && sensors.getCoralLocation() == CoralLocation.TRANSFER_TO_INDEXER || sensors.getCoralLocation() == CoralLocation.INTAKE) {
-        //     intake().schedule();
-        // }
-    }
+  @Override
+  public void periodic() {
+    // if (rollers.getCurrentCommand() == null && sensors.getCoralLocation() ==
+    // CoralLocation.TRANSFER_TO_INDEXER || sensors.getCoralLocation() == CoralLocation.INTAKE) {
+    //     intake().schedule();
+    // }
+  }
 }

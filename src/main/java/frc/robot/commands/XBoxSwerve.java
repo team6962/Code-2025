@@ -7,15 +7,10 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.auto.RobotCoordinates;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.KinematicsUtils;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,6 +24,9 @@ import frc.robot.constants.Constants.TEAM_COLOR;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
 
 public class XBoxSwerve extends Command {
   private XboxController controller;
@@ -175,7 +173,7 @@ public class XBoxSwerve extends Command {
 
     ChassisSpeeds drivenSpeeds =
         new ChassisSpeeds(velocity.getX(), velocity.getY(), angularVelocity);
-    
+
     for (Function<ChassisSpeeds, ChassisSpeeds> modifier : speedsModifiers) {
       drivenSpeeds = modifier.apply(drivenSpeeds);
     }
@@ -229,8 +227,6 @@ public class XBoxSwerve extends Command {
 
   public Command modifySpeeds(Function<ChassisSpeeds, ChassisSpeeds> modifier) {
     return Commands.startEnd(
-      () -> speedsModifiers.add(modifier),
-      () -> speedsModifiers.remove(modifier)
-    );
+        () -> speedsModifiers.add(modifier), () -> speedsModifiers.remove(modifier));
   }
 }

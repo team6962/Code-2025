@@ -3,21 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Properties;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.swerve.module.SwerveModule;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.telemetry.StatusChecks;
-
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -50,7 +41,9 @@ import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.util.CachedRobotState;
 import frc.robot.util.RobotEvent;
 import frc.robot.vision.Algae;
-import frc.robot.vision.CoralDetection;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -142,20 +135,22 @@ public class RobotContainer {
 
     refreshButtonEntry.setBoolean(false);
 
-    autoChooser = new AutoChooser(List.of(
-      new Auto("Nothing", Commands.none()),
-      new Auto(groundAuto.lollipopAuto(CoralStation.RIGHT, true)),
-      new Auto(groundAuto.lollipopAuto(CoralStation.LEFT, true)),
-      new Auto(groundAuto.sideAutonomous(CoralStation.RIGHT)),
-      new Auto(groundAuto.sideAutonomous(CoralStation.LEFT)),
-      new Auto(groundAuto.lollipopAuto(CoralStation.RIGHT, false)),
-      new Auto(groundAuto.lollipopAuto(CoralStation.LEFT, false)),
-      new Auto(groundAuto.middleAuto(0)),
-      new Auto(groundAuto.middleAuto(1)),
-      new Auto(groundAuto.middleAuto(2)),
-      new Auto("Drive Forward", swerveDrive.drive(new ChassisSpeeds(0.5, 0, 0))),
-      new Auto("Wheel Size Calibration", swerveDrive.calibrateWheelSize())
-    ), "Nothing");
+    autoChooser =
+        new AutoChooser(
+            List.of(
+                new Auto("Nothing", Commands.none()),
+                new Auto(groundAuto.lollipopAuto(CoralStation.RIGHT, true)),
+                new Auto(groundAuto.lollipopAuto(CoralStation.LEFT, true)),
+                new Auto(groundAuto.sideAutonomous(CoralStation.RIGHT)),
+                new Auto(groundAuto.sideAutonomous(CoralStation.LEFT)),
+                new Auto(groundAuto.lollipopAuto(CoralStation.RIGHT, false)),
+                new Auto(groundAuto.lollipopAuto(CoralStation.LEFT, false)),
+                new Auto(groundAuto.middleAuto(0)),
+                new Auto(groundAuto.middleAuto(1)),
+                new Auto(groundAuto.middleAuto(2)),
+                new Auto("Drive Forward", swerveDrive.drive(new ChassisSpeeds(0.5, 0, 0))),
+                new Auto("Wheel Size Calibration", swerveDrive.calibrateWheelSize())),
+            "Nothing");
 
     Logger.start(Milliseconds.of(20));
   }

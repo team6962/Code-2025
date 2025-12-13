@@ -106,7 +106,9 @@ public final class StationPositioning {
   }
 
   public static Pose2d reflectPose(Pose2d pose, boolean reflect) {
-    return reflect ? new Pose2d(pose.getX(), Field.WIDTH - pose.getY(), pose.getRotation().unaryMinus()) : pose;
+    return reflect
+        ? new Pose2d(pose.getX(), Field.WIDTH - pose.getY(), pose.getRotation().unaryMinus())
+        : pose;
   }
 
   public static Pose2d getGroundIntakePose(boolean reflect) {
@@ -120,11 +122,13 @@ public final class StationPositioning {
   }
 
   public static Pose2d getGroundStartIntakePose(CoralStation coralStation) {
-    return reflectPose(new Pose2d(2.78, 0.7, Rotation2d.fromDegrees(0)), coralStation == CoralStation.LEFT);
+    return reflectPose(
+        new Pose2d(2.78, 0.7, Rotation2d.fromDegrees(0)), coralStation == CoralStation.LEFT);
   }
 
   public static Pose2d getGroundEndIntakePose(CoralStation coralStation) {
-    return reflectPose(new Pose2d(1.37, 1.44, Rotation2d.fromDegrees(0)), coralStation == CoralStation.LEFT);
+    return reflectPose(
+        new Pose2d(1.37, 1.44, Rotation2d.fromDegrees(0)), coralStation == CoralStation.LEFT);
   }
 
   public static Pose2d rotate180(Pose2d pose) {
