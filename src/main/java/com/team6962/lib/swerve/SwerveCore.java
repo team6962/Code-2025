@@ -27,7 +27,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.ENABLED_SYSTEMS;
 import java.util.Arrays;
 
 /**
@@ -52,7 +51,7 @@ public class SwerveCore extends SubsystemBase implements RobotCoordinates {
 
     for (int i = 0; i < 4; i++) {
       SwerveModule module =
-          RobotBase.isReal() && ENABLED_SYSTEMS.isDriveEnabled()
+          RobotBase.isReal()
               ? new SwerveModule()
               : new SimulatedModule();
       module.configureModule(constants, SwerveModule.Corner.fromIndex(i));

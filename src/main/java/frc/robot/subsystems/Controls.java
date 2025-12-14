@@ -1,40 +1,17 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Feet;
-import static edu.wpi.first.units.Units.Inches;
-
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import com.team6962.lib.swerve.SwerveDrive;
 import com.team6962.lib.telemetry.Logger;
-import com.team6962.lib.utils.MeasureMath;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.auto.AutoAlign;
-import frc.robot.auto.AutoAlign.PolePattern;
-import frc.robot.auto.Autonomous;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.PieceCombos;
-import frc.robot.commands.SafeSubsystems;
 import frc.robot.commands.XBoxSwerve;
 import frc.robot.constants.Constants.DEVICES;
-import frc.robot.constants.Constants.ELEVATOR;
-import frc.robot.constants.Constants.MANIPULATOR_PIVOT;
-import frc.robot.field.ReefPositioning;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeSensors.CoralLocation;
-import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.manipulator.Manipulator;
 
 public class Controls {
   public final CommandXboxController operator =
@@ -54,84 +31,17 @@ public class Controls {
     return xBoxSwerve;
   }
 
-  public void configureBindings(
-      SwerveDrive swerveDrive,
-      Elevator elevator,
-      Manipulator manipulator,
-      AutoAlign autoAlign,
-      Autonomous autonomous,
-      SafeSubsystems manipulatorSafeties,
-      PieceCombos pieceCombos,
-      Intake intake) {
-
-    // Driver
-    // Move swerve chassis
-    // Rotate Swerve Chassis
-    // ^^^ see xbox swerve.java
-
-    // Button to move to processor
-    // Button to move to source
-    // Auto orient towards algae
-    // Button to move to left/right reef (dpad left right)
-    // Button for aligning to algae on the reef (dpad up)
-
-    driver.a().whileTrue(
-      autoAlign.autoAlignBarge()
-        .andThen(
-          rumbleBoth()
-            .repeatedly()
-            .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
-        )
-    );
-    driver
-        .b()
-        .whileTrue(
-            autoAlign.alignToClosestPoleTeleop(
-                AutoAlign.PolePattern.RIGHT,
-                () ->
-                    rumbleBoth()
-                        .repeatedly()
-                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
-
-    driver
-        .x()
-        .whileTrue(
-            autoAlign.alignToClosestPoleTeleop(
-                AutoAlign.PolePattern.LEFT,
-                () ->
-                    rumbleBoth()
-                        .repeatedly()
-                        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))));
-    driver.y().whileTrue(autograbAlgae2(swerveDrive, elevator, manipulator, pieceCombos, autoAlign));
-    driver.start().whileTrue(autoAlign.alignToClosestL1Teleop(
-      AutoAlign.PolePattern.LEFT,
-      () -> rumbleBoth()
-        .repeatedly()
-        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
-    ));
-    driver.back().whileTrue(autoAlign.alignToClosestL1Teleop(
-      AutoAlign.PolePattern.RIGHT,
-      () -> rumbleBoth()
-        .repeatedly()
-        .alongWith(LEDs.setStateCommand(LEDs.State.AUTO_ALIGN))
-    ));
-
-    // driver.leftBumper();
-    driver.rightBumper().whileTrue(intake.drop());
-    driver.rightStick().whileTrue(Commands.parallel(
-      IntakeCommands.intakeTransfer(intake, elevator, manipulator, manipulatorSafeties, pieceCombos)
-        .andThen(Commands.waitUntil(() -> manipulator.grabber.hasCoral()))
-        .andThen(Commands.parallel(
-            pieceCombos.readyL2()
-        ))
-        .andThen(rumbleOperator()),
-      Commands.waitUntil(() -> intake.sensors.getCoralLocation() == CoralLocation.INTAKE)
-        .andThen(Commands.parallel(
-            rumbleDriver(),
-            LEDs.setStateCommand(LEDs.State.GOOD)
-        ))
-    ));
-    driver.leftStick().whileTrue(intake.intake());
+  public void configureBindings(SwerveDrive swerveDrive) {
+    driver.a();
+    driver.b();
+    driver.x();
+    driver.y();
+    driver.start();
+    driver.back();
+    driver.leftBumper();
+    driver.rightBumper();
+    driver.rightStick();
+    driver.leftStick();
     driver.povCenter(); // USED
     driver.povUp(); // USED
     driver.povDown(); // USED
@@ -146,217 +56,23 @@ public class Controls {
     Logger.logXBoxController("Controllers/Driver", driverHID);
     Logger.logXBoxController("Controllers/Operator", operatorHID);
 
-    // Operator
-    // Button to L2-L4, and Barge Height
-    // Intake Algae with The Box
-    // Output Algae from The Box
-    // Output Coral
-    // L2 Algae Removal height
-    // L3 Algae Removal Height
-    // Algae ground Height
+    operator.a();
+    operator.b();
+    operator.x();
+    operator.y();
 
-    operator.a().onTrue(pieceCombos.coralL1());
-    operator.b().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 2));
-    operator.x().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 3));
-    operator.y().onTrue(autoscoreCoral(swerveDrive, elevator, manipulator, pieceCombos, 4));
-
-    operator.povUp().whileTrue(elevator.fineControlUp());
-    operator.povDown().whileTrue(elevator.fineControlDown());
-    operator.povRight().whileTrue(manipulator.pivot.up());
-    operator.povLeft().whileTrue(manipulator.pivot.down());
-    operator.back().onTrue(pieceCombos.algaeL3());
-    operator.start().onTrue(pieceCombos.algaeL2());
-
-    // Big Left Paddle - Barge
-    operator
-        .leftStick()
-        .onTrue(
-          pieceCombos.stow()
-            .andThen(
-              elevator.launchBarge()
-                .withDeadline(Commands.sequence(
-                  Commands.waitUntil(() -> elevator.getPosition().gt(Inches.of(52.5))),
-                  manipulator.grabber.dropAlgae().withTimeout(0.5)
-                ))
-            )
-        ); // barge combo
-    
-    // Big Right Paddle - Stow
-    operator
-        .rightStick()
-        .whileTrue(pieceCombos.stow()); // big right paddle
-    
-    operator.rightBumper().onTrue(manipulator.grabber.repositionCoral());
-
-    // Right Trigger - Intake algae / Shoot coral
-    operator
-        .rightTrigger()
-        .whileTrue(
-            pieceCombos
-                .intakeAlgaeOrShootCoral()
-                .andThen(
-                    rumbleBoth()
-                        .alongWith(
-                            LEDs.setStateCommand(LEDs.State.GOOD)))); // drop coral/intake algae
-    
-    // Left Bumper - Backup barge
-    operator.leftBumper().onTrue(
-      Commands.either(
-        manipulator.stow().andThen(elevator.algaeBarge()).andThen(manipulator.grabber.dropAlgae()),
-        manipulator.stow()
-          .andThen(elevator.algaeBarge()),
-        () -> elevator.getPosition().gt(ELEVATOR.ALGAE.BARGE_HEIGHT.minus(Inches.of(2)))
-      )
-    ); // shoot barge
-
-    // Right Trigger - Drop algae
-    operator
-        .leftTrigger()
-        .whileTrue(
-            manipulator
-                .grabber
-                .dropAlgae()
-                .andThen(
-                    LEDs.setStateCommand(LEDs.State.GOOD)) // ✅ Only runs when button is pressed
-            );
-  }
-
-  private boolean isNearCoralPole(SwerveDrive swerveDrive, Distance translationTolerance, Angle rotationTolerance, PolePattern pattern) {
-    for (int i = pattern.start; i < 12; i += pattern.increment) {
-      Pose2d placePose = ReefPositioning.getCoralPlacePose(i);
-
-      if (swerveDrive.isWithinToleranceOf(placePose, translationTolerance, rotationTolerance)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  private Command autoscoreCoral(
-      SwerveDrive swerveDrive,
-      Elevator elevator,
-      Manipulator manipulator,
-      PieceCombos pieceCombos,
-      int level) {
-    return Commands.sequence(
-      Commands.deadline(
-        Commands.waitUntil(() -> {
-          return (driver.getHID().getBButton() || driver.getHID().getXButton()) && isNearCoralPole(
-              swerveDrive, Feet.of(2), Degrees.of(45),
-              driver.getHID().getBButton() ? PolePattern.RIGHT : PolePattern.LEFT
-            );
-        }),
-        level == 2 ? pieceCombos.coralL2() : pieceCombos.readyL3()
-      ),
-      Commands.parallel(
-        pieceCombos.coral(level),
-        Commands.waitUntil(
-          () -> {
-            if (level == 1) return false;
-
-            if (!isNearCoralPole(swerveDrive, Inches.of(0.85), Degrees.of(4), PolePattern.ALL)) return false;
-
-            Distance targetHeight =
-                level == 2
-                    ? ELEVATOR.CORAL.L2_HEIGHT
-                    : level == 3 ? ELEVATOR.CORAL.L3_HEIGHT : ELEVATOR.CORAL.L4_HEIGHT;
-
-            if (!elevator.isNear(targetHeight)) return false;
-
-            Angle targetAngle =
-                level == 2 || level == 3
-                    ? MANIPULATOR_PIVOT.CORAL.L23_ANGLE
-                    : MANIPULATOR_PIVOT.CORAL.L4_ANGLE;
-
-            if (MeasureMath.minAbsDifference(manipulator.pivot.getPosition(), targetAngle)
-                .gte(Degrees.of(2))) return false;
-
-            return true;
-          }
-        )
-      ),
-      Commands.parallel(pieceCombos.coral(level), manipulator.grabber.dropCoral())
-    );
-  }
-
-  public Command autograbAlgae(
-    SwerveDrive swerveDrive,
-    Elevator elevator,
-    Manipulator manipulator,
-    PieceCombos pieceCombos,
-    AutoAlign autoAlign
-  ) {
-    return Commands.defer(() -> {
-      int face = autoAlign.getClosestReefFace(swerveDrive.getEstimatedPose());
-      int level = ReefPositioning.getAlgaeHeight(face);
-
-      return Commands.sequence(
-        Commands.deadline(
-          swerveDrive
-            .pathfindTo(ReefPositioning.getAlgaeAlignPose(face))
-            .andThen(swerveDrive.driveTo(ReefPositioning.getAlgaeAlignPose(face)))
-              .until(() -> swerveDrive.isWithinToleranceOf(ReefPositioning.getAlgaeAlignPose(face), Inches.of(3), Degrees.of(10))),
-          Commands.sequence(
-            manipulator.pivot.stow().until(() -> manipulator.pivot.getPosition().gt(Degrees.of(-10))),
-            (level == 2 ? elevator.algaeL2() : elevator.ready())
-          )
-        ),
-        manipulator.pivot.stow().until(() -> manipulator.pivot.getPosition().gt(Degrees.of(-10))),
-        level == 2 ? elevator.algaeL2() : elevator.algaeL3(),
-        Commands.deadline(
-          manipulator.grabber.intakeAlgae(),  
-          manipulator.pivot.algaeReef(),
-          swerveDrive.driveTo(ReefPositioning.getAlgaePickupPose(face))
-        ),
-        swerveDrive.driveTo(ReefPositioning.getAlgaeAlignPose(face))
-          .deadlineFor(
-            manipulator.pivot.pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.HOLD_ANGLE),
-            elevator.ready()
-          )
-          .until(() -> swerveDrive.isWithinToleranceOf(ReefPositioning.getAlgaeAlignPose(face), Inches.of(3), Degrees.of(30)))
-      );
-    }, Set.of(swerveDrive.useRotation(), swerveDrive.useTranslation(), elevator, manipulator));
-  }
-
-  public Command autograbAlgae2(
-    SwerveDrive swerveDrive,
-    Elevator elevator,
-    Manipulator manipulator,
-    PieceCombos pieceCombos,
-    AutoAlign autoAlign
-  ) {
-    return Commands.defer(() -> {
-      int face = autoAlign.getClosestReefFace(swerveDrive.getEstimatedPose());
-      int level = ReefPositioning.getAlgaeHeight(face);
-
-      return Commands.sequence(
-        Commands.parallel(
-          manipulator.pivot.stow().until(() -> manipulator.pivot.getPosition().gt(Degrees.of(-10))),
-          swerveDrive
-            .driveQuicklyTo(ReefPositioning.getAlgaeAlignPose(face))
-        ),
-        Commands.parallel(
-          swerveDrive.driveTo(ReefPositioning.getAlgaePickupPose(face)),
-          Commands.sequence(
-            Commands.deadline(
-              (level == 2 ? elevator.algaeL2() : elevator.algaeL3()),
-              manipulator.pivot.stow()
-            ),
-            Commands.parallel(
-              manipulator.grabber.intakeAlgae(),
-              manipulator.pivot.algaeReef()
-            )
-          )
-        ).until(manipulator.grabber::hasAlgae),
-        swerveDrive.driveTo(ReefPositioning.getAlgaeAlignPose(face))
-          .deadlineFor(
-            manipulator.pivot.pivotTo(() -> MANIPULATOR_PIVOT.ALGAE.HOLD_ANGLE),
-            elevator.ready()
-          )
-          .until(() -> swerveDrive.isWithinToleranceOf(ReefPositioning.getAlgaeAlignPose(face), Inches.of(3), Degrees.of(30)))
-      );
-    }, Set.of(swerveDrive.useRotation(), swerveDrive.useTranslation(), elevator, manipulator));
+    operator.povUp();
+    operator.povDown();
+    operator.povRight();
+    operator.povLeft();
+    operator.back();
+    operator.start();
+    operator.leftStick();
+    operator.rightStick();
+    operator.rightBumper();
+    operator.rightTrigger();
+    operator.leftBumper();
+    operator.leftTrigger();
   }
 
   private Command rumble(CommandXboxController controller) {

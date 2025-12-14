@@ -1,19 +1,19 @@
 package com.team6962.lib.swerve.auto;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.field.Field;
-import frc.robot.util.CachedRobotState;
-import java.util.Optional;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public interface RobotCoordinates {
   public static Rotation2d HALF = Rotation2d.fromDegrees(180);
-  public static Translation2d FIELD_CENTER = new Translation2d(Field.WIDTH, Field.LENGTH).div(2);
 
   public static Optional<Boolean> isAllianceInverted() {
-    return CachedRobotState.isAllianceInverted();
+    return DriverStation.getAlliance().map(alliance -> alliance == Alliance.Red);
   }
 
   public Pose2d getEstimatedPose();

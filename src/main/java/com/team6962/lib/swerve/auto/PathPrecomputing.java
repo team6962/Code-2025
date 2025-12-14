@@ -1,5 +1,8 @@
 package com.team6962.lib.swerve.auto;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -11,13 +14,12 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team6962.lib.swerve.prepath.CustomLocalADStar;
 import com.team6962.lib.telemetry.Logger;
 import com.team6962.lib.utils.MeasureMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.CachedRobotState;
-import java.util.LinkedList;
-import java.util.List;
 
 public class PathPrecomputing extends SubsystemBase {
   private Precompute current;
@@ -167,7 +169,7 @@ public class PathPrecomputing extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (CachedRobotState.isEnabled()) {
+    if (RobotState.isEnabled()) {
       if (current != null) {
         queue.add(0, current);
         current = null;

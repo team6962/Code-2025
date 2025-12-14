@@ -20,13 +20,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.Constants.SWERVE_DRIVE;
-import frc.robot.constants.Constants.TEAM_COLOR;
-import frc.robot.util.CachedRobotState;
 import frc.robot.util.software.MathUtils;
 import frc.robot.util.software.MathUtils.InputMath;
 
@@ -95,7 +96,7 @@ public class XBoxSwerve extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!CachedRobotState.isTeleop()) return;
+    if (!RobotState.isTeleop()) return;
 
     // Disable drive if the controller disconnects
     if (!controller.isConnected()) {
@@ -166,7 +167,7 @@ public class XBoxSwerve extends Command {
     }
 
     if (RobotBase.isSimulation()) {
-      if (TEAM_COLOR.IS_BLUE_TEAM.get()) {
+      if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
         velocity = velocity.rotateBy(Rotation2d.fromDegrees(90.0));
       } else {
         velocity = velocity.rotateBy(Rotation2d.fromDegrees(-90.0));

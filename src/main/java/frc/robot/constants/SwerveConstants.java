@@ -1,13 +1,16 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import com.ctre.phoenix6.configs.MountPoseConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.PIDConstants;
@@ -19,8 +22,8 @@ import com.team6962.lib.swerve.SwerveConfig.Gyroscope;
 import com.team6962.lib.swerve.SwerveConfig.Module;
 import com.team6962.lib.swerve.SwerveConfig.Motor;
 import com.team6962.lib.swerve.SwerveConfig.Wheel;
+
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.Preferences;
 
 public final class SwerveConstants {
   private SwerveConstants() {}
@@ -36,12 +39,15 @@ public final class SwerveConstants {
   }
 
   private static SwerveConfig generateConfiguration() {
-    ChassisType chassisType = getChassisType();
-
     return new SwerveConfig(
-            getChassis(chassisType),
-            Gearing.MK4I_L2_PLUS,
-            getModules(chassisType),
+            new Chassis(Inches.of(28), Inches.of(28), Inches.of(22.75), Inches.of(22.75), Pounds.of(115)),
+            Gearing.MK4I_L2,
+            new Module[] {
+              new Module(0, 2, 2, Radians.of(0.05)), // -0.05 rads
+              new Module(3, 1, 0, Radians.of(0.049 + Math.PI)), // -0.049 rads
+              new Module(5, 7, 1, Radians.of(2.4)), // -2.4 rads
+              new Module(4, 6, 3, Radians.of(0.322 + Math.PI)) // -0.322 radsaqwaaqqaq
+            },
             new Motor(
                 DCMotor.getKrakenX60(1),
                 new Slot0Configs()
@@ -49,7 +55,7 @@ public final class SwerveConstants {
                     .withKI(0.01)
                     .withKD(0.01)
                     .withKV(0.118)
-                    .withKA(0.0045)
+                    .withKA(0.003933)
                     .withKS(0.17)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign),
                 Amps.of(250)),
@@ -64,64 +70,16 @@ public final class SwerveConstants {
                     .withKD(0.972)
                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign),
                 Amps.of(60)),
-            Wheel.BILLET.withDiameter(Inches.of(3.9052667792884215)),
+            Wheel.BILLET.withDiameter(Inches.of(3.9053)),
             new DriveGains(new PIDConstants(0.5, 0.0, 0.1), new PIDConstants(0.25, 0.0, 0.05))
                 .withFineTranslation(new PIDConstants(3.5, 0.0, 1.5))
                 .withFineRotation(new PIDConstants(3.5, 0.0, 1.5)),
-            new Gyroscope(1))
-        .withMaxDriveSpeed(MetersPerSecond.of(4.474))
-        .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(6.579))
-        .withMaxRotationSpeed(RotationsPerSecond.of(1.62))
-        .withMaxAngularAcceleration(RotationsPerSecondPerSecond.of(1.28))
-        .withCANBus(chassisType == ChassisType.COMPETITION ? "drivetrain" : "rio");
-  }
-
-  private static Chassis getChassis(ChassisType chassisType) {
-    return switch (chassisType) {
-      case COMPETITION -> new Chassis(
-          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(115));
-      case TEST -> new Chassis(
-          Inches.of(36), Inches.of(36), Inches.of(24.75), Inches.of(24.75), Pounds.of(135));
-    };
-  }
-
-  private static enum ChassisType {
-    COMPETITION,
-    TEST
-  }
-
-  private static ChassisType getChassisType() {
-    String idString = Preferences.getString("Chassis", "COMPETITION");
-
-    if (idString.equals("TEST")) {
-      System.out.println("=== !!! ### TEST CHASSIS ### !!! ===");
-      return ChassisType.TEST;
-    } else if (idString.equals("COMPETITION")) {
-      System.out.println("=== COMPETITION CHASSIS ===");
-
-      return ChassisType.COMPETITION;
-    } else {
-      System.out.println("Bad chassis id. Default to");
-      System.out.println("=== COMPETITION CHASSIS ===");
-
-      return ChassisType.COMPETITION;
-    }
-  }
-
-  private static Module[] getModules(ChassisType chassisType) {
-    return switch (chassisType) {
-      case COMPETITION -> new Module[] {
-        Constants.SWERVE.MODULE_CONFIGS[1],
-        Constants.SWERVE.MODULE_CONFIGS[0],
-        Constants.SWERVE.MODULE_CONFIGS[2],
-        Constants.SWERVE.MODULE_CONFIGS[3]
-      };
-      case TEST -> new Module[] {
-        Constants.SWERVE.MODULE_CONFIGS[5], // Front Left
-        Constants.SWERVE.MODULE_CONFIGS[4], // Front Right
-        Constants.SWERVE.MODULE_CONFIGS[7], // Back Left
-        Constants.SWERVE.MODULE_CONFIGS[6] // Back Right
-      };
-    };
+            new Gyroscope(0).withMountPose(new MountPoseConfigs().withMountPoseYaw(Degrees.of(90)))
+          )
+            .withMaxDriveSpeed(MetersPerSecond.of(4.474))
+            .withMaxLinearAcceleration(MetersPerSecondPerSecond.of(6.579))
+            .withMaxRotationSpeed(RotationsPerSecond.of(1.62))
+            .withMaxAngularAcceleration(RotationsPerSecondPerSecond.of(1.28))
+            .withCANBus("drivetrain");
   }
 }

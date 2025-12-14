@@ -89,7 +89,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(driveConfig.apply(config.driveMotor().gains()));
 
     CTREUtils.check(
-        driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
+        driveConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)));
 
     CTREUtils.check(
         driveConfig.apply(
@@ -129,7 +129,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         steerConfig.apply(
             new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Brake)));
+                .withNeutralMode(NeutralModeValue.Coast)));
 
     CTREUtils.check(
         steerConfig.apply(
@@ -140,7 +140,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     CTREUtils.check(
         steerConfig.apply(
             new FeedbackConfigs()
-                .withFusedCANcoder(steerEncoder)
+                .withRemoteCANcoder(steerEncoder)
                 .withRotorToSensorRatio(config.gearing().steer())));
 
     CTREUtils.check(
